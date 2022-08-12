@@ -1,4 +1,18 @@
-
+#' Validate an NMTRAN dataset
+#'
+#'
+#' @param .data a data frame
+#' @param .spec a yspec object
+#' @examples
+#'
+#' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
+#'
+#' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "nmvalidate"), na = ".")
+#'
+#' nm_validate(nm, nm_spec)
+#'
+#' @md
+#' @export
 nm_validate <- function(.data, .spec){
 
   tests_results <- list()
@@ -74,9 +88,9 @@ nm_validate <- function(.data, .spec){
       assertr::col_concat,
       assertr::is_uniq,
       c(
-        .flags$id,
-        .flags$tafd,
-        .flags$primary_key
+        flags$id,
+        flags$tafd,
+        flags$primary_key
       ),
       success_fun = assertr::success_append,
       error_fun = assertr::error_append,
@@ -91,15 +105,15 @@ nm_validate <- function(.data, .spec){
     dplyr::distinct(
       dplyr::across(
         c(
-          .flags$id,
-          .flags$bl_cov_cat,
-          .flags$bl_cov_cont
+          flags$id,
+          flags$bl_cov_cat,
+          flags$bl_cov_cont
         )
       )
     ) %>%
     assertr::assert(
       assertr::is_uniq,
-      .flags$id,
+      flags$id,
       success_fun = assertr::success_append,
       error_fun = assertr::error_append,
       description = "no duplicate subject level covariates"
@@ -112,11 +126,11 @@ nm_validate <- function(.data, .spec){
     assertr::assert(
       assertr::not_na,
       c(
-        .flags$id,
-        .flags$bl_cov_cat,
-        .flags$bl_cov_cont,
-        .flags$tv_cov_cat,
-        .flags$tv_cov_cont
+        flags$id,
+        flags$bl_cov_cat,
+        flags$bl_cov_cont,
+        flags$tv_cov_cat,
+        flags$tv_cov_cont
       ),
       success_fun = assertr::success_append,
       error_fun = assertr::error_append,
@@ -127,11 +141,11 @@ nm_validate <- function(.data, .spec){
   # -------------------------------------------------------------------------
   tests_results <-
     .data %>%
-    dplyr::select(c(.flags$study, .flags$bl_cov_cont)) %>%
+    dplyr::select(c(flags$study, flags$bl_cov_cont)) %>%
     dplyr::distinct() %>%
-    dplyr::group_by(dplyr::across(.flags$study)) %>%
+    dplyr::group_by(dplyr::across(flags$study)) %>%
     dplyr::summarise_all(mean) %>%
-    tidyr::pivot_longer(cols = .flags$bl_cov_cont) %>%
+    tidyr::pivot_longer(cols = flags$bl_cov_cont) %>%
     dplyr::group_by(name) %>%
     dplyr::mutate(
       ratio = (max(value) / min(value)) - 1
@@ -192,4 +206,3 @@ print.nm_validate_results <- function(.nm_validate_results) {
   cli::cli_h1(end_msg)
 }
 
-nm_validate(nm_errors, nm_spec)

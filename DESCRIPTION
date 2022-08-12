@@ -20,6 +20,7 @@ Imports:
     lifecycle (>= 1.0.1),
     magrittr (>= 2.0.3),
     purrr,
+    readr,
     rlang (>= 1.0.2),
     tidyr,
     withr (>= 2.5.0),
