@@ -167,7 +167,8 @@ nm_validate <- function(.data, .spec){
 }
 
 
-
+#' @method print nm_validate_results
+#' @export
 print.nm_validate_results <- function(.nm_validate_results) {
 
   cli::cli_h1("nm_validate() results:")
