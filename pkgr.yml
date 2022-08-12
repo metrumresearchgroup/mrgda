@@ -1,0 +1,21 @@
+Version: 1
+
+Packages:
+  - tidyverse
+  - yspec
+  - here
+  - styler
+  - roxygen2
+  - testthat
+  - usethis
+  - devtools
+  - assertr
+
+Repos:
+  - assertr: https://s3.amazonaws.com/mpn.metworx.dev/releases/assertr/2.8
+  - MPN: https://mpn.metworx.com/snapshots/stable/2022-06-15
+
+Lockfile:
+    Type: renv
+
+Rpath: ${R_EXE_4_1}
