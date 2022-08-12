@@ -2,6 +2,7 @@ Version: 1
 
 Packages:
   - tidyverse
+  - purrr
   - yspec
   - here
   - styler

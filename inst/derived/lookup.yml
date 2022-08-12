@@ -1,0 +1,203 @@
+SETUP__:
+  description: yspec internal column database
+C:
+  short: Commented rows
+  values: [".",C]
+  decode: [Not a comment, Comment for exclusion]
+  type: character
+NUM:
+  short: Row number
+  type: numeric
+ID:
+  short: NONMEM ID number
+  type: numeric
+TIME:
+  short: Time
+  type: numeric
+  unit: day
+TAD:
+  short: Time after dose
+  type: numeric
+  unit: days
+DOSE: 
+  short: GEN1042 dose 
+  type: numeric
+  unit: mg
+DV:
+  short: Plasma PK concentration
+  type: numeric
+  unit: ng/mL
+DVID:
+  short: Dependent variable ID
+  type: numeric
+  values: [1, 2]
+  decode: [Dosing event, PK observation]
+CMT:
+  short: Compartment
+  type: numeric
+  values: [1]
+  decode: [GEN1046 dose and plasma concentration]
+EVID:
+  short: Event ID
+  type: numeric
+  values: [0, 1, 2]
+  decode: [Observation event, Dosing event, No observation]
+AMT:
+  short: Dose amount
+  type: numeric
+  unit: mg
+RATE:
+  short: Rate
+  type: numeric
+  unit: mg/hour
+DUR:
+  short: Infusion duration
+  type: numeric
+  unit: hours
+MDV:
+  short: Missing data variable
+  values: [0, 1]
+  decode: [DV is not missing, DV is missing]
+BLQ:
+  short: Below limit of quantification
+  type: numeric
+  values: [0, 1]
+  decode: ["No", "Yes"]
+DAY:
+  short: Study day
+  type: numeric
+  unit: days
+WTBL:
+  short: Baseline weight
+  type: numeric
+  unit: kg
+WT:
+  short: Time-varying weight
+  type: numeric
+  unit: kg
+BMIBL: 
+  short: Baseline body mass index
+  short.tex: Baseline BMI
+  type: numeric
+  unit: kg/m$^2$
+AGEBL:
+  short: Baseline age
+  type: numeric
+  unit: years
+LDHBL:
+  short: Baseline lactic acid dehydrogenase
+  short.tex: Baseline LDH
+  type: numeric
+  unit: U/L
+CRPBL:
+  short: Baseline C-reactive protein 
+  short.tex: Baseline CRP
+  type: numeric
+  unit: mg/L
+ECOGBL:
+  short: Baseline ECOG score
+  type: numeric
+  values: [0, 1]
+  decode: [Grade 0, Grade 1]
+SEX:
+  short: Sex
+  type: numeric
+  values: [0, 1]
+  decode: [Female, Male]
+RACE:
+  short: Race
+  type: numeric
+  values: [1, 2, 3, 4]
+  decode: [White, Black or African American, Asian, Other or not specified]
+CTYPE:
+  short: Cancer type
+  type: numeric
+  values: [1, 2, 3, 4, 5, 6, 7]
+  decode: [NSCLC, TNBC, SCCHN, Cervical, Endometrial, Urothelial, Other]
+ADAT:
+  short: Anti-drug antibody (ADA)
+  type: numeric
+  unit: titer
+  comment: missing set to -99
+ADAC:
+  short: Confirmed ADA
+  type: numeric
+  values: [0, 1, 2]
+  decode: [Negative, Positive, Missing]
+ADAPOS:
+  short: Subjects with any positive ADA
+  type: numeric
+  values: [0, 1, 2]
+  decode: ["No", "Yes", "Missing"]
+NAB:
+  short: Neutralizing antibody (Nab)
+  type: numeric
+  values: [0, 1, 2]
+  decode: [Negative, Positive, Missing]
+NABRES:
+  short: Neutralizing antibody response
+  type: numeric
+  unit: percent
+  comment: missing set to -99
+NABPOS:
+  short: Subjects with any positive Nab
+  type: numeric
+  values: [0, 1, 2]
+  decode: ["No", "Yes", "Missing"]
+PD1TRT:
+  short: Prior PD-1 or PD-L1 treatment
+  type: numeric
+  values: [0, 1, 2]
+  decode: ["No", "Yes", "Missing"]
+PDL1ST:
+  short: PDL1 status
+  type: numeric
+  values: [0, 1, 2]
+  decode: [Negative, Positive, Missing]
+BOR:
+  short: Best overall response 
+  type: numeric
+  values:
+    PR: 1
+    SD: 2
+    PD: 3
+    NE/NA: 4
+NOADAT:
+  short: Subjects with missing ada titer value
+  type: numeric
+  values: [0, 1]
+  decode: ["No", "Yes"]
+PKDTIMP:
+  short: Imputed datetime
+  type: numeric
+  values: [0, 1]
+  decode: ["No", "Yes"]
+CTYPEC:
+  short: Cancer type
+  type: character
+DATETIME:
+  short: Datetime
+PKDTOLD:
+  short: Original datetime
+  type: character
+VISIT:
+  short: Analysis visit
+  type: character
+ACTARM:
+  short: Actual treatment arm
+  type: character
+COHORT:
+  short: Study cohort
+  type: character
+USUBJID:
+  short: Unique subject identifier 
+  type: character
+ENRLID:
+  short: Subject enrollment identifier
+  type: character
+STUDYID:
+  short: Study identifier
+  type: character
+EXCLRES:
+  short: Exclusion reason
+  type: character
