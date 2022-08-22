@@ -46,7 +46,11 @@ nm_validate <- function(.data, .spec){
       )
     )
 
-  # helper function ---------------------------------------------------------
+  # helper functions --------------------------------------------------------
+  col_concat_nmvalidate <- function(.x){
+    assertr::col_concat(data = .x, sep = "nmvalidate")
+  }
+
   append_result <- function(.res, .list = tests_results) {
 
     res_se <-
@@ -85,7 +89,7 @@ nm_validate <- function(.data, .spec){
   tests_results <-
     .data %>%
     assertr::assert_rows(
-      assertr::col_concat,
+      col_concat_nmvalidate,
       assertr::is_uniq,
       c(
         flags$id,
