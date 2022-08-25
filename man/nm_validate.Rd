@@ -4,12 +4,14 @@
 \alias{nm_validate}
 \title{Validate an NMTRAN dataset}
 \usage{
-nm_validate(.data, .spec)
+nm_validate(.data, .spec, .error_on_fail = TRUE)
 }
 \arguments{
 \item{.data}{a data frame}
 
 \item{.spec}{a yspec object}
+
+\item{.error_on_fail}{if \code{TRUE}, an R error is executed upon critical failures}
 }
 \description{
 Validate an NMTRAN dataset

@@ -3,6 +3,7 @@
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
+#' @param .error_on_fail if `TRUE`, an R error is executed upon critical failures
 #' @examples
 #'
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
@@ -13,7 +14,7 @@
 #'
 #' @md
 #' @export
-nm_validate <- function(.data, .spec){
+nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   tests_results <- list()
 
@@ -23,7 +24,7 @@ nm_validate <- function(.data, .spec){
       "id",
       "study",
       "primary_keys",
-      "tafd",
+      "time",
       "bl_cov_cat",
       "bl_cov_cont",
       "tv_cov_cat",
@@ -51,14 +52,16 @@ nm_validate <- function(.data, .spec){
 
         list(
           success = TRUE,
-          description = unlist(res_se$success)[["description"]]
+          description = gsub(" (critical)", "", unlist(res_se$success)[["description"]], fixed = TRUE),
+          critical = grepl(" (critical)", unlist(res_se$success)[["description"]], fixed = TRUE)
         )
 
       } else if (!is.null(res_se$errors)) {
 
         list(
           success = FALSE,
-          description = unlist(res_se$errors)[["description"]],
+          description = gsub(" (critical)", "", unlist(res_se$errors)[["description"]], fixed = TRUE),
+          critical = grepl(" (critical)", unlist(res_se$errors)[["description"]], fixed = TRUE),
           error_content =
             .res %>%
             dplyr::slice(
@@ -82,12 +85,14 @@ nm_validate <- function(.data, .spec){
       assertr::is_uniq,
       c(
         flags$id,
-        flags$tafd,
+        flags$time,
         flags$primary_key
       ),
       success_fun = assertr::success_append,
       error_fun = assertr::error_append,
-      description = "No duplicates across id, tafd, and primary keys"
+      description = glue::glue(
+        "No duplicates across: {paste(c(flags$id, flags$time, flags$primary_key), collapse = ', ')} (critical)"
+      )
     ) %>%
     append_result
 
@@ -109,7 +114,7 @@ nm_validate <- function(.data, .spec){
       flags$id,
       success_fun = assertr::success_append,
       error_fun = assertr::error_append,
-      description = "no duplicate subject level covariates"
+      description = "Duplicate baseline covariates (critical)"
     ) %>%
     append_result
 
@@ -121,13 +126,27 @@ nm_validate <- function(.data, .spec){
       c(
         flags$id,
         flags$bl_cov_cat,
-        flags$bl_cov_cont,
+        flags$bl_cov_cont
+      ),
+      success_fun = assertr::success_append,
+      error_fun = assertr::error_append,
+      description = "NA baseline covariates (critical)"
+    ) %>%
+    append_result
+
+  # -------------------------------------------------------------------------
+  tests_results <-
+    .data %>%
+    assertr::assert(
+      assertr::not_na,
+      c(
+        flags$id,
         flags$tv_cov_cat,
         flags$tv_cov_cont
       ),
       success_fun = assertr::success_append,
       error_fun = assertr::error_append,
-      description = "no na covariates"
+      description = "NA time varying covariates (critical)"
     ) %>%
     append_result
 
@@ -149,12 +168,21 @@ nm_validate <- function(.data, .spec){
       ratio,
       success_fun = assertr::success_append,
       error_fun = assertr::error_append,
-      description = "similar continuous covariates across studies"
+      description = "Similar continuous baseline covariates across studies"
     ) %>%
     append_result
 
 
   class(tests_results) <- c("nm_validate_results", class(tests_results))
+
+  # Return a true error of any critical failures
+  critical_failures <-
+    purrr::map_lgl(tests_results, ~ !.x$success & .x$critical) %>% sum
+
+  if (critical_failures > 0 & .error_on_fail) {
+    print(tests_results)
+    stop("nm_validate found critical issues in data", call. = FALSE)
+  }
 
   return(tests_results)
 }
@@ -167,34 +195,65 @@ print.nm_validate_results <- function(.nm_validate_results) {
   cli::cli_h1("nm_validate() results:")
 
   num_passed <- purrr::map_lgl(.nm_validate_results, ~ .x$success) %>% sum
+  num_non_critical_fail <- purrr::map_lgl(.nm_validate_results, ~ !.x$success & !.x$critical) %>% sum
+  num_critical_fail <- purrr::map_lgl(.nm_validate_results, ~ !.x$success & .x$critical) %>% sum
 
   end_msg <- glue::glue("{num_passed} of {length(.nm_validate_results)} checks {crayon::green('PASSED')}")
 
-  if (num_passed != length(.nm_validate_results)) {
+  if (num_non_critical_fail > 0) {
 
-    fail_msg <- glue("{length(.nm_validate_results) - num_passed} {crayon::red('FAILURES')}")
+    warn_msg <- glue::glue("{num_non_critical_fail} {crayon::yellow('WARNINGS')}")
+
+    cli::cli_h2(glue::glue("Found {warn_msg}:"))
+
+    end_msg <- glue::glue("{end_msg} ({warn_msg})")
+
+    non_critical_failures <-
+      purrr::map(.nm_validate_results, ~ {
+        if(isTRUE(!.x$success & !.x$critical)) {
+          return(.x)
+        } else {
+          return(NULL)
+        }
+      }) %>% purrr::compact()
+
+    purrr::iwalk(non_critical_failures, function(res, i) {
+
+      cat("\n")
+
+      cli::cli_alert_warning("Warning {i} (Test {which(purrr::map(.nm_validate_results, ~.x$description) == res$description)}): {res$description} -- {nrow(res$error_content)} problem{?s}:")
+
+      print(res$error_content)
+    })
+
+  }
+
+  if (num_critical_fail > 0) {
+
+    fail_msg <- glue::glue("{num_critical_fail} {crayon::red('FAILURES')}")
 
     cli::cli_h2(glue::glue("Found {fail_msg}:"))
 
     end_msg <- glue::glue("{end_msg} ({fail_msg})")
 
-    failures <-
+    critical_failures <-
       purrr::map(.nm_validate_results, ~ {
-        if(isTRUE(.x$success)) {
-          return(NULL)
-        } else {
+        if(isTRUE(!.x$success & .x$critical)) {
           return(.x)
+        } else {
+          return(NULL)
         }
       }) %>% purrr::compact()
 
-    purrr::iwalk(failures, function(res, i) {
+    purrr::iwalk(critical_failures, function(res, i) {
 
       cat("\n")
 
-      cli::cli_alert_danger("Failure {i}: {res$description} -- {nrow(res$error_content)} problem{?s}:")
+      cli::cli_alert_danger("Failure {i} (Test {which(purrr::map(.nm_validate_results, ~.x$description) == res$description)}): {res$description} -- {nrow(res$error_content)} problem{?s}:")
 
       print(res$error_content)
     })
+
   }
 
   cli::cli_h1(end_msg)
