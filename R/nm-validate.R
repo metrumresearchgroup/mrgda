@@ -31,20 +31,9 @@ nm_validate <- function(.data, .spec){
     )
 
   flags <-
-    purrr::set_names(recognized_flags) %>%
-    purrr::map(
-      ~ tryCatch(
-        yspec::ys_filter(
-          x = .spec,
-          expr =  rlang::eval_bare(rlang::parse_expr(.x))
-        ) %>%
-          dplyr::as_tibble() %>%
-          dplyr::pull(name),
-        error = function(e) {
-          NULL
-        }
-      )
-    )
+    yspec::pull_meta(.spec, "flags")[recognized_flags] %>%
+    purrr::set_names(recognized_flags)
+
 
   # helper functions --------------------------------------------------------
   col_concat_nmvalidate <- function(.x){
