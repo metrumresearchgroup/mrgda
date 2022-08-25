@@ -3,6 +3,7 @@
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
+#' @param .error_on_fail if `TRUE`, an R error is executed upon critical failures
 #' @examples
 #'
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
@@ -145,7 +146,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
       ),
       success_fun = assertr::success_append,
       error_fun = assertr::error_append,
-      description = "NA time varying covariates"
+      description = "NA time varying covariates (critical)"
     ) %>%
     append_result
 
