@@ -13,7 +13,7 @@
 #'
 #' @md
 #' @export
-nm_validate <- function(.data, .spec){
+nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   tests_results <- list()
 
@@ -178,7 +178,7 @@ nm_validate <- function(.data, .spec){
   critical_failures <-
     purrr::map_lgl(tests_results, ~ !.x$success & .x$critical) %>% sum
 
-  if (critical_failures > 0) {
+  if (critical_failures > 0 & .error_on_fail) {
     print(tests_results)
     stop("nm_validate found critical issues in data", call. = FALSE)
   }
@@ -220,7 +220,7 @@ print.nm_validate_results <- function(.nm_validate_results) {
 
       cat("\n")
 
-      cli::cli_alert_warning("Failure {i}: {res$description} -- {nrow(res$error_content)} problem{?s}:")
+      cli::cli_alert_warning("Warning {i} (Test {which(purrr::map(.nm_validate_results, ~.x$description) == res$description)}): {res$description} -- {nrow(res$error_content)} problem{?s}:")
 
       print(res$error_content)
     })
@@ -248,7 +248,7 @@ print.nm_validate_results <- function(.nm_validate_results) {
 
       cat("\n")
 
-      cli::cli_alert_danger("Failure {i}: {res$description} -- {nrow(res$error_content)} problem{?s}:")
+      cli::cli_alert_danger("Failure {i} (Test {which(purrr::map(.nm_validate_results, ~.x$description) == res$description)}): {res$description} -- {nrow(res$error_content)} problem{?s}:")
 
       print(res$error_content)
     })
