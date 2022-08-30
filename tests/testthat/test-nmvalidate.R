@@ -16,7 +16,7 @@ test_that("Works with no failures", {
 
 ### Test 1 ----------------------------------------------------------------
 
-test_that("Works with critical failure on test 1: no duplicates across id, tafd, and primary keys", {
+test_that("Works with critical failure on test 1: No duplicates across id, tafd, and primary keys", {
     nm %>%
     slice(rep(1,2)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
@@ -28,7 +28,7 @@ test_that("Works with critical failure on test 1: no duplicates across id, tafd,
 
 ### Test 2 ----------------------------------------------------------------
 
-test_that("Works with critical failure on test 2: within subject, no differing subject level covariates", {
+test_that("Works with critical failure on test 2: Duplicate baseline covariates", {
   nm %>%
     mutate(AGEBL = replace(AGEBL, ID == 4 & NUM == 68, 52)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
@@ -114,7 +114,7 @@ test_that("Works with no failures", {
 })
 
 ## Multiple failures ------------------------------------------------------
-#potentially remove- same as critical test?
+
 test_that("Works with multiple failures: nm_validate found critical issues in data", {
   nm_errors %>%
     nm_validate(.spec = nm_spec, .error_on_fail = TRUE) %>%
@@ -134,7 +134,21 @@ test_that("Works with critical failure on test 1: nm_validate found critical iss
 
 
 ## Warning failure --------------------------------------------------------
-# copy eother one
+
+test_that("Works with warning failure on test 5: Similar continuous baseline covariates across studies", {
+  nm %>%
+    mutate(
+      AGEBL = case_when(
+        STUDYID == "STUDY-X" ~ AGEBL*0.5,
+        TRUE ~ AGEBL
+      )
+    ) %>%
+    nm_validate(.spec = nm_spec, .error_on_fail = TRUE) %>%
+    as.vector() %>%
+    check_single_error(.i = 5, .err_row = 2,
+                       .desc = "Similar continuous baseline covariates across studies",
+                       .err_type = "WARNING")
+})
 
 # Print method ------------------------------------------------------------
 
@@ -173,7 +187,7 @@ test_that("Works with no failures, no stop on failure: print method", {
 ## Multiple failures ------------------------------------------------------
 
 
-test_that("Works with some failures, stop on failure: print method", {
+test_that("Works with multipple failures, stop on failure: print method", {
   # set up tempfile to sink output to
   .f <- tempfile()
   withr::defer(unlink(.f))
@@ -181,16 +195,16 @@ test_that("Works with some failures, stop on failure: print method", {
 
   nm_try <- try(nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = TRUE))
   # print and read result from temp file
-  # capture.output(print(nm_try))
+  capture.output(print(nm_try))
   res <- readLines(.f)
   expect_true(any(grepl_fixed(
     glue::glue("{n_tests - 3} of {n_tests} checks PASSED"),
     res
   )))
   expect_true(inherits(nm_try, "try-error"))
-}) #not working
+})
 
-test_that("Works with some failures, no stop on failure: print method", {
+test_that("Works with multiple failures, no stop on failure: print method", {
   # set up tempfile to sink output to
   .f <- tempfile()
   withr::defer(unlink(.f))
@@ -221,7 +235,7 @@ test_that("Works with critical failure, stop on failure: print method", {
 
  nm_try <- try(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = TRUE))
  # print and read result from temp file
- # capture.output(print(nm_try))
+ capture.output(print(nm_try))
  res <- readLines(.f)
  expect_true(any(grepl_fixed(
    glue::glue("{n_tests - 1} of {n_tests} checks PASSED"),
@@ -229,7 +243,7 @@ test_that("Works with critical failure, stop on failure: print method", {
  )))
  expect_true(inherits(nm_try, "try-error"))
 
-}) # not working
+})
 
 test_that("Works with critical failure, no stop on failure: print method", {
 
@@ -245,7 +259,7 @@ test_that("Works with critical failure, no stop on failure: print method", {
   capture.output(print(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = FALSE)))
   res <- readLines(.f)
   expect_true(any(grepl_fixed(
-    glue::glue("4 of {n_tests} checks PASSED (1 FAILURES)"),
+    glue::glue("{n_tests-1} of {n_tests} checks PASSED (1 FAILURES)"),
     res
   )))
 })
@@ -272,7 +286,7 @@ test_that("Works with warning failure, stop on failure",{
   capture.output(print(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = TRUE)))
   res <- readLines(.f)
   expect_true(any(grepl_fixed(
-    glue::glue("4 of {n_tests} checks PASSED (1 WARNINGS)"),
+    glue::glue("{n_tests -1} of {n_tests} checks PASSED (1 WARNINGS)"),
     res
   )))
 })
@@ -296,7 +310,7 @@ test_that("Works with warning failure, no stop on failure",{
   capture.output(print(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = FALSE)))
   res <- readLines(.f)
   expect_true(any(grepl_fixed(
-    glue::glue("4 of {n_tests} checks PASSED (1 WARNINGS)"),
+    glue::glue("{n_tests -1} of {n_tests} checks PASSED (1 WARNINGS)"),
     res
   )))
 })
