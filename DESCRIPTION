@@ -1,10 +1,12 @@
 Package: nmvalidate
-Title: What the Package Does (One Line, Title Case)
+Title: Validate NMTRAN datasets
 Version: 0.0.0.9000
 Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
-Description: What the package does (one paragraph).
+    c(
+    person(given = "Eric", family = "Anderson", email = "andersone@metrumrg.com", role = c("aut", "cre")),
+    person(given = "Grace", family = "O'Brien", email = "graceo@metrumrg.com", role = c("aut"))
+    )
+Description: Run various tests on an NMTRAN dataset to validate it prior to modeling.
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)

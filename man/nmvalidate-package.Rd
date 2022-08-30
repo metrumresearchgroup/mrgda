@@ -4,12 +4,17 @@
 \name{nmvalidate-package}
 \alias{nmvalidate}
 \alias{nmvalidate-package}
-\title{nmvalidate: What the Package Does (One Line, Title Case)}
+\title{nmvalidate: Validate NMTRAN datasets}
 \description{
-What the package does (one paragraph).
+Run various tests on an NMTRAN dataset to validate it prior to modeling.
 }
 \author{
-\strong{Maintainer}: First Last \email{first.last@example.com} (\href{https://orcid.org/YOUR-ORCID-ID}{ORCID})
+\strong{Maintainer}: Eric Anderson \email{andersone@metrumrg.com}
+
+Authors:
+\itemize{
+  \item Grace O'Brien \email{graceo@metrumrg.com}
+}
 
 }
 \keyword{internal}

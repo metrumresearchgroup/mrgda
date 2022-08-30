@@ -190,15 +190,15 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
 #' @method print nm_validate_results
 #' @export
-print.nm_validate_results <- function(.nm_validate_results) {
+print.nm_validate_results <- function(x, ...) {
 
   cli::cli_h1("nm_validate() results:")
 
-  num_passed <- purrr::map_lgl(.nm_validate_results, ~ .x$success) %>% sum
-  num_non_critical_fail <- purrr::map_lgl(.nm_validate_results, ~ !.x$success & !.x$critical) %>% sum
-  num_critical_fail <- purrr::map_lgl(.nm_validate_results, ~ !.x$success & .x$critical) %>% sum
+  num_passed <- purrr::map_lgl(x, ~ .x$success) %>% sum
+  num_non_critical_fail <- purrr::map_lgl(x, ~ !.x$success & !.x$critical) %>% sum
+  num_critical_fail <- purrr::map_lgl(x, ~ !.x$success & .x$critical) %>% sum
 
-  end_msg <- glue::glue("{num_passed} of {length(.nm_validate_results)} checks {crayon::green('PASSED')}")
+  end_msg <- glue::glue("{num_passed} of {length(x)} checks {crayon::green('PASSED')}")
 
   if (num_non_critical_fail > 0) {
 
@@ -209,7 +209,7 @@ print.nm_validate_results <- function(.nm_validate_results) {
     end_msg <- glue::glue("{end_msg} ({warn_msg})")
 
     non_critical_failures <-
-      purrr::map(.nm_validate_results, ~ {
+      purrr::map(x, ~ {
         if(isTRUE(!.x$success & !.x$critical)) {
           return(.x)
         } else {
@@ -221,7 +221,7 @@ print.nm_validate_results <- function(.nm_validate_results) {
 
       cat("\n")
 
-      cli::cli_alert_warning("Warning {i} (Test {which(purrr::map(.nm_validate_results, ~.x$description) == res$description)}): {res$description} -- {nrow(res$error_content)} problem{?s}:")
+      cli::cli_alert_warning("Warning {i} (Test {which(purrr::map(x, ~.x$description) == res$description)}): {res$description} -- {nrow(res$error_content)} problem{?s}:")
 
       print(res$error_content)
     })
@@ -237,7 +237,7 @@ print.nm_validate_results <- function(.nm_validate_results) {
     end_msg <- glue::glue("{end_msg} ({fail_msg})")
 
     critical_failures <-
-      purrr::map(.nm_validate_results, ~ {
+      purrr::map(x, ~ {
         if(isTRUE(!.x$success & .x$critical)) {
           return(.x)
         } else {
@@ -249,7 +249,7 @@ print.nm_validate_results <- function(.nm_validate_results) {
 
       cat("\n")
 
-      cli::cli_alert_danger("Failure {i} (Test {which(purrr::map(.nm_validate_results, ~.x$description) == res$description)}): {res$description} -- {nrow(res$error_content)} problem{?s}:")
+      cli::cli_alert_danger("Failure {i} (Test {which(purrr::map(x, ~.x$description) == res$description)}): {res$description} -- {nrow(res$error_content)} problem{?s}:")
 
       print(res$error_content)
     })
