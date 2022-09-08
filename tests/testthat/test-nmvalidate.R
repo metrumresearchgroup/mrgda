@@ -16,92 +16,46 @@ test_that("Works with no failures", {
 
 ### Test 1 ----------------------------------------------------------------
 
-test_that("Works with critical failure on test 1: No duplicates across id, tafd, and primary keys", {
+test_that("Works with failure on test 1: No duplicates across id, tafd, and primary keys", {
     nm %>%
     slice(rep(1,2)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
     as.vector() %>%
-    check_single_error(.i = 1, .err_row = 2, .desc = "No duplicates across: ID, TIME, EVID, DVID") %>%
-    expect_true(.res[[.i]]$critical)
+    check_single_error(.i = 1, .err_row = 2, .desc = "No duplicates across: ID, TIME, EVID, DVID")
 })
 
 
 ### Test 2 ----------------------------------------------------------------
 
-test_that("Works with critical failure on test 2: Duplicate baseline covariates", {
+test_that("Works with failure on test 2: Non-unique baseline covariates", {
   nm %>%
     mutate(AGEBL = replace(AGEBL, ID == 4 & NUM == 68, 52)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
     as.vector() %>%
-    check_single_error(.i = 2, .err_row = 2, .desc = "Duplicate baseline covariates") %>%
-    expect_true(.res[[.i]]$critical)
+    check_single_error(.i = 2, .err_row = 2, .desc = "Non-unique baseline covariates")
 })
 
 
 ### Test 3 ----------------------------------------------------------------
 
-test_that("Works with critical failure on test 3: NA baseline covariates", {
+test_that("Works with failure on test 3: Missing baseline covariates", {
   nm %>%
     mutate(AGEBL = replace(AGEBL, ID == 4, NA)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
     as.vector() %>%
-    check_single_error(.i = 3, .err_row = 27, .desc = "NA baseline covariates")
+    check_single_error(.i = 3, .err_row = 27, .desc = "Missing baseline covariates")
 })
 
 
 ### Test 4 ----------------------------------------------------------------
 
-test_that("Works with critical failure on test 4: NA time varying covariates", {
+test_that("Works with failure on test 4: Missing time varying covariates", {
   nm %>%
     mutate(WT = replace(WT, ID == 4, NA)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
     as.vector() %>%
-    check_single_error(.i = 4, .err_row = 27, .desc = "NA time varying covariates")
+    check_single_error(.i = 4, .err_row = 27, .desc = "Missing time varying covariates")
 })
-
-
-### Test 5 ----------------------------------------------------------------
-
-test_that("Works with warning failure on test 5: Similar continuous baseline covariates across studies", {
-  nm %>%
-    mutate(
-      AGEBL = case_when(
-        STUDYID == "STUDY-X" ~ AGEBL*0.5,
-        TRUE ~ AGEBL
-      )
-    ) %>%
-    nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
-    as.vector() %>%
-    check_single_error(.i = 5, .err_row = 2,
-                       .desc = "Similar continuous baseline covariates across studies",
-                       .err_type = "WARNING")
-})
-
-
-#Check pass for test 5
-test_that("Works with barely pass on test 5: Similar continuous baseline covariates across studies", {
-  x <- nm %>%
-    mutate(
-      AGEBL = case_when(
-        STUDYID == "STUDY-X" ~ AGEBL*0.7,
-        TRUE ~ AGEBL
-      )
-    ) %>%
-    nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
-    as.vector()
-
-  expect_equal(
-    sum(purrr::map_lgl(x, ~ .x$success)),
-    length(x)
-  )
-  expect_true(x[[5]]$success)
-  expect_false(x[[5]]$critical)
-  expect_true(any(grepl_fixed(
-    "Similar continuous baseline covariates across studies",
-    x[[5]]$description
-  )))
-})
-
 
 # Error on fail=TRUE ------------------------------------------------------
 
@@ -113,48 +67,32 @@ test_that("Works with no failures", {
     all(purrr::map_lgl(x, ~ .x$success)))
 })
 
-## Multiple failures ------------------------------------------------------
+## Single failure -------------------------------------------------------
 
-test_that("Works with multiple failures: nm_validate found critical issues in data", {
-  nm_errors %>%
-    nm_validate(.spec = nm_spec, .error_on_fail = TRUE) %>%
-    as.vector() %>%
-    expect_error(regexp ="nm_validate found critical issues in data")
-})
-
-## Critical failure -------------------------------------------------------
-
-test_that("Works with critical failure on test 1: nm_validate found critical issues in data", {
+test_that("Works with single failure on test 1: nm_validate found issues in data", {
   nm %>%
     slice(rep(1,2)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = TRUE) %>%
     as.vector() %>%
-    expect_error(regexp ="nm_validate found critical issues in data")
+    expect_error(regexp ="nm_validate found issues in data")
 })
 
 
-## Warning failure --------------------------------------------------------
 
-test_that("Works with warning failure on test 5: Similar continuous baseline covariates across studies", {
-  nm %>%
-    mutate(
-      AGEBL = case_when(
-        STUDYID == "STUDY-X" ~ AGEBL*0.5,
-        TRUE ~ AGEBL
-      )
-    ) %>%
+## Multiple failures ------------------------------------------------------
+
+test_that("Works with multiple failures: nm_validate found issues in data", {
+  nm_errors %>%
     nm_validate(.spec = nm_spec, .error_on_fail = TRUE) %>%
     as.vector() %>%
-    check_single_error(.i = 5, .err_row = 2,
-                       .desc = "Similar continuous baseline covariates across studies",
-                       .err_type = "WARNING")
+    expect_error(regexp ="nm_validate found issues in data")
 })
 
 # Print method ------------------------------------------------------------
 
 ## No failure -------------------------------------------------------------
 
-test_that("Works with no critical failures, stop on failure: print method", {
+test_that("Works with no failures, stop on failure: print method", {
   # set up tempfile to sink output to
   .f <- tempfile()
   withr::defer(unlink(.f))
@@ -183,6 +121,53 @@ test_that("Works with no failures, no stop on failure: print method", {
     res
   )))
 })
+
+## Single failure -------------------------------------------------------
+
+test_that("Works with single failure, stop on failure: print method", {
+
+  # set up tempfile to sink output to
+  .f <- tempfile()
+  withr::defer(unlink(.f))
+  withr::local_message_sink(.f)
+
+  x <-  nm %>%
+    slice(rep(1,2))
+
+  nm_try <- try(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = TRUE))
+  # print and read result from temp file
+  capture.output(print(nm_try))
+  res <- readLines(.f)
+  expect_true(any(grepl_fixed(
+    glue::glue("{n_tests - 1} of {n_tests} checks PASSED"),
+    res
+  )))
+  expect_true(inherits(nm_try, "try-error"))
+
+})
+
+test_that("Works with single failure, no stop on failure: print method", {
+
+  # set up tempfile to sink output to
+  .f <- tempfile()
+  withr::defer(unlink(.f))
+  withr::local_message_sink(.f)
+
+  x <-  nm %>%
+    slice(rep(1,2))
+
+  # print and read result from temp file
+  capture.output(print(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = FALSE)))
+  res <- readLines(.f)
+  expect_true(any(grepl_fixed(
+    glue::glue("{n_tests-1} of {n_tests} checks PASSED (1 FAILURES)"),
+    res
+  )))
+})
+
+
+
+
 
 ## Multiple failures ------------------------------------------------------
 
@@ -215,102 +200,6 @@ test_that("Works with multiple failures, no stop on failure: print method", {
   res <- readLines(.f)
   expect_true(any(grepl_fixed(
     glue::glue("{n_tests - 3} of {n_tests} checks PASSED"),
-    res
-  )))
-})
-
-
-
-## Critical failure -------------------------------------------------------
-
-test_that("Works with critical failure, stop on failure: print method", {
-
- # set up tempfile to sink output to
- .f <- tempfile()
- withr::defer(unlink(.f))
- withr::local_message_sink(.f)
-
- x <-  nm %>%
-   slice(rep(1,2))
-
- nm_try <- try(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = TRUE))
- # print and read result from temp file
- capture.output(print(nm_try))
- res <- readLines(.f)
- expect_true(any(grepl_fixed(
-   glue::glue("{n_tests - 1} of {n_tests} checks PASSED"),
-   res
- )))
- expect_true(inherits(nm_try, "try-error"))
-
-})
-
-test_that("Works with critical failure, no stop on failure: print method", {
-
-  # set up tempfile to sink output to
-  .f <- tempfile()
-  withr::defer(unlink(.f))
-  withr::local_message_sink(.f)
-
-  x <-  nm %>%
-        slice(rep(1,2))
-
-  # print and read result from temp file
-  capture.output(print(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = FALSE)))
-  res <- readLines(.f)
-  expect_true(any(grepl_fixed(
-    glue::glue("{n_tests-1} of {n_tests} checks PASSED (1 FAILURES)"),
-    res
-  )))
-})
-
-
-## Warning failure --------------------------------------------------------
-
-test_that("Works with warning failure, stop on failure",{
-
-  # set up tempfile to sink output to
-  .f <- tempfile()
-  withr::defer(unlink(.f))
-  withr::local_message_sink(.f)
-
-  x <- nm %>%
-    mutate(
-      AGEBL = case_when(
-        STUDYID == "STUDY-X" ~ AGEBL*0.5,
-        TRUE ~ AGEBL
-      )
-    )
-
-  # print and read result from temp file
-  capture.output(print(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = TRUE)))
-  res <- readLines(.f)
-  expect_true(any(grepl_fixed(
-    glue::glue("{n_tests -1} of {n_tests} checks PASSED (1 WARNINGS)"),
-    res
-  )))
-})
-
-test_that("Works with warning failure, no stop on failure",{
-
-  # set up tempfile to sink output to
-  .f <- tempfile()
-  withr::defer(unlink(.f))
-  withr::local_message_sink(.f)
-
-  x <- nm %>%
-    mutate(
-      AGEBL = case_when(
-        STUDYID == "STUDY-X" ~ AGEBL*0.5,
-        TRUE ~ AGEBL
-      )
-    )
-
-  # print and read result from temp file
-  capture.output(print(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = FALSE)))
-  res <- readLines(.f)
-  expect_true(any(grepl_fixed(
-    glue::glue("{n_tests -1} of {n_tests} checks PASSED (1 WARNINGS)"),
     res
   )))
 })
