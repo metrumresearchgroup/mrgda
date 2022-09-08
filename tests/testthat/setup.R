@@ -16,11 +16,6 @@ check_single_error <- function(.res, .i, .err_row, .desc, .err_type = "FAILURE")
   )
   if(.err_type == "FAILURE"){
     expect_false(.res[[.i]]$success)
-    expect_true(.res[[.i]]$critical)
-  }
-  if(.err_type == "WARNING"){
-    expect_false(.res[[.i]]$success)
-    expect_false(.res[[.i]]$critical)
   }
   expect_true(nrow(.res[[.i]]$error_content) == .err_row)
   expect_true(any(grepl(
