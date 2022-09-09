@@ -11,6 +11,8 @@ nm_summary <- function(.data, .spec){
 
   returnlist <- list()
 
+  .data <- .data %>% yspec::ys_add_factors(.spec, .suffix = "")
+
   # gather flags ------------------------------------------------------------
   recognized_flags <-
     c(
@@ -38,65 +40,77 @@ nm_summary <- function(.data, .spec){
 
   # baseline continuous covariates
   if (length(flags$bl_cov_cont) > 0) {
-    obj1 <- .data %>%
-      dplyr::select(c(STUDY = flags$study, flags$bl_cov_cont)) %>%
+    returnlist[["1"]] <- .data %>%
+      dplyr::select(c(flags$study, flags$bl_cov_cont)) %>%
       dplyr::distinct() %>%
       tidyr::pivot_longer(cols = flags$bl_cov_cont) %>%
-      dplyr::group_by(STUDY, name) %>%
-      dplyr::mutate(
+      dplyr::group_by(across(c(flags$study, "name"))) %>%
+      dplyr::summarise(
         MEAN = signif(mean(value), 3),
         MAX = signif(max(value), 3),
         MIN = signif(min(value), 3)
       ) %>%
       dplyr::ungroup() %>%
       dplyr::left_join(shorts) %>%
-      dplyr::distinct(STUDY, BLCOV = short, MIN, MEAN, MAX) %>%
-      dplyr::arrange(BLCOV)
+      dplyr::select(c(flags$study, "short", "MIN", "MEAN", "MAX")) %>%
+      dplyr::arrange(short) %>%
+      dplyr::mutate(
+        PANEL = "short",
+        LT_CAP_TEXT = "Summary of baseline continuous covariates by study"
+      )
   }
 
-  # largest baseline continuous covariates
-  if (length(flags$bl_cov_cont) > 0) {
-    obj2 <- .data %>%
-      dplyr::select(c(ID = flags$id, STUDY = flags$study, flags$bl_cov_cont)) %>%
+  # baseline categorical covariates
+  if (length(flags$bl_cov_cat) > 0) {
+    returnlist[["2"]] <- .data %>%
+      dplyr::select(c(flags$id, flags$study, flags$bl_cov_cat)) %>%
       dplyr::distinct() %>%
-      tidyr::pivot_longer(cols = flags$bl_cov_cont) %>%
-      dplyr::group_by(name) %>%
-      dplyr::arrange(-value) %>%
-      dplyr::slice(1:5) %>%
+      tidyr::pivot_longer(cols = flags$bl_cov_cat) %>%
+      dplyr::group_by(across(c(flags$study, "name"))) %>%
+      dplyr::count(value) %>%
+      dplyr::mutate(n = round(n/sum(n)*100, 2)) %>%
       dplyr::ungroup() %>%
       dplyr::left_join(shorts) %>%
-      dplyr::mutate(value = signif(value, 3)) %>%
-      dplyr::distinct(ID, STUDY, BLCOV = short, Value = value) %>%
-      dplyr::arrange(BLCOV, -Value)
+      dplyr::distinct(across(c(flags$study, "short", "value", "n"))) %>%
+      dplyr::arrange(-n) %>%
+      dplyr::arrange(across(c("short", flags$study))) %>%
+      tidyr::unite("BLCAT", c(flags$study, "short"), sep = ": ") %>%
+      dplyr::mutate(
+        PANEL = "BLCAT",
+        LT_CAP_TEXT = "Summary of baseline categorical covariates by study"
+      )
   }
 
-  # smallest baseline continuous covariates
-  if (length(flags$bl_cov_cont) > 0) {
-    obj3 <- .data %>%
-      dplyr::select(c(ID = flags$id, STUDY = flags$study, flags$bl_cov_cont)) %>%
-      dplyr::distinct() %>%
-      tidyr::pivot_longer(cols = flags$bl_cov_cont) %>%
-      dplyr::group_by(name) %>%
-      dplyr::arrange(value) %>%
-      dplyr::slice(1:5) %>%
-      dplyr::ungroup() %>%
-      dplyr::left_join(shorts) %>%
-      dplyr::mutate(value = signif(value, 3)) %>%
-      dplyr::distinct(ID, STUDY, BLCOV = short, Value = value) %>%
-      dplyr::arrange(BLCOV, Value)
+  # baseline categorical covariates
+  if (length(flags$primary_keys) > 0) {
+    returnlist[["3"]] <- .data %>%
+      dplyr::count(across(c(flags$primary_keys))) %>%
+      dplyr::mutate(Placeholder = "Full data") %>%
+      dplyr::mutate(
+        PANEL = "Placeholder",
+        LT_CAP_TEXT = "Summary of primary keys"
+      )
   }
 
-  # Output pdf --------------------------------------------------------------
+  # Output ------------------------------------------------------------------
+  class(returnlist) <- c("nm_validate_summary_results", class(returnlist))
 
-  returnlist[["1"]] <- pmtables::stable_long(obj1, panel = pmtables::as.panel("BLCOV"),
-                                        lt_cap_text = "Summary of baseline continuous covariates by study")
+  return(returnlist)
 
-  returnlist[["2"]] <- pmtables::stable_long(obj2, panel = pmtables::as.panel("BLCOV"),
-                                             lt_cap_text = "Summary of highest baseline continuous covariate values")
+}
 
-  returnlist[["3"]] <- pmtables::stable_long(obj3, panel = pmtables::as.panel("BLCOV"),
-                                             lt_cap_text = "Summary of smallest baseline continuous covariate values")
+#' @method print nm_validate_results
+#' @export
+print.nm_validate_summary_results <- function(x, ...) {
+  returnlistStable <-
+    purrr::map(
+      x,
+      ~ pmtables::stable_long(
+        data = .x %>% select(-PANEL, -LT_CAP_TEXT),
+        panel = pmtables::as.panel(unique(.x$PANEL)),
+        lt_cap_text = unique(.x$LT_CAP_TEXT)
+      )
+    )
 
-  pmtables::st2article(returnlist, ntex=2)
-
+  pmtables::st2report(returnlistStable, ntex=length(x))
 }
