@@ -16,6 +16,7 @@ Packages:
   - devtools
   - testthat
   - pmtables
+  - covr
 
 Repos:
   - MPN: https://mpn.metworx.com/snapshots/stable/2022-08-31
