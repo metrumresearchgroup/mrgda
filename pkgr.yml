@@ -1,0 +1,26 @@
+Version: 1
+
+Packages:
+  - assertr
+  - cli
+  - dplyr
+  - glue
+  - lifecycle
+  - magrittr
+  - purrr
+  - readr
+  - rlang
+  - tidyr
+  - withr
+  - yspec
+  - devtools
+  - testthat
+  - pmtables
+
+Repos:
+  - MPN: https://mpn.metworx.com/snapshots/stable/2022-08-31
+
+Lockfile:
+    Type: renv
+
+Rpath: ${R_EXE_4_1}

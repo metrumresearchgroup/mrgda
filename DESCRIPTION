@@ -26,4 +26,6 @@ Imports:
     rlang (>= 1.0.2),
     tidyr,
     withr (>= 2.5.0),
-    yspec
+    yspec,
+    pmtables,
+    tibble

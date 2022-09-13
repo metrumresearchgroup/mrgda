@@ -14,3 +14,12 @@ nm_summary(.data, .spec)
 \description{
 Provide diagnostic summary of an NMTRAN dataset
 }
+\examples{
+
+nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
+
+nm <- readr::read_csv(system.file("derived", "pk.csv", package = "nmvalidate"), na = ".")
+
+nm_summary(nm, nm_spec)
+
+}

@@ -6,4 +6,17 @@
 #' @importFrom glue glue
 #' @importFrom lifecycle deprecated
 ## usethis namespace: end
-globalVariables(c(".", "index", "name", "value", "ratio"))
+globalVariables(
+  c(
+    ".",
+    "index",
+    "name",
+    "value",
+    "ratio",
+    "rowname",
+    "V1",
+    "short",
+    "n"
+  )
+)
+

@@ -4,7 +4,13 @@
 #' @param .spec a yspec object
 #' @examples
 #'
+#' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
 #'
+#' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "nmvalidate"), na = ".")
+#'
+#' nm_summary(nm, nm_spec)
+#'
+#' @md
 #' @md
 #' @export
 nm_summary <- function(.data, .spec){
@@ -30,21 +36,24 @@ nm_summary <- function(.data, .spec){
     yspec::pull_meta(.spec, "flags")[recognized_flags] %>%
     purrr::set_names(recognized_flags)
 
-  shorts <- bind_rows(yspec::ys_get_short_unit(.spec)) %>%
+  shorts <-
+    dplyr::bind_rows(yspec::ys_get_short_unit(.spec)) %>%
     t() %>%
     as.data.frame() %>%
-    tibble::rownames_to_column() %>% rename(name = rowname, short = V1)
+    tibble::rownames_to_column() %>%
+    dplyr::rename(name = rowname, short = V1)
 
 
   # tables ------------------------------------------------------------------
 
   # baseline continuous covariates
   if (length(flags$bl_cov_cont) > 0) {
-    returnlist[["1"]] <- .data %>%
+    returnlist[["1"]] <-
+      .data %>%
       dplyr::select(c(flags$study, flags$bl_cov_cont)) %>%
       dplyr::distinct() %>%
       tidyr::pivot_longer(cols = flags$bl_cov_cont) %>%
-      dplyr::group_by(across(c(flags$study, "name"))) %>%
+      dplyr::group_by(dplyr::across(c(flags$study, "name"))) %>%
       dplyr::summarise(
         MEAN = signif(mean(value), 3),
         MAX = signif(max(value), 3),
@@ -62,18 +71,19 @@ nm_summary <- function(.data, .spec){
 
   # baseline categorical covariates
   if (length(flags$bl_cov_cat) > 0) {
-    returnlist[["2"]] <- .data %>%
+    returnlist[["2"]] <-
+      .data %>%
       dplyr::select(c(flags$id, flags$study, flags$bl_cov_cat)) %>%
       dplyr::distinct() %>%
       tidyr::pivot_longer(cols = flags$bl_cov_cat) %>%
-      dplyr::group_by(across(c(flags$study, "name"))) %>%
+      dplyr::group_by(dplyr::across(c(flags$study, "name"))) %>%
       dplyr::count(value) %>%
       dplyr::mutate(n = round(n/sum(n)*100, 2)) %>%
       dplyr::ungroup() %>%
       dplyr::left_join(shorts) %>%
-      dplyr::distinct(across(c(flags$study, "short", "value", "n"))) %>%
+      dplyr::distinct(dplyr::across(c(flags$study, "short", "value", "n"))) %>%
       dplyr::arrange(-n) %>%
-      dplyr::arrange(across(c("short", flags$study))) %>%
+      dplyr::arrange(dplyr::across(c("short", flags$study))) %>%
       tidyr::unite("BLCAT", c(flags$study, "short"), sep = ": ") %>%
       dplyr::mutate(
         PANEL = "BLCAT",
@@ -83,8 +93,9 @@ nm_summary <- function(.data, .spec){
 
   # baseline categorical covariates
   if (length(flags$primary_keys) > 0) {
-    returnlist[["3"]] <- .data %>%
-      dplyr::count(across(c(flags$primary_keys))) %>%
+    returnlist[["3"]] <-
+      .data %>%
+      dplyr::count(dplyr::across(c(flags$primary_keys))) %>%
       dplyr::mutate(Placeholder = "Full data") %>%
       dplyr::mutate(
         PANEL = "Placeholder",
@@ -93,7 +104,7 @@ nm_summary <- function(.data, .spec){
   }
 
   # Output ------------------------------------------------------------------
-  class(returnlist) <- c("nm_validate_summary_results", class(returnlist))
+  class(returnlist) <- c("nm_summary_results", class(returnlist))
 
   return(returnlist)
 
@@ -101,16 +112,16 @@ nm_summary <- function(.data, .spec){
 
 #' @method print nm_summary_results
 #' @export
-print.nm_validate_summary_results <- function(x, ...) {
+print.nm_summary_results <- function(x, ...) {
   returnlistStable <-
     purrr::map(
       x,
       ~ pmtables::stable_long(
-        data = .x %>% select(-PANEL, -LT_CAP_TEXT),
+        data = .x %>% dplyr::select(-PANEL, -LT_CAP_TEXT),
         panel = pmtables::as.panel(unique(.x$PANEL)),
         lt_cap_text = unique(.x$LT_CAP_TEXT)
       )
     )
 
-  pmtables::st2report(returnlistStable, ntex=length(x))
+  pmtables::st2report(returnlistStable, ntex = length(x))
 }
