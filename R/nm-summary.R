@@ -99,7 +99,7 @@ nm_summary <- function(.data, .spec){
 
 }
 
-#' @method print nm_validate_results
+#' @method print nm_summary_results
 #' @export
 print.nm_validate_summary_results <- function(x, ...) {
   returnlistStable <-
