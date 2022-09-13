@@ -17,6 +17,9 @@ Packages:
   - testthat
   - pmtables
   - covr
+  - markdown
+  - DT
+  - htmltools
 
 Repos:
   - MPN: https://mpn.metworx.com/snapshots/stable/2022-08-31
