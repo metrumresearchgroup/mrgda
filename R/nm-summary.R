@@ -1,5 +1,11 @@
 #' Provide diagnostic summary of an NMTRAN dataset
 #'
+#' @description
+#' This function is intended to provide a high level overview of variables
+#' derived during a data assembly. The output of this function will provide
+#' the user with a pdf file containing a series of tables to help the user
+#' better understand distributions within the derived data set.
+#'
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @examples
