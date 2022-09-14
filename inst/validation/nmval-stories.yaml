@@ -1,0 +1,22 @@
+VAL-S001:
+  name: nm_validate
+  description: As a user, I want to easily perform sanity checks of a data set following
+    data assembly. I want the checks to provide a pass/fail for various variables and
+    variable relationships.
+  ProductRisk: High
+  requirements:
+  - VAL-R001
+  - VAL-R002
+  - VAL-R003
+  - VAL-R004
+  - VAL-R005
+  - VAL-R006
+SUM-S001:
+  name: nm_summary
+  description: As a user, I want a conveinent way to review high level attributes of
+    various variables after completing a data assembly.
+  ProductRisk: High
+  requirements:
+  - SUM-R001
+  - SUM-R002
+  - SUM-R003
