@@ -91,7 +91,7 @@ nm_summary <- function(.data, .spec){
       )
   }
 
-  # baseline categorical covariates
+  # primary keys
   if (length(flags$primary_keys) > 0) {
     returnlist[["3"]] <-
       .data %>%
