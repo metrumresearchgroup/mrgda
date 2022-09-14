@@ -1,0 +1,36 @@
+VAL-R001:
+  description: nm_validate returns appropriate results given different error on fail inputs
+  tests:
+  - NMV-VAL-001
+VAL-R002:
+  description: nm_validate provides anticipated output when duplicates across ID, TIME, EVID, DVID fails
+  tests:
+  - NMV-VAL-002
+VAL-R003:
+  description: nm_validate provides anticipated output when baseline covariates check fails
+  tests:
+  - NMV-VAL-003
+VAL-R004:
+  description: nm_validate provides anticipated output when time-varying covariates check fails
+  tests:
+  - NMV-VAL-004
+VAL-R005:
+  description: nm_validate outputs all failures when they occur
+  tests:
+  - NMV-VAL-005
+VAL-R006:
+  description: nm_validate prints results in console consistently for all potential outcomes
+  tests:
+  - NMV-VAL-006
+SUM-R001:
+  description: nm_summary outputs an accurate summary of baseline continuous covariates
+  tests:
+  - NMV-SUM-001
+SUM-R002:
+  description: nm_summary outputs an accurate summary of baseline categorical covariates
+  tests:
+  - NMV-SUM-002
+SUM-R003:
+  description: nm_summary outputs an accurate summary of primary keys
+  tests:
+  - NMV-SUM-003

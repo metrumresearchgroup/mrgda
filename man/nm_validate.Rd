@@ -14,7 +14,10 @@ nm_validate(.data, .spec, .error_on_fail = TRUE)
 \item{.error_on_fail}{if \code{TRUE}, an R error is executed upon failures}
 }
 \description{
-Validate an NMTRAN dataset
+This function is intended to perform a series of checks on a derived data
+set by leveraging the data specification used during assembly. If a check
+fails, the function will output a description of the problem and where it
+occurs in the dataset.
 }
 \examples{
 

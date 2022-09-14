@@ -4,7 +4,7 @@
 
 ## No failure -------------------------------------------------------------
 
-test_that("Works with no failures", {
+test_that("Works with no failures [NMV-VAL-001]", {
   x = nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
   expect_true(
     all(purrr::map_lgl(x, ~ .x$success)))
@@ -16,7 +16,7 @@ test_that("Works with no failures", {
 
 ### Test 1 ----------------------------------------------------------------
 
-test_that("Works with failure on test 1: No duplicates across id, tafd, and primary keys", {
+test_that("Works with failure on test 1: No duplicates across id, tafd, and primary keys [NMV-VAL-002]", {
     nm %>%
     slice(rep(1,2)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
@@ -27,7 +27,7 @@ test_that("Works with failure on test 1: No duplicates across id, tafd, and prim
 
 ### Test 2 ----------------------------------------------------------------
 
-test_that("Works with failure on test 2: Non-unique baseline covariates", {
+test_that("Works with failure on test 2: Non-unique baseline covariates [NMV-VAL-003]", {
   nm %>%
     mutate(AGEBL = replace(AGEBL, ID == 4 & NUM == 68, 52)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
@@ -38,7 +38,7 @@ test_that("Works with failure on test 2: Non-unique baseline covariates", {
 
 ### Test 3 ----------------------------------------------------------------
 
-test_that("Works with failure on test 3: Missing baseline covariates", {
+test_that("Works with failure on test 3: Missing baseline covariates [NMV-VAL-003]", {
   nm %>%
     mutate(AGEBL = replace(AGEBL, ID == 4, NA)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
@@ -49,7 +49,7 @@ test_that("Works with failure on test 3: Missing baseline covariates", {
 
 ### Test 4 ----------------------------------------------------------------
 
-test_that("Works with failure on test 4: Missing time varying covariates", {
+test_that("Works with failure on test 4: Missing time varying covariates [NMV-VAL-004]", {
   nm %>%
     mutate(WT = replace(WT, ID == 4, NA)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
@@ -61,7 +61,7 @@ test_that("Works with failure on test 4: Missing time varying covariates", {
 
 ## No failure -------------------------------------------------------------
 
-test_that("Works with no failures", {
+test_that("Works with no failures [NMV-VAL-001]", {
   x = nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = TRUE)
   expect_true(
     all(purrr::map_lgl(x, ~ .x$success)))
@@ -69,7 +69,7 @@ test_that("Works with no failures", {
 
 ## Single failure -------------------------------------------------------
 
-test_that("Works with single failure on test 1: nm_validate found issues in data", {
+test_that("Works with single failure on test 1: nm_validate found issues in data [NMV-VAL-002]", {
   nm %>%
     slice(rep(1,2)) %>%
     nm_validate(.spec = nm_spec, .error_on_fail = TRUE) %>%
@@ -81,7 +81,7 @@ test_that("Works with single failure on test 1: nm_validate found issues in data
 
 ## Multiple failures ------------------------------------------------------
 
-test_that("Works with multiple failures: nm_validate found issues in data", {
+test_that("Works with multiple failures: nm_validate found issues in data [NMV-VAL-005]", {
   nm_errors %>%
     nm_validate(.spec = nm_spec, .error_on_fail = TRUE) %>%
     as.vector() %>%
@@ -92,7 +92,7 @@ test_that("Works with multiple failures: nm_validate found issues in data", {
 
 ## No failure -------------------------------------------------------------
 
-test_that("Works with no failures, stop on failure: print method", {
+test_that("Works with no failures, stop on failure: print method [NMV-VAL-006]", {
   # set up tempfile to sink output to
   .f <- tempfile()
   withr::defer(unlink(.f))
@@ -107,7 +107,7 @@ test_that("Works with no failures, stop on failure: print method", {
   )))
 })
 
-test_that("Works with no failures, no stop on failure: print method", {
+test_that("Works with no failures, no stop on failure: print method [NMV-VAL-006]", {
   # set up tempfile to sink output to
   .f <- tempfile()
   withr::defer(unlink(.f))
@@ -124,7 +124,7 @@ test_that("Works with no failures, no stop on failure: print method", {
 
 ## Single failure -------------------------------------------------------
 
-test_that("Works with single failure, stop on failure: print method", {
+test_that("Works with single failure, stop on failure: print method [NMV-VAL-006]", {
 
   # set up tempfile to sink output to
   .f <- tempfile()
@@ -146,7 +146,7 @@ test_that("Works with single failure, stop on failure: print method", {
 
 })
 
-test_that("Works with single failure, no stop on failure: print method", {
+test_that("Works with single failure, no stop on failure: print method [NMV-VAL-006]", {
 
   # set up tempfile to sink output to
   .f <- tempfile()
@@ -172,7 +172,7 @@ test_that("Works with single failure, no stop on failure: print method", {
 ## Multiple failures ------------------------------------------------------
 
 
-test_that("Works with multipple failures, stop on failure: print method", {
+test_that("Works with multipple failures, stop on failure: print method [NMV-VAL-006]", {
   # set up tempfile to sink output to
   .f <- tempfile()
   withr::defer(unlink(.f))
@@ -189,7 +189,7 @@ test_that("Works with multipple failures, stop on failure: print method", {
   expect_true(inherits(nm_try, "try-error"))
 })
 
-test_that("Works with multiple failures, no stop on failure: print method", {
+test_that("Works with multiple failures, no stop on failure: print method [NMV-VAL-006]", {
   # set up tempfile to sink output to
   .f <- tempfile()
   withr::defer(unlink(.f))
