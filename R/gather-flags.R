@@ -1,4 +1,4 @@
-gather_flags <- function(.spec){
+gather_flags <- function(.data, .spec){
 
   recognized_flags <-
     c(
@@ -12,6 +12,15 @@ gather_flags <- function(.spec){
       "tv_cov_cont"
     )
 
-    yspec::pull_meta(.spec, "flags")[recognized_flags] %>%
+  .flags <- yspec::pull_meta(.spec, "flags")[recognized_flags] %>%
     purrr::set_names(recognized_flags)
+
+  # Check if all flags are NULL
+  .flags_bin <- purrr::map(.flags, ~ is.null(.x))
+  if (all(.flags_bin == TRUE)) {
+    stop("No flags specified in spec file")
+  }
+
+  # Modify empty flags with dummy value & create matching column in data set
+
 }
