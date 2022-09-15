@@ -25,22 +25,7 @@ nm_summary <- function(.data, .spec){
 
   .data <- .data %>% yspec::ys_add_factors(.spec, .suffix = "")
 
-  # gather flags ------------------------------------------------------------
-  recognized_flags <-
-    c(
-      "id",
-      "study",
-      "primary_keys",
-      "time",
-      "bl_cov_cat",
-      "bl_cov_cont",
-      "tv_cov_cat",
-      "tv_cov_cont"
-    )
-
-  flags <-
-    yspec::pull_meta(.spec, "flags")[recognized_flags] %>%
-    purrr::set_names(recognized_flags)
+  flags <- nmvalidate:::gather_flags(.spec)
 
   shorts <-
     dplyr::bind_rows(yspec::ys_get_short_unit(.spec)) %>%
@@ -56,6 +41,7 @@ nm_summary <- function(.data, .spec){
   if (length(flags$bl_cov_cont) > 0) {
     returnlist[["1"]] <-
       .data %>%
+      nmvalidate:::assert_flags(c(flags$study, flags$bl_cov_cont)) %>%
       dplyr::select(c(flags$study, flags$bl_cov_cont)) %>%
       dplyr::distinct() %>%
       tidyr::pivot_longer(cols = flags$bl_cov_cont) %>%
