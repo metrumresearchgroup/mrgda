@@ -1,0 +1,43 @@
+SETUP__:
+  lookup_file: [lookup.yml]
+  description: ABC PK Model Data Specification
+  projectnumber: ABC
+  sponsor: ABC Company
+  data_stem: pk
+  flags:
+    id: [ID]
+    time: [TIME]
+    bl_cov_cat: [SEX, RACE]
+    tv_cov_cont: [WT]
+C:
+NUM:
+ID:
+TIME:
+TAD:
+DOSE:
+DV:
+DVID:
+CMT:
+EVID:
+AMT:
+RATE:
+DUR:
+MDV:
+BLQ:
+DAY:
+WTBL:
+WT:
+BMIBL:
+AGEBL:
+SEX:
+RACE:
+ADAT:
+ADAC:
+ADAPOS:
+NOADAT:
+PKDTIMP:
+DATETIME:
+VISIT:
+ACTARM:
+USUBJID:
+STUDYID:

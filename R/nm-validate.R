@@ -23,7 +23,9 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   tests_results <- list()
 
-  flags <- nmvalidate:::gather_flags(.spec)
+  gather_return <- nmvalidate:::gather_flags(.data, .spec)
+
+  flags <- gather_return$flags
 
   # helper functions --------------------------------------------------------
   col_concat_nmvalidate <- function(.x){
@@ -66,7 +68,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   # -------------------------------------------------------------------------
   tests_results[["1"]] <-
-    .data %>%
+    gather_return$data %>%
     assertr::assert_rows(
       col_concat_nmvalidate,
       assertr::is_uniq,
@@ -86,7 +88,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   # -------------------------------------------------------------------------
   tests_results[["2"]] <-
-    .data %>%
+    gather_return$data %>%
     dplyr::distinct(
       dplyr::across(
         c(
@@ -107,7 +109,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   # -------------------------------------------------------------------------
   tests_results[["3"]] <-
-    .data %>%
+    gather_return$data %>%
     assertr::assert(
       assertr::not_na,
       c(
@@ -123,7 +125,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   # -------------------------------------------------------------------------
   tests_results[["4"]] <-
-    .data %>%
+    gather_return$data %>%
     assertr::assert(
       assertr::not_na,
       c(
