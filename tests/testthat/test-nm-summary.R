@@ -32,12 +32,12 @@ test_that("All studies are included in table [NMV-SUM-001]", {
 
 test_that("Values fall within the expected range [NMV-SUM-002]", {
   bccat <- dat_sum$`2`
-  expect_true(all(bccat$n < 100.1))
+  expect_true(all(bccat$Percent < 100.1))
 })
 
 test_that("Values within a group add up to 100 [NMV-SUM-002]", {
   bccat <- dat_sum$`2` %>% dplyr::filter(grepl("STUDY-X: Sex", BLCAT))
-  expect_true(sum(bccat$n) == 100)
+  expect_true(sum(bccat$Percent) == 100)
 })
 
 test_that("Correct caption is used [NMV-SUM-002]", {

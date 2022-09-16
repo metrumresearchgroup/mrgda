@@ -14,6 +14,7 @@ Run various tests on an NMTRAN dataset to validate it prior to modeling.
 Authors:
 \itemize{
   \item Grace O'Brien \email{graceo@metrumrg.com}
+  \item Michael McDermott \email{michaelm@metrumrg.com}
 }
 
 }
