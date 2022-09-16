@@ -22,13 +22,14 @@ gather_flags <- function(.data, .spec){
   }
 
   # Modify empty flags with dummy value & create matching column in data set
+  miss_flags <- c()
   for (i in 1:length(.flags_bin)) {
 
     if (!.flags_bin[[i]]) {
       next
     }
 
-    message(paste0("spec file does not specify ", names(.flags[i]), " flag"))
+    miss_flags <- append(miss_flags, names(.flags[i]))
 
     if (recognized_flags$type[i] == "calculation") {
       .flags[i] = paste0("nmvalidate_", names(.flags[i]))
@@ -38,6 +39,11 @@ gather_flags <- function(.data, .spec){
       .data[[paste0("nmvalidate_", names(.flags[i]))]] = paste0(names(.flags[i]), " flag missing")
     }
 
+  }
+
+  if (length(miss_flags) > 0) {
+    cli::cli_h3("Flags not found in spec")
+    cli::cli_ul(miss_flags)
   }
 
   list_return <- list()
