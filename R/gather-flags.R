@@ -18,7 +18,7 @@ gather_flags <- function(.data, .spec){
   # Check if all flags are NULL
   .flags_bin <- purrr::map(.flags, ~ is.null(.x))
   if (all(.flags_bin == TRUE)) {
-    stop("No flags specified in spec file")
+    stop("No flags found in spec file")
   }
 
   # Modify empty flags with dummy value & create matching column in data set

@@ -34,3 +34,11 @@ SUM-R003:
   description: nm_summary outputs an accurate summary of primary keys
   tests:
   - NMV-SUM-003
+GAT-R001:
+  description: gather-flags outputs modified data and spec file when all flags provided
+  tests:
+  - NMV-GAT-001
+GAT-R002:
+  description: gather-flags modifies data and spec with appropriate messages
+  tests:
+  - NMV-GAT-002
