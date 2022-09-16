@@ -4,3 +4,7 @@
 ^\.Rproj\.user$
 pkgr.yml
 ^LICENSE\.md$
+^pkgdown$
+^.*\.Rproj$
+^man-roxygen$
+^README\.Rmd$

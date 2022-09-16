@@ -8,6 +8,7 @@ nm_errors <- readr::read_csv(system.file("derived", "pk-errors.csv", package = "
 n_tests <- length(nm_validate(nm, nm_spec))
 
 nm_spec_noflags <- yspec::ys_load(system.file("derived", "pk-noflags.yml", package = "nmvalidate"))
+nm_spec_parflags <- yspec::ys_load(system.file("derived", "pk-partial_flags.yml", package = "nmvalidate"))
 
 # Check each err message where:
 # .res=df with err, .i= failure num, .err_row = num rows in err output df, .desc = failure description
