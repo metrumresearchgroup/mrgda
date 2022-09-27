@@ -56,3 +56,7 @@ test_that("nm_summary primary keys: Correct caption is used [NMV-SUM-003]", {
   bccat <- dat_sum$`3`
   expect_equal(bccat$LT_CAP_TEXT[1], "Summary of primary keys")
 })
+
+# Figures -----------------------------------------------------------------
+
+test_that("nm_summary outputs figures: ")

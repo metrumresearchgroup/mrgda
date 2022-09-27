@@ -133,6 +133,7 @@ nm_summary <- function(.data, .spec, .type = "tables"){
 
   if (.type == "figures") {
     mrggsave::mrggsave(figurelist, draw = TRUE, .save = FALSE)
+
   }
 
 }
