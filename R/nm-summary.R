@@ -29,8 +29,6 @@ nm_summary <- function(.data, .spec, .type = "tables"){
 
   # Setup figure output
   figurelist <- list()
-  options(mrg.script = "nm-summary.R")
-  options("mrggsave.dev" = "pdf")
 
   .data <- .data %>% yspec::ys_add_factors(.spec, .suffix = "")
 
@@ -113,6 +111,7 @@ nm_summary <- function(.data, .spec, .type = "tables"){
     ggplot2::facet_wrap(~BLCOV, nrow = 3, ncol = 3, scales = "free") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 0.5, hjust=1))
 
+
   # baseline categorical covariates
   figurelist[["2"]] <-
     gather_return$data %>%
@@ -133,8 +132,12 @@ nm_summary <- function(.data, .spec, .type = "tables"){
 
   if (.type == "figures") {
 
+    for (plot in names(figurelist)) {
+      print(figurelist[[plot]])
+      readline(prompt="Press [enter] to continue")
+    }
+
     return(figurelist)
-    mrggsave::mrggsave(figurelist, draw = TRUE, .save = FALSE)
 
   }
 
