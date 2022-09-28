@@ -29,4 +29,6 @@ Imports:
     withr (>= 2.5.0),
     yspec,
     pmtables,
-    tibble
+    tibble,
+    ggplot2,
+    mrggsave

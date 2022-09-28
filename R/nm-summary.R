@@ -34,7 +34,7 @@ nm_summary <- function(.data, .spec, .type = "tables"){
 
   .data <- .data %>% yspec::ys_add_factors(.spec, .suffix = "")
 
-  gather_return <- nmvalidate:::gather_flags(.data, .spec)
+  gather_return <- gather_flags(.data, .spec)
 
   flags <- gather_return$flags
 
@@ -132,6 +132,8 @@ nm_summary <- function(.data, .spec, .type = "tables"){
   }
 
   if (.type == "figures") {
+
+    return(figurelist)
     mrggsave::mrggsave(figurelist, draw = TRUE, .save = FALSE)
 
   }
