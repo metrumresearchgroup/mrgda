@@ -8,6 +8,7 @@
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
+#' @param .type specify desired output of "tables" or "figures". Default is "tables"
 #' @examples
 #'
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
@@ -16,16 +17,24 @@
 #'
 #' nm_summary(nm, nm_spec)
 #'
+#' # To change the output to summary figures instead of tables
+#' nm_summary(nm, nm_spec, .type = "figures")
+#'
 #' @md
 #' @md
 #' @export
-nm_summary <- function(.data, .spec){
+nm_summary <- function(.data, .spec, .type = "tables"){
 
   returnlist <- list()
 
+  # Setup figure output
+  figurelist <- list()
+  options(mrg.script = "nm-summary.R")
+  options("mrggsave.dev" = "pdf")
+
   .data <- .data %>% yspec::ys_add_factors(.spec, .suffix = "")
 
-  gather_return <- nmvalidate:::gather_flags(.data, .spec)
+  gather_return <- gather_flags(.data, .spec)
 
   flags <- gather_return$flags
 
@@ -93,10 +102,41 @@ nm_summary <- function(.data, .spec){
       LT_CAP_TEXT = "Summary of primary keys"
     )
 
-  # Output ------------------------------------------------------------------
-  class(returnlist) <- c("nm_summary_results", class(returnlist))
+  # figures -----------------------------------------------------------------
+  # baseline continuous covariates
+  figurelist[["1"]] <-
+    gather_return$data %>%
+    dplyr::select(c(flags$id, STUDY = flags$study, flags$bl_cov_cont)) %>%
+    dplyr::distinct() %>%
+    tidyr::pivot_longer(cols = flags$bl_cov_cont, names_to = "BLCOV", values_to = "BLCOV_VAL") %>%
+    ggplot2::ggplot() + ggplot2::geom_boxplot(ggplot2::aes(x = STUDY, y = BLCOV_VAL)) +
+    ggplot2::facet_wrap(~BLCOV, nrow = 3, ncol = 3, scales = "free") +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 0.5, hjust=1))
 
-  return(returnlist)
+  # baseline categorical covariates
+  figurelist[["2"]] <-
+    gather_return$data %>%
+    dplyr::select(c(flags$id, STUDY = flags$study, flags$bl_cov_cat)) %>%
+    dplyr::distinct() %>%
+    tidyr::pivot_longer(cols = flags$bl_cov_cat, names_to = "BLCAT", values_to = "BLCAT_VAL") %>%
+    ggplot2::ggplot() + ggplot2::geom_bar(ggplot2::aes(x = BLCAT_VAL, fill = STUDY), position="dodge") +
+    ggplot2::facet_wrap(~BLCAT, nrow = 3, ncol = 3, scales = "free") +
+    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5))
+
+
+  # Output ------------------------------------------------------------------
+  if (.type == "tables") {
+    class(returnlist) <- c("nm_summary_results", class(returnlist))
+
+    return(returnlist)
+  }
+
+  if (.type == "figures") {
+
+    return(figurelist)
+    mrggsave::mrggsave(figurelist, draw = TRUE, .save = FALSE)
+
+  }
 
 }
 

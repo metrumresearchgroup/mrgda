@@ -23,7 +23,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   tests_results <- list()
 
-  gather_return <- nmvalidate:::gather_flags(.data, .spec)
+  gather_return <- gather_flags(.data, .spec)
 
   flags <- gather_return$flags
 

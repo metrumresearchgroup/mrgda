@@ -20,6 +20,8 @@ Packages:
   - markdown
   - DT
   - htmltools
+  - ggplot2
+  - mrggsave
 
 Repos:
   - MPN: https://mpn.metworx.com/snapshots/stable/2022-08-31

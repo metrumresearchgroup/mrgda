@@ -38,6 +38,10 @@ SUM-R003:
   description: nm_summary outputs an accurate summary of primary keys
   tests:
   - NMV-SUM-003
+SUM-R004:
+  description: nm_summary outputs summaries in either tabular or figure format
+  tests:
+  - NMV-SUM-004
 GAT-R001:
   description: gather-flags outputs modified data and spec file when all flags provided
   tests:
