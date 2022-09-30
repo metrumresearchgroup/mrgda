@@ -1,0 +1,17 @@
+url: https://metrumresearchgroup.github.io/nmvalidate
+
+template:
+  params:
+    docsearch:
+      api_key: 6417058f1efec10fab175718f9ee85d7
+      index_name: nmvalidate
+
+reference:
+  - title: Data Validation
+    desc: Check for errors in a NONMEM data set
+    contents:
+    - nm_validate
+  - title: Data Exploration
+    desc: Quick visualizations of a data set
+    contents:
+    - nm_summary
