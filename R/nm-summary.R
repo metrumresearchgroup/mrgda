@@ -102,26 +102,54 @@ nm_summary <- function(.data, .spec, .type = "tables"){
 
   # figures -----------------------------------------------------------------
   # baseline continuous covariates
-  figurelist[["1"]] <-
+  plot_num <- 1
+
+  covnums <- gather_return$data %>%
+    dplyr::select(c(flags$bl_cov_cont)) %>%
+    tidyr::pivot_longer(cols = flags$bl_cov_cont, names_to = "BLCOV", values_to = "BLCOV_VAL") %>%
+    dplyr::distinct(BLCOV) %>%
+    dplyr::mutate(NUM = 1:dplyr::n())
+
+  blcont_covs <-
     gather_return$data %>%
     dplyr::select(c(flags$id, STUDY = flags$study, flags$bl_cov_cont)) %>%
     dplyr::distinct() %>%
     tidyr::pivot_longer(cols = flags$bl_cov_cont, names_to = "BLCOV", values_to = "BLCOV_VAL") %>%
-    ggplot2::ggplot() + ggplot2::geom_boxplot(ggplot2::aes(x = STUDY, y = BLCOV_VAL)) +
-    ggplot2::facet_wrap(~BLCOV, nrow = 3, ncol = 3, scales = "free") +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 0.5, hjust=1))
+    dplyr::left_join(covnums) %>%
+    dplyr::mutate(GROUPING = ceiling(NUM/9))
 
+  for (i in unique(blcont_covs$GROUPING)) {
+    figurelist[[glue::glue({plot_num})]] <- blcont_covs %>%
+      dplyr::filter(GROUPING == i) %>%
+      ggplot2::ggplot() + ggplot2::geom_boxplot(ggplot2::aes(x = STUDY, y = BLCOV_VAL)) +
+      ggplot2::facet_wrap(~BLCOV, nrow = 3, ncol = 3, scales = "free") +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 0.5, hjust=1))
+    plot_num <- plot_num + 1
+  }
 
-  # baseline categorical covariates
-  figurelist[["2"]] <-
+  # Categorical figures
+  catnums <- gather_return$data %>%
+    dplyr::select(c(flags$bl_cov_cat)) %>%
+    tidyr::pivot_longer(cols = flags$bl_cov_cat, names_to = "BLCAT", values_to = "BLCAT_VAL") %>%
+    dplyr::distinct(BLCAT) %>%
+    dplyr::mutate(NUM = 1:dplyr::n())
+
+  blcat_covs <-
     gather_return$data %>%
     dplyr::select(c(flags$id, STUDY = flags$study, flags$bl_cov_cat)) %>%
     dplyr::distinct() %>%
     tidyr::pivot_longer(cols = flags$bl_cov_cat, names_to = "BLCAT", values_to = "BLCAT_VAL") %>%
-    ggplot2::ggplot() + ggplot2::geom_bar(ggplot2::aes(x = BLCAT_VAL, fill = STUDY), position="dodge") +
-    ggplot2::facet_wrap(~BLCAT, nrow = 3, ncol = 3, scales = "free") +
-    ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5))
+    dplyr::left_join(catnums) %>%
+    dplyr::mutate(GROUPING = ceiling(NUM/6))
 
+  for (i in unique(blcat_covs$GROUPING)) {
+    figurelist[[glue::glue({plot_num})]] <- blcat_covs %>%
+      dplyr::filter(GROUPING == i) %>%
+      ggplot2::ggplot() + ggplot2::geom_bar(ggplot2::aes(x = BLCAT_VAL, fill = STUDY), position="dodge") +
+      ggplot2::facet_wrap(~BLCAT, nrow = 3, ncol = 3, scales = "free") +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5))
+    plot_num <- plot_num + 1
+  }
 
   # Output ------------------------------------------------------------------
   if (.type == "tables") {
