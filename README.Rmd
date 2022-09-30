@@ -20,27 +20,15 @@ names of the flags must match those shown below:
 
 ```{r, eval=FALSE}
 flags:
-  id: [ID]
-  study: [STUDYID]
-  primary_keys: [EVID, DVID]
-  time: [TIME]
-  bl_cov_cat: [SEX, RACE]
-  tv_cov_cat: [TIMECAT]
-  bl_cov_cont: [WTBL, BMIBL, AGEBL]
-  tv_cov_cont: [WT]
+  id: [ID] # Unique subject ID
+  study: [STUDYID] # Study ID
+  primary_keys: [EVID, DVID] # variables such as EVID and DVID where you anticipate no duplicate combinations
+  time: [TIME] # Time
+  bl_cov_cat: [SEX, RACE] # Baseline categorical covariate
+  tv_cov_cat: [TIMECAT] # Time-varying categorical covariate
+  bl_cov_cont: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
+  tv_cov_cont: [WT] # Time-varying continuous covariate
 ```
-
-Each flag is intended for a specific type of variable. Note that not all variables in a data set may fit into one of these flags.
-The flags are defined as such:
-
-- id: subject ID column
-- study: study identification column
-- primary_keys: variables such as EVID and DVID where you anticipate no duplicate combinations
-- time: time column
-- bl_cov_cat: baseline categorical covariates
-- tv_cov_cat: time-varying categorical covariates
-- bl_cov_cont: baseline continuous covariates
-- tv_cov_cont: time-varying continuous covariates
 
 *IMPORTANT NOTE* - it is not necessary to have a variable provided for each flag. Adding variables to each of the flags is optional, 
 however the significance of the output will be decreased with the less information provided in flags.
