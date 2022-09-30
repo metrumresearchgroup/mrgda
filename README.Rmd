@@ -4,6 +4,8 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+`nmvalidate` has a README
+
 ```{r setup, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
