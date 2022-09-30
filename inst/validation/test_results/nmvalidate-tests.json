@@ -1,0 +1,10 @@
+{
+  "date": "2022-09-30 12:18:21",
+  "executor": "michaelm",
+  "info": {
+    "env_vars": {
+      "METWORX_VERSION": "22.09",
+      "COMMIT_HASH": "8a2adc4d528b95ac7f1d9d0fe8032758f75725ca"
+    }
+  }
+}
