@@ -2,7 +2,7 @@ pandoc: 2.17.1.1
 pkgdown: 2.0.6
 pkgdown_sha: ~
 articles: {}
-last_built: 2022-09-30T19:33Z
+last_built: 2022-09-30T20:01Z
 urls:
   reference: https://metrumresearchgroup.github.io/nmvalidate/reference
   article: https://metrumresearchgroup.github.io/nmvalidate/articles

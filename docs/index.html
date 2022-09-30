@@ -66,12 +66,71 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<div class="section level1">
+<div class="page-header"><h1 id="nmvalidate">nmvalidate<a class="anchor" aria-label="anchor" href="#nmvalidate"></a>
+</h1></div>
+<p>A data validation tool designed to identify errors in a derived NONMEM data set. <code>nm_validate</code> runs a series of pass/fail checks on a data set and <code>nm_summary</code> provides a quick visualization of the data.</p>
+<div class="section level2">
+<h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
+</h2>
+<p>Often data sets are derived according to a data specification file. This package leverages the information within this file to validate the data set. It is suggested that the data specification file be made in <code>yaml</code> format. An example of one can be found in <code>inst/derived/pk.yml</code>.</p>
+<p>Within the setup section, <code>flags</code> are defined. In order to use <code>nmvalidate</code> the names of the flags must match those shown below:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>flags<span class="sc">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  id<span class="sc">:</span> [ID]</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  study<span class="sc">:</span> [STUDYID]</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  primary_keys<span class="sc">:</span> [EVID, DVID]</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  time<span class="sc">:</span> [TIME]</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  bl_cov_cat<span class="sc">:</span> [SEX, RACE]</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  tv_cov_cat<span class="sc">:</span> [TIMECAT]</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  bl_cov_cont<span class="sc">:</span> [WTBL, BMIBL, AGEBL]</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  tv_cov_cont<span class="sc">:</span> [WT]</span></code></pre></div>
+<p>Each flag is intended for a specific type of variable. Note that not all variables in a data set may fit into one of these flags. The flags are defined as such:</p>
+<ul>
+<li>id: subject ID column</li>
+<li>study: study identification column</li>
+<li>primary_keys: variables such as EVID and DVID where you anticipate no duplicate combinations</li>
+<li>time: time column</li>
+<li>bl_cov_cat: baseline categorical covariates</li>
+<li>tv_cov_cat: time-varying categorical covariates</li>
+<li>bl_cov_cont: baseline continuous covariates</li>
+<li>tv_cov_cont: time-varying continuous covariates</li>
+</ul>
+<p><em>IMPORTANT NOTE</em> - it is not necessary to have a variable provided for each flag. Adding variables to each of the flags is optional, however the significance of the output will be decreased with the less information provided in flags.</p>
+</div>
+<div class="section level2">
+<h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
+</h2>
+<p>Public documentation of all functions is hosted at <a href="https://metrumresearchgroup.github.io/nmvalidate/" class="uri">https://metrumresearchgroup.github.io/nmvalidate/</a></p>
+</div>
+<div class="section level2">
+<h2 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
+</h2>
+<p><code>nmvalidate</code> uses <a href="https://github.com/metrumresearchgroup/pkgr" class="external-link">pkgr</a> to manage development dependencies and <a href="https://rstudio.github.io/renv/" class="external-link">renv</a> to provide isolation. To replicate this environment,</p>
+<ol style="list-style-type: decimal">
+<li><p>clone the repo</p></li>
+<li><p>install pkgr</p></li>
+<li>
+<p>open package in an R session and run <code>renv::init(bare = TRUE)</code></p>
+<ul>
+<li>install <code>renv</code> &gt; 0.8.3-4 into default <code><a href="https://rdrr.io/r/base/libPaths.html" class="external-link">.libPaths()</a></code> if not already installed</li>
+</ul>
+</li>
+<li><p>run <code>pkgr install</code> in terminal within package directory</p></li>
+<li><p>restart session</p></li>
+</ol>
+<p>Then, launch R with the repo as the working directory (open the project in RStudio). renv will activate and find the project library.</p>
+</div>
+<div class="section level2">
+<h2 id="package-coverage">Package coverage<a class="anchor" aria-label="anchor" href="#package-coverage"></a>
+</h2>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; nmvalidate Coverage: 92.86%</span></span>
-<span><span class="co">#&gt; R/nm-summary.R: 83.67%</span></span>
-<span><span class="co">#&gt; R/gather-flags.R: 93.94%</span></span>
+<span><span class="co">#&gt; nmvalidate Coverage: 94.55%</span></span>
+<span><span class="co">#&gt; R/nm-summary.R: 87.60%</span></span>
+<span><span class="co">#&gt; R/gather-flags.R: 100.00%</span></span>
 <span><span class="co">#&gt; R/nm-validate.R: 100.00%</span></span></code></pre></div>
+</div>
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
