@@ -45,7 +45,7 @@ trigger:
 ---
 kind: pipeline
 type: docker
-name: mrgmisc-release
+name: release
 
 platform:
   os: linux
