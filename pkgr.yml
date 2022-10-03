@@ -24,7 +24,8 @@ Packages:
   - mrggsave
 
 Repos:
-  - MPN: https://mpn.metworx.com/snapshots/stable/2022-08-31
+  - CRAN: https://cran.rstudio.com
+  - MPN: https://mpn.metworx.com/snapshots/stable/2022-08-31 # used for mrg packages
 
 Lockfile:
     Type: renv
