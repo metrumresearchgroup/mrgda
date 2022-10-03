@@ -32,5 +32,8 @@ Imports:
     tibble,
     ggplot2,
     mrggsave
+Suggests:
+    knitr,
+    testthat
 VignetteBuilder: 
     knitr
