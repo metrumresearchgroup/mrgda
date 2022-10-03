@@ -23,7 +23,7 @@
 #' @md
 #' @md
 #' @export
-nm_summary <- function(.data, .spec, .type = "tables"){
+nm_summary <- function(.data, .spec, ..., .type = "tables"){
 
   returnlist <- list()
 

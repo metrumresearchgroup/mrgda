@@ -93,4 +93,8 @@ nm %>%
     nm_validate(.spec = nm_spec, .error_on_fail = FALSE)
 ```
 
+Notice how `nm_validate` outputs the cause of the error along with the rows in question.
+
+# Flags
+
 
