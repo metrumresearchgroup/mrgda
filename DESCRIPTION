@@ -32,3 +32,5 @@ Imports:
     tibble,
     ggplot2,
     mrggsave
+VignetteBuilder: 
+    knitr

@@ -1,0 +1,96 @@
+---
+title: "Getting Started with nmvalidate"
+author: "Michael McDermott"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{getting-started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+This "Getting Started with nmvalidate" vignette takes the user through some basic scenarios for using `nmvalidate` to verify that a data set has been derived according to its data specification and common data assembly errors have been avoided. 
+
+```{r setup, include=FALSE}
+if (interactive()) {
+  devtools::load_all()
+}
+```
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
+library(nmvalidate)
+library(dplyr)
+```
+
+`nmvalidate` is composed of two main functions. `nm_validate` performs a series of pass/fail checks on the dataset, using the flags in the data specification as a guide. `nm_summary` offers to the ability to view high level summaries of the data via tables & figures. Together, these tools are intended to improve the accuracy of derived data sets.
+
+# Data Specification Flags
+
+Often data sets are derived according to a data specification file. This package 
+leverages the information within this file to validate the data set. It is suggested
+that the data specification file be made in `yaml` format. 
+
+Within the setup section of the `yaml` file, `flags` are defined. In order to use `nmvalidate` the
+names of the flags must match those shown below. Adding variables to these flags will inform `nmvalidate` of
+what columns are of interest in the data set.
+
+```{r, eval=FALSE}
+flags:
+  id: [ID] # Unique subject ID
+  study: [STUDYID] # Study ID
+  primary_keys: [EVID, DVID] # variables such as EVID and DVID where you anticipate no duplicate combinations
+  time: [TIME] # Time
+  bl_cov_cat: [SEX, RACE] # Baseline categorical covariate
+  tv_cov_cat: [TIMECAT] # Time-varying categorical covariate
+  bl_cov_cont: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
+  tv_cov_cont: [WT] # Time-varying continuous covariate
+```
+
+In the specification above, we are identifying the `SEX` and `RACE` columns as baseline categorical covariates.
+`nm_validate` will use this information and perform checks such as, does each subject only have 1 unique baseline
+covariates combination?
+
+Similarily, `nm_validate` will use the `primary_keys` and `time` flag to check if every row within this subset of columns 
+is unique. If some rows are not unique, this would indicate a duplicate observation in the data set.
+
+# Non-unique baseline covariates checks
+
+With the data specification flags set up, we can load the data set and specification file into R as such.
+We will also create a `nm1` dataset, that purposefully has non-unique baseline covariates.
+
+```{r}
+nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
+nm <- readr::read_csv(system.file("derived", "pk.csv", package = "nmvalidate"), na = ".", show_col_types = FALSE)
+
+nm1 <- nm %>% dplyr::mutate(AGEBL = replace(AGEBL, ID == 4 & NUM == 68, 52))
+```
+
+Now we can run `nm_validate` on this modified data set.
+
+```{r}
+nm_validate(.data = nm1, .spec = nm_spec, .error_on_fail = FALSE)
+```
+
+As expected, the modified data set failed the baseline covariate check. Notice how `nm_validate` outputs the 
+number of passed & failed tests, along with the rows from the data that caused the issue.
+
+# Missing time-varying covariate checks
+
+A similar error message will appear for other checks as well. For instance, another common error during 
+data assembly is leaving time-varying covariates unfilled. If `nm_validate` finds a case of this, it will
+return the following:
+
+```{r}
+nm %>%
+    dplyr::mutate(WT = replace(WT, ID == 4, NA)) %>%
+    nm_validate(.spec = nm_spec, .error_on_fail = FALSE)
+```
+
+
