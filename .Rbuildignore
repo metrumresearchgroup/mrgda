@@ -5,6 +5,8 @@
 pkgr.yml
 ^LICENSE\.md$
 ^pkgdown$
+^_pkgdown.yml$
 ^.*\.Rproj$
 ^man-roxygen$
 ^README\.Rmd$
+^.drone.yml$

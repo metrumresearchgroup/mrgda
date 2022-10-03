@@ -8,6 +8,7 @@
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
+#' @param ... arguments passed through from methods (currently none)
 #' @param .type specify desired output of "tables" or "figures". Default is "tables"
 #' @examples
 #'

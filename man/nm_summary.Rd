@@ -4,12 +4,14 @@
 \alias{nm_summary}
 \title{Provide diagnostic summary of an NMTRAN dataset}
 \usage{
-nm_summary(.data, .spec, .type = "tables")
+nm_summary(.data, .spec, ..., .type = "tables")
 }
 \arguments{
 \item{.data}{a data frame}
 
 \item{.spec}{a yspec object}
+
+\item{...}{arguments passed through from methods (currently none)}
 
 \item{.type}{specify desired output of "tables" or "figures". Default is "tables"}
 }
