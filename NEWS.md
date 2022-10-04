@@ -14,6 +14,3 @@
   with quick visual summaries of their data. It outputs these summaries in
   either tables or figures, depending on the users preference.
 
-## Bug fixes
-
-- 
