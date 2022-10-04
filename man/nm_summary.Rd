@@ -27,9 +27,7 @@ nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate
 
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "nmvalidate"), na = ".")
 
-nm_summary(nm, nm_spec)
-
 # To change the output to summary figures instead of tables
-nm_summary(nm, nm_spec, .type = "figures")
+nm_summary(.data = nm, .spec = nm_spec, .type = "figures")
 
 }
