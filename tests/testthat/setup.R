@@ -1,14 +1,14 @@
 library(dplyr)
 library(testthat)
-library(nmvalidate)
+library(mrgda)
 
-nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
-nm <- readr::read_csv(system.file("derived", "pk.csv", package = "nmvalidate"), na = ".", show_col_types = FALSE)
-nm_errors <- readr::read_csv(system.file("derived", "pk-errors.csv", package = "nmvalidate"), na = ".", show_col_types = FALSE)
+nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
+nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
+nm_errors <- readr::read_csv(system.file("derived", "pk-errors.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
 n_tests <- length(nm_validate(nm, nm_spec))
 
-nm_spec_noflags <- yspec::ys_load(system.file("derived", "pk-noflags.yml", package = "nmvalidate"))
-nm_spec_parflags <- yspec::ys_load(system.file("derived", "pk-partial_flags.yml", package = "nmvalidate"))
+nm_spec_noflags <- yspec::ys_load(system.file("derived", "pk-noflags.yml", package = "mrgda"))
+nm_spec_parflags <- yspec::ys_load(system.file("derived", "pk-partial_flags.yml", package = "mrgda"))
 
 # Check each err message where:
 # .res=df with err, .i= failure num, .err_row = num rows in err output df, .desc = failure description

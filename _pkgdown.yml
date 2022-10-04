@@ -4,7 +4,7 @@ template:
   params:
     docsearch:
       api_key: 6417058f1efec10fab175718f9ee85d7
-      index_name: nmvalidate
+      index_name: mrgda
 
 reference:
   - title: Data Validation

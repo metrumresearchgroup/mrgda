@@ -34,7 +34,7 @@ flags:
 however the significance of the output will be decreased with the less information provided in flags.
 
 ## Documentation
-Public documentation of all functions is hosted at [https://metrumresearchgroup.github.io/nmvalidate/](https://metrumresearchgroup.github.io/nmvalidate/)
+Public documentation of all functions is hosted at [https://metrumresearchgroup.github.io/mrgda/](https://metrumresearchgroup.github.io/mrgda/)
 
 ## Development
 

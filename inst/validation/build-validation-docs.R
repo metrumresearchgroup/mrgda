@@ -11,7 +11,7 @@
 ##
 #######################################################
 
-PKGNAME <- "nmvalidate"
+PKGNAME <- "mrgda"
 PKGVERSION <- "0.0.0.9000"
 STYLE_REF_DIR <- "docx-ref-header-image" # set to NULL if not using style ref
 

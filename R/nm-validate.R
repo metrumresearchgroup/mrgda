@@ -11,9 +11,9 @@
 #' @param .error_on_fail if `TRUE`, an R error is executed upon failures
 #' @examples
 #'
-#' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
+#' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 #'
-#' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "nmvalidate"), na = ".")
+#' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 #'
 #' nm_validate(nm, nm_spec)
 #'

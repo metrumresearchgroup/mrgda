@@ -21,9 +21,9 @@ occurs in the dataset.
 }
 \examples{
 
-nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
+nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 
-nm <- readr::read_csv(system.file("derived", "pk.csv", package = "nmvalidate"), na = ".")
+nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 
 nm_validate(nm, nm_spec)
 

@@ -37,7 +37,7 @@ information provided in flags.
 ## Documentation
 
 Public documentation of all functions is hosted at
-<https://metrumresearchgroup.github.io/nmvalidate/>
+<https://metrumresearchgroup.github.io/mrgda/>
 
 ## Development
 
@@ -66,7 +66,7 @@ in RStudio). renv will activate and find the project library.
 
 ``` r
 covr::package_coverage()
-#> nmvalidate Coverage: 94.55%
+#> mrgda Coverage: 94.55%
 #> R/nm-summary.R: 87.60%
 #> R/gather-flags.R: 100.00%
 #> R/nm-validate.R: 100.00%

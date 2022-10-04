@@ -1,4 +1,4 @@
 library(testthat)
-library(nmvalidate)
+library(mrgda)
 
-test_check("nmvalidate")
+test_check("mrgda")

@@ -1,5 +1,5 @@
-nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
-nm <- readr::read_csv(system.file("derived", "pk.csv", package = "nmvalidate"), na = ".", show_col_types = FALSE)
+nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
+nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
 dat_sum <- nm_summary(.data = nm, .spec = nm_spec, .type = "tables")
 
 # Baseline continuous covariates tests ------------------------------------
