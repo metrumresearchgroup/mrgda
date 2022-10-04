@@ -19,22 +19,14 @@ Within the setup section, `flags` are defined. In order to use
 
 ``` r
 flags:
-  # Unique subject ID
-  id: [ID]
-  # Study ID
-  study: [STUDYID]
-  # Columns that define a unique row (other than ID and TIME) - typically EVID, etc
-  primary_keys: [EVID, DVID] 
-  # Time identifier
-  time: [TIME] 
-  # Baseline categorical covariates
-  bl_cov_cat: [SEX, RACE, BLADA] 
-  # Baseline continuous covariates
-  bl_cov_cont: [BLWT, BLALB] 
-  # Time-varying categorical covariates
-  tv_cov_cat: [ADA] 
-  # Time-varying continuous covariates
-  tv_cov_cont: [WT, ALB] 
+  id: [ID] # Unique subject ID
+  study: [STUDYID] # Study ID
+  primary_keys: [EVID, DVID] # Columns that define a unique row (along with ID and TIME) - typically EVID, etc
+  time: [TIME] # Time 
+  bl_cov_cat: [SEX, RACE, BLADA] # Baseline categorical covariates 
+  bl_cov_cont: [BLWT, BLALB] # Baseline continuous covariates
+  tv_cov_cat: [ADA] # Time-varying categorical covariates
+  tv_cov_cont: [WT, ALB] # Time-varying continuous covariates
 ```
 
 *IMPORTANT NOTE* - it is not necessary to have a variable provided for
