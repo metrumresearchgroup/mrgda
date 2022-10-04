@@ -97,4 +97,9 @@ Notice how `nm_validate` outputs the cause of the error along with the rows in q
 
 # Flags
 
+As the examples show above, the flags specified in the data specification inform `nm_validate` of the 
+relevant columns to check for each test. If no variables are provided to a flag, the tests will still
+run however their results will not hold significance. 
 
+The value and benefit of using `nmvalidate` is dependent on the amount of information included in the
+flags. As more relevant variables are added, the significance of the tests passing increase as well.
