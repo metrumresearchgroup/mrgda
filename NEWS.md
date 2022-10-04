@@ -1,8 +1,8 @@
-# nmvalidate 0.1.0
+# mrgda 0.1.0
 
 ## New features and changes
 
-- `nmvalidate` initial aim is to assist users in verifying the accuracy
+- `mrgda` initial aim is to assist users in verifying the accuracy
   of data sets intended for NONMEM, following their derivation.
 
 - The main feature, `nm_validate()` asks the user to provide the derived

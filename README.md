@@ -1,11 +1,11 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# nmvalidate
+# mrgda
 
-A data validation tool designed to identify errors in a derived NONMEM
-data set. `nm_validate` runs a series of pass/fail checks on a data set
-and `nm_summary` provides a quick visualization of the data.
+A data assembly validation tool designed to identify errors in derived
+data sets. `nm_validate` runs a series of pass/fail checks on NONMEM
+data sets and `nm_summary` provides a quick visualization of this data.
 
 ## Background
 
@@ -14,19 +14,19 @@ package leverages the information within this file to validate the data
 set. It is suggested that the data specification file be made in `yaml`
 format. An example of one can be found in `inst/derived/pk.yml`.
 
-Within the setup section, `flags` are defined. In order to use
-`nmvalidate` the names of the flags must match those shown below:
+Within the setup section, `flags` are defined. In order to use `mrgda`
+the names of the flags must match those shown below:
 
 ``` r
 flags:
   id: [ID] # Unique subject ID
   study: [STUDYID] # Study ID
-  primary_keys: [EVID, DVID] # Columns that define a unique row (along with ID and TIME) - typically EVID, etc
-  time: [TIME] # Time 
-  bl_cov_cat: [SEX, RACE, BLADA] # Baseline categorical covariates 
-  bl_cov_cont: [BLWT, BLALB] # Baseline continuous covariates
-  tv_cov_cat: [ADA] # Time-varying categorical covariates
-  tv_cov_cont: [WT, ALB] # Time-varying continuous covariates
+  primary_keys: [EVID, DVID] # variables such as EVID and DVID where you anticipate no duplicate combinations
+  time: [TIME] # Time
+  bl_cov_cat: [SEX, RACE] # Baseline categorical covariate
+  tv_cov_cat: [TIMECAT] # Time-varying categorical covariate
+  bl_cov_cont: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
+  tv_cov_cont: [WT] # Time-varying continuous covariate
 ```
 
 *IMPORTANT NOTE* - it is not necessary to have a variable provided for
@@ -41,7 +41,7 @@ Public documentation of all functions is hosted at
 
 ## Development
 
-`nmvalidate` uses [pkgr](https://github.com/metrumresearchgroup/pkgr) to
+`mrgda` uses [pkgr](https://github.com/metrumresearchgroup/pkgr) to
 manage development dependencies and
 [renv](https://rstudio.github.io/renv/) to provide isolation. To
 replicate this environment,

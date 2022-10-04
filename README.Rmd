@@ -4,10 +4,10 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# nmvalidate
-A data validation tool designed to identify errors in a derived NONMEM data set. 
-`nm_validate` runs a series of pass/fail checks on a data set and `nm_summary` 
-provides a quick visualization of the data.
+# mrgda
+A data assembly validation tool designed to identify errors in derived data sets. 
+`nm_validate` runs a series of pass/fail checks on NONMEM data sets and `nm_summary` 
+provides a quick visualization of this data.
 
 ## Background
 Often data sets are derived according to a data specification file. This package 
@@ -15,7 +15,7 @@ leverages the information within this file to validate the data set. It is sugge
 that the data specification file be made in `yaml` format. An example of one can be 
 found in `inst/derived/pk.yml`.
 
-Within the setup section, `flags` are defined. In order to use `nmvalidate` the
+Within the setup section, `flags` are defined. In order to use `mrgda` the
 names of the flags must match those shown below:
 
 ```{r, eval=FALSE}
@@ -38,7 +38,7 @@ Public documentation of all functions is hosted at [https://metrumresearchgroup.
 
 ## Development
 
-`nmvalidate` uses [pkgr](https://github.com/metrumresearchgroup/pkgr) to manage
+`mrgda` uses [pkgr](https://github.com/metrumresearchgroup/pkgr) to manage
 development dependencies and [renv](https://rstudio.github.io/renv/) to
 provide isolation. To replicate this environment,
 

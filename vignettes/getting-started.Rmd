@@ -1,5 +1,5 @@
 ---
-title: "Getting Started with nmvalidate"
+title: "Getting Started with mrgda"
 author: "Michael McDermott"
 output: rmarkdown::html_vignette
 vignette: >
@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 
 # Introduction
 
-This "Getting Started with nmvalidate" vignette takes the user through some basic scenarios for using `nmvalidate` to verify that a data set has been derived according to its data specification and common data assembly errors have been avoided. 
+This "Getting Started with mrgda" vignette takes the user through some basic scenarios for using `mrgda` to verify that a data set has been derived according to its data specification and common data assembly errors have been avoided. 
 
 ```{r setup, include=FALSE}
 if (interactive()) {
@@ -25,11 +25,11 @@ if (interactive()) {
 }
 ```
 ```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
-library(nmvalidate)
+library(mrgda)
 library(dplyr)
 ```
 
-`nmvalidate` is composed of two main functions. `nm_validate` performs a series of pass/fail checks on the dataset, using the flags in the data specification as a guide. `nm_summary` offers to the ability to view high level summaries of the data via tables & figures. Together, these tools are intended to improve the accuracy of derived data sets.
+`mrgda` is composed of two main functions. `nm_validate` performs a series of pass/fail checks on the dataset, using the flags in the data specification as a guide. `nm_summary` offers to the ability to view high level summaries of the data via tables & figures. Together, these tools are intended to improve the accuracy of derived data sets.
 
 # Data Specification Flags
 
@@ -37,8 +37,8 @@ Often data sets are derived according to a data specification file. This package
 leverages the information within this file to validate the data set. It is suggested
 that the data specification file be made in `yaml` format. 
 
-Within the setup section of the `yaml` file, `flags` are defined. In order to use `nmvalidate` the
-names of the flags must match those shown below. Adding variables to these flags will inform `nmvalidate` of
+Within the setup section of the `yaml` file, `flags` are defined. In order to use `mrgda` the
+names of the flags must match those shown below. Adding variables to these flags will inform `mrgda` of
 what columns are of interest in the data set.
 
 ```{r, eval=FALSE}
@@ -66,8 +66,8 @@ With the data specification flags set up, we can load the data set and specifica
 We will also create a `nm1` dataset, that purposefully has non-unique baseline covariates.
 
 ```{r}
-nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
-nm <- readr::read_csv(system.file("derived", "pk.csv", package = "nmvalidate"), na = ".", show_col_types = FALSE)
+nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
+nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
 
 nm1 <- nm %>% dplyr::mutate(AGEBL = replace(AGEBL, ID == 4 & NUM == 68, 52))
 ```
@@ -101,5 +101,5 @@ As the examples show above, the flags specified in the data specification inform
 relevant columns to check for each test. If no variables are provided to a flag, the tests will still
 run however their results will not hold significance. 
 
-The value and benefit of using `nmvalidate` is dependent on the amount of information included in the
+The value and benefit of using `mrgda` is dependent on the amount of information included in the
 flags. As more relevant variables are added, the significance of the tests passing increase as well.
