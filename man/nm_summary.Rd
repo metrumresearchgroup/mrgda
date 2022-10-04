@@ -23,9 +23,9 @@ better understand distributions within the derived data set.
 }
 \examples{
 
-nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "nmvalidate"))
+nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 
-nm <- readr::read_csv(system.file("derived", "pk.csv", package = "nmvalidate"), na = ".")
+nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 
 # To change the output to summary figures instead of tables
 nm_summary(.data = nm, .spec = nm_spec, .type = "figures")

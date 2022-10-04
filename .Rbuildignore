@@ -1,6 +1,6 @@
 ^renv$
 ^renv\.lock$
-^nmvalidate\.Rproj$
+^mrgda\.Rproj$
 ^\.Rproj\.user$
 pkgr.yml
 ^LICENSE\.md$

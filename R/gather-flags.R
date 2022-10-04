@@ -32,11 +32,11 @@ gather_flags <- function(.data, .spec){
     miss_flags <- append(miss_flags, names(.flags[i]))
 
     if (recognized_flags$type[i] == "calculation") {
-      .flags[i] = paste0("nmvalidate_", names(.flags[i]))
-      .data[[paste0("nmvalidate_", names(.flags[i]))]] = 0
+      .flags[i] = paste0("mrgda_", names(.flags[i]))
+      .data[[paste0("mrgda_", names(.flags[i]))]] = 0
     } else {
-      .flags[i] = paste0("nmvalidate_", names(.flags[i]))
-      .data[[paste0("nmvalidate_", names(.flags[i]))]] = paste0(names(.flags[i]), " flag missing")
+      .flags[i] = paste0("mrgda_", names(.flags[i]))
+      .data[[paste0("mrgda_", names(.flags[i]))]] = paste0(names(.flags[i]), " flag missing")
     }
 
   }
