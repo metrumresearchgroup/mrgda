@@ -106,17 +106,8 @@ better understand distributions within the derived data set.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Use `spec()` to retrieve the full column specification for this data.</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span>
 <span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="fu">nm_summary</span><span class="op">(</span><span class="va">nm</span>, <span class="va">nm_spec</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Flags not found in spec </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> • tv_cov_cat</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "name"</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "name"</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "BLCOV"</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "BLCAT"</span>
-<span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># To change the output to summary figures instead of tables</span></span></span>
-<span class="r-in"><span><span class="fu">nm_summary</span><span class="op">(</span><span class="va">nm</span>, <span class="va">nm_spec</span>, .type <span class="op">=</span> <span class="st">"figures"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu">nm_summary</span><span class="op">(</span>.data <span class="op">=</span> <span class="va">nm</span>, .spec <span class="op">=</span> <span class="va">nm_spec</span>, .type <span class="op">=</span> <span class="st">"figures"</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> ── Flags not found in spec </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> • tv_cov_cat</span>
