@@ -19,11 +19,6 @@ knitr::opts_chunk$set(
 
 This "Getting Started with mrgda" vignette takes the user through some basic scenarios for using `mrgda` to verify that a data set has been derived according to its data specification and common data assembly errors have been avoided. 
 
-```{r setup, include=FALSE}
-if (interactive()) {
-  devtools::load_all()
-}
-```
 ```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
 library(mrgda)
 library(dplyr)

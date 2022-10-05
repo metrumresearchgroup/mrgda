@@ -10,6 +10,7 @@
 #' @param .spec a yspec object
 #' @param ... arguments passed through from methods (currently none)
 #' @param .type specify desired output of "tables" or "figures". Default is "tables"
+#' @param .figure_prompt whether graphics device asks for confirmation between figures
 #' @examples
 #'
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
@@ -17,41 +18,42 @@
 #' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 #'
 #' # To change the output to summary figures instead of tables
-#' nm_summary(.data = nm, .spec = nm_spec, .type = "figures")
+#' nm_summary(.data = nm, .spec = nm_spec, .type = "figures", .figure_prompt = FALSE)
 #'
 #' @md
-#' @md
 #' @export
-nm_summary <- function(.data, .spec, ..., .type = "tables"){
-
-  returnlist <- list()
-
-  # Setup figure output
-  figurelist <- list()
+nm_summary <- function(.data,
+                       .spec,
+                       ...,
+                       .type = "tables",
+                       .figure_prompt = TRUE){
 
   .data <- .data %>% yspec::ys_add_factors(.spec, .suffix = "")
 
-  gather_return <- gather_flags(.data, .spec)
-
-  flags <- gather_return$flags
+  g_r <- gather_flags(.data, .spec)
 
   shorts <-
     dplyr::bind_rows(yspec::ys_get_short_unit(.spec)) %>%
     t() %>%
     as.data.frame() %>%
-    tibble::rownames_to_column() %>%
+    tibble::rownames_to_column(.data = .) %>%
     dplyr::rename(name = rowname, short = V1)
 
+  subject_level_data <-
+    .data %>%
+    dplyr::group_by(dplyr::across(g_r$flags$id)) %>%
+    dplyr::slice(1) %>%
+    dplyr::ungroup()
 
   # tables ------------------------------------------------------------------
+  returnlist <- list()
 
   # baseline continuous covariates
   returnlist[["1"]] <-
-    gather_return$data %>%
-    dplyr::select(c(flags$id, flags$study, flags$bl_cov_cont)) %>%
-    dplyr::distinct() %>%
-    tidyr::pivot_longer(cols = flags$bl_cov_cont) %>%
-    dplyr::group_by(dplyr::across(c(flags$study, "name"))) %>%
+    subject_level_data %>%
+    dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cov_cont)) %>%
+    tidyr::pivot_longer(cols = g_r$flags$bl_cov_cont) %>%
+    dplyr::group_by(dplyr::across(c(g_r$flags$study, "name"))) %>%
     dplyr::summarise(
       MEAN = signif(mean(value), 3),
       MAX = signif(max(value), 3),
@@ -59,8 +61,12 @@ nm_summary <- function(.data, .spec, ..., .type = "tables"){
     ) %>%
     dplyr::ungroup() %>%
     dplyr::left_join(shorts) %>%
-    dplyr::mutate(short = dplyr::if_else(is.na(short), "Missing flag", short)) %>%
-    dplyr::select(c(flags$study, "short", "MIN", "MEAN", "MAX")) %>%
+    dplyr::mutate(
+      short = dplyr::if_else(is.na(short), "Missing flag", short)
+    ) %>%
+    dplyr::select(
+      c(g_r$flags$study, "short", "MIN", "MEAN", "MAX")
+    ) %>%
     dplyr::arrange(short) %>%
     dplyr::mutate(
       PANEL = "short",
@@ -69,21 +75,28 @@ nm_summary <- function(.data, .spec, ..., .type = "tables"){
 
   # baseline categorical covariates
   returnlist[["2"]] <-
-    gather_return$data %>%
-    dplyr::select(c(flags$id, flags$study, flags$bl_cov_cat)) %>%
-    dplyr::distinct() %>%
-    tidyr::pivot_longer(cols = flags$bl_cov_cat) %>%
-    dplyr::group_by(dplyr::across(c(flags$study, "name"))) %>%
+    subject_level_data %>%
+    dplyr::select(
+      c(g_r$flags$id,
+        g_r$flags$study,
+        g_r$flags$bl_cov_cat)
+    ) %>%
+    tidyr::pivot_longer(cols = g_r$flags$bl_cov_cat) %>%
+    dplyr::group_by(dplyr::across(c(g_r$flags$study, "name"))) %>%
     dplyr::count(value) %>%
     dplyr::mutate(n = round(n/sum(n)*100, 2)) %>%
     dplyr::ungroup() %>%
     dplyr::left_join(shorts) %>%
-    dplyr::mutate(short = dplyr::if_else(is.na(short), "Missing flag", short)) %>%
-    dplyr::distinct(dplyr::across(c(flags$study, "short", "value", "n"))) %>%
+    dplyr::mutate(
+      short = dplyr::if_else(is.na(short), "Missing flag", short)
+    ) %>%
+    dplyr::distinct(
+      dplyr::across(c(g_r$flags$study, "short", "value", "n"))
+    ) %>%
     dplyr::arrange(-n) %>%
     dplyr::rename(Percent = n) %>%
-    dplyr::arrange(dplyr::across(c("short", flags$study))) %>%
-    tidyr::unite("BLCAT", c(flags$study, "short"), sep = ": ") %>%
+    dplyr::arrange(dplyr::across(c("short", g_r$flags$study))) %>%
+    tidyr::unite("BLCAT", c(g_r$flags$study, "short"), sep = ": ") %>%
     dplyr::mutate(
       PANEL = "BLCAT",
       LT_CAP_TEXT = "Summary of baseline categorical covariates by study"
@@ -91,8 +104,8 @@ nm_summary <- function(.data, .spec, ..., .type = "tables"){
 
   # primary keys
   returnlist[["3"]] <-
-    gather_return$data %>%
-    dplyr::count(dplyr::across(c(flags$primary_keys))) %>%
+    g_r$data %>%
+    dplyr::count(dplyr::across(c(g_r$flags$primary_keys))) %>%
     dplyr::mutate(Placeholder = "Full data") %>%
     dplyr::mutate(
       PANEL = "Placeholder",
@@ -100,57 +113,94 @@ nm_summary <- function(.data, .spec, ..., .type = "tables"){
     )
 
   # figures -----------------------------------------------------------------
+  figurelist <- list()
+
   # baseline continuous covariates
   plot_num <- 1
 
-  covnums <- gather_return$data %>%
-    dplyr::select(c(flags$bl_cov_cont)) %>%
-    tidyr::pivot_longer(cols = flags$bl_cov_cont, names_to = "BLCOV", values_to = "BLCOV_VAL") %>%
+  covnums <-
+    g_r$data %>%
+    dplyr::select(c(g_r$flags$bl_cov_cont)) %>%
+    tidyr::pivot_longer(
+      cols = g_r$flags$bl_cov_cont,
+      names_to = "BLCOV",
+      values_to = "BLCOV_VAL"
+    ) %>%
     dplyr::distinct(BLCOV) %>%
     dplyr::mutate(NUM = 1:dplyr::n())
 
   blcont_covs <-
-    gather_return$data %>%
-    dplyr::select(c(flags$id, STUDY = flags$study, flags$bl_cov_cont)) %>%
-    dplyr::distinct() %>%
-    tidyr::pivot_longer(cols = flags$bl_cov_cont, names_to = "BLCOV", values_to = "BLCOV_VAL") %>%
+    subject_level_data %>%
+    dplyr::select(
+      c(g_r$flags$id,
+        STUDY = g_r$flags$study,
+        g_r$flags$bl_cov_cont)
+    ) %>%
+    tidyr::pivot_longer(
+      cols = g_r$flags$bl_cov_cont,
+      names_to = "BLCOV",
+      values_to = "BLCOV_VAL"
+    ) %>%
     dplyr::left_join(covnums) %>%
     dplyr::mutate(GROUPING = ceiling(NUM/9))
 
   for (i in unique(blcont_covs$GROUPING)) {
-    figurelist[[glue::glue({plot_num})]] <- blcont_covs %>%
+    figurelist[[glue::glue({plot_num})]] <-
+      blcont_covs %>%
       dplyr::filter(GROUPING == i) %>%
-      ggplot2::ggplot() + ggplot2::geom_boxplot(ggplot2::aes(x = STUDY, y = BLCOV_VAL)) +
+      ggplot2::ggplot() +
+      ggplot2::geom_boxplot(ggplot2::aes(x = STUDY, y = BLCOV_VAL)) +
       ggplot2::facet_wrap(~BLCOV, nrow = 3, ncol = 3, scales = "free") +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 45, vjust = 0.5, hjust=1))
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_text(angle = 45, vjust = 0.5, hjust = 1)
+      )
     plot_num <- plot_num + 1
   }
 
   # Categorical figures
-  catnums <- gather_return$data %>%
-    dplyr::select(c(flags$bl_cov_cat)) %>%
-    tidyr::pivot_longer(cols = flags$bl_cov_cat, names_to = "BLCAT", values_to = "BLCAT_VAL") %>%
+  catnums <-
+    g_r$data %>%
+    dplyr::select(c(g_r$flags$bl_cov_cat)) %>%
+    tidyr::pivot_longer(
+      cols = g_r$flags$bl_cov_cat,
+      names_to = "BLCAT",
+      values_to = "BLCAT_VAL"
+    ) %>%
     dplyr::distinct(BLCAT) %>%
     dplyr::mutate(NUM = 1:dplyr::n())
 
   blcat_covs <-
-    gather_return$data %>%
-    dplyr::select(c(flags$id, STUDY = flags$study, flags$bl_cov_cat)) %>%
-    dplyr::distinct() %>%
-    tidyr::pivot_longer(cols = flags$bl_cov_cat, names_to = "BLCAT", values_to = "BLCAT_VAL") %>%
+    subject_level_data %>%
+    dplyr::select(
+      c(g_r$flags$id,
+        STUDY = g_r$flags$study,
+        g_r$flags$bl_cov_cat)
+    ) %>%
+    tidyr::pivot_longer(
+      cols = g_r$flags$bl_cov_cat,
+      names_to = "BLCAT",
+      values_to = "BLCAT_VAL"
+    ) %>%
     dplyr::left_join(catnums) %>%
     dplyr::mutate(GROUPING = ceiling(NUM/6))
 
   for (i in unique(blcat_covs$GROUPING)) {
-    figurelist[[glue::glue({plot_num})]] <- blcat_covs %>%
+    figurelist[[glue::glue({plot_num})]] <-
+      blcat_covs %>%
       dplyr::filter(GROUPING == i) %>%
-      ggplot2::ggplot() + ggplot2::geom_bar(ggplot2::aes(x = BLCAT_VAL, fill = STUDY), position="dodge") +
+      ggplot2::ggplot() +
+      ggplot2::geom_bar(
+        ggplot2::aes(x = BLCAT_VAL, fill = STUDY),
+        position = "dodge"
+      ) +
       ggplot2::facet_wrap(~BLCAT, nrow = 3, ncol = 3, scales = "free") +
-      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5))
+      ggplot2::theme(
+        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)
+      )
     plot_num <- plot_num + 1
   }
 
-  # Output ------------------------------------------------------------------
+  # output ------------------------------------------------------------------
   if (.type == "tables") {
     class(returnlist) <- c("nm_summary_results", class(returnlist))
 
@@ -160,8 +210,13 @@ nm_summary <- function(.data, .spec, ..., .type = "tables"){
   if (.type == "figures") {
 
     for (plot in names(figurelist)) {
+
       print(figurelist[[plot]])
-      readline(prompt="Press [enter] to continue")
+
+      if (.figure_prompt) {
+        readline(prompt = "Press [enter] to see next figure")
+      }
+
     }
 
     return(figurelist)

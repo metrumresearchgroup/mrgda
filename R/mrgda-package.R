@@ -16,7 +16,14 @@ globalVariables(
     "rowname",
     "V1",
     "short",
-    "n"
+    "n",
+    "BLCAT",
+    "BLCAT_VAL",
+    "BLCOV",
+    "BLCOV_VAL",
+    "GROUPING",
+    "NUM",
+    "STUDY"
   )
 )
 
