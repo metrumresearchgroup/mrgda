@@ -23,7 +23,8 @@ globalVariables(
     "BLCOV_VAL",
     "GROUPING",
     "NUM",
-    "STUDY"
+    "STUDY",
+    "Percent"
   )
 )
 

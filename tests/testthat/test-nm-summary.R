@@ -62,12 +62,14 @@ test_that("nm_summary primary keys: Correct caption is used [NMV-SUM-003]", {
 test_that("nm_summary outputs figures: Baseline continuous covariates [NMV-SUM-004]", {
   figsum <- nm_summary(.data = nm, .spec = nm_spec, .type = "figures", .figure_prompt = FALSE)
   figdata <- figsum$`1`$data
-  expect_equal(nrow(figdata), 534)
-  expect_equal(as.numeric(figdata[5, 4]), 31.258035)
+  expect_equal(nrow(figdata), 178)
+  expect_equal(as.numeric(figdata[5, 4]), 105.1)
 })
 
 test_that("nm_summary outputs figures: Baseline categorical covariates [NMV-SUM-004]", {
   figsum <- nm_summary(.data = nm, .spec = nm_spec, .type = "figures", .figure_prompt = FALSE)
   figdata <- figsum$`2`$data
-  expect_equal(nrow(figdata), 356)
+  expect_equal(nrow(figdata), 178)
+  expect_equal(as.numeric(figdata[177, 4]), 28.634435)
 })
+
