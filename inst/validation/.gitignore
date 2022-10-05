@@ -1,3 +1,5 @@
 *.docx
 *.md
 *.csv
+*.json
+test_results/

@@ -60,7 +60,7 @@ covariates combination?
 Similarily, `nm_validate` will use the `primary_keys` and `time` flag to check if every row within this subset of columns 
 is unique. If some rows are not unique, this would indicate a duplicate observation in the data set.
 
-# Non-unique baseline covariates checks
+# Non-unique baseline covariates checks (NONMEM)
 
 With the data specification flags set up, we can load the data set and specification file into R as such.
 We will also create a `nm1` dataset, that purposefully has non-unique baseline covariates.
@@ -81,7 +81,7 @@ nm_validate(.data = nm1, .spec = nm_spec, .error_on_fail = FALSE)
 As expected, the modified data set failed the baseline covariate check. Notice how `nm_validate` outputs the 
 number of passed & failed tests, along with the rows from the data that caused the issue.
 
-# Missing time-varying covariate checks
+# Missing time-varying covariate checks (NONMEM)
 
 A similar error message will appear for other checks as well. For instance, another common error during 
 data assembly is leaving time-varying covariates unfilled. If `nm_validate` finds a case of this, it will
