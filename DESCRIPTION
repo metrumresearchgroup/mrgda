@@ -28,7 +28,8 @@ Imports:
     pmtables,
     tibble,
     ggplot2,
-    mrggsave
+    mrggsave,
+    stringr
 Suggests: 
     knitr,
     testthat (>= 3.0.0)

@@ -142,7 +142,7 @@ nm_summary <- function(.data,
       values_to = "BLCOV_VAL"
     ) %>%
     dplyr::left_join(covnums) %>%
-    dplyr::mutate(GROUPING = ceiling(NUM/9))
+    dplyr::mutate(GROUPING = ceiling(NUM/1))
 
   for (i in unique(blcont_covs$GROUPING)) {
     figurelist[[glue::glue({plot_num})]] <-
@@ -150,54 +150,44 @@ nm_summary <- function(.data,
       dplyr::filter(GROUPING == i) %>%
       ggplot2::ggplot() +
       ggplot2::geom_boxplot(ggplot2::aes(x = STUDY, y = BLCOV_VAL)) +
-      ggplot2::facet_wrap(~BLCOV, nrow = 3, ncol = 3, scales = "free") +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_text(angle = 45, vjust = 0.5, hjust = 1)
-      )
+      ggplot2::facet_wrap(~BLCOV, nrow = 1, ncol = 1, scales = "free_y")# +
+      # ggplot2::theme(
+      #   axis.text.x = ggplot2::element_text(
+      #     angle = 90,
+      #     vjust = 0.5,
+      #     hjust = 1)
+      # )
     plot_num <- plot_num + 1
   }
 
   # Categorical figures
-  catnums <-
-    g_r$data %>%
-    dplyr::select(c(g_r$flags$bl_cov_cat)) %>%
-    tidyr::pivot_longer(
-      cols = g_r$flags$bl_cov_cat,
-      names_to = "BLCAT",
-      values_to = "BLCAT_VAL"
-    ) %>%
-    dplyr::distinct(BLCAT) %>%
-    dplyr::mutate(NUM = 1:dplyr::n())
 
   blcat_covs <-
-    subject_level_data %>%
-    dplyr::select(
-      c(g_r$flags$id,
-        STUDY = g_r$flags$study,
-        g_r$flags$bl_cov_cat)
-    ) %>%
-    tidyr::pivot_longer(
-      cols = g_r$flags$bl_cov_cat,
-      names_to = "BLCAT",
-      values_to = "BLCAT_VAL"
-    ) %>%
-    dplyr::left_join(catnums) %>%
-    dplyr::mutate(GROUPING = ceiling(NUM/6))
+  returnlist[["2"]] %>%
+    dplyr::mutate(
+      STUDY = stringr::str_split_fixed(BLCAT, ": ", n = Inf)[, 1],
+      BLCAT = stringr::str_split_fixed(BLCAT, ": ", n = Inf)[, 2],
+      GROUPING = as.numeric(as.factor(BLCAT))
+    )
 
   for (i in unique(blcat_covs$GROUPING)) {
+
     figurelist[[glue::glue({plot_num})]] <-
       blcat_covs %>%
       dplyr::filter(GROUPING == i) %>%
-      ggplot2::ggplot() +
-      ggplot2::geom_bar(
-        ggplot2::aes(x = BLCAT_VAL, fill = STUDY),
-        position = "dodge"
+      ggplot2::ggplot(
+        ggplot2::aes(x = value, y = Percent, fill = STUDY, label = Percent)
       ) +
-      ggplot2::facet_wrap(~BLCAT, nrow = 3, ncol = 3, scales = "free") +
+      ggplot2::geom_bar(stat = "identity", position = "dodge") +
+      ggplot2::geom_label(position = ggplot2::position_dodge(width = 1)) +
+      ggplot2::facet_wrap(~BLCAT, nrow = 1, ncol = 1, scales = "free") +
       ggplot2::theme(
-        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5)
+        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5),
+        legend.position = "top"
       )
+
     plot_num <- plot_num + 1
+
   }
 
   # output ------------------------------------------------------------------
