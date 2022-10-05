@@ -48,7 +48,7 @@ nm_summary <- function(.data, .spec, ..., .type = "tables"){
   # baseline continuous covariates
   returnlist[["1"]] <-
     gather_return$data %>%
-    dplyr::select(c(flags$study, flags$bl_cov_cont)) %>%
+    dplyr::select(c(flags$id, flags$study, flags$bl_cov_cont)) %>%
     dplyr::distinct() %>%
     tidyr::pivot_longer(cols = flags$bl_cov_cont) %>%
     dplyr::group_by(dplyr::across(c(flags$study, "name"))) %>%
