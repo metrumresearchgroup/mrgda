@@ -20,10 +20,8 @@ Imports:
     lifecycle (>= 1.0.1),
     magrittr (>= 2.0.3),
     purrr,
-    readr,
     rlang (>= 1.0.2),
     tidyr,
-    withr (>= 2.5.0),
     yspec,
     pmtables,
     tibble,
@@ -31,7 +29,9 @@ Imports:
     stringr
 Suggests: 
     knitr,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    readr,
+    withr (>= 2.5.0)
 Config/testthat/edition: 3
 VignetteBuilder: 
     knitr
