@@ -1,6 +1,6 @@
 VAL-S001:
   name: nm_validate
-  description: As a user, I want to easily perform sanity checks of a data set following
+  description: As a user, I want to easily perform checks of a data set following
     data assembly. I want the checks to provide a pass/fail for various variables and
     variable relationships.
   ProductRisk: High
