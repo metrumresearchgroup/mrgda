@@ -51,8 +51,8 @@ nm_summary <- function(.data,
   # baseline continuous covariates
   returnlist[["1"]] <-
     subject_level_data %>%
-    dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cov_cont)) %>%
-    tidyr::pivot_longer(cols = g_r$flags$bl_cov_cont) %>%
+    dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cont_cov)) %>%
+    tidyr::pivot_longer(cols = g_r$flags$bl_cont_cov) %>%
     dplyr::group_by(dplyr::across(c(g_r$flags$study, "name"))) %>%
     dplyr::summarise(
       MEAN = signif(mean(value), 3),
@@ -79,9 +79,9 @@ nm_summary <- function(.data,
     dplyr::select(
       c(g_r$flags$id,
         g_r$flags$study,
-        g_r$flags$bl_cov_cat)
+        g_r$flags$bl_cat_cov)
     ) %>%
-    tidyr::pivot_longer(cols = g_r$flags$bl_cov_cat) %>%
+    tidyr::pivot_longer(cols = g_r$flags$bl_cat_cov) %>%
     dplyr::group_by(dplyr::across(c(g_r$flags$study, "name"))) %>%
     dplyr::count(value) %>%
     dplyr::mutate(n = round(n/sum(n)*100, 2)) %>%
@@ -120,9 +120,9 @@ nm_summary <- function(.data,
 
   covnums <-
     g_r$data %>%
-    dplyr::select(c(g_r$flags$bl_cov_cont)) %>%
+    dplyr::select(c(g_r$flags$bl_cont_cov)) %>%
     tidyr::pivot_longer(
-      cols = g_r$flags$bl_cov_cont,
+      cols = g_r$flags$bl_cont_cov,
       names_to = "BLCOV",
       values_to = "BLCOV_VAL"
     ) %>%
@@ -134,10 +134,10 @@ nm_summary <- function(.data,
     dplyr::select(
       c(g_r$flags$id,
         STUDY = g_r$flags$study,
-        g_r$flags$bl_cov_cont)
+        g_r$flags$bl_cont_cov)
     ) %>%
     tidyr::pivot_longer(
-      cols = g_r$flags$bl_cov_cont,
+      cols = g_r$flags$bl_cont_cov,
       names_to = "BLCOV",
       values_to = "BLCOV_VAL"
     ) %>%

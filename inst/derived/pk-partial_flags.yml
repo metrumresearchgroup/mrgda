@@ -7,8 +7,8 @@ SETUP__:
   flags:
     study: [STUDYID]
     primary_keys: [EVID, DVID]
-    bl_cov_cont: [WTBL, BMIBL, AGEBL]
-    tv_cov_cont: [WT]
+    bl_cont_cov: [WTBL, BMIBL, AGEBL]
+    tv_cont_cov: [WT]
 C:
 NUM:
 ID:
