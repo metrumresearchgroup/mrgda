@@ -3,6 +3,7 @@
 S3method(print,nm_summary_results)
 S3method(print,nm_validate_results)
 export("%>%")
+export(mutate_egfr)
 export(nm_summary)
 export(nm_validate)
 import(rlang)
