@@ -9,9 +9,9 @@ SETUP__:
     study: [STUDYID]
     primary_keys: [EVID, DVID]
     time: [TIME]
-    bl_cov_cat: [SEX, RACE]
-    bl_cov_cont: [WTBL, BMIBL, AGEBL]
-    tv_cov_cont: [WT]
+    bl_cat_cov: [SEX, RACE]
+    bl_cont_cov: [WTBL, BMIBL, AGEBL]
+    tv_cont_cov: [WT]
 C:
 NUM:
 ID:

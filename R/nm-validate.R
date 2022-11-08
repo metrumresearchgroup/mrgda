@@ -93,8 +93,8 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
       dplyr::across(
         c(
           flags$id,
-          flags$bl_cov_cat,
-          flags$bl_cov_cont
+          flags$bl_cat_cov,
+          flags$bl_cont_cov
         )
       )
     ) %>%
@@ -114,8 +114,8 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
       assertr::not_na,
       c(
         flags$id,
-        flags$bl_cov_cat,
-        flags$bl_cov_cont
+        flags$bl_cat_cov,
+        flags$bl_cont_cov
       ),
       success_fun = assertr::success_append,
       error_fun = assertr::error_append,
@@ -130,8 +130,8 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
       assertr::not_na,
       c(
         flags$id,
-        flags$tv_cov_cat,
-        flags$tv_cov_cont
+        flags$tv_cat_cov,
+        flags$tv_cont_cov
       ),
       success_fun = assertr::success_append,
       error_fun = assertr::error_append,

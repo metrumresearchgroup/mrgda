@@ -6,10 +6,10 @@ gather_flags <- function(.data, .spec){
     "study", "group",
     "primary_keys", "group",
     "time", "group",
-    "bl_cov_cat", "group",
-    "bl_cov_cont", "calculation",
-    "tv_cov_cat", "group",
-    "tv_cov_cont", "calculation"
+    "bl_cat_cov", "group",
+    "bl_cont_cov", "calculation",
+    "tv_cat_cov", "group",
+    "tv_cont_cov", "calculation"
   )
 
   .flags <- yspec::pull_meta(.spec, "flags")[recognized_flags$name] %>%

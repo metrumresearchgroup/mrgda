@@ -24,10 +24,10 @@ flags:
   study: [STUDYID] # Study ID
   primary_keys: [EVID, DVID] # variables such as EVID and DVID where you anticipate no duplicate combinations
   time: [TIME] # Time
-  bl_cov_cat: [SEX, RACE] # Baseline categorical covariate
-  tv_cov_cat: [TIMECAT] # Time-varying categorical covariate
-  bl_cov_cont: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
-  tv_cov_cont: [WT] # Time-varying continuous covariate
+  bl_cat_cov: [SEX, RACE] # Baseline categorical covariate
+  tv_cat_cov: [TIMECAT] # Time-varying categorical covariate
+  bl_cont_cov: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
+  tv_cont_cov: [WT] # Time-varying continuous covariate
 ```
 
 *IMPORTANT NOTE* - it is not necessary to have a variable provided for each flag. Adding variables to each of the flags is optional, 
