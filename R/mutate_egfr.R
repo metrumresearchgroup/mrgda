@@ -17,12 +17,12 @@
 #' @export
 mutate_egfr <- function(.df, .age, .wt, .serum_creatinine, .sex, .female_value) {
 
-  print("Formula source: https://www.kidney.org/content/ckd-epi-creatinine-equation-2021")
-
   assertthat::assert_that(
-    length(groups(.df)) == 0,
+    !inherits(.df, "grouped_df"),
     msg = "Grouping found in data.frame. This function evaluates a single row at a time. Please ungroup() first."
   )
+
+  message_function("calc_egfr")
 
   .df %>%
     dplyr::rowwise() %>%
@@ -35,7 +35,7 @@ mutate_egfr <- function(.df, .age, .wt, .serum_creatinine, .sex, .female_value) 
         .female_value = .female_value
       )
     ) %>%
-    ungroup()
+    dplyr::ungroup()
 
 }
 

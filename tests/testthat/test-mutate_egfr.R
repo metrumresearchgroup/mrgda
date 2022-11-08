@@ -11,7 +11,7 @@ test_that("mutate_egfr appropriately calculates EGFR value", {
   expect_equal(.ex_egfr$EGFR[2], 71.689694)
 })
 
-test_that("mutate_egfr reponds to change in specified female value", {
+test_that("mutate_egfr responds to change in specified female value", {
   .ex_egfr1 <- mutate_egfr(.df = test_df, .age = AGE, .wt = WT, .serum_creatinine = SC, .sex = SEX, .female_value = 1)
   .ex_egfr2 <- mutate_egfr(.df = test_df, .age = AGE, .wt = WT, .serum_creatinine = SC, .sex = SEX, .female_value = 2)
   expect_true(.ex_egfr1$EGFR[1] != .ex_egfr2$EGFR[1])
