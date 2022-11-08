@@ -26,7 +26,8 @@ Imports:
     pmtables,
     tibble,
     ggplot2,
-    stringr
+    stringr,
+    assertthat
 Suggests: 
     knitr,
     testthat (>= 3.0.0),
