@@ -23,7 +23,14 @@
 #'   SEX = c(1, 2, 1),
 #'   RACE = c(1, 2, 3))
 #'
-#' mutate_egfr(.df = test_df, .age = AGE, .wt = WT, .serum_creatinine = SC, .sex = SEX, .female_value = 1)
+#' test_df %>%
+#' mutate_egfr(
+#'  .age = AGE,
+#'  .wt = WT,
+#'  .serum_creatinine = SC,
+#'  .sex = SEX,
+#'  .female_value = 1
+#'  )
 #'
 #' @export
 mutate_egfr <- function(.df, .age, .wt, .serum_creatinine, .sex, .female_value) {
