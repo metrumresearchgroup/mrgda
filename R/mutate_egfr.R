@@ -14,6 +14,17 @@
 #' @param .sex numeric sex
 #' @param .female_value numeric value referencing female subjects
 #'
+#' @examples
+#'
+#' test_df <- dplyr::tibble(
+#'   AGE = c(45, 82, 73),
+#'   WT = c(64, 23, 92),
+#'   SC = c(1.02, 1.04, 1.98),
+#'   SEX = c(1, 2, 1),
+#'   RACE = c(1, 2, 3))
+#'
+#' mutate_egfr(.df = test_df, .age = AGE, .wt = WT, .serum_creatinine = SC, .sex = SEX, .female_value = 1)
+#'
 #' @export
 mutate_egfr <- function(.df, .age, .wt, .serum_creatinine, .sex, .female_value) {
 

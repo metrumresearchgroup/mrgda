@@ -26,3 +26,15 @@ will be named \code{EGFR}.
 \details{
 https://www.kidney.org/content/ckd-epi-creatinine-equation-2021
 }
+\examples{
+
+test_df <- dplyr::tibble(
+  AGE = c(45, 82, 73),
+  WT = c(64, 23, 92),
+  SC = c(1.02, 1.04, 1.98),
+  SEX = c(1, 2, 1),
+  RACE = c(1, 2, 3))
+
+mutate_egfr(.df = test_df, .age = AGE, .wt = WT, .serum_creatinine = SC, .sex = SEX, .female_value = 1)
+
+}
