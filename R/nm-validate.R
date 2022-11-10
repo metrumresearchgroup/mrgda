@@ -38,9 +38,6 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   }
 
-  .data_name <- arg_names$.data
-  .spec_name <- arg_names$.spec
-
   # grab data and spec flags ------------------------------------------------
 
   tests_results <- list()
@@ -50,39 +47,39 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   flags <- gather_return$flags
 
   # helper functions --------------------------------------------------------
-  col_concat_nmvalidate <- function(.x){
-    assertr::col_concat(data = .x, sep = "nmvalidate")
-  }
+  # col_concat_nmvalidate <- function(.x){
+  #   assertr::col_concat(data = .x, sep = "nmvalidate")
+  # }
 
-  build_result <- function(.res, .list = tests_results) {
-
-    res_se <-
-      purrr::set_names(c("success", "errors")) %>%
-      purrr::map(., ~ attr(.res, glue::glue("assertr_{.x}")))
-
-    out <-
-      if (!is.null(res_se$success)) {
-
-        list(
-          success = TRUE,
-          description = unlist(res_se$success)[["description"]]
-        )
-
-      } else if (!is.null(res_se$errors)) {
-
-        list(
-          success = FALSE,
-          description = unlist(res_se$errors)[["description"]],
-          error_content =
-            .res %>%
-            dplyr::slice(
-              dplyr::pull(res_se$errors[[1]][["error_df"]], index)
-            )
-        )
-
-      }
-
-  }
+  # build_result <- function(.res, .list = tests_results) {
+  #
+  #   res_se <-
+  #     purrr::set_names(c("success", "errors")) %>%
+  #     purrr::map(., ~ attr(.res, glue::glue("assertr_{.x}")))
+  #
+  #   out <-
+  #     if (!is.null(res_se$success)) {
+  #
+  #       list(
+  #         success = TRUE,
+  #         description = unlist(res_se$success)[["description"]]
+  #       )
+  #
+  #     } else if (!is.null(res_se$errors)) {
+  #
+  #       list(
+  #         success = FALSE,
+  #         description = unlist(res_se$errors)[["description"]],
+  #         error_content =
+  #           .res %>%
+  #           dplyr::slice(
+  #             dplyr::pull(res_se$errors[[1]][["error_df"]], index)
+  #           )
+  #       )
+  #
+  #     }
+  #
+  # }
 
   collapse_covs <- function(.covs){
     paste(.covs, collapse = ", ")
@@ -91,6 +88,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   pass_fail <- function(.description, .code) {
 
     .ans <- list()
+    # browser()
 
     # Run code uses input data
     .code_run <-
@@ -106,82 +104,85 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
     .ans$description <- .description
     .ans$debug <- .code_return
-    .ans$result <- if (nrow(.outputdf) > 0) {
-      "Passed"} else {"Failed"}
+    .ans$success <- nrow(.outputdf) == 0
 
-
+    return(.ans)
 
   }
 
   # ##### BEGIN TESTS ##### -------------------------------------------------
 
   tests_results <- list()
-  browser()
 
   # -------------------------------------------------------------------------
-  tests_results[["1"]] <-
-    gather_return$data %>%
-    assertr::assert_rows(
-      col_concat_nmvalidate,
-      assertr::is_uniq,
-      c(
-        flags$id,
-        flags$time,
-        flags$primary_key
-      ),
-      success_fun = assertr::success_append,
-      error_fun = assertr::error_append,
-      description = glue::glue(
-        "No duplicates across: {paste(c(flags$id, flags$time, flags$primary_key), collapse = ', ')}"
+  # tests_results[["1"]] <-
+  #   gather_return$data %>%
+  #   assertr::assert_rows(
+  #     col_concat_nmvalidate,
+  #     assertr::is_uniq,
+  #     c(
+  #       flags$id,
+  #       flags$time,
+  #       flags$primary_key
+  #     ),
+  #     success_fun = assertr::success_append,
+  #     error_fun = assertr::error_append,
+  #     description = glue::glue(
+  #       "No duplicates across: {paste(c(flags$id, flags$time, flags$primary_key), collapse = ', ')}"
+  #     )
+  #   ) %>%
+  #   build_result()
+
+
+  # -------------------------------------------------------------------------
+  tests_results[["2"]] <-
+    pass_fail(
+      .description = "Non-unique baseline covariates",
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov))})",
+        "dplyr::filter(complete.cases(.))",
+        "dplyr::distinct()",
+        "dplyr::group_by(across({flags$id}))",
+        "dplyr::add_count()",
+        "dplyr::ungroup()",
+        "dplyr::filter(n > 1)"
       )
-    ) %>%
-    build_result()
-
-
-  # -------------------------------------------------------------------------
-  tests_results[["2"]] <- pass_fail(
-    .description = "Non-unique baseline covariates",
-    .code = c(
-      "{arg_names$.data}",
-      "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov))})",
-      "dplyr::distinct()",
-      "dplyr::count(flags$id)",
-      "dplyr::filter(n > 1)"
     )
-  )
 
   # Missing baseline covariates ---------------------------------------------
 
-  tests_results[["3"]] <- pass_fail(
-    .description = "Missing baseline covariates",
-    .code = c(
-      "{arg_names$.data}",
-      "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov))})",
-      "dplyr::filter(!complete.cases(.))"
+  tests_results[["3"]] <-
+    pass_fail(
+      .description = "Missing covariates",
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov, flags$tv_cont_cov, flags$tv_cat_cov))})",
+        "dplyr::filter(!complete.cases(.))"
+      )
     )
-  )
 
   # Missing time varying covariates -----------------------------------------
-
-  tests_results[["4"]] <- pass_fail(
-    .description = "Missing time varying covariates",
-    .code = c(
-      "{arg_names$.data}",
-      "dplyr::select({collapse_covs(c(flags$id, flags$tv_cont_cov))})",
-      "dplyr::filter(!complete.cases(.))"
-    )
-  )
+  #
+  #   tests_results[["4"]] <- pass_fail(
+  #     .description = "Missing time varying covariates",
+  #     .code = c(
+  #       "{arg_names$.data}",
+  #       "dplyr::select({collapse_covs(c(flags$id, flags$tv_cont_cov))})",
+  #       "dplyr::filter(!complete.cases(.))"
+  #     )
+  #   )
 
   # Output ------------------------------------------------------------------
   class(tests_results) <- c("nm_validate_results", class(tests_results))
 
-  # Return a true error of any failures
-  failures <- purrr::map_lgl(tests_results, ~ !.x$success) %>% sum
-
-  if (failures > 0 & .error_on_fail) {
-    print(tests_results)
-    stop("nm_validate found issues in data", call. = FALSE)
-  }
+  # # Return a true error of any failures
+  # failures <- purrr::map_lgl(tests_results, ~ !.x$success) %>% sum
+  #
+  # if (failures > 0 & .error_on_fail) {
+  #   print(tests_results)
+  #   stop("nm_validate found issues in data", call. = FALSE)
+  # }
 
   return(tests_results)
 }
@@ -198,13 +199,39 @@ print.nm_validate_results <- function(x, ...) {
 
   end_msg <- glue::glue("{num_passed} of {length(x)} checks {crayon::green('PASSED')}")
 
+  if (num_passed > 0) {
+
+    # fail_msg <- glue::glue("{num_fail} {crayon::red('FAILURES')}")
+
+    #cli::cli_h2(glue::glue("Found {fail_msg}:"))
+
+    #end_msg <- glue::glue("{end_msg} ({fail_msg})")
+
+    passes <-
+      purrr::map(x, ~ {
+        if(isTRUE(.x$success)) {
+          return(.x)
+        } else {
+          return(NULL)
+        }
+      }) %>% purrr::compact()
+
+    purrr::iwalk(passes, function(res, i) {
+
+      cat("\n")
+
+      cli::cli_alert_success("{res$description}")
+    })
+
+  }
+
   if (num_fail > 0) {
 
-    fail_msg <- glue::glue("{num_fail} {crayon::red('FAILURES')}")
+    # fail_msg <- glue::glue("{num_fail} {crayon::red('FAILURES')}")
 
-    cli::cli_h2(glue::glue("Found {fail_msg}:"))
+    #cli::cli_h2(glue::glue("Found {fail_msg}:"))
 
-    end_msg <- glue::glue("{end_msg} ({fail_msg})")
+    #end_msg <- glue::glue("{end_msg} ({fail_msg})")
 
     failures <-
       purrr::map(x, ~ {
@@ -219,14 +246,56 @@ print.nm_validate_results <- function(x, ...) {
 
       cat("\n")
 
-      cli::cli_alert_danger("Test {i} failure: {res$description} -- {nrow(res$error_content)} problem{?s}:")
+      cli::cli_alert_danger("{res$description} -- {nrow(res$debug)} Run the following code{?s}:")
 
-      print(res$error_content)
+      print(res$debug)
     })
 
   }
 
-  cli::cli_h1(end_msg)
+  # end_msg)
+  cat(summary_line(n_fail = num_fail, n_pass = num_passed))
+
 }
 
+
+
+colourise <- function(text, as = c("success", "skip", "warning", "failure", "error")) {
+  if (has_colour()) {
+    unclass(cli::make_ansi_style(testthat_style(as))(text))
+  } else {
+    text
+  }
+}
+
+has_colour <- function() {
+  isTRUE(getOption("testthat.use_colours", TRUE)) &&
+    cli::num_ansi_colors() > 1
+}
+
+testthat_style <- function(type = c("success", "skip", "warning", "failure", "error")) {
+  type <- match.arg(type)
+
+  c(
+    success = "green",
+    skip = "blue",
+    warning = "magenta",
+    failure = "red",
+    error = "red"
+  )[[type]]
+}
+
+summary_line <- function(n_fail, n_pass) {
+  colourise_if <- function(text, colour, cond) {
+    if (cond) colourise(text, colour) else text
+  }
+
+  # Ordered from most important to least important
+  paste0(
+    "[ ",
+    colourise_if("FAIL", "failure", n_fail > 0), " ", n_fail, " | ",
+    colourise_if("PASS", "success", n_pass > 0), " ", n_pass,
+    " ]"
+  )
+}
 
