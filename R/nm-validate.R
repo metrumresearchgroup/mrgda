@@ -21,6 +21,28 @@
 #' @export
 nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
+  # argument names ----------------------------------------------------------
+  args_used <- as.character(sys.calls()[[1]])[-1]
+
+  arg_names <- list()
+
+  for(i in 1:length(args_used)){
+
+    arg.i = args_used[i]
+
+    check.i <- purrr::set_names(c(".data", ".spec")) %>%
+      purrr::map(., ~ identical(get(.x), get(arg.i))) %>%
+      unlist()
+
+    arg_names[[names(check.i[check.i])]] <- arg.i
+
+  }
+
+  .data_name <- arg_names$.data
+  .spec_name <- arg_names$.spec
+
+  # grab data and spec flags ------------------------------------------------
+
   tests_results <- list()
 
   gather_return <- gather_flags(.data, .spec)
@@ -62,9 +84,39 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   }
 
+  collapse_covs <- function(.covs){
+    paste(.covs, collapse = ", ")
+  }
+
+  pass_fail <- function(.description, .code) {
+
+    .ans <- list()
+
+    # Run code uses input data
+    .code_run <-
+      gsub("{arg_names$.data}", ".data", .code, fixed = TRUE) %>%
+      glue::glue_collapse(, sep = " %>% ") %>%
+      glue::glue()
+
+    .code_return <-
+      glue::glue_collapse(.code, sep = " %>% ") %>%
+      glue::glue()
+
+    .outputdf <- rlang::parse_expr(.code_run) %>% rlang::eval_tidy()
+
+    .ans$description <- .description
+    .ans$debug <- .code_return
+    .ans$result <- if (nrow(.outputdf) > 0) {
+      "Passed"} else {"Failed"}
+
+
+
+  }
+
   # ##### BEGIN TESTS ##### -------------------------------------------------
 
   tests_results <- list()
+  browser()
 
   # -------------------------------------------------------------------------
   tests_results[["1"]] <-
@@ -87,57 +139,38 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
 
   # -------------------------------------------------------------------------
-  tests_results[["2"]] <-
-    gather_return$data %>%
-    dplyr::distinct(
-      dplyr::across(
-        c(
-          flags$id,
-          flags$bl_cat_cov,
-          flags$bl_cont_cov
-        )
-      )
-    ) %>%
-    assertr::assert(
-      assertr::is_uniq,
-      flags$id,
-      success_fun = assertr::success_append,
-      error_fun = assertr::error_append,
-      description = "Non-unique baseline covariates"
-    ) %>%
-    build_result()
+  tests_results[["2"]] <- pass_fail(
+    .description = "Non-unique baseline covariates",
+    .code = c(
+      "{arg_names$.data}",
+      "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov))})",
+      "dplyr::distinct()",
+      "dplyr::count(flags$id)",
+      "dplyr::filter(n > 1)"
+    )
+  )
 
-  # -------------------------------------------------------------------------
-  tests_results[["3"]] <-
-    gather_return$data %>%
-    assertr::assert(
-      assertr::not_na,
-      c(
-        flags$id,
-        flags$bl_cat_cov,
-        flags$bl_cont_cov
-      ),
-      success_fun = assertr::success_append,
-      error_fun = assertr::error_append,
-      description = "Missing baseline covariates"
-    ) %>%
-    build_result()
+  # Missing baseline covariates ---------------------------------------------
 
-  # -------------------------------------------------------------------------
-  tests_results[["4"]] <-
-    gather_return$data %>%
-    assertr::assert(
-      assertr::not_na,
-      c(
-        flags$id,
-        flags$tv_cat_cov,
-        flags$tv_cont_cov
-      ),
-      success_fun = assertr::success_append,
-      error_fun = assertr::error_append,
-      description = "Missing time varying covariates"
-    ) %>%
-    build_result()
+  tests_results[["3"]] <- pass_fail(
+    .description = "Missing baseline covariates",
+    .code = c(
+      "{arg_names$.data}",
+      "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov))})",
+      "dplyr::filter(!complete.cases(.))"
+    )
+  )
+
+  # Missing time varying covariates -----------------------------------------
+
+  tests_results[["4"]] <- pass_fail(
+    .description = "Missing time varying covariates",
+    .code = c(
+      "{arg_names$.data}",
+      "dplyr::select({collapse_covs(c(flags$id, flags$tv_cont_cov))})",
+      "dplyr::filter(!complete.cases(.))"
+    )
+  )
 
   # Output ------------------------------------------------------------------
   class(tests_results) <- c("nm_validate_results", class(tests_results))
@@ -195,4 +228,5 @@ print.nm_validate_results <- function(x, ...) {
 
   cli::cli_h1(end_msg)
 }
+
 
