@@ -114,7 +114,19 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   tests_results <- list()
 
-  # -------------------------------------------------------------------------
+  # Duplicate primary keys  -------------------------------------------------
+  tests_results[["1"]] <-
+    pass_fail(
+      .description = "Duplicate primary keys",
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(c(flags$id, flags$time, flags$primary_key))})",
+        "dplyr::count({collapse_covs(c(flags$id, flags$time, flags$primary_key))})",
+        "dplyr::filter(n > 1)"
+      )
+    )
+
+
   # tests_results[["1"]] <-
   #   gather_return$data %>%
   #   assertr::assert_rows(
@@ -134,7 +146,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   #   build_result()
 
 
-  # -------------------------------------------------------------------------
+  # Non-unique baseline covariates ------------------------------------------
   tests_results[["2"]] <-
     pass_fail(
       .description = "Non-unique baseline covariates",
@@ -161,17 +173,6 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
         "dplyr::filter(!complete.cases(.))"
       )
     )
-
-  # Missing time varying covariates -----------------------------------------
-  #
-  #   tests_results[["4"]] <- pass_fail(
-  #     .description = "Missing time varying covariates",
-  #     .code = c(
-  #       "{arg_names$.data}",
-  #       "dplyr::select({collapse_covs(c(flags$id, flags$tv_cont_cov))})",
-  #       "dplyr::filter(!complete.cases(.))"
-  #     )
-  #   )
 
   # Output ------------------------------------------------------------------
   class(tests_results) <- c("nm_validate_results", class(tests_results))
