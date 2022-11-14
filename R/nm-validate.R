@@ -117,7 +117,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   # Duplicate primary keys  -------------------------------------------------
   tests_results[["1"]] <-
     pass_fail(
-      .description = "Duplicate primary keys",
+      .description = "No duplicate primary keys",
       .code = c(
         "{arg_names$.data}",
         "dplyr::select({collapse_covs(c(flags$id, flags$time, flags$primary_key))})",
@@ -125,26 +125,6 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
         "dplyr::filter(n > 1)"
       )
     )
-
-
-  # tests_results[["1"]] <-
-  #   gather_return$data %>%
-  #   assertr::assert_rows(
-  #     col_concat_nmvalidate,
-  #     assertr::is_uniq,
-  #     c(
-  #       flags$id,
-  #       flags$time,
-  #       flags$primary_key
-  #     ),
-  #     success_fun = assertr::success_append,
-  #     error_fun = assertr::error_append,
-  #     description = glue::glue(
-  #       "No duplicates across: {paste(c(flags$id, flags$time, flags$primary_key), collapse = ', ')}"
-  #     )
-  #   ) %>%
-  #   build_result()
-
 
   # Non-unique baseline covariates ------------------------------------------
   tests_results[["2"]] <-
@@ -166,7 +146,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   tests_results[["3"]] <-
     pass_fail(
-      .description = "Missing covariates",
+      .description = "No missing covariates",
       .code = c(
         "{arg_names$.data}",
         "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov, flags$tv_cont_cov, flags$tv_cat_cov))})",
