@@ -52,36 +52,6 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   #   assertr::col_concat(data = .x, sep = "nmvalidate")
   # }
 
-  # build_result <- function(.res, .list = tests_results) {
-  #
-  #   res_se <-
-  #     purrr::set_names(c("success", "errors")) %>%
-  #     purrr::map(., ~ attr(.res, glue::glue("assertr_{.x}")))
-  #
-  #   out <-
-  #     if (!is.null(res_se$success)) {
-  #
-  #       list(
-  #         success = TRUE,
-  #         description = unlist(res_se$success)[["description"]]
-  #       )
-  #
-  #     } else if (!is.null(res_se$errors)) {
-  #
-  #       list(
-  #         success = FALSE,
-  #         description = unlist(res_se$errors)[["description"]],
-  #         error_content =
-  #           .res %>%
-  #           dplyr::slice(
-  #             dplyr::pull(res_se$errors[[1]][["error_df"]], index)
-  #           )
-  #       )
-  #
-  #     }
-  #
-  # }
-
   collapse_covs <- function(.covs){
     paste(.covs, collapse = ", ")
   }
