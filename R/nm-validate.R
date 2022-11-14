@@ -3,8 +3,8 @@
 #' @description
 #' This function is intended to perform a series of checks on a derived data
 #' set by leveraging the data specification used during assembly. If a check
-#' fails, the function will output a description of the problem and where it
-#' occurs in the dataset.
+#' fails, the function will output a description of the problem and code to
+#' use for debugging.
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
@@ -22,7 +22,8 @@
 nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   # argument names ----------------------------------------------------------
-  args_used <- as.character(sys.calls()[[1]])[-1]
+  sys_calls <- sys.calls()
+  args_used <- as.character(sys_calls[length(sys_calls)][[1]])[-1]
 
   arg_names <- list()
 
@@ -229,12 +230,14 @@ print.nm_validate_results <- function(x, ...) {
 
       cli::cli_alert_danger("{res$description} -- {nrow(res$debug)} Run the following code{?s}:")
 
-      print(res$debug)
+      cat(gsub("%>%", "%>%\n", as.character(res$debug, fixed = TRUE)))
+      cat("\n")
     })
 
   }
 
   # end_msg)
+  cat("\n")
   cat(summary_line(n_fail = num_fail, n_pass = num_passed))
 
 }

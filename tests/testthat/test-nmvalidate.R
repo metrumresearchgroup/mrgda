@@ -1,4 +1,16 @@
 
+# returns appropriate debug code when issue detected ----------------------
+
+test_that("nm_validate debug code: Returns usable debug code [NMV-VAL-001]", {
+  x = nm_validate(.data = nm_errors, .spec = nm_spec)
+  # Test 1
+  expect_equal(nrow(rlang::parse_expr(x$`1`$debug) %>% rlang::eval_tidy()), 1)
+  # Test 2
+  expect_equal(nrow(rlang::parse_expr(x$`2`$debug) %>% rlang::eval_tidy()), 2)
+  # Test 3
+  expect_equal(nrow(rlang::parse_expr(x$`3`$debug) %>% rlang::eval_tidy()), 1)
+})
+
 # Error on fail=FALSE -----------------------------------------------------
 
 
