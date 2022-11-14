@@ -21,6 +21,7 @@
 #' @export
 nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
+
   # argument names ----------------------------------------------------------
   sys_calls <- sys.calls()
   args_used <- as.character(sys_calls[length(sys_calls)][[1]])[-1]
@@ -29,13 +30,16 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   for(i in 1:length(args_used)){
 
-    arg.i = args_used[i]
+    if(args_used[i] %in% c("TRUE", "FALSE")){
+      next
+    }
 
-    check.i <- purrr::set_names(c(".data", ".spec")) %>%
-      purrr::map(., ~ identical(get(.x), get(arg.i))) %>%
+    check.i <-
+      purrr::set_names(c(".data", ".spec")) %>%
+      purrr::map(., ~ identical(get(.x), get(args_used[i]))) %>%
       unlist()
 
-    arg_names[[names(check.i[check.i])]] <- arg.i
+    arg_names[[names(check.i[check.i])]] <- args_used[i]
 
   }
 
@@ -48,15 +52,12 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   flags <- gather_return$flags
 
   # helper functions --------------------------------------------------------
-  # col_concat_nmvalidate <- function(.x){
-  #   assertr::col_concat(data = .x, sep = "nmvalidate")
-  # }
 
   collapse_covs <- function(.covs){
     paste(.covs, collapse = ", ")
   }
 
-  pass_fail <- function(.description, .code) {
+  pass_fail <- function(.code) {
 
     .ans <- list()
     # browser()
@@ -73,7 +74,6 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
     .outputdf <- rlang::parse_expr(.code_run) %>% rlang::eval_tidy()
 
-    .ans$description <- .description
     .ans$debug <- .code_return
     .ans$success <- nrow(.outputdf) == 0
 
@@ -86,9 +86,8 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   tests_results <- list()
 
   # Duplicate primary keys  -------------------------------------------------
-  tests_results[["1"]] <-
+  tests_results[["No duplicate primary keys"]] <-
     pass_fail(
-      .description = "No duplicate primary keys",
       .code = c(
         "{arg_names$.data}",
         "dplyr::select({collapse_covs(c(flags$id, flags$time, flags$primary_key))})",
@@ -98,9 +97,8 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
     )
 
   # Non-unique baseline covariates ------------------------------------------
-  tests_results[["2"]] <-
+  tests_results[["Non-unique baseline covariates"]] <-
     pass_fail(
-      .description = "Non-unique baseline covariates",
       .code = c(
         "{arg_names$.data}",
         "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov))})",
@@ -115,9 +113,8 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   # Missing baseline covariates ---------------------------------------------
 
-  tests_results[["3"]] <-
+  tests_results[["No missing covariates"]] <-
     pass_fail(
-      .description = "No missing covariates",
       .code = c(
         "{arg_names$.data}",
         "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov, flags$tv_cont_cov, flags$tv_cat_cov))})",
@@ -128,13 +125,13 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   # Output ------------------------------------------------------------------
   class(tests_results) <- c("nm_validate_results", class(tests_results))
 
-  # # Return a true error of any failures
-  # failures <- purrr::map_lgl(tests_results, ~ !.x$success) %>% sum
-  #
-  # if (failures > 0 & .error_on_fail) {
-  #   print(tests_results)
-  #   stop("nm_validate found issues in data", call. = FALSE)
-  # }
+  # Return a true error of any failures
+  failures <- purrr::map_lgl(tests_results, ~ !.x$success) %>% sum
+
+  if (failures > 0 & .error_on_fail) {
+    print(tests_results)
+    stop(call. = FALSE)
+  }
 
   return(tests_results)
 }
@@ -153,12 +150,6 @@ print.nm_validate_results <- function(x, ...) {
 
   if (num_passed > 0) {
 
-    # fail_msg <- glue::glue("{num_fail} {crayon::red('FAILURES')}")
-
-    #cli::cli_h2(glue::glue("Found {fail_msg}:"))
-
-    #end_msg <- glue::glue("{end_msg} ({fail_msg})")
-
     passes <-
       purrr::map(x, ~ {
         if(isTRUE(.x$success)) {
@@ -168,22 +159,16 @@ print.nm_validate_results <- function(x, ...) {
         }
       }) %>% purrr::compact()
 
-    purrr::iwalk(passes, function(res, i) {
+    for (i in 1:length(passes)) {
 
       cat("\n")
 
-      cli::cli_alert_success("{res$description}")
-    })
+      cli::cli_alert_success("{names(x)[i]}")
+    }
 
   }
 
   if (num_fail > 0) {
-
-    # fail_msg <- glue::glue("{num_fail} {crayon::red('FAILURES')}")
-
-    #cli::cli_h2(glue::glue("Found {fail_msg}:"))
-
-    #end_msg <- glue::glue("{end_msg} ({fail_msg})")
 
     failures <-
       purrr::map(x, ~ {
@@ -194,15 +179,15 @@ print.nm_validate_results <- function(x, ...) {
         }
       }) %>% purrr::compact()
 
-    purrr::iwalk(failures, function(res, i) {
+    for (i in 1:length(failures)) {
 
       cat("\n")
 
-      cli::cli_alert_danger("{res$description} -- {nrow(res$debug)} Run the following code{?s}:")
+      cli::cli_alert_danger("{names(x)[i]} -- Copy/paste and run the following code:")
 
-      cat(gsub("%>%", "%>%\n", as.character(res$debug, fixed = TRUE)))
+      cat(gsub("%>%", "%>%\n", as.character(failures[[i]]$debug, fixed = TRUE)))
       cat("\n")
-    })
+    }
 
   }
 
