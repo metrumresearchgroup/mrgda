@@ -16,8 +16,8 @@ nm_validate(.data, .spec, .error_on_fail = TRUE)
 \description{
 This function is intended to perform a series of checks on a derived data
 set by leveraging the data specification used during assembly. If a check
-fails, the function will output a description of the problem and where it
-occurs in the dataset.
+fails, the function will output a description of the problem and code to
+use for debugging.
 }
 \examples{
 

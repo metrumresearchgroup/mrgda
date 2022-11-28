@@ -21,27 +21,14 @@
 #' @export
 nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
+  # Check inputs
+  stopifnot(".data must be a data.frame" = inherits(.data, "data.frame"))
+  stopifnot(".spec must be a yspec object" = inherits(.spec, "yspec"))
+  stopifnot(".error_on_fail must be a logical" = is.logical(.error_on_fail))
 
   # argument names ----------------------------------------------------------
-  sys_calls <- sys.calls()
-  args_used <- as.character(sys_calls[length(sys_calls)][[1]])[-1]
-
-  arg_names <- list()
-
-  for(i in 1:length(args_used)){
-
-    if(args_used[i] %in% c("TRUE", "FALSE")){
-      next
-    }
-
-    check.i <-
-      purrr::set_names(c(".data", ".spec")) %>%
-      purrr::map(., ~ identical(get(.x), get(args_used[i]))) %>%
-      unlist()
-
-    arg_names[[names(check.i[check.i])]] <- args_used[i]
-
-  }
+  arg_names <- as.list(as.character(match.call())[-1])
+  names(arg_names) <- names(match.call())[-1]
 
   # grab data and spec flags ------------------------------------------------
 
@@ -123,7 +110,10 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
     )
 
   # Output ------------------------------------------------------------------
+
   class(tests_results) <- c("nm_validate_results", class(tests_results))
+
+  return(tests_results)
 
   # Return a true error of any failures
   failures <- purrr::map_lgl(tests_results, ~ !.x$success) %>% sum
@@ -133,7 +123,6 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
     stop(call. = FALSE)
   }
 
-  return(tests_results)
 }
 
 
@@ -196,45 +185,3 @@ print.nm_validate_results <- function(x, ...) {
   cat(summary_line(n_fail = num_fail, n_pass = num_passed))
 
 }
-
-
-
-colourise <- function(text, as = c("success", "skip", "warning", "failure", "error")) {
-  if (has_colour()) {
-    unclass(cli::make_ansi_style(testthat_style(as))(text))
-  } else {
-    text
-  }
-}
-
-has_colour <- function() {
-  isTRUE(getOption("testthat.use_colours", TRUE)) &&
-    cli::num_ansi_colors() > 1
-}
-
-testthat_style <- function(type = c("success", "skip", "warning", "failure", "error")) {
-  type <- match.arg(type)
-
-  c(
-    success = "green",
-    skip = "blue",
-    warning = "magenta",
-    failure = "red",
-    error = "red"
-  )[[type]]
-}
-
-summary_line <- function(n_fail, n_pass) {
-  colourise_if <- function(text, colour, cond) {
-    if (cond) colourise(text, colour) else text
-  }
-
-  # Ordered from most important to least important
-  paste0(
-    "[ ",
-    colourise_if("FAIL", "failure", n_fail > 0), " ", n_fail, " | ",
-    colourise_if("PASS", "success", n_pass > 0), " ", n_pass,
-    " ]"
-  )
-}
-

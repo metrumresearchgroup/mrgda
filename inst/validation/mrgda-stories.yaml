@@ -11,14 +11,13 @@ VAL-S001:
   - VAL-R004
   - VAL-R005
   - VAL-R006
-  - VAL-R007
   - GAT-R001
   - GAT-R002
 SUM-S001:
   name: nm_summary
   description: As a user, I want a conveinent way to review high level attributes of
     various variables after completing a data assembly.
-  ProductRisk: High
+  ProductRisk: Low
   requirements:
   - SUM-R001
   - SUM-R002
@@ -26,3 +25,11 @@ SUM-S001:
   - SUM-R004
   - GAT-R001
   - GAT-R002
+EGF-S001:
+  name: mutate_egfr
+  description: As a user, I want to mutate a EGFR column to a dataset with appropriate
+    values for each subject.
+  ProductRisk: High
+  requirements:
+  - EGF-R001
+  - EGF-R002

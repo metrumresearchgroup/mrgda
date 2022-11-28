@@ -21,6 +21,7 @@ names of the flags must match those shown below:
 ```{r, eval=FALSE}
 flags:
   id: [ID] # Unique subject ID
+  num: [NUM] # unique row ID
   study: [STUDYID] # Study ID
   primary_keys: [EVID, DVID] # variables such as EVID and DVID where you anticipate no duplicate combinations
   time: [TIME] # Time

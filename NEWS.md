@@ -1,3 +1,10 @@
+# mrgda Development
+
+## New features and changes
+
+- `nm_validate()` now returns the debug code used to find any errors, rather than the errors themselves.
+
+
 # mrgda 0.1.0
 
 ## New features and changes

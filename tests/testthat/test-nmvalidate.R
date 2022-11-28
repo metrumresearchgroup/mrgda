@@ -1,219 +1,94 @@
+# Load in spec and data
+nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
+nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
+nm_errors <- readr::read_csv(system.file("derived", "pk-errors.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
+
+nm_spec_noflags <- yspec::ys_load(system.file("derived", "pk-noflags.yml", package = "mrgda"))
+nm_spec_parflags <- yspec::ys_load(system.file("derived", "pk-partial_flags.yml", package = "mrgda"))
+
 
 # returns appropriate debug code when issue detected ----------------------
-
 test_that("nm_validate debug code: Returns usable debug code [NMV-VAL-001]", {
-  x = nm_validate(.data = nm_errors, .spec = nm_spec)
+
+  x = nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
   # Test 1
-  expect_equal(nrow(rlang::parse_expr(x$`1`$debug) %>% rlang::eval_tidy()), 1)
+  expect_equal(nrow(rlang::parse_expr(x$`No duplicate primary keys`$debug) %>% rlang::eval_tidy()), 1)
   # Test 2
-  expect_equal(nrow(rlang::parse_expr(x$`2`$debug) %>% rlang::eval_tidy()), 2)
+  expect_equal(nrow(rlang::parse_expr(x$`Non-unique baseline covariates`$debug) %>% rlang::eval_tidy()), 2)
   # Test 3
-  expect_equal(nrow(rlang::parse_expr(x$`3`$debug) %>% rlang::eval_tidy()), 1)
+  expect_equal(nrow(rlang::parse_expr(x$`No missing covariates`$debug) %>% rlang::eval_tidy()), 1)
 })
 
-# Error on fail=FALSE -----------------------------------------------------
+
+# duplicates across id, time, primary_keys fails --------------------------
+test_that("nm_validate catches duplicates across id, time, primary_keys [NMV-VAL-002]", {
+  nm_dups <- nm_errors
+  nm_dups$EVID[1:10] = 0
+  nm_dups$DVID[1:10] = 1
+  nm_dups$TIME[1:10] = 100
+  x = nm_validate(.data = nm_dups, .spec = nm_spec, .error_on_fail = FALSE)
+  n_val_df <- rlang::parse_expr(x$`No duplicate primary keys`$debug) %>% rlang::eval_tidy()
+  n_val <- n_val_df$n
+
+  expect_equal(n_val, 10)
+})
 
 
-## No failure -------------------------------------------------------------
+# non-unique baseline covariates -------------------------------------------
+test_that("nm_validate catches non-unique baseline covariates [NMV-VAL-003]", {
+  nm_nonuni <- nm_errors
+  nm_nonuni$WTBL[4] = 79.5
+  nm_nonuni$WTBL[5] = 80.4
+  nm_nonuni$WTBL[6] = 90.5
+  x = nm_validate(.data = nm_nonuni, .spec = nm_spec, .error_on_fail = FALSE)
+  n_val_df <- rlang::parse_expr(x$`Non-unique baseline covariates`$debug) %>% rlang::eval_tidy()
 
-test_that("nm_validate standard case: Works with no failures [NMV-VAL-001]", {
+  expect_equal(nrow(n_val_df), 5)
+})
+
+
+# missing covariates -------------------------------------------------------
+test_that("nm_validate catches missing covariates [NMV-VAL-004]", {
+  nm_missc <- nm_errors
+  nm_missc$WTBL[4] = NA_real_
+  nm_missc$WT[5] = NA_real_
+  nm_missc$SEX[6] = NA_real_
+  x = nm_validate(.data = nm_missc, .spec = nm_spec, .error_on_fail = FALSE)
+  n_val_df <- rlang::parse_expr(x$`No missing covariates`$debug) %>% rlang::eval_tidy()
+
+  expect_equal(nrow(n_val_df), 4)
+  expect_equal(n_val_df$WT[1], NA_real_)
+  expect_equal(n_val_df$WTBL[2], NA_real_)
+  expect_equal(n_val_df$SEX[4], NA_real_)
+})
+
+
+# output all failures ---------------------------------------------------
+test_that("nm_validate outputs all failures [NMV-VAL-005]", {
+  x = nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
+
+  expect_false(x$`No duplicate primary keys`$success)
+  expect_false(x$`Non-unique baseline covariates`$success)
+  expect_false(x$`No missing covariates`$success)
+
   x = nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
-  expect_true(
-    all(purrr::map_lgl(x, ~ .x$success)))
+
+  expect_true(x$`No duplicate primary keys`$success)
+  expect_true(x$`Non-unique baseline covariates`$success)
+  expect_true(x$`No missing covariates`$success)
 })
 
+# output all failures ---------------------------------------------------
+test_that("nm_validate prints multiple failures [NMV-VAL-006]", {
+  x = nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
 
-## Failure message for each test ------------------------------------------
+  expect_false(x$`No duplicate primary keys`$success)
+  expect_false(x$`Non-unique baseline covariates`$success)
+  expect_false(x$`No missing covariates`$success)
 
+  x = nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
 
-### Test 1 ----------------------------------------------------------------
-
-test_that("nm_validate works with failure on test 1: No duplicates across id, tafd, and primary keys [NMV-VAL-002]", {
-    nm %>%
-    slice(rep(1,2)) %>%
-    nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
-    as.vector() %>%
-    check_single_error(.i = 1, .err_row = 2, .desc = "No duplicates across: ID, TIME, EVID, DVID")
+  expect_true(x$`No duplicate primary keys`$success)
+  expect_true(x$`Non-unique baseline covariates`$success)
+  expect_true(x$`No missing covariates`$success)
 })
-
-
-### Test 2 ----------------------------------------------------------------
-
-test_that("nm_validate works with failure on test 2: Non-unique baseline covariates [NMV-VAL-003]", {
-  nm %>%
-    mutate(AGEBL = replace(AGEBL, ID == 4 & NUM == 68, 52)) %>%
-    nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
-    as.vector() %>%
-    check_single_error(.i = 2, .err_row = 2, .desc = "Non-unique baseline covariates")
-})
-
-
-### Test 3 ----------------------------------------------------------------
-
-test_that("nm_validate works with failure on test 2: Missing baseline covariates [NMV-VAL-003]", {
-  nm %>%
-    mutate(AGEBL = replace(AGEBL, ID == 4, NA)) %>%
-    nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
-    as.vector() %>%
-    check_single_error(.i = 3, .err_row = 27, .desc = "Missing baseline covariates")
-})
-
-
-### Test 4 ----------------------------------------------------------------
-
-test_that("nm_validate works with failure on test 4: Missing time varying covariates [NMV-VAL-004]", {
-  nm %>%
-    mutate(WT = replace(WT, ID == 4, NA)) %>%
-    nm_validate(.spec = nm_spec, .error_on_fail = FALSE) %>%
-    as.vector() %>%
-    check_single_error(.i = 4, .err_row = 27, .desc = "Missing time varying covariates")
-})
-
-# Error on fail=TRUE ------------------------------------------------------
-
-## No failure -------------------------------------------------------------
-
-test_that("nm_validate standard case: Works with no failures with error=TRUE [NMV-VAL-001]", {
-  x = nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = TRUE)
-  expect_true(
-    all(purrr::map_lgl(x, ~ .x$success)))
-})
-
-## Single failure -------------------------------------------------------
-
-test_that("nm_validate works with failure on test 1:  Finds issues in data [NMV-VAL-002]", {
-  nm %>%
-    slice(rep(1,2)) %>%
-    nm_validate(.spec = nm_spec, .error_on_fail = TRUE) %>%
-    as.vector() %>%
-    expect_error(regexp ="nm_validate found issues in data")
-})
-
-
-
-## Multiple failures ------------------------------------------------------
-
-test_that("nm_validate works with multiple failures: Finds issues in data [NMV-VAL-005]", {
-  nm_errors %>%
-    nm_validate(.spec = nm_spec, .error_on_fail = TRUE) %>%
-    as.vector() %>%
-    expect_error(regexp ="nm_validate found issues in data")
-})
-
-# Print method ------------------------------------------------------------
-
-## No failure -------------------------------------------------------------
-
-test_that("nm_validate works with no failures, stop on failure: Print method [NMV-VAL-006]", {
-  # set up tempfile to sink output to
-  .f <- tempfile()
-  withr::defer(unlink(.f))
-  withr::local_message_sink(.f)
-
-  # print and read result from temp file
-  capture.output(print(nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = TRUE)))
-  res <- readLines(.f)
-  expect_true(any(grepl_fixed(
-    glue::glue("{n_tests} of {n_tests} checks PASSED"),
-    res
-  )))
-})
-
-test_that("nm_validate works with no failures, stop on failure: Print to temp file [NMV-VAL-006]", {
-  # set up tempfile to sink output to
-  .f <- tempfile()
-  withr::defer(unlink(.f))
-  withr::local_message_sink(.f)
-
-  # print and read result from temp file
-  print(nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE))
-  res <- readLines(.f)
-  expect_true(any(grepl_fixed(
-    glue::glue("{n_tests} of {n_tests} checks PASSED"),
-    res
-  )))
-})
-
-## Single failure -------------------------------------------------------
-
-test_that("nm_validate works with no failures, stop on failure: print failure [NMV-VAL-006]", {
-
-  # set up tempfile to sink output to
-  .f <- tempfile()
-  withr::defer(unlink(.f))
-  withr::local_message_sink(.f)
-
-  x <-  nm %>%
-    slice(rep(1,2))
-
-  nm_try <- try(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = TRUE))
-  # print and read result from temp file
-  capture.output(print(nm_try))
-  res <- readLines(.f)
-  expect_true(any(grepl_fixed(
-    glue::glue("{n_tests - 1} of {n_tests} checks PASSED"),
-    res
-  )))
-  expect_true(inherits(nm_try, "try-error"))
-
-})
-
-test_that("nm_validate works with no failures, stop on failure: Print specific failure [NMV-VAL-006]", {
-
-  # set up tempfile to sink output to
-  .f <- tempfile()
-  withr::defer(unlink(.f))
-  withr::local_message_sink(.f)
-
-  x <-  nm %>%
-    slice(rep(1,2))
-
-  # print and read result from temp file
-  capture.output(print(nm_validate(.data = x, .spec = nm_spec, .error_on_fail = FALSE)))
-  res <- readLines(.f)
-  expect_true(any(grepl_fixed(
-    glue::glue("{n_tests-1} of {n_tests} checks PASSED (1 FAILURES)"),
-    res
-  )))
-})
-
-
-
-
-
-## Multiple failures ------------------------------------------------------
-
-
-test_that("nm_validate works with multiple failures, stop on failure: Print method [NMV-VAL-007]", {
-  # set up tempfile to sink output to
-  .f <- tempfile()
-  withr::defer(unlink(.f))
-  withr::local_message_sink(.f)
-
-  nm_try <- try(nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = TRUE))
-  # print and read result from temp file
-  capture.output(print(nm_try))
-  res <- readLines(.f)
-  expect_true(any(grepl_fixed(
-    glue::glue("{n_tests - 3} of {n_tests} checks PASSED"),
-    res
-  )))
-  expect_true(inherits(nm_try, "try-error"))
-})
-
-test_that("nm_validate works with multiple failures, stop on failure: Print failures [NMV-VAL-007]", {
-  # set up tempfile to sink output to
-  .f <- tempfile()
-  withr::defer(unlink(.f))
-  withr::local_message_sink(.f)
-
-  # print and read result from temp file
-  capture.output(print(nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)))
-  res <- readLines(.f)
-  expect_true(any(grepl_fixed(
-    glue::glue("{n_tests - 3} of {n_tests} checks PASSED"),
-    res
-  )))
-})
-
-

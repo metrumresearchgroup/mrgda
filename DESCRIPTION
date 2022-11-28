@@ -1,6 +1,6 @@
 Package: mrgda
 Title: Validate NMTRAN datasets
-Version: 0.1.0
+Version: 0.1.9000
 Authors@R: 
     c(
     person(given = "Eric", family = "Anderson", email = "andersone@metrumrg.com", role = c("aut", "cre")),
@@ -13,7 +13,6 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.1
 Imports: 
-    assertr,
     cli (>= 3.3.0),
     dplyr,
     glue (>= 1.6.2),
