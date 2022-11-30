@@ -47,7 +47,6 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   pass_fail <- function(.code) {
 
     .ans <- list()
-    # browser()
 
     # Run code uses input data
     .code_run <-
