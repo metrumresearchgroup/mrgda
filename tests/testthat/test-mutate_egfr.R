@@ -5,13 +5,13 @@ test_df <- dplyr::tibble(
      SEX = c(1, 2, 1),
      RACE = c(1, 2, 3))
 
-test_that("mutate_egfr appropriately calculates EGFR value", {
+test_that("mutate_egfr appropriately calculates EGFR value [NMV-EGF-001]", {
   .ex_egfr <- mutate_egfr(.df = test_df, .age = AGE, .wt = WT, .serum_creatinine = SC, .sex = SEX, .female_value = 1)
   expect_equal(.ex_egfr$EGFR[1], 69.13866)
   expect_equal(.ex_egfr$EGFR[2], 71.689694)
 })
 
-test_that("mutate_egfr responds to change in specified female value", {
+test_that("mutate_egfr responds to change in specified female value [NMV-EGF-002]", {
   .ex_egfr1 <- mutate_egfr(.df = test_df, .age = AGE, .wt = WT, .serum_creatinine = SC, .sex = SEX, .female_value = 1)
   .ex_egfr2 <- mutate_egfr(.df = test_df, .age = AGE, .wt = WT, .serum_creatinine = SC, .sex = SEX, .female_value = 2)
   expect_true(.ex_egfr1$EGFR[1] != .ex_egfr2$EGFR[1])

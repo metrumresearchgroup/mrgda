@@ -1,5 +1,5 @@
 VAL-R001:
-  description: nm_validate returns appropriate results given different error on fail inputs
+  description: nm_validate returns appropriate debug code when issue detected
   tests:
   - NMV-VAL-001
 VAL-R002:
@@ -7,25 +7,21 @@ VAL-R002:
   tests:
   - NMV-VAL-002
 VAL-R003:
-  description: nm_validate provides anticipated output when baseline covariates check fails
+  description: nm_validate provides anticipated output when non-unique baseline covariates present
   tests:
   - NMV-VAL-003
 VAL-R004:
-  description: nm_validate provides anticipated output when time-varying covariates check fails
+  description: nm_validate provides anticipated output when covariates are missing
   tests:
   - NMV-VAL-004
 VAL-R005:
-  description: nm_validate outputs all failures when they occur
+  description: nm_validate prints results in console consistently for all potential outcomes
   tests:
   - NMV-VAL-005
 VAL-R006:
-  description: nm_validate prints results in console consistently for all potential outcomes
+  description: nm_validate provides appropriate debug code when arguments provided out of order
   tests:
   - NMV-VAL-006
-VAL-R007:
-  description: nm_validate prints multiple failures
-  tests:
-  - NMV-VAL-007
 SUM-R001:
   description: nm_summary outputs an accurate summary of baseline continuous covariates
   tests:
@@ -50,3 +46,11 @@ GAT-R002:
   description: gather-flags modifies data and spec with appropriate messages
   tests:
   - NMV-GAT-002
+EGF-R001:
+  description: mutate_egfr calculates appropriate EGFR value
+  tests:
+  - NMV-EGF-001
+EGF-R002:
+  description: mutate_egfr calculates EGFR correctly for female subjects
+  tests:
+  - NMV-EGF-002

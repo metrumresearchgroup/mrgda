@@ -10,3 +10,4 @@ pkgr.yml
 ^man-roxygen$
 ^README\.Rmd$
 ^.drone.yml$
+make-R.R

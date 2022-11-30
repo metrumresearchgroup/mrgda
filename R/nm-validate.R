@@ -3,8 +3,8 @@
 #' @description
 #' This function is intended to perform a series of checks on a derived data
 #' set by leveraging the data specification used during assembly. If a check
-#' fails, the function will output a description of the problem and where it
-#' occurs in the dataset.
+#' fails, the function will output a description of the problem and code to
+#' use for debugging.
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
@@ -21,6 +21,17 @@
 #' @export
 nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
+  # Check inputs
+  stopifnot(".data must be a data.frame" = inherits(.data, "data.frame"))
+  stopifnot(".spec must be a yspec object" = inherits(.spec, "yspec"))
+  stopifnot(".error_on_fail must be a logical" = is.logical(.error_on_fail))
+
+  # argument names ----------------------------------------------------------
+  arg_names <- as.list(as.character(match.call())[-1])
+  names(arg_names) <- names(match.call())[-1]
+
+  # grab data and spec flags ------------------------------------------------
+
   tests_results <- list()
 
   gather_return <- gather_flags(.data, .spec)
@@ -28,37 +39,31 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   flags <- gather_return$flags
 
   # helper functions --------------------------------------------------------
-  col_concat_nmvalidate <- function(.x){
-    assertr::col_concat(data = .x, sep = "nmvalidate")
+
+  collapse_covs <- function(.covs){
+    paste(.covs, collapse = ", ")
   }
 
-  build_result <- function(.res, .list = tests_results) {
+  pass_fail <- function(.code) {
 
-    res_se <-
-      purrr::set_names(c("success", "errors")) %>%
-      purrr::map(., ~ attr(.res, glue::glue("assertr_{.x}")))
+    .ans <- list()
 
-    out <-
-      if (!is.null(res_se$success)) {
+    # Run code uses input data
+    .code_run <-
+      gsub("{arg_names$.data}", ".data", .code, fixed = TRUE) %>%
+      glue::glue_collapse(, sep = " %>% ") %>%
+      glue::glue()
 
-        list(
-          success = TRUE,
-          description = unlist(res_se$success)[["description"]]
-        )
+    .code_return <-
+      glue::glue_collapse(.code, sep = " %>% ") %>%
+      glue::glue()
 
-      } else if (!is.null(res_se$errors)) {
+    .outputdf <- rlang::parse_expr(.code_run) %>% rlang::eval_tidy()
 
-        list(
-          success = FALSE,
-          description = unlist(res_se$errors)[["description"]],
-          error_content =
-            .res %>%
-            dplyr::slice(
-              dplyr::pull(res_se$errors[[1]][["error_df"]], index)
-            )
-        )
+    .ans$debug <- .code_return
+    .ans$success <- nrow(.outputdf) == 0
 
-      }
+    return(.ans)
 
   }
 
@@ -66,80 +71,45 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   tests_results <- list()
 
-  # -------------------------------------------------------------------------
-  tests_results[["1"]] <-
-    gather_return$data %>%
-    assertr::assert_rows(
-      col_concat_nmvalidate,
-      assertr::is_uniq,
-      c(
-        flags$id,
-        flags$time,
-        flags$primary_key
-      ),
-      success_fun = assertr::success_append,
-      error_fun = assertr::error_append,
-      description = glue::glue(
-        "No duplicates across: {paste(c(flags$id, flags$time, flags$primary_key), collapse = ', ')}"
+  # Duplicate primary keys  -------------------------------------------------
+  tests_results[["No duplicate primary keys"]] <-
+    pass_fail(
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(c(flags$id, flags$time, flags$primary_key))})",
+        "dplyr::count({collapse_covs(c(flags$id, flags$time, flags$primary_key))})",
+        "dplyr::filter(n > 1)"
       )
-    ) %>%
-    build_result()
+    )
 
-
-  # -------------------------------------------------------------------------
-  tests_results[["2"]] <-
-    gather_return$data %>%
-    dplyr::distinct(
-      dplyr::across(
-        c(
-          flags$id,
-          flags$bl_cat_cov,
-          flags$bl_cont_cov
-        )
+  # Non-unique baseline covariates ------------------------------------------
+  tests_results[["Non-unique baseline covariates"]] <-
+    pass_fail(
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov))})",
+        "dplyr::filter(complete.cases(.))",
+        "dplyr::distinct()",
+        "dplyr::group_by(across({flags$id}))",
+        "dplyr::add_count()",
+        "dplyr::ungroup()",
+        "dplyr::filter(n > 1)"
       )
-    ) %>%
-    assertr::assert(
-      assertr::is_uniq,
-      flags$id,
-      success_fun = assertr::success_append,
-      error_fun = assertr::error_append,
-      description = "Non-unique baseline covariates"
-    ) %>%
-    build_result()
+    )
 
-  # -------------------------------------------------------------------------
-  tests_results[["3"]] <-
-    gather_return$data %>%
-    assertr::assert(
-      assertr::not_na,
-      c(
-        flags$id,
-        flags$bl_cat_cov,
-        flags$bl_cont_cov
-      ),
-      success_fun = assertr::success_append,
-      error_fun = assertr::error_append,
-      description = "Missing baseline covariates"
-    ) %>%
-    build_result()
+  # Missing baseline covariates ---------------------------------------------
 
-  # -------------------------------------------------------------------------
-  tests_results[["4"]] <-
-    gather_return$data %>%
-    assertr::assert(
-      assertr::not_na,
-      c(
-        flags$id,
-        flags$tv_cat_cov,
-        flags$tv_cont_cov
-      ),
-      success_fun = assertr::success_append,
-      error_fun = assertr::error_append,
-      description = "Missing time varying covariates"
-    ) %>%
-    build_result()
+  tests_results[["No missing covariates"]] <-
+    pass_fail(
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov, flags$tv_cont_cov, flags$tv_cat_cov))})",
+        "dplyr::filter(!complete.cases(.))"
+      )
+    )
 
   # Output ------------------------------------------------------------------
+
   class(tests_results) <- c("nm_validate_results", class(tests_results))
 
   # Return a true error of any failures
@@ -147,10 +117,12 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   if (failures > 0 & .error_on_fail) {
     print(tests_results)
-    stop("nm_validate found issues in data", call. = FALSE)
+    message("\n")
+    stop("nm_validate() found issues", call. = FALSE)
   }
 
   return(tests_results)
+
 }
 
 
@@ -165,13 +137,27 @@ print.nm_validate_results <- function(x, ...) {
 
   end_msg <- glue::glue("{num_passed} of {length(x)} checks {crayon::green('PASSED')}")
 
+  if (num_passed > 0) {
+
+    passes <-
+      purrr::map(x, ~ {
+        if(isTRUE(.x$success)) {
+          return(.x)
+        } else {
+          return(NULL)
+        }
+      }) %>% purrr::compact()
+
+    for (i in 1:length(passes)) {
+
+      cat("\n")
+
+      cli::cli_alert_success("{names(x)[i]}")
+    }
+
+  }
+
   if (num_fail > 0) {
-
-    fail_msg <- glue::glue("{num_fail} {crayon::red('FAILURES')}")
-
-    cli::cli_h2(glue::glue("Found {fail_msg}:"))
-
-    end_msg <- glue::glue("{end_msg} ({fail_msg})")
 
     failures <-
       purrr::map(x, ~ {
@@ -182,17 +168,20 @@ print.nm_validate_results <- function(x, ...) {
         }
       }) %>% purrr::compact()
 
-    purrr::iwalk(failures, function(res, i) {
+    for (i in 1:length(failures)) {
 
       cat("\n")
 
-      cli::cli_alert_danger("Test {i} failure: {res$description} -- {nrow(res$error_content)} problem{?s}:")
+      cli::cli_alert_danger("{names(x)[i]} -- Copy/paste and run the following code:")
 
-      print(res$error_content)
-    })
+      cat(gsub("%>%", "%>%\n", as.character(failures[[i]]$debug, fixed = TRUE)))
+      cat("\n")
+    }
 
   }
 
-  cli::cli_h1(end_msg)
-}
+  # end_msg)
+  cat("\n")
+  cat(summary_line(n_fail = num_fail, n_pass = num_passed))
 
+}

@@ -9,7 +9,8 @@ gather_flags <- function(.data, .spec){
     "bl_cat_cov", "group",
     "bl_cont_cov", "calculation",
     "tv_cat_cov", "group",
-    "tv_cont_cov", "calculation"
+    "tv_cont_cov", "calculation",
+    "num", "group"
   )
 
   .flags <- yspec::pull_meta(.spec, "flags")[recognized_flags$name] %>%
@@ -19,31 +20,6 @@ gather_flags <- function(.data, .spec){
   .flags_bin <- purrr::map(.flags, ~ is.null(.x))
   if (all(.flags_bin == TRUE)) {
     stop("No flags found in spec file")
-  }
-
-  # Modify empty flags with dummy value & create matching column in data set
-  miss_flags <- c()
-  for (i in 1:length(.flags_bin)) {
-
-    if (!.flags_bin[[i]]) {
-      next
-    }
-
-    miss_flags <- append(miss_flags, names(.flags[i]))
-
-    if (recognized_flags$type[i] == "calculation") {
-      .flags[i] = paste0("mrgda_", names(.flags[i]))
-      .data[[paste0("mrgda_", names(.flags[i]))]] = 0
-    } else {
-      .flags[i] = paste0("mrgda_", names(.flags[i]))
-      .data[[paste0("mrgda_", names(.flags[i]))]] = paste0(names(.flags[i]), " flag missing")
-    }
-
-  }
-
-  if (length(miss_flags) > 0) {
-    cli::cli_h3("Flags not found in spec")
-    cli::cli_ul(miss_flags)
   }
 
   list_return <- list()
