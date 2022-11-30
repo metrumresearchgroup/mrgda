@@ -2,7 +2,24 @@
 
 ## New features and changes
 
-- `nm_validate()` now returns the debug code used to find any errors, rather than the errors themselves.
+- Output of `nm_validate()` now returns code using the users given arguments 
+  when errors are found in the data. The code helps the user to debug the 
+  issue. (#12)
+  
+- Two checks in `nm_validate()` were combined. The missing time varying covariate
+  and baseline covariate checks are now combined as a missing covariate check. (#12)
+
+- Baseline and time-varying covariate flag names were updated to make them 
+  more easily readable. (#9)
+
+- `mutate_egfr()` was added as a new function to assist users calculating 
+  estimated glomerular filtration rate during data assemblies (#8)
+  
+- `readr` and `withr` were moved to suggests from imports. `assertr` was removed
+  as a dependency. (#4, #12)
+  
+- The output continuous and categorical figures from `nm_summary()` were modified
+  to be more adaptable to different data sets. (#2)
 
 
 # mrgda 0.1.0
