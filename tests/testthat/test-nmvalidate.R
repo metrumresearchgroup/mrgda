@@ -64,7 +64,7 @@ test_that("nm_validate catches missing covariates [NMV-VAL-004]", {
 
 
 # output all failures ---------------------------------------------------
-test_that("nm_validate outputs all failures [NMV-VAL-005]", {
+test_that("nm_validate prints multiple failures [NMV-VAL-005]", {
   x = nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
 
   expect_false(x$`No duplicate primary keys`$success)
@@ -78,17 +78,12 @@ test_that("nm_validate outputs all failures [NMV-VAL-005]", {
   expect_true(x$`No missing covariates`$success)
 })
 
+
 # output all failures ---------------------------------------------------
-test_that("nm_validate prints multiple failures [NMV-VAL-006]", {
-  x = nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
+test_that("nm_validate works when arguments are provided out of order [NMV-VAL-006]", {
+  x = nm_validate(.spec = nm_spec, .data = nm_errors, .error_on_fail = FALSE)
 
-  expect_false(x$`No duplicate primary keys`$success)
-  expect_false(x$`Non-unique baseline covariates`$success)
-  expect_false(x$`No missing covariates`$success)
-
-  x = nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
-
-  expect_true(x$`No duplicate primary keys`$success)
-  expect_true(x$`Non-unique baseline covariates`$success)
-  expect_true(x$`No missing covariates`$success)
+  expect_true(grepl("nm_errors", x$`No duplicate primary keys`$debug))
+  expect_true(grepl("nm_errors", x$`Non-unique baseline covariates`$debug))
+  expect_true(grepl("nm_errors", x$`No missing covariates`$debug))
 })

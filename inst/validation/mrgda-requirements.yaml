@@ -15,11 +15,11 @@ VAL-R004:
   tests:
   - NMV-VAL-004
 VAL-R005:
-  description: nm_validate outputs all failures when they occur
+  description: nm_validate prints results in console consistently for all potential outcomes
   tests:
   - NMV-VAL-005
 VAL-R006:
-  description: nm_validate prints results in console consistently for all potential outcomes
+  description: nm_validate provides appropriate debug code when arguments provided out of order
   tests:
   - NMV-VAL-006
 SUM-R001:

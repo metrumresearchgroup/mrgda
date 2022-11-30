@@ -113,8 +113,6 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   class(tests_results) <- c("nm_validate_results", class(tests_results))
 
-  return(tests_results)
-
   # Return a true error of any failures
   failures <- purrr::map_lgl(tests_results, ~ !.x$success) %>% sum
 
@@ -122,6 +120,8 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
     print(tests_results)
     stop(call. = FALSE)
   }
+
+  return(tests_results)
 
 }
 
