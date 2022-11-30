@@ -117,7 +117,8 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
 
   if (failures > 0 & .error_on_fail) {
     print(tests_results)
-    stop(call. = FALSE)
+    message("\n")
+    stop("nm_validate() found issues", call. = FALSE)
   }
 
   return(tests_results)
