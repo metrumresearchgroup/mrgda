@@ -63,7 +63,7 @@ mrgvalidate::create_package_docs(
   product_name = PKGNAME,
   version = PKGVERSION,
   language = "R",
-  repo_url = "https://github.com/metrumresearchgroup/mrgmisc",
+  repo_url = "https://github.com/metrumresearchgroup/mrgda",
   specs = spec,
   release_notes_file = file.path("NEWS.md"),
   auto_test_dir = test_dir,
