@@ -15,3 +15,7 @@ reference:
     desc: Quick visualizations of a data set
     contents:
     - nm_summary
+  - title: Data Assembly
+    desc: Helper functions for deriving variables
+    contents:
+    - mutate_egfr
