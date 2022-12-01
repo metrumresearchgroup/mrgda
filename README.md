@@ -20,13 +20,14 @@ the names of the flags must match those shown below:
 ``` r
 flags:
   id: [ID] # Unique subject ID
+  num: [NUM] # Unique row ID
   study: [STUDYID] # Study ID
-  primary_keys: [EVID, DVID] # variables such as EVID and DVID where you anticipate no duplicate combinations
-  time: [TIME] # Time
-  bl_cov_cat: [SEX, RACE] # Baseline categorical covariate
-  tv_cov_cat: [TIMECAT] # Time-varying categorical covariate
-  bl_cov_cont: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
-  tv_cov_cont: [WT] # Time-varying continuous covariate
+  primary_keys: [EVID, DVID] # Variables such as EVID and DVID where you anticipate no duplicate combinations
+  time: [TIME] # Time 
+  bl_cat_cov: [SEX, RACE] # Baseline categorical covariate
+  tv_cat_cov: [TIMECAT] # Time-varying categorical covariate
+  bl_cont_cov: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
+  tv_cont_cov: [WT] # Time-varying continuous covariate
 ```
 
 *IMPORTANT NOTE* - it is not necessary to have a variable provided for
@@ -66,8 +67,12 @@ in RStudio). renv will activate and find the project library.
 
 ``` r
 covr::package_coverage()
-#> mrgda Coverage: 94.55%
-#> R/nm-summary.R: 87.60%
+#> mrgda Coverage: 77.04%
+#> R/print-aesthetics.R: 0.00%
+#> R/nm-validate.R: 63.16%
+#> R/nm-summary.R: 89.47%
+#> R/calc-egfr.R: 100.00%
 #> R/gather-flags.R: 100.00%
-#> R/nm-validate.R: 100.00%
+#> R/message-function.R: 100.00%
+#> R/mutate-egfr.R: 100.00%
 ```
