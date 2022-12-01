@@ -23,24 +23,24 @@ test_that("nm_summary base cont covariates: All values are grouped by study [NMV
   expect_true(bcc$MAX[1] != bcc$MAX[2])
 })
 
-test_that("nm_summary base cont covariates: All studies are included in table [NMV-SUM-001]", {
+test_that("nm_summary baseline continuous covariates: All studies are included in table [NMV-SUM-001]", {
   bcc2 <- dat_sum$`1` %>% dplyr::distinct(STUDYID)
   expect_equal(nrow(bcc2), 2)
 })
 
 # Baseline categorical covariates -----------------------------------------
 
-test_that("nm_summary base cat covariates: Values fall within the expected range [NMV-SUM-002]", {
+test_that("nm_summary baseline categorical covariates: Values fall within the expected range [NMV-SUM-002]", {
   bccat <- dat_sum$`2`
   expect_true(all(bccat$Percent < 100.1))
 })
 
-test_that("nm_summary base cat covariates: Values within a group add up to 100 [NMV-SUM-002]", {
+test_that("nm_summary baseline categorical covariates: Values within a group add up to 100 [NMV-SUM-002]", {
   bccat <- dat_sum$`2` %>% dplyr::filter(grepl("STUDY-X: Sex", BLCAT))
   expect_true(sum(bccat$Percent) == 100)
 })
 
-test_that("nm_summary base cat covariates: Correct caption is used [NMV-SUM-002]", {
+test_that("nm_summary baseline categorical covariates: Correct caption is used [NMV-SUM-002]", {
   bccat <- dat_sum$`2`
   expect_equal(bccat$LT_CAP_TEXT[1], "Summary of baseline categorical covariates by study")
 })
@@ -66,7 +66,7 @@ test_that("nm_summary outputs figures: Baseline covariates continuous [NMV-SUM-0
   expect_equal(as.numeric(figdata[5, 4]), 105.1)
 })
 
-test_that("nm_summary outputs figures: Baseline covariates  categorical [NMV-SUM-004]", {
+test_that("nm_summary outputs figures: Categorical baseline covariates [NMV-SUM-004]", {
   figsum <- nm_summary(.data = nm, .spec = nm_spec, .type = "figures", .figure_prompt = FALSE)
   figdata <- figsum$`2`$data
   expect_equal(nrow(figdata), 178)

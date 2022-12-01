@@ -27,8 +27,8 @@ SUM-S001:
   - GAT-R002
 EGF-S001:
   name: mutate_egfr
-  description: As a user, I want to mutate a EGFR column to a dataset with appropriate
-    values for each subject.
+  description: As a user, I want to mutate an estimated glomerular filtration rate (EGFR)
+  column to a dataset with appropriate values for each subject.
   ProductRisk: High
   requirements:
   - EGF-R001
