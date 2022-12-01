@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -56,6 +56,22 @@
       
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.2.0" id="mrgda-020">mrgda 0.2.0<a class="anchor" aria-label="anchor" href="#mrgda-020"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-0-2-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-2-0"></a></h3>
+<ul><li><p>Output of <code><a href="../reference/nm_validate.html">nm_validate()</a></code> now returns code using the users given arguments when errors are found in the data. The code helps the user to debug the issue. (#12)</p></li>
+<li><p>Two checks in <code><a href="../reference/nm_validate.html">nm_validate()</a></code> were combined. The missing time varying covariate and baseline covariate checks are now combined as a missing covariate check. (#12)</p></li>
+<li><p>Baseline and time-varying covariate flag names were updated to make them more easily readable. The updated flag names are available in the README. (#9)</p></li>
+<li><p><code><a href="../reference/mutate_egfr.html">mutate_egfr()</a></code> was added as a new function to assist users calculating estimated glomerular filtration rate during data assemblies (#8)</p></li>
+<li><p><code>readr</code> and <code>withr</code> were moved to suggests from imports. <code>assertr</code> was removed as a dependency. (#4, #12)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/nm_summary.html">nm_summary()</a></code> did not create readable continuous and categorical covariate figures when a large number of covariates were present. (#2)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.0" id="mrgda-010">mrgda 0.1.0<a class="anchor" aria-label="anchor" href="#mrgda-010"></a></h2>
 <div class="section level3">

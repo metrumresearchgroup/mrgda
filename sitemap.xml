@@ -7,6 +7,9 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/NEWS_release.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html</loc>
   </url>
   <url>
@@ -22,10 +25,16 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/news/index.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/calc_egfr.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/index.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/mrgda-package.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/mutate_egfr.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/nm_summary.html</loc>

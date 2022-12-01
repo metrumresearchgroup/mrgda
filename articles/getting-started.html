@@ -35,7 +35,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -125,10 +125,10 @@ interest in the data set.</p>
 <span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  study<span class="sc">:</span> [STUDYID] <span class="co"># Study ID</span></span>
 <span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  primary_keys<span class="sc">:</span> [EVID, DVID] <span class="co"># variables such as EVID and DVID where you anticipate no duplicate combinations</span></span>
 <span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  time<span class="sc">:</span> [TIME] <span class="co"># Time</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  bl_cov_cat<span class="sc">:</span> [SEX, RACE] <span class="co"># Baseline categorical covariate</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  tv_cov_cat<span class="sc">:</span> [TIMECAT] <span class="co"># Time-varying categorical covariate</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  bl_cov_cont<span class="sc">:</span> [WTBL, BMIBL, AGEBL] <span class="co"># Baseline continuous covariate</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  tv_cov_cont<span class="sc">:</span> [WT] <span class="co"># Time-varying continuous covariate</span></span></code></pre></div>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  bl_cat_cov<span class="sc">:</span> [SEX, RACE] <span class="co"># Baseline categorical covariate</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  tv_cat_cov<span class="sc">:</span> [TIMECAT] <span class="co"># Time-varying categorical covariate</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  bl_cont_cov<span class="sc">:</span> [WTBL, BMIBL, AGEBL] <span class="co"># Baseline continuous covariate</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  tv_cont_cov<span class="sc">:</span> [WT] <span class="co"># Time-varying continuous covariate</span></span></code></pre></div>
 <p>In the specification above, we are identifying the <code>SEX</code>
 and <code>RACE</code> columns as baseline categorical covariates.
 <code>nm_validate</code> will use this information and perform checks
@@ -140,7 +140,7 @@ row within this subset of columns is unique. If some rows are not
 unique, this would indicate a duplicate observation in the data set.</p>
 </div>
 <div class="section level2">
-<h2 id="non-unique-baseline-covariates-checks">Non-unique baseline covariates checks<a class="anchor" aria-label="anchor" href="#non-unique-baseline-covariates-checks"></a>
+<h2 id="non-unique-baseline-covariates-checks-nonmem">Non-unique baseline covariates checks (NONMEM)<a class="anchor" aria-label="anchor" href="#non-unique-baseline-covariates-checks-nonmem"></a>
 </h2>
 <p>With the data specification flags set up, we can load the data set
 and specification file into R as such. We will also create a
@@ -156,28 +156,27 @@ set.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/nm_validate.html">nm_validate</a></span><span class="op">(</span>.data <span class="op">=</span> <span class="va">nm1</span>, .spec <span class="op">=</span> <span class="va">nm_spec</span>, .error_on_fail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Flags not found in spec</span></span>
-<span><span class="co">#&gt; • tv_cov_cat</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">nm_validate() results:</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No duplicate primary keys</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Non-unique baseline covariates</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> No duplicate primary keys -- Copy/paste and run the following code:</span></span>
+<span><span class="co">#&gt; nm1 %&gt;%</span></span>
+<span><span class="co">#&gt;  dplyr::select(ID, SEX, RACE, WTBL, BMIBL, AGEBL) %&gt;%</span></span>
+<span><span class="co">#&gt;  dplyr::filter(complete.cases(.)) %&gt;%</span></span>
+<span><span class="co">#&gt;  dplyr::distinct() %&gt;%</span></span>
+<span><span class="co">#&gt;  dplyr::group_by(across(ID)) %&gt;%</span></span>
+<span><span class="co">#&gt;  dplyr::add_count() %&gt;%</span></span>
+<span><span class="co">#&gt;  dplyr::ungroup() %&gt;%</span></span>
+<span><span class="co">#&gt;  dplyr::filter(n &gt; 1)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── <span style="font-weight: bold;">Found 1 </span><span style="color: #BB0000; font-weight: bold;">FAILURES</span><span style="font-weight: bold;">:</span> ──</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> Test 2 failure: Non-unique baseline covariates -- 2 problems:</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 6</span></span></span>
-<span><span class="co">#&gt;      ID  WTBL BMIBL AGEBL   SEX  RACE</span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span>     4  101.  27.6    48     1     1</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span>     4  101.  27.6    52     1     1</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">3 of 4 checks </span><span style="color: #00BB00; font-weight: bold;">PASSED</span><span style="font-weight: bold;"> (1 </span><span style="color: #BB0000; font-weight: bold;">FAILURES</span><span style="font-weight: bold;">)</span> <span style="color: #00BBBB;">───────────────────────────────────────────</span></span></span></code></pre></div>
+<span><span class="co">#&gt; [ <span style="color: #BB0000;">FAIL</span> 1 | <span style="color: #00BB00;">PASS</span> 2 ]</span></span></code></pre></div>
 <p>As expected, the modified data set failed the baseline covariate
 check. Notice how <code>nm_validate</code> outputs the number of passed
 &amp; failed tests, along with the rows from the data that caused the
 issue.</p>
 </div>
 <div class="section level2">
-<h2 id="missing-time-varying-covariate-checks">Missing time-varying covariate checks<a class="anchor" aria-label="anchor" href="#missing-time-varying-covariate-checks"></a>
+<h2 id="missing-time-varying-covariate-checks-nonmem">Missing time-varying covariate checks (NONMEM)<a class="anchor" aria-label="anchor" href="#missing-time-varying-covariate-checks-nonmem"></a>
 </h2>
 <p>A similar error message will appear for other checks as well. For
 instance, another common error during data assembly is leaving
@@ -188,33 +187,15 @@ case of this, it will return the following:</p>
 <span>    <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>WT <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/replace.html" class="external-link">replace</a></span><span class="op">(</span><span class="va">WT</span>, <span class="va">ID</span> <span class="op">==</span> <span class="fl">4</span>, <span class="cn">NA</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="../reference/pipe.html">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="../reference/nm_validate.html">nm_validate</a></span><span class="op">(</span>.spec <span class="op">=</span> <span class="va">nm_spec</span>, .error_on_fail <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── Flags not found in spec</span></span>
-<span><span class="co">#&gt; • tv_cov_cat</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">nm_validate() results:</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> No duplicate primary keys</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Non-unique baseline covariates</span></span>
+<span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> No duplicate primary keys -- Copy/paste and run the following code:</span></span>
+<span><span class="co">#&gt; . %&gt;%</span></span>
+<span><span class="co">#&gt;  dplyr::select(ID, SEX, RACE, WTBL, BMIBL, AGEBL, WT) %&gt;%</span></span>
+<span><span class="co">#&gt;  dplyr::filter(!complete.cases(.))</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── <span style="font-weight: bold;">Found 1 </span><span style="color: #BB0000; font-weight: bold;">FAILURES</span><span style="font-weight: bold;">:</span> ──</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #BB0000;">✖</span> Test 4 failure: Missing time varying covariates -- 27 problems:</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 27 × 29</span></span></span>
-<span><span class="co">#&gt;    C       NUM    ID   TIME    TAD  DOSE      DV  DVID   CMT  EVID   AMT  RATE</span></span>
-<span><span class="co">#&gt;    <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 1</span> <span style="color: #BB0000;">NA</span>       66     4  -<span style="color: #BB0000;">0.27</span>  -<span style="color: #BB0000;">0.27</span>    30   <span style="color: #BB0000;">NA</span>        2     1     2    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 2</span> <span style="color: #BB0000;">NA</span>       67     4   0      0       30   <span style="color: #BB0000;">NA</span>        1     1     1    30  46.2</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 3</span> <span style="color: #BB0000;">NA</span>       68     4   0.75   0.75    30 <span style="text-decoration: underline;">2</span>934        2     1     0    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 4</span> <span style="color: #BB0000;">NA</span>       69     4   2.82   2.82    30 <span style="text-decoration: underline;">2</span>307        2     1     0    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 5</span> <span style="color: #BB0000;">NA</span>       70     4   4.8    4.8     30 <span style="text-decoration: underline;">1</span>730        2     1     0    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 6</span> <span style="color: #BB0000;">NA</span>       71     4  23.4   23.4     30  610        2     1     0    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 7</span> <span style="color: #BB0000;">NA</span>       72     4  48.0   48.0     30  383        2     1     0    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 8</span> <span style="color: #BB0000;">NA</span>       73     4 172.   172.      30   57.1      2     1     0    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;"> 9</span> <span style="color: #BB0000;">NA</span>       74     4 339.   339.      30    4.55     2     1     0    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">10</span> <span style="color: #BB0000;">NA</span>       75     4 505.   505.      30   <span style="color: #BB0000;">NA</span>        2     1     2    <span style="color: #BB0000;">NA</span>  <span style="color: #BB0000;">NA</span>  </span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># … with 17 more rows, and 17 more variables: DUR &lt;dbl&gt;, MDV &lt;dbl&gt;, BLQ &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   DAY &lt;dbl&gt;, WTBL &lt;dbl&gt;, WT &lt;dbl&gt;, BMIBL &lt;dbl&gt;, AGEBL &lt;dbl&gt;, SEX &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   RACE &lt;dbl&gt;, ADAT &lt;chr&gt;, ADAC &lt;dbl&gt;, ADAPOS &lt;dbl&gt;, NOADAT &lt;dbl&gt;,</span></span></span>
-<span><span class="co">#&gt; <span style="color: #949494;">#   PKDTIMP &lt;dbl&gt;, STUDYID &lt;chr&gt;, mrgda_tv_cov_cat &lt;chr&gt;</span></span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">3 of 4 checks </span><span style="color: #00BB00; font-weight: bold;">PASSED</span><span style="font-weight: bold;"> (1 </span><span style="color: #BB0000; font-weight: bold;">FAILURES</span><span style="font-weight: bold;">)</span> <span style="color: #00BBBB;">───────────────────────────────────────────</span></span></span></code></pre></div>
+<span><span class="co">#&gt; [ <span style="color: #BB0000;">FAIL</span> 1 | <span style="color: #00BB00;">PASS</span> 2 ]</span></span></code></pre></div>
 <p>Notice how <code>nm_validate</code> outputs the cause of the error
 along with the rows in question.</p>
 </div>

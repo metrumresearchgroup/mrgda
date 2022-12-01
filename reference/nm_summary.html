@@ -20,7 +20,7 @@ better understand distributions within the derived data set."><!-- mathjax --><s
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.0.9000</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -68,7 +68,7 @@ better understand distributions within the derived data set.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">nm_summary</span><span class="op">(</span><span class="va">.data</span>, <span class="va">.spec</span>, <span class="va">...</span>, .type <span class="op">=</span> <span class="st">"tables"</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">nm_summary</span><span class="op">(</span><span class="va">.data</span>, <span class="va">.spec</span>, <span class="va">...</span>, .type <span class="op">=</span> <span class="st">"tables"</span>, .figure_prompt <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -87,6 +87,10 @@ better understand distributions within the derived data set.</p>
 
 <dt>.type</dt>
 <dd><p>specify desired output of "tables" or "figures". Default is "tables"</p></dd>
+
+
+<dt>.figure_prompt</dt>
+<dd><p>whether graphics device asks for confirmation between figures</p></dd>
 
 </dl></div>
 
@@ -107,21 +111,29 @@ better understand distributions within the derived data set.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Specify the column types or set `show_col_types = FALSE` to quiet this message.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># To change the output to summary figures instead of tables</span></span></span>
-<span class="r-in"><span><span class="fu">nm_summary</span><span class="op">(</span>.data <span class="op">=</span> <span class="va">nm</span>, .spec <span class="op">=</span> <span class="va">nm_spec</span>, .type <span class="op">=</span> <span class="st">"figures"</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> ── Flags not found in spec </span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> • tv_cov_cat</span>
+<span class="r-in"><span><span class="fu">nm_summary</span><span class="op">(</span>.data <span class="op">=</span> <span class="va">nm</span>, .spec <span class="op">=</span> <span class="va">nm_spec</span>, .type <span class="op">=</span> <span class="st">"figures"</span>, .figure_prompt <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "name"</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "name"</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "BLCOV"</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Joining, by = "BLCAT"</span>
 <span class="r-plt img"><img src="nm_summary-1.png" alt="" width="700" height="433"></span>
 <span class="r-plt img"><img src="nm_summary-2.png" alt="" width="700" height="433"></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> $`1`</span>
 <span class="r-plt img"><img src="nm_summary-3.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="nm_summary-4.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="nm_summary-5.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`1`</span>
+<span class="r-plt img"><img src="nm_summary-6.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $`2`</span>
-<span class="r-plt img"><img src="nm_summary-4.png" alt="" width="700" height="433"></span>
+<span class="r-plt img"><img src="nm_summary-7.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`3`</span>
+<span class="r-plt img"><img src="nm_summary-8.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`4`</span>
+<span class="r-plt img"><img src="nm_summary-9.png" alt="" width="700" height="433"></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $`5`</span>
+<span class="r-plt img"><img src="nm_summary-10.png" alt="" width="700" height="433"></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
