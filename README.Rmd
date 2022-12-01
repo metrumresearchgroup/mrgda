@@ -21,10 +21,10 @@ names of the flags must match those shown below:
 ```{r, eval=FALSE}
 flags:
   id: [ID] # Unique subject ID
-  num: [NUM] # unique row ID
+  num: [NUM] # Unique row ID
   study: [STUDYID] # Study ID
-  primary_keys: [EVID, DVID] # variables such as EVID and DVID where you anticipate no duplicate combinations
-  time: [TIME] # Time
+  primary_keys: [EVID, DVID] # Variables such as EVID and DVID where you anticipate no duplicate combinations
+  time: [TIME] # Time 
   bl_cat_cov: [SEX, RACE] # Baseline categorical covariate
   tv_cat_cov: [TIMECAT] # Time-varying categorical covariate
   bl_cont_cov: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
