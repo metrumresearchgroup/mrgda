@@ -87,3 +87,14 @@ test_that("nm_validate works when arguments are provided out of order [NMV-VAL-0
   expect_true(grepl("nm_errors", x$`Non-unique baseline covariates`$debug))
   expect_true(grepl("nm_errors", x$`No missing covariates`$debug))
 })
+
+
+# output prints appropriate test names ------------------------------------
+test_that("nm_validate prints correct test names when only 1 failure  [NMV-VAL-007]", {
+  nm_1e <- nm
+  nm_1e$WTBL[1] = NA_real_
+  x = nm_validate(.spec = nm_spec, .data = nm_1e, .error_on_fail = FALSE)
+
+  expect_true(names(x)[3] == "No missing covariates")
+})
+

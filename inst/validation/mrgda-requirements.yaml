@@ -22,6 +22,10 @@ VAL-R006:
   description: nm_validate provides appropriate debug code when arguments provided out of order
   tests:
   - NMV-VAL-006
+VAL-R007:
+  description: nm_validate prints appropriate test names when single failure occurs
+  tests:
+  - NMV-VAL-007
 SUM-R001:
   description: nm_summary outputs an accurate summary of baseline continuous covariates
   tests:
