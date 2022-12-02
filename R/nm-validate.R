@@ -109,7 +109,6 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
     )
 
   # Output ------------------------------------------------------------------
-
   class(tests_results) <- c("nm_validate_results", class(tests_results))
 
   # Return a true error of any failures
@@ -152,7 +151,7 @@ print.nm_validate_results <- function(x, ...) {
 
       cat("\n")
 
-      cli::cli_alert_success("{names(x)[i]}")
+      cli::cli_alert_success("{names(passes)[i]}")
     }
 
   }
@@ -172,7 +171,7 @@ print.nm_validate_results <- function(x, ...) {
 
       cat("\n")
 
-      cli::cli_alert_danger("{names(x)[i]} -- Copy/paste and run the following code:")
+      cli::cli_alert_danger("{names(failures)[i]} -- Copy/paste and run the following code:")
 
       cat(gsub("%>%", "%>%\n", as.character(failures[[i]]$debug, fixed = TRUE)))
       cat("\n")
