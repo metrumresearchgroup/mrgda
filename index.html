@@ -35,7 +35,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.1</span>
       </span>
     </div>
 
@@ -89,13 +89,14 @@
 <p>Within the setup section, <code>flags</code> are defined. In order to use <code>mrgda</code> the names of the flags must match those shown below:</p>
 <div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>flags<span class="sc">:</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>  id<span class="sc">:</span> [ID] <span class="co"># Unique subject ID</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  study<span class="sc">:</span> [STUDYID] <span class="co"># Study ID</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  primary_keys<span class="sc">:</span> [EVID, DVID] <span class="co"># variables such as EVID and DVID where you anticipate no duplicate combinations</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  time<span class="sc">:</span> [TIME] <span class="co"># Time</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  bl_cov_cat<span class="sc">:</span> [SEX, RACE] <span class="co"># Baseline categorical covariate</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  tv_cov_cat<span class="sc">:</span> [TIMECAT] <span class="co"># Time-varying categorical covariate</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  bl_cov_cont<span class="sc">:</span> [WTBL, BMIBL, AGEBL] <span class="co"># Baseline continuous covariate</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  tv_cov_cont<span class="sc">:</span> [WT] <span class="co"># Time-varying continuous covariate</span></span></code></pre></div>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>  num<span class="sc">:</span> [NUM] <span class="co"># Unique row ID</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  study<span class="sc">:</span> [STUDYID] <span class="co"># Study ID</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  primary_keys<span class="sc">:</span> [EVID, DVID] <span class="co"># Variables such as EVID and DVID where you anticipate no duplicate combinations</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  time<span class="sc">:</span> [TIME] <span class="co"># Time </span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  bl_cat_cov<span class="sc">:</span> [SEX, RACE] <span class="co"># Baseline categorical covariate</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  tv_cat_cov<span class="sc">:</span> [TIMECAT] <span class="co"># Time-varying categorical covariate</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  bl_cont_cov<span class="sc">:</span> [WTBL, BMIBL, AGEBL] <span class="co"># Baseline continuous covariate</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  tv_cont_cov<span class="sc">:</span> [WT] <span class="co"># Time-varying continuous covariate</span></span></code></pre></div>
 <p><em>IMPORTANT NOTE</em> - it is not necessary to have a variable provided for each flag. Adding variables to each of the flags is optional, however the significance of the output will be decreased with the less information provided in flags.</p>
 </div>
 <div class="section level2">
@@ -126,10 +127,14 @@
 </h2>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">covr</span><span class="fu">::</span><span class="fu"><a href="http://covr.r-lib.org/reference/package_coverage.html" class="external-link">package_coverage</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; mrgda Coverage: 94.55%</span></span>
-<span><span class="co">#&gt; R/nm-summary.R: 87.60%</span></span>
+<span><span class="co">#&gt; mrgda Coverage: 77.04%</span></span>
+<span><span class="co">#&gt; R/print-aesthetics.R: 0.00%</span></span>
+<span><span class="co">#&gt; R/nm-validate.R: 63.16%</span></span>
+<span><span class="co">#&gt; R/nm-summary.R: 89.47%</span></span>
+<span><span class="co">#&gt; R/calc-egfr.R: 100.00%</span></span>
 <span><span class="co">#&gt; R/gather-flags.R: 100.00%</span></span>
-<span><span class="co">#&gt; R/nm-validate.R: 100.00%</span></span></code></pre></div>
+<span><span class="co">#&gt; R/message-function.R: 100.00%</span></span>
+<span><span class="co">#&gt; R/mutate-egfr.R: 100.00%</span></span></code></pre></div>
 </div>
 </div>
   </div>
