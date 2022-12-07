@@ -1,3 +1,11 @@
+# mrgda 0.2.1
+
+## Bug fixes
+
+- `nm_validate` did not always print the corresponding test name alongside the 
+  debug code. (#16)
+
+
 # mrgda 0.2.0
 
 ## New features and changes
