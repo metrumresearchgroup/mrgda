@@ -26,7 +26,8 @@ Imports:
     tibble,
     ggplot2,
     stringr,
-    assertthat
+    assertthat,
+    forcats
 Suggests: 
     knitr,
     testthat (>= 3.0.0),

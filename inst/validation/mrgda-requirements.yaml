@@ -58,3 +58,11 @@ EGF-R002:
   description: mutate_egfr calculates EGFR correctly for female subjects
   tests:
   - NMV-EGF-002
+MID-R001:
+  description: mutate_id generates appropriate IDs for standard case
+  tests:
+  - NMV-MID-001
+MID-R002:
+  description: mutate_id generates appropriate IDs when unique starting ID given
+  tests:
+  - NMV-MID-002
