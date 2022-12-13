@@ -4,14 +4,14 @@
 \alias{mutate_id}
 \title{Mutate ID}
 \usage{
-mutate_id(.df, .usubjid, .startid = 1)
+mutate_id(.df, .unique_subject_identifier, .start_id = 1)
 }
 \arguments{
 \item{.df}{data.frame to add ID column to}
 
-\item{.usubjid}{subject identifier}
+\item{.unique_subject_identifier}{subject identifier}
 
-\item{.startid}{numerical value for first ID value}
+\item{.start_id}{numerical value for first ID value}
 }
 \description{
 Mutate ID column to a data.frame. The new column will be named \code{ID}.
@@ -25,8 +25,8 @@ test_df <- dplyr::tibble(
 
 test_df \%>\%
 mutate_id(
- .usubjid = USUBJID,
- .startid = 1
+ .unique_subject_identifier = USUBJID,
+ .start_id = 1
  )
 
 }

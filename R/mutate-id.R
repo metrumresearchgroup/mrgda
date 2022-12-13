@@ -4,8 +4,8 @@
 #' Mutate ID column to a data.frame. The new column will be named `ID`.
 #'
 #' @param .df data.frame to add ID column to
-#' @param .usubjid subject identifier
-#' @param .startid numerical value for first ID value
+#' @param .unique_subject_identifier subject identifier
+#' @param .start_id numerical value for first ID value
 #'
 #' @examples
 #'
@@ -16,12 +16,12 @@
 #'
 #' test_df %>%
 #' mutate_id(
-#'  .usubjid = USUBJID,
-#'  .startid = 1
+#'  .unique_subject_identifier = USUBJID,
+#'  .start_id = 1
 #'  )
 #'
 #' @export
-mutate_id <- function(.df, .usubjid, .startid = 1) {
+mutate_id <- function(.df, .unique_subject_identifier, .start_id = 1) {
 
   assertthat::assert_that(
     !inherits(.df, "grouped_df"),
@@ -31,8 +31,8 @@ mutate_id <- function(.df, .usubjid, .startid = 1) {
   .df %>%
     dplyr::mutate(
       ID = calc_id(
-        .usubjid = {{.usubjid}},
-        .startid = .startid
+        .unique_subject_identifier = {{.unique_subject_identifier}},
+        .start_id = .start_id
       )
     ) %>%
     dplyr::ungroup()

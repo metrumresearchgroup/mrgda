@@ -4,12 +4,12 @@
 \alias{calc_id}
 \title{ID formula}
 \usage{
-calc_id(.usubjid, .startid = 1)
+calc_id(.unique_subject_identifier, .start_id = 1)
 }
 \arguments{
-\item{.usubjid}{subject identifier}
+\item{.unique_subject_identifier}{subject identifier}
 
-\item{.startid}{numerical value to start creating ID's}
+\item{.start_id}{numerical value to start creating ID's}
 }
 \description{
 ID formula
