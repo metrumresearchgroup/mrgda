@@ -3,7 +3,7 @@
 ## New features and changes
 
 - Added `mutate-id` for users to calculate subject identification columns
-  during their data assemblies. (#19)
+  during their data assemblies. (#20)
 
 # mrgda 0.2.1
 
