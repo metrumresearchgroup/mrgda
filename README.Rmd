@@ -4,38 +4,78 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# mrgda
-A data assembly validation tool designed to identify errors in derived data sets. 
-`nm_validate` runs a series of pass/fail checks on NONMEM data sets and `nm_summary` 
-provides a quick visualization of this data.
+## Overview
 
-## Background
-Often data sets are derived according to a data specification file. This package 
-leverages the information within this file to validate the data set. It is suggested
-that the data specification file be made in `yaml` format. An example of one can be 
-found in `inst/derived/pk.yml`.
+`mrgda` assists with deriving and validating NONMEM data sets. While assembling 
+data, a set of functions are provided to mutate common NONMEM variables:
 
-Within the setup section, `flags` are defined. In order to use `mrgda` the
-names of the flags must match those shown below:
+- `mutate_egfr()` adds an estimated glomerular filtration rate (eGFR) column
 
-```{r, eval=FALSE}
-flags:
-  id: [ID] # Unique subject ID
-  num: [NUM] # Unique row ID
-  study: [STUDYID] # Study ID
-  primary_keys: [EVID, DVID] # Variables such as EVID and DVID where you anticipate no duplicate combinations
-  time: [TIME] # Time 
-  bl_cat_cov: [SEX, RACE] # Baseline categorical covariate
-  tv_cat_cov: [TIMECAT] # Time-varying categorical covariate
-  bl_cont_cov: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
-  tv_cont_cov: [WT] # Time-varying continuous covariate
+Once derived, `mrgda` will help you identify any common errors that exist in 
+the data, by providing:
+
+- `nm_summary()` outputs covariate summary tables and informative data visualizations
+
+- `nm_validate()` runs a series of pass/fail checks for:
+  - Duplicated events
+  - Non-unique baseline covariates
+  - Missing covariates
+
+These all leverage information within a data specification file. It is suggested
+that this file be in `yaml` format, similar to the example found [here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml).
+You can learn more about setting up the data specification file in the 
+[Getting Started with mrgda](https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html) vignette.
+
+
+## Usage
+
+```{r, include=FALSE}
+
+nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
+nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
+nm_errors <- readr::read_csv(system.file("derived", "pk-errors.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
+
+nm_ex_df <- dplyr::tibble(
+     AGE = c(45, 82, 73),
+     WT = c(64, 23, 92),
+     SC = c(1.02, 1.04, 1.98),
+     SEX = c(1, 2, 1),
+     RACE = c(1, 2, 3))
+
 ```
 
-*IMPORTANT NOTE* - it is not necessary to have a variable provided for each flag. Adding variables to each of the flags is optional, 
-however the significance of the output will be decreased with the less information provided in flags.
+#### Data validation
+
+`nm_validate()` outputs the results of the pass/fail checks. If a check fails,
+the user will be provided code to help identify where the error is in the data.
+
+```{r, comment=NA}
+library(mrgda)
+
+nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
+
+```
+
+#### Data derivation
+
+Data assembly functions such as `mutate_egfr()` mutates a new column onto the data. 
+The user is also provided the source for the equation used in the caluclation.
+
+```{r, comment=NA}
+nm_ex_df %>% 
+  mutate_egfr(
+    .age = AGE,
+    .wt = WT,
+    .serum_creatinine = SC,
+    .sex = SEX,
+    .female_value = 1
+  )
+```
+
 
 ## Documentation
 Public documentation of all functions is hosted at [https://metrumresearchgroup.github.io/mrgda/](https://metrumresearchgroup.github.io/mrgda/)
+
 
 ## Development
 
@@ -59,9 +99,12 @@ provide isolation. To replicate this environment,
 Then, launch R with the repo as the working directory (open the project
 in RStudio). renv will activate and find the project library.
 
-## Package coverage
+## Getting help
+
+If you encounter a clear bug, please file an issue with a minimal reproducible example on [mrgda](https://github.com/mrgda/issues). 
 
 ```{r setup, include = FALSE}
+## Package coverage
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -74,6 +117,6 @@ if (basename(getwd()) == "docs") {
 
 ```
 
-```{r}
+```{r, include=FALSE}
 covr::package_coverage()
 ```

@@ -1,39 +1,114 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# mrgda
+## Overview
 
-A data assembly validation tool designed to identify errors in derived
-data sets. `nm_validate` runs a series of pass/fail checks on NONMEM
-data sets and `nm_summary` provides a quick visualization of this data.
+`mrgda` assists with deriving and validating NONMEM data sets. While
+assembling data, a set of functions are provided to mutate common NONMEM
+variables:
 
-## Background
+-   `mutate_egfr()` adds an estimated glomerular filtration rate (eGFR)
+    column
 
-Often data sets are derived according to a data specification file. This
-package leverages the information within this file to validate the data
-set. It is suggested that the data specification file be made in `yaml`
-format. An example of one can be found in `inst/derived/pk.yml`.
+Once derived, `mrgda` will help you identify any common errors that
+exist in the data, by providing:
 
-Within the setup section, `flags` are defined. In order to use `mrgda`
-the names of the flags must match those shown below:
+-   `nm_summary()` outputs covariate summary tables and informative data
+    visualizations
+
+-   `nm_validate()` runs a series of pass/fail checks for:
+
+    -   Duplicated events
+    -   Non-unique baseline covariates
+    -   Missing covariates
+
+These all leverage information within a data specification file. It is
+suggested that this file be in `yaml` format, similar to the example
+found
+[here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml).
+You can learn more about setting up the data specification file in the
+[Getting Started with
+mrgda](https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html)
+vignette.
+
+## Usage
+
+#### Data validation
+
+`nm_validate()` outputs the results of the pass/fail checks. If a check
+fails, the user will be provided code to help identify where the error
+is in the data.
 
 ``` r
-flags:
-  id: [ID] # Unique subject ID
-  num: [NUM] # Unique row ID
-  study: [STUDYID] # Study ID
-  primary_keys: [EVID, DVID] # Variables such as EVID and DVID where you anticipate no duplicate combinations
-  time: [TIME] # Time 
-  bl_cat_cov: [SEX, RACE] # Baseline categorical covariate
-  tv_cat_cov: [TIMECAT] # Time-varying categorical covariate
-  bl_cont_cov: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
-  tv_cont_cov: [WT] # Time-varying continuous covariate
+library(mrgda)
+
+nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
 ```
 
-*IMPORTANT NOTE* - it is not necessary to have a variable provided for
-each flag. Adding variables to each of the flags is optional, however
-the significance of the output will be decreased with the less
-information provided in flags.
+    ── nm_validate() results: ──────────────────────────────────────────────────────
+
+    ✖ No duplicate primary keys -- Copy/paste and run the following code:
+
+    nm_errors %>%
+     dplyr::select(ID, TIME, EVID, DVID) %>%
+     dplyr::count(ID, TIME, EVID, DVID) %>%
+     dplyr::filter(n > 1)
+
+    ✖ Non-unique baseline covariates -- Copy/paste and run the following code:
+
+    nm_errors %>%
+     dplyr::select(ID, SEX, RACE, WTBL, BMIBL, AGEBL) %>%
+     dplyr::filter(complete.cases(.)) %>%
+     dplyr::distinct() %>%
+     dplyr::group_by(across(ID)) %>%
+     dplyr::add_count() %>%
+     dplyr::ungroup() %>%
+     dplyr::filter(n > 1)
+
+    ✖ No missing covariates -- Copy/paste and run the following code:
+
+    nm_errors %>%
+     dplyr::select(ID, SEX, RACE, WTBL, BMIBL, AGEBL, WT) %>%
+     dplyr::filter(!complete.cases(.))
+
+    [ FAIL 3 | PASS 0 ]
+
+#### Data derivation
+
+Data assembly functions such as `mutate_egfr()` mutates a new column
+onto the data. The user is also provided the source for the equation
+used in the caluclation.
+
+``` r
+nm_ex_df %>% 
+  mutate_egfr(
+    .age = AGE,
+    .wt = WT,
+    .serum_creatinine = SC,
+    .sex = SEX,
+    .female_value = 1
+  )
+```
+
+    ┌ calc_egfr() formula: ─────────────────────────────────────────────────────────────┐
+    │                                                                                   │
+    │   function (.age, .wt, .serum_creatinine, .sex, .female_value)                    │
+    │   {                                                                               │
+    │       .alpha <- dplyr::if_else(.sex == .female_value, -0.241, -0.302)             │
+    │       .k <- dplyr::if_else(.sex == .female_value, 0.7, 0.9)                       │
+    │       142 * (min(.serum_creatinine/.k, 1)^.alpha) * (max(.serum_creatinine/.k,    │
+    │           1)^-1.2) * (0.9938^.age) * (dplyr::if_else(.sex == .female_value,       │
+    │           1.012, 1))                                                              │
+    │   }                                                                               │
+    │                                                                                   │
+    └───────────────────────────────────────────────────────────────────────────────────┘
+
+    # A tibble: 3 × 6
+        AGE    WT    SC   SEX  RACE  EGFR
+      <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
+    1    45    64  1.02     1     1  69.1
+    2    82    23  1.04     2     2  71.7
+    3    73    92  1.98     1     3  26.2
 
 ## Documentation
 
@@ -63,16 +138,7 @@ replicate this environment,
 Then, launch R with the repo as the working directory (open the project
 in RStudio). renv will activate and find the project library.
 
-## Package coverage
+## Getting help
 
-``` r
-covr::package_coverage()
-#> mrgda Coverage: 77.04%
-#> R/print-aesthetics.R: 0.00%
-#> R/nm-validate.R: 63.16%
-#> R/nm-summary.R: 89.47%
-#> R/calc-egfr.R: 100.00%
-#> R/gather-flags.R: 100.00%
-#> R/message-function.R: 100.00%
-#> R/mutate-egfr.R: 100.00%
-```
+If you encounter a clear bug, please file an issue with a minimal
+reproducible example on [mrgda](https://github.com/mrgda/issues).

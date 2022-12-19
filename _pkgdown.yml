@@ -1,10 +1,14 @@
 url: https://metrumresearchgroup.github.io/mrgda
 
+title: mrgda
 template:
   params:
-    docsearch:
-      api_key: 6417058f1efec10fab175718f9ee85d7
-      index_name: mrgda
+    bootswatch: flatly
+navbar:
+  type: inverse
+  right:
+  - icon: fa-github fa-lg
+    href: https://github.com/metrumresearchgroup/mrgda
 
 reference:
   - title: Data Validation
