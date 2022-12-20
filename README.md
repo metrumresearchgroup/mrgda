@@ -3,33 +3,50 @@
 
 ## Overview
 
-`mrgda` assists with deriving and validating NONMEM data sets. While
-assembling data, a set of functions are provided to mutate common NONMEM
-variables:
+mrgda is a NONMEM data assembly helper, providing a set of functions
+that help validate your derived data set. Working hand in hand with your
+data specification, `nm_validate()` checks for common data set errors
+such as:
 
--   `mutate_egfr()` adds an estimated glomerular filtration rate (eGFR)
-    column
+-   Duplicated events
+-   Non-unique baseline covariates
+-   Missing covariates
 
-Once derived, `mrgda` will help you identify any common errors that
-exist in the data, by providing:
+To use mrgda optimally, you are encouraged to set up your data
+specification file in `yaml` format, similar to the example found
+[here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml)
+and discussed further in the Setup section below.
 
--   `nm_summary()` outputs covariate summary tables and informative data
-    visualizations
+## Setup
 
--   `nm_validate()` runs a series of pass/fail checks for:
+Before running mrgda, a `flags` parameter needs to be defined within the
+`SETUP` section of the data specification yaml file. All relevant column
+names need to be defined for each of the following flags:
 
-    -   Duplicated events
-    -   Non-unique baseline covariates
-    -   Missing covariates
+-   `id` - subject identification (typically ID)
+-   `study` - study identification
+-   `primary_keys` - event defining variables (ie. EVID and DVID)
+-   `time` - time
+-   `bl_cat_cov` - baseline categorical covariates
+-   `tv_cat_cov` - time-varying categorical covariates
+-   `bl_cont_cov` - baseline continuous covariates
+-   `tv_cont_cov` - time-varying continuous covariates
 
-These all leverage information within a data specification file. It is
-suggested that this file be in `yaml` format, similar to the example
-found
-[here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml).
-You can learn more about setting up the data specification file in the
-[Getting Started with
-mrgda](https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html)
-vignette.
+Note in the example below that multiple variables can be listed for each
+flag and that not all flags need to be defined. For instance, no
+time-varying categorical covariates are listed below.
+
+``` r
+SETUP:
+  flags:
+    id: [ID]
+    study: [STUDYID]
+    primary_keys: [EVID, DVID]
+    time: [TIME]
+    bl_cat_cov: [SEX, RACE]
+    bl_cont_cov: [WTBL, BMIBL, AGEBL] 
+    tv_cont_cov: [WT]
+```
 
 ## Usage
 
@@ -72,43 +89,6 @@ nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
      dplyr::filter(!complete.cases(.))
 
     [ FAIL 3 | PASS 0 ]
-
-#### Data derivation
-
-Data assembly functions such as `mutate_egfr()` mutates a new column
-onto the data. The user is also provided the source for the equation
-used in the caluclation.
-
-``` r
-nm_ex_df %>% 
-  mutate_egfr(
-    .age = AGE,
-    .wt = WT,
-    .serum_creatinine = SC,
-    .sex = SEX,
-    .female_value = 1
-  )
-```
-
-    ┌ calc_egfr() formula: ─────────────────────────────────────────────────────────────┐
-    │                                                                                   │
-    │   function (.age, .wt, .serum_creatinine, .sex, .female_value)                    │
-    │   {                                                                               │
-    │       .alpha <- dplyr::if_else(.sex == .female_value, -0.241, -0.302)             │
-    │       .k <- dplyr::if_else(.sex == .female_value, 0.7, 0.9)                       │
-    │       142 * (min(.serum_creatinine/.k, 1)^.alpha) * (max(.serum_creatinine/.k,    │
-    │           1)^-1.2) * (0.9938^.age) * (dplyr::if_else(.sex == .female_value,       │
-    │           1.012, 1))                                                              │
-    │   }                                                                               │
-    │                                                                                   │
-    └───────────────────────────────────────────────────────────────────────────────────┘
-
-    # A tibble: 3 × 6
-        AGE    WT    SC   SEX  RACE  EGFR
-      <dbl> <dbl> <dbl> <dbl> <dbl> <dbl>
-    1    45    64  1.02     1     1  69.1
-    2    82    23  1.04     2     2  71.7
-    3    73    92  1.98     1     3  26.2
 
 ## Documentation
 
