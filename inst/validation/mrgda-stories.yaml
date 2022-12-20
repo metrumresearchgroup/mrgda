@@ -34,3 +34,11 @@ EGF-S001:
   requirements:
   - EGF-R001
   - EGF-R002
+MID-S001:
+  name: mutate_id
+  description: As a user, I want to mutate a subject identification
+    column to a dataset with unique values for each subject.
+  ProductRisk: Low
+  requirements:
+  - MID-R001
+  - MID-R002
