@@ -6,13 +6,8 @@
 
 ## Overview
 
-mrgda is a NONMEM data assembly helper, providing a set of functions that help
-validate your derived data set. Working hand in hand with your data specification,
-`nm_validate()` checks for common data set errors such as:
-
-* Duplicated events
-* Non-unique baseline covariates
-* Missing covariates
+mrgda is a NONMEM data assembly helper, providing a set of functions that leverages
+your data specification file to validate a derived data set.
 
 To use mrgda optimally, you are encouraged to set up your data specification file
 in `yaml` format, similar to the example found [here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml) and
@@ -68,13 +63,14 @@ nm_ex_df <- dplyr::tibble(
 
 #### Data validation
 
-`nm_validate()` outputs the results of the pass/fail checks. If a check fails,
-the user will be provided code to help identify where the error is in the data.
+To validate your data, simply provide `nm_validate()` with your NONMEM data set 
+and data specification. It's output will indicate the result of a series of 
+pass/fail validation checks.
 
-```{r, comment=NA}
+```{r, comment=NA, }
 library(mrgda)
 
-nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
+nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
 
 ```
 
