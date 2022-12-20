@@ -46,10 +46,10 @@ nm_summary <- function(.data,
     dplyr::ungroup()
 
   # tables ------------------------------------------------------------------
-  returnlist <- list()
+  tablelist <- list()
 
   # baseline continuous covariates
-  returnlist[["1"]] <-
+  tablelist[["1"]] <-
     subject_level_data %>%
     dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cont_cov)) %>%
     tidyr::pivot_longer(cols = g_r$flags$bl_cont_cov) %>%
@@ -74,7 +74,7 @@ nm_summary <- function(.data,
     )
 
   # baseline categorical covariates
-  returnlist[["2"]] <-
+  tablelist[["2"]] <-
     subject_level_data %>%
     dplyr::select(
       c(g_r$flags$id,
@@ -103,7 +103,7 @@ nm_summary <- function(.data,
     )
 
   # primary keys
-  returnlist[["3"]] <-
+  tablelist[["3"]] <-
     g_r$data %>%
     dplyr::count(dplyr::across(c(g_r$flags$primary_keys))) %>%
     dplyr::mutate(Placeholder = "Full data") %>%
@@ -151,19 +151,19 @@ nm_summary <- function(.data,
       ggplot2::ggplot() +
       ggplot2::geom_boxplot(ggplot2::aes(x = STUDY, y = BLCOV_VAL)) +
       ggplot2::facet_wrap(~BLCOV, nrow = 1, ncol = 1, scales = "free_y")# +
-      # ggplot2::theme(
-      #   axis.text.x = ggplot2::element_text(
-      #     angle = 90,
-      #     vjust = 0.5,
-      #     hjust = 1)
-      # )
+    # ggplot2::theme(
+    #   axis.text.x = ggplot2::element_text(
+    #     angle = 90,
+    #     vjust = 0.5,
+    #     hjust = 1)
+    # )
     plot_num <- plot_num + 1
   }
 
   # Categorical figures
 
   blcat_covs <-
-  returnlist[["2"]] %>%
+    tablelist[["2"]] %>%
     dplyr::mutate(
       STUDY = stringr::str_split_fixed(BLCAT, ": ", n = Inf)[, 1],
       BLCAT = stringr::str_split_fixed(BLCAT, ": ", n = Inf)[, 2],
@@ -191,50 +191,15 @@ nm_summary <- function(.data,
   }
 
   # output ------------------------------------------------------------------
-  if (.type == "tables") {
-    class(returnlist) <- c("nm_summary_results", class(returnlist))
+  nm_summary_temp <- tempfile(fileext = ".html")
 
-    return(returnlist)
-  }
+  rmarkdown::render(
+    input = system.file("templates/nm-summary.Rmd", package = "mrgda"),
+    output_file = nm_summary_temp,
+    params = list(figurelist = figurelist),
+    envir = new.env()
+  )
 
-  if (.type == "figures") {
+  rstudioapi::viewer(nm_summary_temp)
 
-    for (plot in names(figurelist)) {
-
-      print(figurelist[[plot]])
-
-      if (.figure_prompt) {
-        readline(prompt = "Press [enter] to see next figure")
-      }
-
-    }
-
-    return(figurelist)
-
-  }
-
-}
-
-#' @method print nm_summary_results
-#' @export
-print.nm_summary_results <- function(x, ...) {
-  returnlistStable <-
-    purrr::map(
-      x,
-      ~ {
-
-        if(all(is.na(.x[[unique(.x$PANEL)]]))) {
-          .x[[unique(.x$PANEL)]] <- "Missing flags"
-        }
-
-        pmtables::stable_long(
-          data = .x %>% dplyr::select(-PANEL, -LT_CAP_TEXT),
-          panel = pmtables::as.panel(unique(.x$PANEL)),
-          lt_cap_text = unique(.x$LT_CAP_TEXT)
-        )
-
-      }
-    )
-
-  pmtables::st2report(returnlistStable, ntex = length(x))
 }

@@ -1,0 +1,34 @@
+---
+title: "nm summary"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    toc_collapsed: false
+params: 
+  figurelist: "`r list()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Figures
+
+```{r, results="asis"}
+
+for (i in 1:length(params$figurelist)) {
+  
+  writeLines("\n")
+  
+  writeLines(paste0("## ", names(params$figurelist)[i]))
+  
+  print(params$figurelist[[i]])
+  
+  writeLines("\n")
+}
+
+
+
+```
