@@ -4,38 +4,79 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# mrgda
-A data assembly validation tool designed to identify errors in derived data sets. 
-`nm_validate` runs a series of pass/fail checks on NONMEM data sets and `nm_summary` 
-provides a quick visualization of this data.
+## Overview
 
-## Background
-Often data sets are derived according to a data specification file. This package 
-leverages the information within this file to validate the data set. It is suggested
-that the data specification file be made in `yaml` format. An example of one can be 
-found in `inst/derived/pk.yml`.
+mrgda is a NONMEM data assembly helper, providing a set of functions that leverages
+your data specification file to validate a derived data set.
 
-Within the setup section, `flags` are defined. In order to use `mrgda` the
-names of the flags must match those shown below:
+To use mrgda optimally, you are encouraged to set up your data specification file
+in `yaml` format, similar to the example found [here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml) and
+discussed further in the Setup section below.
+
+## Setup
+
+Before running mrgda, a `flags` parameter needs to be defined within the `SETUP` 
+section of the data specification yaml file. All relevant column names need to 
+be defined for each of the following flags:
+
+* `id` - subject identification (typically ID)
+* `study` - study identification
+* `primary_keys` - event defining variables (ie. EVID and DVID)
+* `time` - time
+* `bl_cat_cov` - baseline categorical covariates
+* `tv_cat_cov` - time-varying categorical covariates
+* `bl_cont_cov` - baseline continuous covariates
+* `tv_cont_cov` - time-varying continuous covariates
+
+Note in the example below that multiple variables can be listed for each flag
+and that not all flags need to be defined. For instance, no time-varying 
+categorical covariates are listed below.
 
 ```{r, eval=FALSE}
-flags:
-  id: [ID] # Unique subject ID
-  num: [NUM] # Unique row ID
-  study: [STUDYID] # Study ID
-  primary_keys: [EVID, DVID] # Variables such as EVID and DVID where you anticipate no duplicate combinations
-  time: [TIME] # Time 
-  bl_cat_cov: [SEX, RACE] # Baseline categorical covariate
-  tv_cat_cov: [TIMECAT] # Time-varying categorical covariate
-  bl_cont_cov: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
-  tv_cont_cov: [WT] # Time-varying continuous covariate
+SETUP:
+  flags:
+    id: [ID]
+    study: [STUDYID]
+    primary_keys: [EVID, DVID]
+    time: [TIME]
+    bl_cat_cov: [SEX, RACE]
+    bl_cont_cov: [WTBL, BMIBL, AGEBL] 
+    tv_cont_cov: [WT]
 ```
 
-*IMPORTANT NOTE* - it is not necessary to have a variable provided for each flag. Adding variables to each of the flags is optional, 
-however the significance of the output will be decreased with the less information provided in flags.
+## Usage
+
+```{r, include=FALSE}
+
+nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
+nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
+nm_errors <- readr::read_csv(system.file("derived", "pk-errors.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
+
+nm_ex_df <- dplyr::tibble(
+     AGE = c(45, 82, 73),
+     WT = c(64, 23, 92),
+     SC = c(1.02, 1.04, 1.98),
+     SEX = c(1, 2, 1),
+     RACE = c(1, 2, 3))
+
+```
+
+#### Data validation
+
+To validate your data, simply provide `nm_validate()` with your NONMEM data set 
+and data specification. It's output will indicate the result of a series of 
+pass/fail validation checks.
+
+```{r, comment=NA, }
+library(mrgda)
+
+nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
+
+```
 
 ## Documentation
 Public documentation of all functions is hosted at [https://metrumresearchgroup.github.io/mrgda/](https://metrumresearchgroup.github.io/mrgda/)
+
 
 ## Development
 
@@ -59,9 +100,12 @@ provide isolation. To replicate this environment,
 Then, launch R with the repo as the working directory (open the project
 in RStudio). renv will activate and find the project library.
 
-## Package coverage
+## Getting help
+
+If you encounter a clear bug, please file an issue with a minimal reproducible example on [mrgda](https://github.com/mrgda/issues). 
 
 ```{r setup, include = FALSE}
+## Package coverage
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
@@ -74,6 +118,6 @@ if (basename(getwd()) == "docs") {
 
 ```
 
-```{r}
+```{r, include=FALSE}
 covr::package_coverage()
 ```
