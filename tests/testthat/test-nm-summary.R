@@ -1,6 +1,6 @@
 nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
-dat_sum <- nm_summary(.data = nm, .spec = nm_spec, .type = "tables")
+dat_sum <- nm_summary(.data = nm, .spec = nm_spec)
 
 # Baseline continuous covariates tests ------------------------------------
 
@@ -60,14 +60,14 @@ test_that("nm_summary primary keys: Correct caption is used [NMV-SUM-003]", {
 # Figures -----------------------------------------------------------------
 
 test_that("nm_summary outputs figures: Baseline covariates continuous [NMV-SUM-004]", {
-  figsum <- nm_summary(.data = nm, .spec = nm_spec, .type = "figures", .figure_prompt = FALSE)
+  figsum <- nm_summary(.data = nm, .spec = nm_spec)
   figdata <- figsum$`1`$data
   expect_equal(nrow(figdata), 178)
   expect_equal(as.numeric(figdata[5, 4]), 105.1)
 })
 
 test_that("nm_summary outputs figures: Categorical baseline covariates [NMV-SUM-004]", {
-  figsum <- nm_summary(.data = nm, .spec = nm_spec, .type = "figures", .figure_prompt = FALSE)
+  figsum <- nm_summary(.data = nm, .spec = nm_spec)
   figdata <- figsum$`2`$data
   expect_equal(nrow(figdata), 178)
   expect_equal(as.numeric(figdata[177, 4]), 28.634435)

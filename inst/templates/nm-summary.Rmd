@@ -1,13 +1,14 @@
 ---
-title: "nm summary"
+title: "`r paste0('NM Summary ', Sys.info()[['user']], ' ', Sys.time())`"
 output: 
   html_document:
     toc: true
-    toc_float: true
+    toc_float:
+      collapsed: false
     toc_depth: 3
-    toc_collapsed: false
 params: 
   figurelist: "`r list()`"
+  tablelist: "`r list()`"
 ---
 
 ```{r setup, include=FALSE}
@@ -16,19 +17,75 @@ knitr::opts_chunk$set(echo = FALSE)
 
 # Figures
 
+## Boxplots
+
 ```{r, results="asis"}
 
-for (i in 1:length(params$figurelist)) {
+for (i in 1:length(params$figurelist$boxplots)) {
   
   writeLines("\n")
   
-  writeLines(paste0("## ", names(params$figurelist)[i]))
+  writeLines(paste0("### ", names(params$figurelist$boxplots)[i]))
   
-  print(params$figurelist[[i]])
+  print(params$figurelist$boxplots[[i]])
   
   writeLines("\n")
 }
 
+```
 
+## Barplots
+
+```{r, results="asis"}
+
+for (i in 1:length(params$figurelist$barplots)) {
+  
+  writeLines("\n")
+  
+  writeLines(paste0("### ", names(params$figurelist$barplots)[i]))
+  
+  print(params$figurelist$barplots[[i]])
+  
+  writeLines("\n")
+}
 
 ```
+
+# Tables
+
+## Covariates 
+
+```{r, results="asis"}
+
+for (i in 1:length(params$tablelist$covariates)) {
+
+  writeLines("\n")
+  
+  writeLines(paste0("### ", names(params$tablelist$covariates)[i]))
+
+  print(htmltools::tagList(gt::gt(params$tablelist$covariates[[i]])))
+
+  writeLines("\n")
+}
+
+```
+
+## Miscellaneous 
+
+```{r, results='asis'}
+
+for (i in 1:length(params$tablelist$misc)) {
+
+  writeLines("\n")
+  
+  writeLines(paste0("### ", names(params$tablelist$misc)[i]))
+
+  print(htmltools::tagList(gt::gt(params$tablelist$misc[[i]])))
+
+  writeLines("\n")
+}
+
+```
+
+
+
