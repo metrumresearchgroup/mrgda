@@ -1,8 +1,9 @@
 ---
-title: "`r paste0('NM Summary ', Sys.info()[['user']], ' ', Sys.time())`"
-output: 
-  html_document:
-    toc: true
+title: "NM Summary"
+author: "`r Sys.info()[['user']]`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  rmdformats::readthedown:
     toc_float:
       collapsed: false
     toc_depth: 3
