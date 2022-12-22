@@ -35,9 +35,8 @@ nm_summary <- function(.data, .spec){
 
   subject_level_data <-
     .data %>%
-    dplyr::group_by(dplyr::across(g_r$flags$id)) %>%
-    dplyr::slice(1) %>%
-    dplyr::ungroup()
+    dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cat_cov, g_r$flags$bl_cont_cov)) %>%
+    dplyr::distinct()
 
   # tables ------------------------------------------------------------------
   outputs$Tables <- list()
@@ -64,7 +63,8 @@ nm_summary <- function(.data, .spec){
       c(g_r$flags$study, "short", "MIN", "MEAN", "MAX")
     ) %>%
     dplyr::group_by(short) %>%
-    gt::gt()
+    gt::gt() %>%
+    suppressMessages()
 
   # baseline categorical Covariates
   outputs$Tables$Covariates[["Baseline categorical Covariates"]] <-
@@ -90,7 +90,8 @@ nm_summary <- function(.data, .spec){
     dplyr::rename(Percent = n) %>%
     dplyr::arrange(dplyr::across(c(g_r$flags$study, "short", -"Percent"))) %>%
     dplyr::group_by(short, value) %>%
-    gt::gt()
+    gt::gt() %>%
+    suppressMessages()
 
   # primary keys
   outputs$Tables$Miscellaneous[["Primary key summary"]] <-
@@ -119,7 +120,8 @@ nm_summary <- function(.data, .spec){
       names_to = "BLCOV",
       values_to = "BLCOV_VAL"
     ) %>%
-    dplyr::left_join(shorts %>% dplyr::rename(BLCOV = name))
+    dplyr::left_join(shorts %>% dplyr::rename(BLCOV = name)) %>%
+    suppressMessages()
 
   for (i in unique(blcont_covs$short)) {
     outputs$Figures$Boxplots[[i]] <-
@@ -127,6 +129,7 @@ nm_summary <- function(.data, .spec){
       dplyr::filter(short == i) %>%
       ggplot2::ggplot() +
       ggplot2::geom_boxplot(ggplot2::aes(x = STUDY, y = BLCOV_VAL)) +
+      #ggplot2::geom_jitter(ggplot2::aes(x = STUDY, y = BLCOV_VAL), height = 0, width = 0.1) +
       ggplot2::facet_wrap(~short)
   }
 
