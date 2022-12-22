@@ -20,6 +20,8 @@
 #' @export
 nm_summary <- function(.data, .spec){
 
+  outputs <- list()
+
   .data <- .data %>% yspec::ys_add_factors(.spec, .suffix = "")
 
   g_r <- gather_flags(.data, .spec)
@@ -38,10 +40,12 @@ nm_summary <- function(.data, .spec){
     dplyr::ungroup()
 
   # tables ------------------------------------------------------------------
-  tablelist <- list()
+  outputs$Tables <- list()
 
-  # baseline continuous covariates
-  tablelist$covariates[["Baseline continuous covariates"]] <-
+  # browser()
+
+  # baseline continuous Covariates
+  outputs$Tables$Covariates[["Baseline continuous Covariates"]] <-
     subject_level_data %>%
     dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cont_cov)) %>%
     tidyr::pivot_longer(cols = g_r$flags$bl_cont_cov) %>%
@@ -59,10 +63,11 @@ nm_summary <- function(.data, .spec){
     dplyr::select(
       c(g_r$flags$study, "short", "MIN", "MEAN", "MAX")
     ) %>%
-    dplyr::arrange(short)
+    dplyr::group_by(short) %>%
+    gt::gt()
 
-  # baseline categorical covariates
-  tablelist$covariates[["Baseline categorical covariates"]] <-
+  # baseline categorical Covariates
+  outputs$Tables$Covariates[["Baseline categorical Covariates"]] <-
     subject_level_data %>%
     dplyr::select(
       c(g_r$flags$id,
@@ -83,21 +88,23 @@ nm_summary <- function(.data, .spec){
     ) %>%
     dplyr::arrange(-n) %>%
     dplyr::rename(Percent = n) %>%
-    dplyr::arrange(dplyr::across(c("short", g_r$flags$study))) %>%
-    tidyr::unite("BLCAT", c(g_r$flags$study, "short"), sep = ": ")
+    dplyr::arrange(dplyr::across(c(g_r$flags$study, "short", -"Percent"))) %>%
+    dplyr::group_by(short, value) %>%
+    gt::gt()
 
   # primary keys
-  tablelist$misc[["Primary key summary"]] <-
+  outputs$Tables$Miscellaneous[["Primary key summary"]] <-
     g_r$data %>%
     dplyr::count(dplyr::across(c(g_r$flags$primary_keys))) %>%
-    dplyr::mutate(Placeholder = "Full data")
+    dplyr::mutate(Placeholder = "Full data") %>%
+    gt::gt()
 
   # figures -----------------------------------------------------------------
-  figurelist <- list()
+  outputs$Figures <- list()
 
   #browser()
 
-  # baseline continuous covariates
+  # baseline continuous Covariates
   #plot_num <- 1
 
   blcont_covs <-
@@ -115,7 +122,7 @@ nm_summary <- function(.data, .spec){
     dplyr::left_join(shorts %>% dplyr::rename(BLCOV = name))
 
   for (i in unique(blcont_covs$short)) {
-    figurelist$boxplots[[i]] <-
+    outputs$Figures$Boxplots[[i]] <-
       blcont_covs %>%
       dplyr::filter(short == i) %>%
       ggplot2::ggplot() +
@@ -123,35 +130,6 @@ nm_summary <- function(.data, .spec){
       ggplot2::facet_wrap(~short)
   }
 
-  # Categorical figures
-
-  blcat_covs <-
-    tablelist$covariates$`Baseline categorical covariates` %>%
-    dplyr::mutate(
-      STUDY = stringr::str_split_fixed(BLCAT, ": ", n = Inf)[, 1],
-      BLCAT = stringr::str_split_fixed(BLCAT, ": ", n = Inf)[, 2],
-      GROUPING = as.numeric(as.factor(BLCAT))
-    )
-
-  for (i in unique(blcat_covs$BLCAT)) {
-
-    figurelist$barplots[[i]] <-
-      blcat_covs %>%
-      dplyr::filter(BLCAT == i) %>%
-      ggplot2::ggplot(
-        ggplot2::aes(x = value, y = Percent, fill = STUDY, label = Percent)
-      ) +
-      ggplot2::geom_bar(stat = "identity", position = "dodge") +
-      ggplot2::geom_label(position = ggplot2::position_dodge(width = 1)) +
-      ggplot2::facet_wrap(~BLCAT) +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5),
-        legend.position = "top"
-      )
-
-    #plot_num <- plot_num + 1
-
-  }
 
   # output ------------------------------------------------------------------
   nm_summary_temp <- tempfile(fileext = ".html")
@@ -159,7 +137,7 @@ nm_summary <- function(.data, .spec){
   rmarkdown::render(
     input = system.file("templates/nm-summary.Rmd", package = "mrgda"),
     output_file = nm_summary_temp,
-    params = list(figurelist = figurelist, tablelist = tablelist),
+    params = list(outputs = outputs),
     envir = new.env(),
     quiet = TRUE
   )
@@ -168,7 +146,6 @@ nm_summary <- function(.data, .spec){
     browseURL(nm_summary_temp)
   }
 
-  # return(list(figurelist = figurelist, tablelist = tablelist))
-
+  # return(outputs)
 }
 

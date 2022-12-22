@@ -7,85 +7,51 @@ output:
       collapsed: false
     toc_depth: 3
 params: 
-  figurelist: "`r list()`"
-  tablelist: "`r list()`"
+  outputs: "`r list()`"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
 ```
 
-# Figures
-
-## Boxplots
-
 ```{r, results="asis"}
 
-for (i in 1:length(params$figurelist$boxplots)) {
+for(type.i in names(outputs)){
   
-  writeLines("\n")
+  writeLines(paste0("# ", type.i))
   
-  writeLines(paste0("### ", names(params$figurelist$boxplots)[i]))
+  outputs_type.i <- outputs[[type.i]]
   
-  print(params$figurelist$boxplots[[i]])
+  for(sub_type.i in names(outputs_type.i)) {
+    
+    writeLines(paste0("## ", sub_type.i))
+    
+    outputs_sub_type.i <- outputs_type.i[[sub_type.i]]
+    
+    for (output.i in names(outputs_sub_type.i)) {
+      
+      writeLines(paste0("### ", output.i))
+      
+      output_classes.i <- class(outputs_sub_type.i[[output.i]])
+      
+      if("gt_tbl" %in% output_classes.i){
+        
+        print(htmltools::tagList(outputs_sub_type.i[[output.i]]))
+        
+      } else if("ggplot" %in% output_classes.i){
+        
+        print(outputs_sub_type.i[[output.i]])
+        
+      }
+      
+      rm(output.i)
+      
+      writeLines("\n")
+    }
+    
+  }
   
-  writeLines("\n")
 }
 
 ```
-
-## Barplots
-
-```{r, results="asis"}
-
-for (i in 1:length(params$figurelist$barplots)) {
-  
-  writeLines("\n")
-  
-  writeLines(paste0("### ", names(params$figurelist$barplots)[i]))
-  
-  print(params$figurelist$barplots[[i]])
-  
-  writeLines("\n")
-}
-
-```
-
-# Tables
-
-## Covariates 
-
-```{r, results="asis"}
-
-for (i in 1:length(params$tablelist$covariates)) {
-
-  writeLines("\n")
-  
-  writeLines(paste0("### ", names(params$tablelist$covariates)[i]))
-
-  print(htmltools::tagList(gt::gt(params$tablelist$covariates[[i]])))
-
-  writeLines("\n")
-}
-
-```
-
-## Miscellaneous 
-
-```{r, results='asis'}
-
-for (i in 1:length(params$tablelist$misc)) {
-
-  writeLines("\n")
-  
-  writeLines(paste0("### ", names(params$tablelist$misc)[i]))
-
-  print(htmltools::tagList(gt::gt(params$tablelist$misc[[i]])))
-
-  writeLines("\n")
-}
-
-```
-
-
 
