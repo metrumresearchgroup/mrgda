@@ -7,7 +7,7 @@
 # mrgda
 A data assembly validation tool designed to identify errors in derived data sets. 
 `nm_validate` runs a series of pass/fail checks on NONMEM data sets and `nm_summary` 
-provides a quick visualization of this data.
+provides a quick visualization of this data. 
 
 ## Background
 Often data sets are derived according to a data specification file. This package 
