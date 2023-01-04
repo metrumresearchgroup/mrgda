@@ -119,6 +119,20 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
       )
     )
 
+  # MDV not equal to 1 when DV is NA (only if MDV is in data set)
+
+  if ("MDV" %in% colnames(gather_return$data)) {
+    tests_results[["MDV not set to 1 when DV is NA"]] <-
+      pass_fail(
+        .code = c(
+          "{arg_names$.data}",
+          "dplyr::select(DV, MDV)",
+          "dplyr::filter(is.na(DV) & MDV != 1)"
+        )
+      )
+  }
+
+
   # Output ------------------------------------------------------------------
   class(tests_results) <- c("nm_validate_results", class(tests_results))
 
