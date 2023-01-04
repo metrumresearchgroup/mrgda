@@ -1,39 +1,94 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-# mrgda
+## Overview
 
-A data assembly validation tool designed to identify errors in derived
-data sets. `nm_validate` runs a series of pass/fail checks on NONMEM
-data sets and `nm_summary` provides a quick visualization of this data.
+mrgda is a NONMEM data assembly helper, providing a set of functions
+that help validate your derived data set. Working hand in hand with your
+data specification, `nm_validate()` checks for common data set errors
+such as:
 
-## Background
+-   Duplicated events
+-   Non-unique baseline covariates
+-   Missing covariates
 
-Often data sets are derived according to a data specification file. This
-package leverages the information within this file to validate the data
-set. It is suggested that the data specification file be made in `yaml`
-format. An example of one can be found in `inst/derived/pk.yml`.
+To use mrgda optimally, you are encouraged to set up your data
+specification file in `yaml` format, similar to the example found
+[here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml)
+and discussed further in the Setup section below.
 
-Within the setup section, `flags` are defined. In order to use `mrgda`
-the names of the flags must match those shown below:
+## Setup
+
+Before running mrgda, a `flags` parameter needs to be defined within the
+`SETUP` section of the data specification yaml file. All relevant column
+names need to be defined for each of the following flags:
+
+-   `id` - subject identification (typically ID)
+-   `study` - study identification
+-   `primary_keys` - event defining variables (ie. EVID and DVID)
+-   `time` - time
+-   `bl_cat_cov` - baseline categorical covariates
+-   `tv_cat_cov` - time-varying categorical covariates
+-   `bl_cont_cov` - baseline continuous covariates
+-   `tv_cont_cov` - time-varying continuous covariates
+
+Note in the example below that multiple variables can be listed for each
+flag and that not all flags need to be defined. For instance, no
+time-varying categorical covariates are listed below.
 
 ``` r
-flags:
-  id: [ID] # Unique subject ID
-  num: [NUM] # Unique row ID
-  study: [STUDYID] # Study ID
-  primary_keys: [EVID, DVID] # Variables such as EVID and DVID where you anticipate no duplicate combinations
-  time: [TIME] # Time 
-  bl_cat_cov: [SEX, RACE] # Baseline categorical covariate
-  tv_cat_cov: [TIMECAT] # Time-varying categorical covariate
-  bl_cont_cov: [WTBL, BMIBL, AGEBL] # Baseline continuous covariate
-  tv_cont_cov: [WT] # Time-varying continuous covariate
+SETUP:
+  flags:
+    id: [ID]
+    study: [STUDYID]
+    primary_keys: [EVID, DVID]
+    time: [TIME]
+    bl_cat_cov: [SEX, RACE]
+    bl_cont_cov: [WTBL, BMIBL, AGEBL] 
+    tv_cont_cov: [WT]
 ```
 
-*IMPORTANT NOTE* - it is not necessary to have a variable provided for
-each flag. Adding variables to each of the flags is optional, however
-the significance of the output will be decreased with the less
-information provided in flags.
+## Usage
+
+#### Data validation
+
+`nm_validate()` outputs the results of the pass/fail checks. If a check
+fails, the user will be provided code to help identify where the error
+is in the data.
+
+``` r
+library(mrgda)
+
+nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
+```
+
+    ── nm_validate() results: ──────────────────────────────────────────────────────
+
+    ✖ No duplicate primary keys -- Copy/paste and run the following code:
+
+    nm_errors %>%
+     dplyr::select(ID, TIME, EVID, DVID) %>%
+     dplyr::count(ID, TIME, EVID, DVID) %>%
+     dplyr::filter(n > 1)
+
+    ✖ Non-unique baseline covariates -- Copy/paste and run the following code:
+
+    nm_errors %>%
+     dplyr::select(ID, SEX, RACE, WTBL, BMIBL, AGEBL) %>%
+     dplyr::filter(complete.cases(.)) %>%
+     dplyr::distinct() %>%
+     dplyr::group_by(across(ID)) %>%
+     dplyr::add_count() %>%
+     dplyr::ungroup() %>%
+     dplyr::filter(n > 1)
+
+    ✖ No missing covariates -- Copy/paste and run the following code:
+
+    nm_errors %>%
+     dplyr::select(ID, SEX, RACE, WTBL, BMIBL, AGEBL, WT) %>%
+     dplyr::filter(!complete.cases(.))
+
+    [ FAIL 3 | PASS 0 ]
 
 ## Documentation
 
@@ -63,16 +118,7 @@ replicate this environment,
 Then, launch R with the repo as the working directory (open the project
 in RStudio). renv will activate and find the project library.
 
-## Package coverage
+## Getting help
 
-``` r
-covr::package_coverage()
-#> mrgda Coverage: 77.04%
-#> R/print-aesthetics.R: 0.00%
-#> R/nm-validate.R: 63.16%
-#> R/nm-summary.R: 89.47%
-#> R/calc-egfr.R: 100.00%
-#> R/gather-flags.R: 100.00%
-#> R/message-function.R: 100.00%
-#> R/mutate-egfr.R: 100.00%
-```
+If you encounter a clear bug, please file an issue with a minimal
+reproducible example on [mrgda](https://github.com/mrgda/issues).
