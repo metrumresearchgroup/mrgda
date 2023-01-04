@@ -98,3 +98,15 @@ test_that("nm_validate prints correct test names when only 1 failure  [NMV-VAL-0
   expect_true(names(x)[3] == "No missing covariates")
 })
 
+# output catches NA, Inf and -Inf for non-finite TIME --------------------
+test_that("nm_validate catches all cases of non-finite TIME [NMV-VAL-008]", {
+  nm_1e <- nm_errors
+  nm_1e$TIME[1] = NA
+  nm_1e$TIME[2] = Inf
+  nm_1e$TIME[3] = -Inf
+
+  x = nm_validate(.spec = nm_spec, .data = nm_1e, .error_on_fail = FALSE)
+
+  expect_true(nrow(rlang::parse_expr(x$`Non-finite TIME values`$debug) %>% rlang::eval_tidy()) == 3)
+})
+

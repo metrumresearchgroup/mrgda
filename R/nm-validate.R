@@ -108,6 +108,17 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
       )
     )
 
+  # Non-finite time values
+
+  tests_results[["Non-finite TIME values"]] <-
+    pass_fail(
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(c(flags$id, flags$time))})",
+        "dplyr::filter(!is.finite({collapse_covs(c(flags$time))}))"
+      )
+    )
+
   # Output ------------------------------------------------------------------
   class(tests_results) <- c("nm_validate_results", class(tests_results))
 
