@@ -28,7 +28,9 @@ Imports:
     stringr,
     assertthat,
     forcats,
-    gt
+    gt,
+    rmdformats,
+    rmarkdown
 Suggests: 
     knitr,
     testthat (>= 3.0.0),

@@ -41,8 +41,6 @@ nm_summary <- function(.data, .spec){
   # tables ------------------------------------------------------------------
   outputs$Tables <- list()
 
-  # browser()
-
   # baseline continuous Covariates
   outputs$Tables$Covariates[["Baseline continuous Covariates"]] <-
     subject_level_data %>%
@@ -103,11 +101,6 @@ nm_summary <- function(.data, .spec){
   # figures -----------------------------------------------------------------
   outputs$Figures <- list()
 
-  #browser()
-
-  # baseline continuous Covariates
-  #plot_num <- 1
-
   blcont_covs <-
     subject_level_data %>%
     dplyr::select(
@@ -149,6 +142,6 @@ nm_summary <- function(.data, .spec){
     browseURL(nm_summary_temp)
   }
 
-  # return(outputs)
+  return(outputs)
 }
 
