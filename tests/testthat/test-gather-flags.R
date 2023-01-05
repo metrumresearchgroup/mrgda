@@ -7,10 +7,10 @@ nm_spec_nocont <- yspec::ys_load(system.file("derived", "pk-missing-cont.yml", p
 
 test_that("gather_flags standard case: Works with standard case [NMV-GAT-001]", {
   gather_results <- gather_flags(nm, nm_spec)
-  expect_equal(gather_results$flags$primary_keys, c("EVID", "DVID"))
+  expect_equal(c(gather_results$flags$evid, gather_results$flags$dvid), c("EVID", "DVID"))
 })
 
 test_that("gather_flags special cases: Generates error if no flags specified [NMV-GAT-002]", {
-  expect_error(gather_flags(nm, nm_spec_noflags), "No flags found in spec file")
+  expect_message(gather_flags(nm, nm_spec_noflags), "No flags found in spec file")
 })
 

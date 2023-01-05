@@ -124,5 +124,5 @@ test_that("nm_validate checks if MDV is set to 1 for all rows with NA DV [NMV-VA
 
   nm_2e <- nm %>% dplyr::select(-MDV)
   x = nm_validate(.spec = nm_spec, .data = nm_2e, .error_on_fail = FALSE)
-  expect_equal(length(x), 4)
+  expect_true(is.na(x$`MDV not set to 1 when DV is NA`$success))
 })

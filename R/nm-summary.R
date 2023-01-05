@@ -94,7 +94,7 @@ nm_summary <- function(.data, .spec){
   # primary keys
   outputs$Tables$Miscellaneous[["Primary key summary"]] <-
     g_r$data %>%
-    dplyr::count(dplyr::across(c(g_r$flags$primary_keys))) %>%
+    dplyr::count(dplyr::across(c(g_r$flags$evid, g_r$flags$dvid, g_r$flags$primary_keys))) %>%
     dplyr::mutate(Placeholder = "Full data") %>%
     gt::gt()
 
@@ -139,7 +139,7 @@ nm_summary <- function(.data, .spec){
   )
 
   if(interactive()){
-    browseURL(nm_summary_temp)
+    utils::browseURL(nm_summary_temp)
   }
 
   return(outputs)

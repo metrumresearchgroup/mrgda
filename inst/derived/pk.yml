@@ -5,10 +5,6 @@ SETUP__:
   sponsor: ABC Company
   data_stem: pk
   flags:
-    id: [ID]
-    study: [STUDYID]
-    primary_keys: [EVID, DVID]
-    time: [TIME]
     bl_cat_cov: [SEX, RACE]
     bl_cont_cov: [WTBL, BMIBL, AGEBL]
     tv_cont_cov: [WT]
