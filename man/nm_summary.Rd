@@ -4,18 +4,12 @@
 \alias{nm_summary}
 \title{Provide diagnostic summary of an NMTRAN dataset}
 \usage{
-nm_summary(.data, .spec, ..., .type = "tables", .figure_prompt = TRUE)
+nm_summary(.data, .spec)
 }
 \arguments{
 \item{.data}{a data frame}
 
 \item{.spec}{a yspec object}
-
-\item{...}{arguments passed through from methods (currently none)}
-
-\item{.type}{specify desired output of "tables" or "figures". Default is "tables"}
-
-\item{.figure_prompt}{whether graphics device asks for confirmation between figures}
 }
 \description{
 This function is intended to provide a high level overview of variables
@@ -29,7 +23,6 @@ nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 
-# To change the output to summary figures instead of tables
-nm_summary(.data = nm, .spec = nm_spec, .type = "figures", .figure_prompt = FALSE)
+nm_summary(.data = nm, .spec = nm_spec)
 
 }

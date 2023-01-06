@@ -26,6 +26,18 @@ VAL-R007:
   description: nm_validate prints appropriate test names when single failure occurs
   tests:
   - NMV-VAL-007
+VAL-R008:
+  description: nm_validate catches NA, Inf and -Inf cases for non-finite TIME
+  tests:
+  - NMV-VAL-008
+VAL-R009:
+  description: nm_validate checks if MDV is set to 1 for all NA DV
+  tests:
+  - NMV-VAL-009
+VAL-R010:
+  description: nm_validate checks if all NUM values are unique
+  tests:
+  - NMV-VAL-010
 SUM-R001:
   description: nm_summary outputs an accurate summary of baseline continuous covariates
   tests:

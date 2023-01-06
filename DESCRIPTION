@@ -27,7 +27,10 @@ Imports:
     ggplot2,
     stringr,
     assertthat,
-    forcats
+    forcats,
+    gt,
+    rmdformats,
+    rmarkdown
 Suggests: 
     knitr,
     testthat (>= 3.0.0),

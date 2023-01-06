@@ -98,3 +98,44 @@ test_that("nm_validate prints correct test names when only 1 failure  [NMV-VAL-0
   expect_true(names(x)[3] == "No missing covariates")
 })
 
+# output catches NA, Inf and -Inf for non-finite TIME --------------------
+test_that("nm_validate catches all cases of non-finite TIME [NMV-VAL-008]", {
+  nm_1e <- nm_errors
+  nm_1e$TIME[1] = NA
+  nm_1e$TIME[2] = Inf
+  nm_1e$TIME[3] = -Inf
+
+  x = nm_validate(.spec = nm_spec, .data = nm_1e, .error_on_fail = FALSE)
+
+  expect_true(nrow(rlang::parse_expr(x$`Non-finite TIME values`$debug) %>% rlang::eval_tidy()) == 3)
+})
+
+# output catches when MDV incorrectly set for NA DV --------------------
+test_that("nm_validate checks if MDV is set to 1 for all rows with NA DV [NMV-VAL-009]", {
+  nm_1e <- nm
+  nm_1e$DV[1] = NA_real_
+  nm_1e$MDV[1] = 0
+
+  x = nm_validate(.spec = nm_spec, .data = nm_1e, .error_on_fail = FALSE)
+  expect_true(nrow(rlang::parse_expr(x$`MDV not set to 1 when DV is NA`$debug) %>% rlang::eval_tidy()) == 1)
+
+  x = nm_validate(.spec = nm_spec, .data = nm, .error_on_fail = FALSE)
+  expect_true(nrow(rlang::parse_expr(x$`MDV not set to 1 when DV is NA`$debug) %>% rlang::eval_tidy()) == 0)
+
+  nm_2e <- nm %>% dplyr::select(-MDV)
+  x = nm_validate(.spec = nm_spec, .data = nm_2e, .error_on_fail = FALSE)
+  expect_true(is.na(x$`MDV not set to 1 when DV is NA`$success))
+})
+
+# output ensures only unique NUM values in dataset --------------------
+test_that("nm_validate checks if all NUM are unique [NMV-VAL-010]", {
+  nm_num <- nm
+
+  x = nm_validate(.spec = nm_spec, .data = nm_num, .error_on_fail = FALSE)
+  expect_true(nrow(rlang::parse_expr(x$`All NUM values are unique`$debug) %>% rlang::eval_tidy()) == 2534)
+
+  nm_num <- nm_num %>% dplyr::filter(STUDYID == "STUDY-X")
+
+  x = nm_validate(.spec = nm_spec, .data = nm_num, .error_on_fail = FALSE)
+  expect_true(x$`All NUM values are unique`$success)
+})

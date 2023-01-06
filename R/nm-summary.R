@@ -8,25 +8,19 @@
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
-#' @param ... arguments passed through from methods (currently none)
-#' @param .type specify desired output of "tables" or "figures". Default is "tables"
-#' @param .figure_prompt whether graphics device asks for confirmation between figures
 #' @examples
 #'
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 #'
 #' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 #'
-#' # To change the output to summary figures instead of tables
-#' nm_summary(.data = nm, .spec = nm_spec, .type = "figures", .figure_prompt = FALSE)
+#' nm_summary(.data = nm, .spec = nm_spec)
 #'
 #' @md
 #' @export
-nm_summary <- function(.data,
-                       .spec,
-                       ...,
-                       .type = "tables",
-                       .figure_prompt = TRUE){
+nm_summary <- function(.data, .spec){
+
+  outputs <- list()
 
   .data <- .data %>% yspec::ys_add_factors(.spec, .suffix = "")
 
@@ -41,15 +35,14 @@ nm_summary <- function(.data,
 
   subject_level_data <-
     .data %>%
-    dplyr::group_by(dplyr::across(g_r$flags$id)) %>%
-    dplyr::slice(1) %>%
-    dplyr::ungroup()
+    dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cat_cov, g_r$flags$bl_cont_cov)) %>%
+    dplyr::distinct()
 
   # tables ------------------------------------------------------------------
-  returnlist <- list()
+  outputs$Tables <- list()
 
-  # baseline continuous covariates
-  returnlist[["1"]] <-
+  # baseline continuous Covariates
+  outputs$Tables$Covariates[["Baseline continuous Covariates"]] <-
     subject_level_data %>%
     dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cont_cov)) %>%
     tidyr::pivot_longer(cols = g_r$flags$bl_cont_cov) %>%
@@ -67,14 +60,12 @@ nm_summary <- function(.data,
     dplyr::select(
       c(g_r$flags$study, "short", "MIN", "MEAN", "MAX")
     ) %>%
-    dplyr::arrange(short) %>%
-    dplyr::mutate(
-      PANEL = "short",
-      LT_CAP_TEXT = "Summary of baseline continuous covariates by study"
-    )
+    dplyr::group_by(short) %>%
+    gt::gt() %>%
+    suppressMessages()
 
-  # baseline categorical covariates
-  returnlist[["2"]] <-
+  # baseline categorical Covariates
+  outputs$Tables$Covariates[["Baseline categorical Covariates"]] <-
     subject_level_data %>%
     dplyr::select(
       c(g_r$flags$id,
@@ -95,39 +86,20 @@ nm_summary <- function(.data,
     ) %>%
     dplyr::arrange(-n) %>%
     dplyr::rename(Percent = n) %>%
-    dplyr::arrange(dplyr::across(c("short", g_r$flags$study))) %>%
-    tidyr::unite("BLCAT", c(g_r$flags$study, "short"), sep = ": ") %>%
-    dplyr::mutate(
-      PANEL = "BLCAT",
-      LT_CAP_TEXT = "Summary of baseline categorical covariates by study"
-    )
+    dplyr::arrange(dplyr::across(c(g_r$flags$study, "short", -"Percent"))) %>%
+    dplyr::group_by(short, value) %>%
+    gt::gt() %>%
+    suppressMessages()
 
   # primary keys
-  returnlist[["3"]] <-
+  outputs$Tables$Miscellaneous[["Primary key summary"]] <-
     g_r$data %>%
-    dplyr::count(dplyr::across(c(g_r$flags$primary_keys))) %>%
+    dplyr::count(dplyr::across(c(g_r$flags$evid, g_r$flags$dvid, g_r$flags$primary_keys))) %>%
     dplyr::mutate(Placeholder = "Full data") %>%
-    dplyr::mutate(
-      PANEL = "Placeholder",
-      LT_CAP_TEXT = "Summary of primary keys"
-    )
+    gt::gt()
 
   # figures -----------------------------------------------------------------
-  figurelist <- list()
-
-  # baseline continuous covariates
-  plot_num <- 1
-
-  covnums <-
-    g_r$data %>%
-    dplyr::select(c(g_r$flags$bl_cont_cov)) %>%
-    tidyr::pivot_longer(
-      cols = g_r$flags$bl_cont_cov,
-      names_to = "BLCOV",
-      values_to = "BLCOV_VAL"
-    ) %>%
-    dplyr::distinct(BLCOV) %>%
-    dplyr::mutate(NUM = 1:dplyr::n())
+  outputs$Figures <- list()
 
   blcont_covs <-
     subject_level_data %>%
@@ -141,100 +113,35 @@ nm_summary <- function(.data,
       names_to = "BLCOV",
       values_to = "BLCOV_VAL"
     ) %>%
-    dplyr::left_join(covnums) %>%
-    dplyr::mutate(GROUPING = ceiling(NUM/1))
+    dplyr::left_join(shorts %>% dplyr::rename(BLCOV = name)) %>%
+    suppressMessages()
 
-  for (i in unique(blcont_covs$GROUPING)) {
-    figurelist[[glue::glue({plot_num})]] <-
+  for (i in unique(blcont_covs$short)) {
+    outputs$Figures$Boxplots[[i]] <-
       blcont_covs %>%
-      dplyr::filter(GROUPING == i) %>%
+      dplyr::filter(short == i) %>%
       ggplot2::ggplot() +
       ggplot2::geom_boxplot(ggplot2::aes(x = STUDY, y = BLCOV_VAL)) +
-      ggplot2::facet_wrap(~BLCOV, nrow = 1, ncol = 1, scales = "free_y")# +
-      # ggplot2::theme(
-      #   axis.text.x = ggplot2::element_text(
-      #     angle = 90,
-      #     vjust = 0.5,
-      #     hjust = 1)
-      # )
-    plot_num <- plot_num + 1
+      #ggplot2::geom_jitter(ggplot2::aes(x = STUDY, y = BLCOV_VAL), height = 0, width = 0.1) +
+      ggplot2::facet_wrap(~short)
   }
 
-  # Categorical figures
-
-  blcat_covs <-
-  returnlist[["2"]] %>%
-    dplyr::mutate(
-      STUDY = stringr::str_split_fixed(BLCAT, ": ", n = Inf)[, 1],
-      BLCAT = stringr::str_split_fixed(BLCAT, ": ", n = Inf)[, 2],
-      GROUPING = as.numeric(as.factor(BLCAT))
-    )
-
-  for (i in unique(blcat_covs$GROUPING)) {
-
-    figurelist[[glue::glue({plot_num})]] <-
-      blcat_covs %>%
-      dplyr::filter(GROUPING == i) %>%
-      ggplot2::ggplot(
-        ggplot2::aes(x = value, y = Percent, fill = STUDY, label = Percent)
-      ) +
-      ggplot2::geom_bar(stat = "identity", position = "dodge") +
-      ggplot2::geom_label(position = ggplot2::position_dodge(width = 1)) +
-      ggplot2::facet_wrap(~BLCAT, nrow = 1, ncol = 1, scales = "free") +
-      ggplot2::theme(
-        axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5),
-        legend.position = "top"
-      )
-
-    plot_num <- plot_num + 1
-
-  }
 
   # output ------------------------------------------------------------------
-  if (.type == "tables") {
-    class(returnlist) <- c("nm_summary_results", class(returnlist))
+  nm_summary_temp <- tempfile(fileext = ".html")
 
-    return(returnlist)
+  rmarkdown::render(
+    input = system.file("templates/nm-summary.Rmd", package = "mrgda"),
+    output_file = nm_summary_temp,
+    params = list(outputs = outputs),
+    envir = new.env(),
+    quiet = TRUE
+  )
+
+  if(interactive()){
+    utils::browseURL(nm_summary_temp)
   }
 
-  if (.type == "figures") {
-
-    for (plot in names(figurelist)) {
-
-      print(figurelist[[plot]])
-
-      if (.figure_prompt) {
-        readline(prompt = "Press [enter] to see next figure")
-      }
-
-    }
-
-    return(figurelist)
-
-  }
-
+  return(outputs)
 }
 
-#' @method print nm_summary_results
-#' @export
-print.nm_summary_results <- function(x, ...) {
-  returnlistStable <-
-    purrr::map(
-      x,
-      ~ {
-
-        if(all(is.na(.x[[unique(.x$PANEL)]]))) {
-          .x[[unique(.x$PANEL)]] <- "Missing flags"
-        }
-
-        pmtables::stable_long(
-          data = .x %>% dplyr::select(-PANEL, -LT_CAP_TEXT),
-          panel = pmtables::as.panel(unique(.x$PANEL)),
-          lt_cap_text = unique(.x$LT_CAP_TEXT)
-        )
-
-      }
-    )
-
-  pmtables::st2report(returnlistStable, ntex = length(x))
-}

@@ -15,7 +15,7 @@
 #'
 #' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 #'
-#' nm_validate(nm, nm_spec)
+#' nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
 #'
 #' @md
 #' @export
@@ -41,17 +41,28 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   # helper functions --------------------------------------------------------
 
   collapse_covs <- function(.covs){
-    paste(.covs, collapse = ", ")
+    paste(unique(.covs), collapse = ", ")
   }
 
-  pass_fail <- function(.code) {
+  pass_fail <- function(.code, .required_flags) {
+
 
     .ans <- list()
+
+    if (any(unlist(purrr::map(flags[.required_flags], ~ is.null(.x))))) {
+
+      .ans$debug <- glue::glue_collapse(.required_flags, sep = ", ") %>% glue::glue()
+      .ans$success <- as.logical(NA)
+
+      return(.ans)
+
+    }
+
 
     # Run code uses input data
     .code_run <-
       gsub("{arg_names$.data}", ".data", .code, fixed = TRUE) %>%
-      glue::glue_collapse(, sep = " %>% ") %>%
+      glue::glue_collapse(x = ., sep = " %>% ") %>%
       glue::glue()
 
     .code_return <-
@@ -76,10 +87,11 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
     pass_fail(
       .code = c(
         "{arg_names$.data}",
-        "dplyr::select({collapse_covs(c(flags$id, flags$time, flags$primary_key))})",
-        "dplyr::count({collapse_covs(c(flags$id, flags$time, flags$primary_key))})",
+        "dplyr::select({collapse_covs(c(flags$id, flags$time, flags$evid, flags$dvid, flags$primary_key))})",
+        "dplyr::count({collapse_covs(c(flags$id, flags$time, flags$evid, flags$dvid, flags$primary_key))})",
         "dplyr::filter(n > 1)"
-      )
+      ),
+      .required_flags = c("id", "time", "evid")
     )
 
   # Non-unique baseline covariates ------------------------------------------
@@ -94,7 +106,8 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
         "dplyr::add_count()",
         "dplyr::ungroup()",
         "dplyr::filter(n > 1)"
-      )
+      ),
+      .required_flags = c("id")
     )
 
   # Missing baseline covariates ---------------------------------------------
@@ -105,8 +118,46 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
         "{arg_names$.data}",
         "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov, flags$tv_cont_cov, flags$tv_cat_cov))})",
         "dplyr::filter(!complete.cases(.))"
-      )
+      ),
+      .required_flags = c("id")
     )
+
+  # Non-finite time values
+  tests_results[["Non-finite TIME values"]] <-
+    pass_fail(
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(c(flags$id, flags$time))})",
+        "dplyr::filter(!is.finite({collapse_covs(c(flags$time))}))"
+      ),
+      .required_flags = c("time")
+    )
+
+  # MDV not equal to 1 when DV is NA
+  tests_results[["MDV not set to 1 when DV is NA"]] <-
+    pass_fail(
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(c(flags$dv, flags$mdv))})",
+        "dplyr::filter(is.na({collapse_covs(flags$dv)}) & {collapse_covs(flags$mdv)} != 1)"
+      ),
+      .required_flags = c("dv", "mdv")
+    )
+
+  # NUM is unique
+  tests_results[["All NUM values are unique"]] <-
+    pass_fail(
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(flags$num)})",
+        "dplyr::group_by(across({flags$num}))",
+        "dplyr::add_count()",
+        "dplyr::ungroup()",
+        "dplyr::filter(n > 1)"
+      ),
+      .required_flags = c("num")
+    )
+
 
   # Output ------------------------------------------------------------------
   class(tests_results) <- c("nm_validate_results", class(tests_results))
@@ -131,10 +182,11 @@ print.nm_validate_results <- function(x, ...) {
 
   cli::cli_h1("nm_validate() results:")
 
-  num_passed <- purrr::map_lgl(x, ~ .x$success) %>% sum
-  num_fail <- purrr::map_lgl(x, ~ !.x$success) %>% sum
+  num_passed <- purrr::map_lgl(x, ~ .x$success) %>% sum(., na.rm = TRUE)
+  num_fail <- purrr::map_lgl(x, ~ !.x$success) %>% sum(., na.rm = TRUE)
+  num_skipped <- purrr::map_lgl(x, ~ is.na(.x$success)) %>% sum(., na.rm = TRUE)
 
-  end_msg <- glue::glue("{num_passed} of {length(x)} checks {crayon::green('PASSED')}")
+  end_msg <- glue::glue("{num_passed} of {length(x) - num_skipped} checks {crayon::green('PASSED')}")
 
   if (num_passed > 0) {
 
@@ -179,8 +231,31 @@ print.nm_validate_results <- function(x, ...) {
 
   }
 
+  if (num_skipped > 0) {
+
+    skipped <-
+      purrr::map(x, ~ {
+        if(is.na(.x$success)) {
+          return(.x)
+        } else {
+          return(NULL)
+        }
+      }) %>% purrr::compact()
+
+    for (i in 1:length(num_skipped)) {
+
+      cat("\n")
+
+      cli::cli_alert_warning("{names(skipped)[i]} -- Test not run due to following flags not found:")
+
+      cat(gsub("%>%", "%>%\n", as.character(skipped[[i]]$debug, fixed = TRUE)))
+      cat("\n")
+    }
+
+  }
+
   # end_msg)
   cat("\n")
-  cat(summary_line(n_fail = num_fail, n_pass = num_passed))
+  cat(summary_line(n_fail = num_fail, n_pass = num_passed, n_skip = num_skipped))
 
 }

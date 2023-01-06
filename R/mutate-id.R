@@ -28,6 +28,8 @@ mutate_id <- function(.df, .unique_subject_identifier, .start_id = 1) {
     msg = "Grouping found in data.frame. This function evaluates a single row at a time. Please ungroup() first."
   )
 
+  message_function("calc_id")
+
   .df %>%
     dplyr::mutate(
       ID = calc_id(

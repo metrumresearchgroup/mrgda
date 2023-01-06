@@ -1,0 +1,58 @@
+---
+title: "NM Summary"
+author: "`r Sys.info()[['user']]`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  rmdformats::readthedown:
+    toc_float:
+      collapsed: false
+    toc_depth: 3
+params: 
+  outputs: "`r list()`"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, results="asis"}
+
+for(type.i in names(outputs)){
+  
+  writeLines(paste0("# ", type.i))
+  
+  outputs_type.i <- outputs[[type.i]]
+  
+  for(sub_type.i in names(outputs_type.i)) {
+    
+    writeLines(paste0("## ", sub_type.i))
+    
+    outputs_sub_type.i <- outputs_type.i[[sub_type.i]]
+    
+    for (output.i in names(outputs_sub_type.i)) {
+      
+      writeLines(paste0("### ", output.i))
+      
+      output_classes.i <- class(outputs_sub_type.i[[output.i]])
+      
+      if("gt_tbl" %in% output_classes.i){
+        
+        print(htmltools::tagList(outputs_sub_type.i[[output.i]]))
+        
+      } else if("ggplot" %in% output_classes.i){
+        
+        print(outputs_sub_type.i[[output.i]])
+        
+      }
+      
+      rm(output.i)
+      
+      writeLines("\n")
+    }
+    
+  }
+  
+}
+
+```
+
