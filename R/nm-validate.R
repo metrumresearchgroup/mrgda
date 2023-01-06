@@ -123,7 +123,6 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
     )
 
   # Non-finite time values
-
   tests_results[["Non-finite TIME values"]] <-
     pass_fail(
       .code = c(
@@ -146,7 +145,6 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
     )
 
   # NUM is unique
-
   tests_results[["All NUM values are unique"]] <-
     pass_fail(
       .code = c(
