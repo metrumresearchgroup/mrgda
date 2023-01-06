@@ -15,7 +15,7 @@
 #'
 #' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 #'
-#' nm_validate(nm, nm_spec)
+#' nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
 #'
 #' @md
 #' @export

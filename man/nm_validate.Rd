@@ -25,6 +25,6 @@ nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 
-nm_validate(nm, nm_spec)
+nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
 
 }
