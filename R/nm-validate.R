@@ -145,6 +145,21 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
       .required_flags = c("dv", "mdv")
     )
 
+  # NUM is unique
+
+  tests_results[["All NUM values are unique"]] <-
+    pass_fail(
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(flags$num)})",
+        "dplyr::group_by(across({flags$num}))",
+        "dplyr::add_count()",
+        "dplyr::ungroup()",
+        "dplyr::filter(n > 1)"
+      ),
+      .required_flags = c("num")
+    )
+
 
   # Output ------------------------------------------------------------------
   class(tests_results) <- c("nm_validate_results", class(tests_results))
