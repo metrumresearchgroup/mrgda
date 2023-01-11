@@ -22,6 +22,7 @@ Packages:
   - htmltools
   - ggplot2
   - mrggsave
+  - diffdf
 
 Repos:
   - CRAN: https://cran.rstudio.com
