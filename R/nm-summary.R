@@ -36,8 +36,8 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE){
   }
 
   if (!.study_compare) {
-    g_r$flags$study <- "ALLDATAMRGDA"
-    g_r$data[[g_r$flags$study]] <- "All Data"
+    g_r$flags$study <- "All Studies"
+    g_r$data[[g_r$flags$study]] <- "All Studies"
   }
 
   shorts <-
