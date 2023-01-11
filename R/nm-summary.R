@@ -113,7 +113,6 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE){
   outputs$Tables$Miscellaneous[["Primary key summary"]] <-
     g_r$data %>%
     dplyr::count(dplyr::across(c(g_r$flags$evid, g_r$flags$dvid, g_r$flags$primary_keys))) %>%
-    #dplyr::mutate(Placeholder = "Full data") %>%
     gt::gt()
 
   # figures -----------------------------------------------------------------
