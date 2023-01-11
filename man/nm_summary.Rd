@@ -4,12 +4,14 @@
 \alias{nm_summary}
 \title{Provide diagnostic summary of an NMTRAN dataset}
 \usage{
-nm_summary(.data, .spec)
+nm_summary(.data, .spec, .study_compare = TRUE)
 }
 \arguments{
 \item{.data}{a data frame}
 
 \item{.spec}{a yspec object}
+
+\item{.study_compare}{if TRUE (default), tables & figures will be grouped by study}
 }
 \description{
 This function is intended to provide a high level overview of variables
