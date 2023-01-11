@@ -1,8 +1,26 @@
-write_nm <- function(.data, .spec, .filepath) {
+nm_create <- function(.data, .spec, .file) {
+
+
+
+  # Read in Current Version for Diff ----------------------------------------
+  if (file.exists(.file)) {
+    .current_nm <- readr::read_csv(.file, na = ".")
+  }
+
+
+  # Write Out New Version ---------------------------------------------------
+  data.table::fwrite(
+    x = .data,
+    file = .file,
+    sep = ",",
+    quote = FALSE,
+    row.names = FALSE,
+    na = "."
+  )
 
   # Prepare Meta Data Folder ------------------------------------------------
-  .data_location <- dirname(.filepath)
-  .data_name <- tools::file_path_sans_ext(basename(.filepath))
+  .data_location <- dirname(.file)
+  .data_name <- tools::file_path_sans_ext(basename(.file))
   .meta_data_folder <- file.path(.data_location, .data_name)
 
   # Create directory anew if it exists
@@ -25,23 +43,14 @@ write_nm <- function(.data, .spec, .filepath) {
     output_dir = .meta_data_folder
   )
 
-  if (file.exists(.filepath)) {
+
+  if (file.exists(.file)) {
     diffdf::diffdf(
-      base = readr::read_csv(.filepath, na = "."),
+      base = readr::read_csv(.file, na = "."),
       compare = .data,
       file = file.path(.meta_data_folder, "data-diff.txt"),
       suppress_warnings = TRUE
     )
   }
-
-  # Write Out Main Data Set -------------------------------------------------
-  data.table::fwrite(
-    x = .data,
-    file = .filepath,
-    sep = ",",
-    quote = FALSE,
-    row.names = FALSE,
-    na = "."
-  )
 
 }
