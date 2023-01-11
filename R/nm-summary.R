@@ -23,9 +23,22 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE){
 
   outputs <- list()
 
-  .data <- .data %>% yspec::ys_add_factors(.spec, .suffix = "")
-
   g_r <- gather_flags(.data, .spec)
+
+  g_r$data <- g_r$data %>% yspec::ys_add_factors(.spec, .suffix = "")
+
+  if (is.null(g_r$flags$study) & .study_compare) {
+    stop(
+      c("'study' flag not found." ,
+        "\n",
+        "Please add a 'study' flag to your spec, or set '.study_compare' to FALSE.")
+    )
+  }
+
+  if (!.study_compare) {
+    g_r$flags$study <- "ALLDATAMRGDA"
+    g_r$data[[g_r$flags$study]] <- "All Data"
+  }
 
   shorts <-
     dplyr::bind_rows(yspec::ys_get_short_unit(.spec)) %>%
@@ -35,26 +48,11 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE){
     dplyr::rename(name = rowname, short = V1)
 
   subject_level_data <-
-    .data %>%
+    g_r$data %>%
     dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cat_cov, g_r$flags$bl_cont_cov)) %>%
     dplyr::distinct()
 
-  if (is.null(g_r$flags$study) & .study_compare) {
 
-    stop(
-      c("nm_summary(): 'study' flag not found." ,
-        "\n",
-        "Please set '.study_compare' to FALSE, or add a 'study' flag to your spec.")
-    )
-
-  }
-
-
-  if (!.study_compare) {
-    g_r$data$ALLDATAMRGDA <- "All Data"
-    subject_level_data$ALLDATAMRGDA <- "All Data"
-    g_r$flags$study <- "ALLDATAMRGDA"
-  }
 
   # tables ------------------------------------------------------------------
   outputs$Tables <- list()
