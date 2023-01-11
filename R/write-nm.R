@@ -1,8 +1,8 @@
-write_nm <- function(.data, .spec, .file) {
+write_nm <- function(.data, .spec, .filepath) {
 
   # Prepare Meta Data Folder ------------------------------------------------
-  .data_location <- dirname(.file)
-  .data_name <- tools::file_path_sans_ext(basename(.file))
+  .data_location <- dirname(.filepath)
+  .data_name <- tools::file_path_sans_ext(basename(.filepath))
   .meta_data_folder <- file.path(.data_location, .data_name)
 
   # Create directory anew if it exists
@@ -14,7 +14,7 @@ write_nm <- function(.data, .spec, .file) {
 
   # Write Out Meta Data -----------------------------------------------------
   haven::write_xpt(
-    data = yspec::ys_add_labels(.data, spec),
+    data = yspec::ys_add_labels(.data, .spec),
     path = file.path(.meta_data_folder, paste0(.data_name, ".xpt")),
     version = 5, # Use version 5
     name = .data_name # Max of 8 chars
@@ -22,12 +22,12 @@ write_nm <- function(.data, .spec, .file) {
 
   yspec::ys_document(
     x = .spec,
-    output_dir = .meta_data_directory
+    output_dir = .meta_data_folder
   )
 
-  if (file.exists(.file)) {
+  if (file.exists(.filepath)) {
     diffdf::diffdf(
-      base = readr::read_csv(.file, na = "."),
+      base = readr::read_csv(.filepath, na = "."),
       compare = .data,
       file = file.path(.meta_data_folder, "data-diff.txt"),
       suppress_warnings = TRUE
@@ -37,7 +37,7 @@ write_nm <- function(.data, .spec, .file) {
   # Write Out Main Data Set -------------------------------------------------
   data.table::fwrite(
     x = .data,
-    file = .file,
+    file = .filepath,
     sep = ",",
     quote = FALSE,
     row.names = FALSE,
