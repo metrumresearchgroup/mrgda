@@ -39,6 +39,17 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE){
     dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cat_cov, g_r$flags$bl_cont_cov)) %>%
     dplyr::distinct()
 
+  if (is.null(g_r$flags$study) & .study_compare) {
+
+    stop(
+      c("nm_summary(): 'study' flag not found." ,
+        "\n",
+        "Please set '.study_compare' to FALSE, or add a 'study' flag to your spec.")
+    )
+
+  }
+
+
   if (!.study_compare) {
     g_r$data$ALLDATAMRGDA <- "All Data"
     subject_level_data$ALLDATAMRGDA <- "All Data"
