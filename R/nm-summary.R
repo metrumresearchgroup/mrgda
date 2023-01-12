@@ -8,6 +8,7 @@
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
+#' @param .study_compare if TRUE (default), tables & figures will be grouped by study
 #' @examples
 #'
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
@@ -18,13 +19,26 @@
 #'
 #' @md
 #' @export
-nm_summary <- function(.data, .spec){
+nm_summary <- function(.data, .spec, .study_compare = TRUE){
 
   outputs <- list()
 
-  .data <- .data %>% yspec::ys_add_factors(.spec, .suffix = "")
-
   g_r <- gather_flags(.data, .spec)
+
+  g_r$data <- g_r$data %>% yspec::ys_add_factors(.spec, .suffix = "")
+
+  if (is.null(g_r$flags$study) & .study_compare) {
+    stop(
+      c("'study' flag not found." ,
+        "\n",
+        "Please add a 'study' flag to your spec, or set '.study_compare' to FALSE.")
+    )
+  }
+
+  if (!.study_compare) {
+    g_r$flags$study <- "All Studies"
+    g_r$data[[g_r$flags$study]] <- "All Studies"
+  }
 
   shorts <-
     dplyr::bind_rows(yspec::ys_get_short_unit(.spec)) %>%
@@ -34,15 +48,17 @@ nm_summary <- function(.data, .spec){
     dplyr::rename(name = rowname, short = V1)
 
   subject_level_data <-
-    .data %>%
+    g_r$data %>%
     dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cat_cov, g_r$flags$bl_cont_cov)) %>%
     dplyr::distinct()
+
+
 
   # tables ------------------------------------------------------------------
   outputs$Tables <- list()
 
   # baseline continuous Covariates
-  outputs$Tables$Covariates[["Baseline continuous Covariates"]] <-
+  outputs$Tables$Covariates[["Baseline continuous covariates"]] <-
     subject_level_data %>%
     dplyr::select(c(g_r$flags$id, g_r$flags$study, g_r$flags$bl_cont_cov)) %>%
     tidyr::pivot_longer(cols = g_r$flags$bl_cont_cov) %>%
@@ -62,10 +78,11 @@ nm_summary <- function(.data, .spec){
     ) %>%
     dplyr::group_by(short) %>%
     gt::gt() %>%
+    gt::tab_header(title = "Baseline continuous covariates") %>%
     suppressMessages()
 
   # baseline categorical Covariates
-  outputs$Tables$Covariates[["Baseline categorical Covariates"]] <-
+  outputs$Tables$Covariates[["Baseline categorical covariates"]] <-
     subject_level_data %>%
     dplyr::select(
       c(g_r$flags$id,
@@ -87,15 +104,24 @@ nm_summary <- function(.data, .spec){
     dplyr::arrange(-n) %>%
     dplyr::rename(Percent = n) %>%
     dplyr::arrange(dplyr::across(c(g_r$flags$study, "short", -"Percent"))) %>%
-    dplyr::group_by(short, value) %>%
+    dplyr::group_by(dplyr::across(c(g_r$flags$study, "short"))) %>%
     gt::gt() %>%
+    gt::tab_header(title = "Baseline categorical covariates") %>%
     suppressMessages()
+
+  # BLQ counts
+  outputs$Tables$Miscellaneous[["BLQ summary"]] <-
+    g_r$data %>%
+    dplyr::count(dplyr::across(c(g_r$flags$study, g_r$flags$evid, g_r$flags$blq))) %>%
+    dplyr::arrange(dplyr::across(c(g_r$flags$study, g_r$flags$evid, g_r$flags$blq))) %>%
+    dplyr::group_by(dplyr::across(c(g_r$flags$study))) %>%
+    gt::gt() %>%
+    gt::tab_header(title = "BLQ summary")
 
   # primary keys
   outputs$Tables$Miscellaneous[["Primary key summary"]] <-
     g_r$data %>%
     dplyr::count(dplyr::across(c(g_r$flags$evid, g_r$flags$dvid, g_r$flags$primary_keys))) %>%
-    dplyr::mutate(Placeholder = "Full data") %>%
     gt::gt()
 
   # figures -----------------------------------------------------------------
@@ -123,7 +149,9 @@ nm_summary <- function(.data, .spec){
       ggplot2::ggplot() +
       ggplot2::geom_boxplot(ggplot2::aes(x = STUDY, y = BLCOV_VAL)) +
       #ggplot2::geom_jitter(ggplot2::aes(x = STUDY, y = BLCOV_VAL), height = 0, width = 0.1) +
-      ggplot2::facet_wrap(~short)
+      #ggplot2::facet_wrap(~short) +
+      ggplot2::ylab(i) +
+      ggplot2::xlab("Study")
   }
 
 
@@ -142,6 +170,5 @@ nm_summary <- function(.data, .spec){
     utils::browseURL(nm_summary_temp)
   }
 
-  return(outputs)
+  return((outputs))
 }
-
