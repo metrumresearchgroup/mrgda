@@ -44,10 +44,15 @@ nm_1 <-
     SEX,
     WTBL,
     CRCLBL,
-    STUDYID)
+    STUDYID
+  )
 
 nm_spec <- 
-  yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
+  yspec::ys_load(system.file("derived", "pk-trim.yml", package = "mrgda"))
+  
+
+
+nm_1 <- nm_1 %>% select(names(nm_spec)[names(nm_spec) %in% names(.)])
 
 ```
 
@@ -97,12 +102,37 @@ nm_final <-
 
 knitr::kable(head(nm_final))
 
+nm_spec <- nm_spec %>% yspec::ys_select(names(nm_spec)[names(nm_spec) %in% names(nm_final)])
+
+nm_final <- nm_final %>% select(names(nm_spec))
+
+yspec::ys_check(nm_final, nm_spec)
+
 ```
 
 # Data Validation
 
-```{r}
+## Flag setup
 
+```{yaml}
+SETUP__:
+  lookup_file: [lookup.yml]
+  description: ABC PK Model Data Specification
+  data_stem: pk
+  flags:
+    bl_cat_cov: [SEX]
+    bl_cont_cov: [WTBL, AGEBL]
+```
+
+## nm_validate()
+```{r}
+mrgda::nm_validate(nm_final, nm_spec)
+
+```
+
+## nm_summary()
+```{r}
+mrgda::nm_validate(nm_final, nm_spec)
 
 ```
 
@@ -110,5 +140,6 @@ knitr::kable(head(nm_final))
 
 ```{r}
 
+# mrgda::nm_write(nm_final, nm_spec)
 
 ```

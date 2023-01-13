@@ -19,8 +19,8 @@ TAD:
   short: Time after dose
   type: numeric
   unit: days
-DOSE: 
-  short: GEN1042 dose 
+DOSE:
+  short: GEN1042 dose
   type: numeric
   unit: mg
 DV:
@@ -75,7 +75,7 @@ WT:
   short: Time-varying weight
   type: numeric
   unit: kg
-BMIBL: 
+BMIBL:
   short: Baseline body mass index
   short.tex: Baseline BMI
   type: numeric
@@ -90,7 +90,7 @@ LDHBL:
   type: numeric
   unit: U/L
 CRPBL:
-  short: Baseline C-reactive protein 
+  short: Baseline C-reactive protein
   short.tex: Baseline CRP
   type: numeric
   unit: mg/L
@@ -155,7 +155,7 @@ PDL1ST:
   values: [0, 1, 2]
   decode: [Negative, Positive, Missing]
 BOR:
-  short: Best overall response 
+  short: Best overall response
   type: numeric
   values:
     PR: 1
@@ -190,7 +190,7 @@ COHORT:
   short: Study cohort
   type: character
 USUBJID:
-  short: Unique subject identifier 
+  short: Unique subject identifier
   type: character
 ENRLID:
   short: Subject enrollment identifier
@@ -201,3 +201,10 @@ STUDYID:
 EXCLRES:
   short: Exclusion reason
   type: character
+CRCLBL:
+  short: Baseline serum creatinine
+  type: numeric
+  unit: mg/dL
+EGFR:
+  short: EGFR
+  type: numeric
