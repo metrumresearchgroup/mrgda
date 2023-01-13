@@ -1,0 +1,114 @@
+---
+title: "mrgda usage"
+author: "Eric Anderson"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{usage}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+
+library(tidyverse)
+
+
+nm <- 
+  readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
+
+
+CRCLBL <- rnorm(n = length(unique(nm$ID)), mean = 1, sd = .25)
+
+blcrcl <-
+  nm %>% 
+  distinct(ID) %>% 
+  mutate(CRCLBL = CRCLBL)
+
+nm_1 <-
+  nm %>% 
+  left_join(blcrcl) %>% 
+  transmute(
+    USUBJID = glue::glue("{STUDYID}-{ID}"),
+    TIME, 
+    EVID, 
+    DV,
+    AMT,
+    AGEBL,
+    SEX,
+    WTBL,
+    CRCLBL,
+    STUDYID)
+
+nm_spec <- 
+  yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
+
+```
+
+```{r, echo=FALSE}
+
+knitr::kable(head(nm_1))
+
+```
+
+# Data Assembly
+
+## mutate_id()
+
+```{r}
+
+nm_2 <-
+  nm_1 %>% 
+  mrgda::mutate_id(.unique_subject_identifier = USUBJID)
+
+```
+
+```{r, echo=FALSE}
+
+knitr::kable(head(nm_2))
+
+```
+
+
+## mutate_egfr()
+
+```{r}
+nm_spec$SEX
+
+nm_final <-
+  nm_2 %>% 
+  mrgda::mutate_egfr(
+    .age = AGEBL, 
+    .wt = WTBL,
+    .serum_creatinine = CRCLBL, 
+    .sex = SEX,
+    .female_value = 0
+  )
+
+```
+
+```{r, echo=FALSE}
+
+knitr::kable(head(nm_final))
+
+```
+
+# Data Validation
+
+```{r}
+
+
+```
+
+# Data Creation
+
+```{r}
+
+
+```
