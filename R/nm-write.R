@@ -74,7 +74,7 @@ nm_write <- function(.data, .spec, .file) {
 
   if (!is.null(.current_nm)) {
     diffdf::diffdf(
-      base = readr::read_csv(.file, na = ".") %>% suppressMessages(),
+      base = .current_nm,
       compare = .data,
       file = file.path(.meta_data_folder, "data-diff.txt"),
       suppress_warnings = TRUE
