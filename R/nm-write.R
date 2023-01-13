@@ -1,4 +1,4 @@
-#' Create (write out) an NMTRAN dataset and corresponding meta data
+#' Write an NMTRAN data set and corresponding meta data
 #'
 #' @description
 #' This function will take a nonmem ready data frame in R and write it out to a nonmem ready csv.
@@ -15,7 +15,7 @@
 #'}
 #' @md
 #' @export
-nm_create <- function(.data, .spec, .file) {
+nm_write <- function(.data, .spec, .file) {
 
   # Read in Current Version for Diff ----------------------------------------
   if (file.exists(.file)) {
