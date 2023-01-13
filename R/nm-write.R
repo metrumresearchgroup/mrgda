@@ -56,7 +56,7 @@ nm_write <- function(.data, .spec, .file) {
     data = yspec::ys_add_labels(.data, .spec),
     path = file.path(.meta_data_folder, paste0(.data_name, ".xpt")),
     version = 5, # Use version 5
-    name = .data_name # Max of 8 chars
+    name = substr(.data_name, 1, 8) # Max of 8 chars
   )
 
   cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))

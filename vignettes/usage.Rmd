@@ -131,18 +131,20 @@ mrgda::nm_validate(nm_final, nm_spec)
 ```
 
 ## nm_summary()
-```{r}
+```{r, results='asis'}
 mrgda::nm_summary(nm_final, nm_spec)
 
 ```
 
 # Data Creation
 
-## nm_create()
+## nm_write()
 ```{r}
 
-mrgda::nm_create(nm_final,
-                 nm_spec, 
-                 here::here("inst", "derived", "vignette"))
+mrgda::nm_write(
+  nm_final,
+  nm_spec, 
+  file.path(tempdir(), "pk.csv")
+)
 
 ```
