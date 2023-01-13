@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
   comment = "#>"
 )
 
-library(tidyverse)
+library(dplyr)
 
 
 nm <- 
@@ -121,7 +121,7 @@ description: ABC PK Model Data Specification
 data_stem: pk
 flags:
   bl_cat_cov: [SEX]
-bl_cont_cov: [WTBL, AGEBL]
+  bl_cont_cov: [WTBL, AGEBL]
 ```
 
 ## nm_validate()
