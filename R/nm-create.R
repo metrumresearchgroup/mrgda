@@ -1,3 +1,20 @@
+#' Create (write out) an NMTRAN dataset and corresponding meta data
+#'
+#' @description
+#' This function will take a nonmem ready data frame in R and write it out to a nonmem ready csv.
+#' It also creates a meta data folder, storing the xpt file along with other useful information.
+#'
+#' @param .data a data frame
+#' @param .spec a yspec object
+#' @param .file the name of the csv file to write out to (including the path).
+#' @examples
+#'\dontrun{
+#' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
+#' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
+#' nm_write(.data = nm, .spec = nm_spec, .file = "data/derived/pk.csv")
+#'}
+#' @md
+#' @export
 nm_create <- function(.data, .spec, .file) {
 
   # Read in Current Version for Diff ----------------------------------------

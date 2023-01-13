@@ -33,7 +33,8 @@ Imports:
     rmarkdown,
     diffdf,
     haven,
-    data.table
+    data.table,
+    yaml
 Suggests: 
     knitr,
     testthat (>= 3.0.0),
