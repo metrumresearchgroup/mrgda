@@ -154,6 +154,30 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE){
       ggplot2::xlab("Study")
   }
 
+  # Time varying spaghetti plots
+  tvcont_covs <-
+    g_r$data %>%
+    dplyr::select(
+      c(g_r$flags$id,
+        g_r$flags$time,
+        STUDY = g_r$flags$study,
+        g_r$flags$tv_cont_cov)
+    )
+
+  for (i in unique(g_r$flags$tv_cont_cov)) {
+    outputs$Figures$Spaghetti[[i]] <-
+      tvcont_covs %>%
+      dplyr::select(c(ID = g_r$flags$id,
+                      TIME = g_r$flags$time,
+                      COV = i)) %>%
+      dplyr::distinct(COV, .keep_all = TRUE) %>%
+      ggplot2::ggplot() +
+      ggplot2::geom_point(ggplot2::aes(x = TIME, y = COV)) +
+      ggplot2::geom_line(ggplot2::aes(x = TIME, y = COV, group = ID)) +
+      ggplot2::ylab(i) +
+      ggplot2::xlab("Time")
+  }
+
 
   # output ------------------------------------------------------------------
   nm_summary_temp <- tempfile(fileext = ".html")

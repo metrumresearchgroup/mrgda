@@ -55,3 +55,10 @@ test_that("nm_summary outputs figures: Baseline covariates continuous [NMV-SUM-0
   expect_equal(as.numeric(figsum[5, 4]), 105.1)
 })
 
+test_that("nm_summary outputs figures: Time-varying covariates continuous [NMV-SUM-005]", {
+  figsum <- dat_sum$Figures$Spaghetti$WT$data
+  expect_equal(nrow(figsum), 259)
+  expect_equal(as.numeric(figsum[5, 3]), 83.1)
+  expect_true(nrow(figsum %>% dplyr::group_by(ID) %>% dplyr::count(COV) %>% dplyr::filter(n > 1)) == 0)
+})
+
