@@ -19,7 +19,7 @@ nm_write <- function(.data, .spec, .file) {
 
   # Read in Current Version for Diff ----------------------------------------
   if (file.exists(.file)) {
-    .current_nm <- readr::read_csv(.file, na = ".") %>% suppressMessages()
+    .current_nm <- readr::read_csv(.file) %>% suppressMessages()
   } else {
     .current_nm <- NULL
   }
@@ -75,7 +75,7 @@ nm_write <- function(.data, .spec, .file) {
   if (!is.null(.current_nm)) {
     diffdf::diffdf(
       base = .current_nm,
-      compare = .data,
+      compare = readr::read_csv(.file) %>% suppressMessages(),
       file = file.path(.meta_data_folder, "data-diff.txt"),
       suppress_warnings = TRUE
     )
