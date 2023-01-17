@@ -64,30 +64,13 @@ knitr::kable(head(nm_1))
 
 # Data Assembly
 
-## mutate_id()
-
-```{r}
-
-nm_2 <-
-  nm_1 %>% 
-  mrgda::mutate_id(.unique_subject_identifier = USUBJID)
-
-```
-
-```{r, echo=FALSE}
-
-knitr::kable(head(nm_2))
-
-```
-
-
 ## mutate_egfr()
 
 ```{r}
 nm_spec$SEX
 
 nm_final <-
-  nm_2 %>% 
+  nm_1 %>% 
   mrgda::mutate_egfr(
     .age = AGEBL, 
     .wt = WTBL,
