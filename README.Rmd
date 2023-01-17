@@ -87,9 +87,9 @@ figures to help you visualize your data.
 nm_summary(.data = nm, .spec = nm_spec)
 ```
 
-![Baseline continuous covariates table](bl-cont-cov-table.png)
+![Baseline continuous covariates table](man/figures/bl-cont-cov-table.png)
 
-![Baseline continuous covariates figure](cov-boxplot.png)
+![Baseline continuous covariates figure](man/figures/cov-boxplot.png)
 
 
 ## Documentation
