@@ -30,7 +30,7 @@ be defined for each of the following flags:
 
 Note in the example below that multiple variables can be listed for each flag
 and that not all flags need to be defined. For instance, no time-varying 
-categorical covariates are listed below.
+categorical covariates are listed below. 
 
 ```{r, eval=FALSE}
 SETUP:
