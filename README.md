@@ -63,8 +63,20 @@ nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
 
     ✔ No missing covariates
 
+    ✔ Non-finite TIME values
 
-    [ FAIL 0 | PASS 3 ]
+    ✔ MDV not set to 1 when DV is NA
+
+    ✖ All NUM values are unique -- Copy/paste and run the following code:
+
+    nm %>%
+     dplyr::select(NUM) %>%
+     dplyr::group_by(across(NUM)) %>%
+     dplyr::add_count() %>%
+     dplyr::ungroup() %>%
+     dplyr::filter(n > 1)
+
+    [ FAIL 1 | SKIP 0 | PASS 5 ]
 
 If an error is found in the data, you will be provided with code to help
 debug where the problem occurs.
@@ -83,8 +95,14 @@ nm_validate(.data = nm2, .spec = nm_spec, .error_on_fail = FALSE)
 
     ## ✔ No missing covariates
 
+    ## ✔ Non-finite TIME values
+
+    ## ✔ MDV not set to 1 when DV is NA
+
+    ## ✔ All NUM values are unique
+
     ## 
-    ## [ FAIL 0 | PASS 3 ]
+    ## [ FAIL 0 | SKIP 0 | PASS 6 ]
 
 ### Data summary
 
