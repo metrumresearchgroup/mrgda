@@ -23,3 +23,8 @@ reference:
     desc: Helper functions for deriving variables
     contents:
     - mutate_egfr
+    - mutate_id
+  - title: Data Creation
+    desc: Write NONMEM data set
+    contents:
+    - nm_write
