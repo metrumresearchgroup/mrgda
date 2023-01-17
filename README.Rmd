@@ -6,12 +6,12 @@
 
 ## Overview
 
-mrgda is a NONMEM data assembly helper, providing a set of functions that leverages
-your data specification file to validate a derived data set.
+mrgda is a NONMEM data assembly helper, providing a set of functions that help 
+you assemble, explore and validate your data set.
 
 To use mrgda optimally, you are encouraged to set up your data specification file
 in `yaml` format, similar to the example found [here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml) and
-discussed further in the Setup section below.
+discussed further in the `Setup` section below.
 
 ## Setup
 
@@ -47,9 +47,10 @@ SETUP:
 ## Usage
 
 ```{r, include=FALSE}
+library(dplyr)
 nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
-nm_errors <- readr::read_csv(system.file("derived", "pk-errors.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
+nm2 <- nm %>% dplyr::filter(STUDYID == "STUDY-X")
 nm_ex_df <- dplyr::tibble(
      AGE = c(45, 82, 73),
      WT = c(64, 23, 92),
@@ -58,16 +59,38 @@ nm_ex_df <- dplyr::tibble(
      RACE = c(1, 2, 3))
 ```
 
-#### Data validation
+### Data validation
 
 To validate your data, simply provide `nm_validate()` with your NONMEM data set 
 and data specification. It's output will indicate the result of a series of 
 pass/fail validation checks.
 
-```{r, comment=NA, }
+```{r, comment=NA}
 library(mrgda)
 nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
 ```
+
+If an error is found in the data, you will be provided with code to help debug 
+where the problem occurs.
+
+```{r}
+nm_validate(.data = nm2, .spec = nm_spec, .error_on_fail = FALSE)
+```
+
+### Data summary
+
+To explore your data, provide `nm_summary()` with your NONMEM data set 
+and data specification. A html document will be generated with tables and 
+figures to help you visualize your data.
+
+```{r, eval=FALSE}
+nm_summary(.data = nm, .spec = nm_spec)
+```
+
+![Baseline continuous covariates table](bl-cont-cov-table.png)
+
+![Baseline continuous covariates figure](cov-boxplot.png)
+
 
 ## Documentation
 Public documentation of all functions is hosted at [https://metrumresearchgroup.github.io/mrgda/](https://metrumresearchgroup.github.io/mrgda/)

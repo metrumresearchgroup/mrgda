@@ -5,33 +5,17 @@ SETUP__:
   sponsor: ABC Company
   data_stem: pk
   flags:
-    bl_cont_cov: [WTBL, BMIBL, AGEBL]
-    tv_cont_cov: [WT]
-C:
-NUM:
+    bl_cat_cov: [SEX]
+    bl_cont_cov: [WTBL, AGEBL]
 ID:
+USUBJID:
 TIME:
-TAD:
-DOSE:
-DV:
-DVID:
-CMT:
 EVID:
+DV:
 AMT:
-RATE:
-DUR:
-MDV:
-BLQ:
-DAY:
-WTBL:
-WT:
-BMIBL:
 AGEBL:
 SEX:
-RACE:
-ADAT:
-ADAC:
-ADAPOS:
-NOADAT:
-PKDTIMP:
+WTBL:
+CRCLBL:
+EGFR:
 STUDYID:

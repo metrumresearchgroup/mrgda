@@ -163,7 +163,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   class(tests_results) <- c("nm_validate_results", class(tests_results))
 
   # Return a true error of any failures
-  failures <- purrr::map_lgl(tests_results, ~ !.x$success) %>% sum
+  failures <- purrr::map_lgl(tests_results, ~ !.x$success) %>% sum(., na.rm = TRUE)
 
   if (failures > 0 & .error_on_fail) {
     print(tests_results)
@@ -242,7 +242,7 @@ print.nm_validate_results <- function(x, ...) {
         }
       }) %>% purrr::compact()
 
-    for (i in 1:length(num_skipped)) {
+    for (i in 1:length(skipped)) {
 
       cat("\n")
 

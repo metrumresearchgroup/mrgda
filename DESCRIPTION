@@ -30,7 +30,11 @@ Imports:
     forcats,
     gt,
     rmdformats,
-    rmarkdown
+    rmarkdown,
+    diffdf,
+    haven,
+    data.table,
+    yaml
 Suggests: 
     knitr,
     testthat (>= 3.0.0),

@@ -4,18 +4,12 @@
 ## Overview
 
 mrgda is a NONMEM data assembly helper, providing a set of functions
-that help validate your derived data set. Working hand in hand with your
-data specification, `nm_validate()` checks for common data set errors
-such as:
-
--   Duplicated events
--   Non-unique baseline covariates
--   Missing covariates
+that help you assemble, explore and validate your data set.
 
 To use mrgda optimally, you are encouraged to set up your data
 specification file in `yaml` format, similar to the example found
 [here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml)
-and discussed further in the Setup section below.
+and discussed further in the `Setup` section below.
 
 ## Setup
 
@@ -50,45 +44,61 @@ SETUP:
 
 ## Usage
 
-#### Data validation
+### Data validation
 
-`nm_validate()` outputs the results of the pass/fail checks. If a check
-fails, the user will be provided code to help identify where the error
-is in the data.
+To validate your data, simply provide `nm_validate()` with your NONMEM
+data set and data specification. It’s output will indicate the result of
+a series of pass/fail validation checks.
 
 ``` r
 library(mrgda)
-
-nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
+nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
 ```
 
     ── nm_validate() results: ──────────────────────────────────────────────────────
 
-    ✖ No duplicate primary keys -- Copy/paste and run the following code:
+    ✔ No duplicate primary keys
 
-    nm_errors %>%
-     dplyr::select(ID, TIME, EVID, DVID) %>%
-     dplyr::count(ID, TIME, EVID, DVID) %>%
-     dplyr::filter(n > 1)
+    ✔ Non-unique baseline covariates
 
-    ✖ Non-unique baseline covariates -- Copy/paste and run the following code:
+    ✔ No missing covariates
 
-    nm_errors %>%
-     dplyr::select(ID, SEX, RACE, WTBL, BMIBL, AGEBL) %>%
-     dplyr::filter(complete.cases(.)) %>%
-     dplyr::distinct() %>%
-     dplyr::group_by(across(ID)) %>%
-     dplyr::add_count() %>%
-     dplyr::ungroup() %>%
-     dplyr::filter(n > 1)
 
-    ✖ No missing covariates -- Copy/paste and run the following code:
+    [ FAIL 0 | PASS 3 ]
 
-    nm_errors %>%
-     dplyr::select(ID, SEX, RACE, WTBL, BMIBL, AGEBL, WT) %>%
-     dplyr::filter(!complete.cases(.))
+If an error is found in the data, you will be provided with code to help
+debug where the problem occurs.
 
-    [ FAIL 3 | PASS 0 ]
+``` r
+nm_validate(.data = nm2, .spec = nm_spec, .error_on_fail = FALSE)
+```
+
+    ## 
+
+    ## ── nm_validate() results: ──────────────────────────────────────────────────────
+
+    ## ✔ No duplicate primary keys
+
+    ## ✔ Non-unique baseline covariates
+
+    ## ✔ No missing covariates
+
+    ## 
+    ## [ FAIL 0 | PASS 3 ]
+
+### Data summary
+
+To explore your data, provide `nm_summary()` with your NONMEM data set
+and data specification. A html document will be generated with tables
+and figures to help you visualize your data.
+
+``` r
+nm_summary(.data = nm, .spec = nm_spec)
+```
+
+![Baseline continuous covariates table](bl-cont-cov-table.png)
+
+![Baseline continuous covariates figure](cov-boxplot.png)
 
 ## Documentation
 
