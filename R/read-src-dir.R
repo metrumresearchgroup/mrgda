@@ -41,7 +41,7 @@ read_src_dir <- function(.path, .file_types = "detect"){
     } else if (.file_type_use == "csv") {
       readr::read_csv
     } else {
-      stop("'.file_types' must be c('csv', 'sas7bdat', or 'xpt'")
+      stop("'.file_types' must be 'csv', 'sas7bdat', or 'xpt'")
     }
 
 
