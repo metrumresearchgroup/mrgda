@@ -1,0 +1,17 @@
+name,default
+id,ID
+dv,DV
+amt,AMT
+study,STUDYID_STUDY
+primary_keys,NA
+time,TAFD_TIME
+bl_cat_cov,NA
+bl_cont_cov,NA
+tv_cat_cov,NA
+tv_cont_cov,NA
+num,NUM
+mdv,MDV
+evid,EVID
+dvid,DVID
+blq,BQL_BLQ
+occ,OCC

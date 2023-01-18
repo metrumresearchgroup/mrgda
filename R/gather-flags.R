@@ -1,24 +1,8 @@
 gather_flags <- function(.data, .spec){
 
-  recognized_flags <- tibble::tribble(
-    ~name, ~default,
-    "id", "ID",
-    "dv", "DV",
-    "amt", "AMT",
-    "study", "STUDYID_STUDY",
-    "primary_keys", NA_character_,
-    "time", "TAFD_TIME",
-    "bl_cat_cov", NA_character_,
-    "bl_cont_cov", NA_character_,
-    "tv_cat_cov", NA_character_,
-    "tv_cont_cov", NA_character_,
-    "num", "NUM",
-    "mdv", "MDV",
-    "evid", "EVID",
-    "dvid", "DVID",
-    "blq", "BQL_BLQ",
-    "occ", "OCC"
-  )
+  recognized_flags <-
+    system.file("package-data", "recognized-flags.csv", package = "mrgda") %>%
+    readr::read_csv(file = .)
 
   .flags <- yspec::pull_meta(.spec, "flags")[recognized_flags$name] %>%
     purrr::set_names(recognized_flags$name)
