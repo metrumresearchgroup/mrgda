@@ -2,7 +2,6 @@
 
 S3method(print,nm_validate_results)
 export("%>%")
-export(mutate_egfr)
 export(nm_summary)
 export(nm_validate)
 export(nm_write)
