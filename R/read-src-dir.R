@@ -1,12 +1,10 @@
-#' Read in a source data directory (e.g. a folder filled with SDTM domains).
+#' Read in every file in a source data directory.
 #'
 #' @description
-#' This function will take a nonmem ready data frame in R and write it out to a nonmem ready csv.
-#' It also creates a meta data folder, storing the xpt file along with other useful information.
+#' This function takes a path to a source data directory (typically SDTM or ADaM folder), reads in every data file, and returns a named list of the data objects.
 #'
 #' @param .path Full path to the source data directory.
-#' @param .file_types Type of files being read in (e.g. 'xpt').
-#' Setting to 'detect' will determine file type based on the most occurring file type in .path.
+#' @param .file_types Type of files being read in (e.g. 'sas7bat'). Setting to 'detect' will determine file type based on the most occurring file type in .path.
 #' @examples
 #' path <- system.file("example-sdtm", package = "mrgda")
 #' src_list <- read_src_dir(.path = path)
@@ -28,7 +26,7 @@ read_src_dir <- function(.path, .file_types = "detect"){
 
   } else {
 
-    .file_type_use <- .file_types
+    .file_type_use <- gsub(".", "", .file_types, fixed = TRUE)
 
   }
 

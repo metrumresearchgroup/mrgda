@@ -2,19 +2,17 @@
 % Please edit documentation in R/read-src-dir.R
 \name{read_src_dir}
 \alias{read_src_dir}
-\title{Read in a source data directory (e.g. a folder filled with SDTM domains).}
+\title{Read in every file in a source data directory.}
 \usage{
 read_src_dir(.path, .file_types = "detect")
 }
 \arguments{
 \item{.path}{Full path to the source data directory.}
 
-\item{.file_types}{Type of files being read in (e.g. 'xpt').
-Setting to 'detect' will determine file type based on the most occurring file type in .path.}
+\item{.file_types}{Type of files being read in (e.g. 'sas7bat'). Setting to 'detect' will determine file type based on the most occurring file type in .path.}
 }
 \description{
-This function will take a nonmem ready data frame in R and write it out to a nonmem ready csv.
-It also creates a meta data folder, storing the xpt file along with other useful information.
+This function takes a path to a source data directory (typically SDTM or ADaM folder), reads in every data file, and returns a named list of the data objects.
 }
 \examples{
 path <- system.file("example-sdtm", package = "mrgda")
