@@ -58,6 +58,28 @@ read_src_dir <- function(.path, .file_types = "detect") {
 
   }
 
+
+  usubjid <-
+    purrr::map_dfr(
+      .out,
+      ~ {
+        if ("USUBJID" %in% names(.x)) {
+          return(
+            dplyr::distinct(.x, USUBJID) %>% dplyr::mutate(VALUE = TRUE)
+          )
+        }
+      },
+      .id = "DOMAIN"
+    ) %>%
+    dplyr::mutate(DOMAIN = tools::file_path_sans_ext(DOMAIN)) %>%
+    tidyr::pivot_wider(names_from = DOMAIN, values_from = VALUE)
+
+  usubjid[is.na(usubjid)] <- FALSE
+
+  .out$usubjid <- usubjid
+
+  cli::cli_alert_info(glue::glue("{nrow(.out$usubjid)} unique USUBJID across all domains"))
+
   return(.out)
 
 }
