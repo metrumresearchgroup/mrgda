@@ -1,4 +1,4 @@
-#' Read in every file in a source data directory.
+#' Read in every domain in a source data directory.
 #'
 #' @description
 #' This function takes a path to a source data directory (typically SDTM or ADaM folder), reads in every data file, and returns a named list of the data objects.
@@ -10,8 +10,7 @@
 #' src_list <- read_src_dir(.path = path)
 #' @md
 #' @export
-read_src_dir <- function(.path, .file_types = "detect"){
-
+read_src_dir <- function(.path, .file_types = "detect") {
   .out <- list()
 
   .files <- list.files(.path, full.names = TRUE)
@@ -19,13 +18,11 @@ read_src_dir <- function(.path, .file_types = "detect"){
   .extensions <- tools::file_ext(.files)
 
   if (.file_types == "detect") {
-
     .file_type_use <- names(which.max(table(.extensions)))
 
     cli::cli_alert_info(paste0("Detected type = '", .file_type_use, "'"))
 
   } else {
-
     .file_type_use <- gsub(".", "", .file_types, fixed = TRUE)
 
   }
@@ -44,17 +41,22 @@ read_src_dir <- function(.path, .file_types = "detect"){
 
 
   for (file.i in .files) {
-
     if (tools::file_ext(file.i) != .file_type_use) {
       next
     }
 
-    .out[[basename(file.i)]] <- .read_function(file.i)
+    data.i <- try(.read_function(file.i))
 
-    cli::cli_alert_success(file.i)
+    if (inherits(data.i, "try-error")) {
+      cli::cli_alert_danger(file.i)
+    } else {
+      cli::cli_alert_success(file.i)
+      .out[[basename(file.i)]] <- data.i
+    }
+
+    rm(data.i)
 
   }
-
 
   return(.out)
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/read-src-dir.R
 \name{read_src_dir}
 \alias{read_src_dir}
-\title{Read in every file in a source data directory.}
+\title{Read in every domain in a source data directory.}
 \usage{
 read_src_dir(.path, .file_types = "detect")
 }

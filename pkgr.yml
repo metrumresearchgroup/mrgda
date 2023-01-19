@@ -23,6 +23,7 @@ Packages:
   - ggplot2
   - mrggsave
   - diffdf
+  - plotly
 
 Repos:
   - CRAN: https://cran.rstudio.com

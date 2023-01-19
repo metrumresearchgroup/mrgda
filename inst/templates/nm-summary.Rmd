@@ -3,10 +3,11 @@ title: "NM Summary"
 author: "`r Sys.info()[['user']]`"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output:
-  rmdformats::readthedown:
+  html_document:
+    toc: true
     toc_float:
       collapsed: false
-    toc_depth: 3
+      smooth_scroll: false
 params: 
   outputs: "`r list()`"
 ---
@@ -23,7 +24,7 @@ for(type.i in names(outputs)){
   
   outputs_type.i <- outputs[[type.i]]
   
-  for(sub_type.i in names(outputs_type.i)) {
+  for (sub_type.i in names(outputs_type.i)) {
     
     writeLines(paste0("## ", sub_type.i))
     
@@ -35,13 +36,16 @@ for(type.i in names(outputs)){
       
       output_classes.i <- class(outputs_sub_type.i[[output.i]])
       
-      if("gt_tbl" %in% output_classes.i){
+      if ("gt_tbl" %in% output_classes.i) {
         
         print(htmltools::tagList(outputs_sub_type.i[[output.i]]))
         
-      } else if("ggplot" %in% output_classes.i){
+      } else if ("ggplot" %in% output_classes.i) {
         
         print(outputs_sub_type.i[[output.i]])
+        
+      } else if ("plotly" %in% output_classes.i) {
+        print(htmltools::tagList(outputs_sub_type.i[[output.i]]))
         
       }
       
@@ -53,6 +57,28 @@ for(type.i in names(outputs)){
   }
   
 }
+
+```
+
+```{r echo=FALSE, messages=FALSE, warning=FALSE}
+
+get_deps <- function(.object){
+  
+  .deps <- lapply(Filter(function(x) {
+    inherits(x, "htmlwidget")
+  }, .object),
+  function(hw) {
+    htmltools::renderTags(hw)$dependencies
+  })
+  
+  htmltools::attachDependencies(
+    htmltools::tagList(),
+    unlist(.deps, recursive = FALSE)
+  )
+}
+
+get_deps(outputs$Figures$Boxplots)
+get_deps(outputs$Figures$Spaghetti)
 
 ```
 
