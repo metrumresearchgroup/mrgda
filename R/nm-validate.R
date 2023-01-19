@@ -19,7 +19,7 @@
 #'
 #' @md
 #' @export
-nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
+nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .omit = NULL){
 
   # Check inputs
   stopifnot(".data must be a data.frame" = inherits(.data, "data.frame"))
@@ -158,6 +158,9 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
       .required_flags = c("num")
     )
 
+  for (omit.i in .omit) {
+    tests_results[[omit.i]] <- NULL
+  }
 
   # Output ------------------------------------------------------------------
   class(tests_results) <- c("nm_validate_results", class(tests_results))
