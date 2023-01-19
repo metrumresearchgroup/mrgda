@@ -34,7 +34,8 @@ Imports:
     diffdf,
     haven,
     data.table,
-    yaml
+    yaml,
+    plotly
 Suggests: 
     knitr,
     testthat (>= 3.0.0),
