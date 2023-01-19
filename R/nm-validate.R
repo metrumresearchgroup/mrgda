@@ -168,7 +168,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
       .code = c(
         "{arg_names$.data}",
         "dplyr::select({collapse_covs(c(flags$amt, flags$rate, flags$dur, flags$evid))})",
-        "dplyr::filter(round({collapse_covs(flags$amt)},0) != round({collapse_covs(flags$rate)} * {collapse_covs(flags$dur)}, 0))"
+        "dplyr::filter(signif({collapse_covs(flags$amt)},2) != signif({collapse_covs(flags$rate)} * {collapse_covs(flags$dur)}, 2))"
       ),
       .required_flags = c("amt", "rate", "dur")
     )
