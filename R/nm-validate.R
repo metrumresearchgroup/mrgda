@@ -9,17 +9,21 @@
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .error_on_fail if `TRUE`, an R error is executed upon failures
+#' @param .test_omit Vector of test names to exclude.
 #' @examples
 #'
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 #'
 #' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 #'
-#' nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
+#' nm_validate(.data = nm,
+#'             .spec = nm_spec,
+#'             .error_on_fail = FALSE,
+#'             .test_omit = c('MDV not set to 1 when DV is NA'))
 #'
 #' @md
 #' @export
-nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .omit = NULL){
+nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
 
   # Check inputs
   stopifnot(".data must be a data.frame" = inherits(.data, "data.frame"))
@@ -158,7 +162,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .omit = NULL){
       .required_flags = c("num")
     )
 
-  for (omit.i in .omit) {
+  for (omit.i in .test_omit) {
     tests_results[[omit.i]] <- NULL
   }
 

@@ -24,7 +24,10 @@ globalVariables(
     "GROUPING",
     "NUM",
     "STUDY",
-    "Percent"
+    "Percent",
+    "ID",
+    "VAL",
+    "TIME"
   )
 )
 

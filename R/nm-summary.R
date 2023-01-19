@@ -9,7 +9,7 @@
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .study_compare if TRUE (default), tables & figures will be grouped by study
-#' @param .study_compare Should the figures and tabled be returned?
+#' @param .return_output Should the figures and tabled be returned?
 #' @examples
 #'
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))

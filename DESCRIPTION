@@ -29,7 +29,6 @@ Imports:
     assertthat,
     forcats,
     gt,
-    rmdformats,
     rmarkdown,
     diffdf,
     haven,
