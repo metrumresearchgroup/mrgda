@@ -162,6 +162,17 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
       .required_flags = c("num")
     )
 
+  # AMT = RATE * DUR
+  tests_results[["All dosing AMT values are equivalent to RATE * DUR"]] <-
+    pass_fail(
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(c(flags$amt, flags$rate, flags$dur, flags$evid))})",
+        "dplyr::filter(round({collapse_covs(flags$amt)},0) != round({collapse_covs(flags$rate)} * {collapse_covs(flags$dur)}, 0))"
+      ),
+      .required_flags = c("amt", "rate", "dur")
+    )
+
   for (omit.i in .test_omit) {
     tests_results[[omit.i]] <- NULL
   }

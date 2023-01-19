@@ -38,6 +38,10 @@ VAL-R010:
   description: nm_validate checks if all NUM values are unique
   tests:
   - NMV-VAL-010
+VAL-R011:
+  description: nm_validate checks if all dosing rows have AMT = RATE * DUR
+  tests:
+  - NMV-VAL-011
 SUM-R001:
   description: nm_summary outputs an accurate summary of baseline continuous covariates
   tests:

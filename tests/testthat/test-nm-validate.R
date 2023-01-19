@@ -139,3 +139,18 @@ test_that("nm_validate checks if all NUM are unique [NMV-VAL-010]", {
   x = nm_validate(.spec = nm_spec, .data = nm_num, .error_on_fail = FALSE)
   expect_true(x$`All NUM values are unique`$success)
 })
+
+# output ensures all dosing rows have AMT = RATE*DUR --------------------
+test_that("nm_validate checks if AMT always equals RATE times DUR [NMV-VAL-011]", {
+  x = nm_validate(.spec = nm_spec, .data = nm, .error_on_fail = FALSE)
+  expect_true(x$`All dosing AMT values are equivalent to RATE * DUR`$success)
+
+  nm_amt <- nm
+  nm_amt$AMT[2] = 1
+  x = nm_validate(.spec = nm_spec, .data = nm_amt, .error_on_fail = FALSE)
+
+  expect_equal(
+    nrow(rlang::parse_expr(x$`All dosing AMT values are equivalent to RATE * DUR`$debug) %>% rlang::eval_tidy()),
+    1)
+
+})
