@@ -27,7 +27,9 @@ globalVariables(
     "Percent",
     "ID",
     "VAL",
-    "TIME"
+    "TIME",
+    "DOMAIN",
+    "VALUE"
   )
 )
 

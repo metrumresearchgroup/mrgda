@@ -12,7 +12,7 @@ test_that("nm_validate debug code: Returns usable debug code [NMV-VAL-001]", {
 
   x = nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
   # Test 1
-  expect_equal(nrow(rlang::parse_expr(x$`No duplicate primary keys`$debug) %>% rlang::eval_tidy()), 1)
+  expect_equal(nrow(rlang::parse_expr(x$`No duplicate records`$debug) %>% rlang::eval_tidy()), 1)
   # Test 2
   expect_equal(nrow(rlang::parse_expr(x$`Non-unique baseline covariates`$debug) %>% rlang::eval_tidy()), 2)
   # Test 3
@@ -27,7 +27,7 @@ test_that("nm_validate catches duplicates across id, time, primary_keys [NMV-VAL
   nm_dups$DVID[1:10] = 1
   nm_dups$TIME[1:10] = 100
   x = nm_validate(.data = nm_dups, .spec = nm_spec, .error_on_fail = FALSE)
-  n_val_df <- rlang::parse_expr(x$`No duplicate primary keys`$debug) %>% rlang::eval_tidy()
+  n_val_df <- rlang::parse_expr(x$`No duplicate records`$debug) %>% rlang::eval_tidy()
   n_val <- n_val_df$n
 
   expect_equal(n_val, 10)
@@ -67,13 +67,13 @@ test_that("nm_validate catches missing covariates [NMV-VAL-004]", {
 test_that("nm_validate prints multiple failures [NMV-VAL-005]", {
   x = nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
 
-  expect_false(x$`No duplicate primary keys`$success)
+  expect_false(x$`No duplicate records`$success)
   expect_false(x$`Non-unique baseline covariates`$success)
   expect_false(x$`No missing covariates`$success)
 
   x = nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
 
-  expect_true(x$`No duplicate primary keys`$success)
+  expect_true(x$`No duplicate records`$success)
   expect_true(x$`Non-unique baseline covariates`$success)
   expect_true(x$`No missing covariates`$success)
 })
@@ -83,7 +83,7 @@ test_that("nm_validate prints multiple failures [NMV-VAL-005]", {
 test_that("nm_validate works when arguments are provided out of order [NMV-VAL-006]", {
   x = nm_validate(.spec = nm_spec, .data = nm_errors, .error_on_fail = FALSE)
 
-  expect_true(grepl("nm_errors", x$`No duplicate primary keys`$debug))
+  expect_true(grepl("nm_errors", x$`No duplicate records`$debug))
   expect_true(grepl("nm_errors", x$`Non-unique baseline covariates`$debug))
   expect_true(grepl("nm_errors", x$`No missing covariates`$debug))
 })
@@ -132,12 +132,12 @@ test_that("nm_validate checks if all NUM are unique [NMV-VAL-010]", {
   nm_num <- nm
 
   x = nm_validate(.spec = nm_spec, .data = nm_num, .error_on_fail = FALSE)
-  expect_true(nrow(rlang::parse_expr(x$`All NUM values are unique`$debug) %>% rlang::eval_tidy()) == 2534)
+  expect_true(nrow(rlang::parse_expr(x$`All NUM values are unique`$debug) %>% rlang::eval_tidy()) == 0)
 
-  nm_num <- nm_num %>% dplyr::filter(STUDYID == "STUDY-X")
+  nm_num$NUM[2] <- 1
 
   x = nm_validate(.spec = nm_spec, .data = nm_num, .error_on_fail = FALSE)
-  expect_true(x$`All NUM values are unique`$success)
+  expect_false(x$`All NUM values are unique`$success)
 })
 
 # output ensures all dosing rows have AMT = RATE*DUR --------------------

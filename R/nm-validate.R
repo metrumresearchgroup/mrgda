@@ -87,12 +87,12 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
   tests_results <- list()
 
   # Duplicate primary keys  -------------------------------------------------
-  tests_results[["No duplicate primary keys"]] <-
+  tests_results[["No duplicate records"]] <-
     pass_fail(
       .code = c(
         "{arg_names$.data}",
-        "dplyr::select({collapse_covs(c(flags$id, flags$time, flags$evid, flags$dvid, flags$primary_key))})",
-        "dplyr::count({collapse_covs(c(flags$id, flags$time, flags$evid, flags$dvid, flags$primary_key))})",
+        "dplyr::select({collapse_covs(c(flags$id, flags$time, flags$evid, flags$dvid, flags$primary_keys))})",
+        "dplyr::count({collapse_covs(c(flags$id, flags$time, flags$evid, flags$dvid, flags$primary_keys))})",
         "dplyr::filter(n > 1)"
       ),
       .required_flags = c("id", "time", "evid")

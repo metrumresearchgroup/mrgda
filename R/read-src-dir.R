@@ -51,7 +51,7 @@ read_src_dir <- function(.path, .file_types = "detect") {
       cli::cli_alert_danger(file.i)
     } else {
       cli::cli_alert_success(file.i)
-      .out[[basename(file.i)]] <- data.i
+      .out[[tools::file_path_sans_ext(basename(file.i))]] <- data.i
     }
 
     rm(data.i)

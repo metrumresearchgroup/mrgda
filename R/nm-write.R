@@ -6,7 +6,7 @@
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
-#' @param .file the name of the csv file to write out to (including the path).
+#' @param .file csv file name to write out to (including path)
 #' @examples
 #'\dontrun{
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
@@ -16,6 +16,10 @@
 #' @md
 #' @export
 nm_write <- function(.data, .spec, .file) {
+
+  if (tools::file_ext(.file) != "csv") {
+    stop("'.file' must reference a 'csv' file")
+  }
 
   # Read in Current Version for Diff ----------------------------------------
   if (file.exists(.file)) {
