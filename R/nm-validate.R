@@ -9,17 +9,21 @@
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .error_on_fail if `TRUE`, an R error is executed upon failures
+#' @param .test_omit Vector of test names to exclude.
 #' @examples
 #'
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 #'
 #' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 #'
-#' nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
+#' nm_validate(.data = nm,
+#'             .spec = nm_spec,
+#'             .error_on_fail = FALSE,
+#'             .test_omit = c('MDV not set to 1 when DV is NA'))
 #'
 #' @md
 #' @export
-nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
+nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
 
   # Check inputs
   stopifnot(".data must be a data.frame" = inherits(.data, "data.frame"))
@@ -83,12 +87,12 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
   tests_results <- list()
 
   # Duplicate primary keys  -------------------------------------------------
-  tests_results[["No duplicate primary keys"]] <-
+  tests_results[["No duplicate records"]] <-
     pass_fail(
       .code = c(
         "{arg_names$.data}",
-        "dplyr::select({collapse_covs(c(flags$id, flags$time, flags$evid, flags$dvid, flags$primary_key))})",
-        "dplyr::count({collapse_covs(c(flags$id, flags$time, flags$evid, flags$dvid, flags$primary_key))})",
+        "dplyr::select({collapse_covs(c(flags$id, flags$time, flags$evid, flags$dvid, flags$primary_keys))})",
+        "dplyr::count({collapse_covs(c(flags$id, flags$time, flags$evid, flags$dvid, flags$primary_keys))})",
         "dplyr::filter(n > 1)"
       ),
       .required_flags = c("id", "time", "evid")
@@ -158,6 +162,20 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE){
       .required_flags = c("num")
     )
 
+  # AMT = RATE * DUR
+  tests_results[["All dosing AMT values are equivalent to RATE * DUR"]] <-
+    pass_fail(
+      .code = c(
+        "{arg_names$.data}",
+        "dplyr::select({collapse_covs(c(flags$amt, flags$rate, flags$dur, flags$evid))})",
+        "dplyr::filter(signif({collapse_covs(flags$amt)},2) != signif({collapse_covs(flags$rate)} * {collapse_covs(flags$dur)}, 2))"
+      ),
+      .required_flags = c("amt", "rate", "dur")
+    )
+
+  for (omit.i in .test_omit) {
+    tests_results[[omit.i]] <- NULL
+  }
 
   # Output ------------------------------------------------------------------
   class(tests_results) <- c("nm_validate_results", class(tests_results))

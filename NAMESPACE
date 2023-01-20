@@ -2,11 +2,11 @@
 
 S3method(print,nm_validate_results)
 export("%>%")
-export(mutate_egfr)
-export(mutate_id)
 export(nm_summary)
 export(nm_validate)
 export(nm_write)
+export(read_src_dir)
+export(view_sdtm_domains)
 import(rlang)
 importFrom(glue,glue)
 importFrom(lifecycle,deprecated)

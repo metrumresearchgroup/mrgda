@@ -13,11 +13,11 @@ nm_write(nm, nm_spec, .temp_csv)
 
 # Baseline continuous covariates tests ------------------------------------
 
-test_that("nm_write write csv: csv is written correctly and matches data", {
+test_that("nm_write write csv: csv is written correctly and matches data [NMV-NMW-001]", {
   expect_equal(nm, .csv_in)
 })
 
-test_that("nm_write write xpt: xpt data includes correct labels", {
+test_that("nm_write write xpt: xpt data includes correct labels [NMV-NMW-002]", {
   expect_equal(
     yspec::ys_get_short(nm_spec)[order(names(yspec::ys_get_short(nm_spec)))],
     .xpt_in_labels[order(names(.xpt_in_labels))]

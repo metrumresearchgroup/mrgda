@@ -1,6 +1,6 @@
 nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
-dat_sum <- nm_summary(.data = nm, .spec = nm_spec)
+dat_sum <- nm_summary(.data = nm, .spec = nm_spec, .return_output = TRUE)
 
 # Baseline continuous covariates tests ------------------------------------
 
@@ -30,7 +30,7 @@ test_that("nm_summary baseline continuous covariates: All studies are included i
 
 # Baseline categorical covariates -----------------------------------------
 
-test_that("nm_summary baseline categorical covariates: Values fall within the expected range [NMV-SUM-002]", {
+test_that("nm_summary baseline categorical covariates- Values fall within the expected range [NMV-SUM-002]", {
   bccat <- dat_sum$Tables$Covariates$`Baseline categorical covariates`$`_data`
   expect_true(all(bccat$Percent < 100.1))
 })
@@ -50,15 +50,14 @@ test_that("nm_summary primary keys: All EVID appear [NMV-SUM-003]", {
 # Figures -----------------------------------------------------------------
 
 test_that("nm_summary outputs figures: Baseline covariates continuous [NMV-SUM-004]", {
-  figsum <- dat_sum$Figures$Boxplots$`Baseline weight (kg)`$data
-  expect_equal(nrow(figsum), 178)
-  expect_equal(as.numeric(figsum[5, 4]), 105.1)
+  figsum <- dat_sum$Figures$Boxplots$`Baseline weight (kg)`$x$data[[1]]$y
+  expect_equal(length(figsum), 178)
+  expect_equal(as.numeric(figsum[5]), 105.1)
 })
 
 test_that("nm_summary outputs figures: Time-varying covariates continuous [NMV-SUM-005]", {
-  figsum <- dat_sum$Figures$Spaghetti$WT$data
-  expect_equal(nrow(figsum), 664)
-  expect_equal(as.numeric(figsum[5, 3]), 83.1)
-  expect_true(nrow(figsum %>% dplyr::group_by(ID) %>% dplyr::count(COV) %>% dplyr::filter(n > 1)) == 0)
+  figsum <- dat_sum$Figures$Spaghetti$`Time-varying weight (kg)`$x$data[[1]]$y
+  expect_equal(length(figsum), 664)
+  expect_equal(figsum[5], 83.1)
 })
 

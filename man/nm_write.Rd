@@ -11,7 +11,7 @@ nm_write(.data, .spec, .file)
 
 \item{.spec}{a yspec object}
 
-\item{.file}{the name of the csv file to write out to (including the path).}
+\item{.file}{csv file name to write out to (including path)}
 }
 \description{
 This function will take a nonmem ready data frame in R and write it out to a nonmem ready csv.

@@ -1,6 +1,6 @@
 Package: mrgda
 Title: Validate NMTRAN datasets
-Version: 0.2.1.8001
+Version: 0.3.0
 Authors@R: 
     c(
     person(given = "Eric", family = "Anderson", email = "andersone@metrumrg.com", role = c("aut", "cre")),
@@ -22,19 +22,15 @@ Imports:
     rlang (>= 1.0.2),
     tidyr,
     yspec,
-    pmtables,
     tibble,
     ggplot2,
-    stringr,
-    assertthat,
-    forcats,
     gt,
-    rmdformats,
     rmarkdown,
     diffdf,
     haven,
     data.table,
-    yaml
+    yaml,
+    plotly
 Suggests: 
     knitr,
     testthat (>= 3.0.0),

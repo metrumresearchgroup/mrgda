@@ -4,7 +4,7 @@
 \alias{nm_validate}
 \title{Validate an NMTRAN dataset}
 \usage{
-nm_validate(.data, .spec, .error_on_fail = TRUE)
+nm_validate(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL)
 }
 \arguments{
 \item{.data}{a data frame}
@@ -12,6 +12,8 @@ nm_validate(.data, .spec, .error_on_fail = TRUE)
 \item{.spec}{a yspec object}
 
 \item{.error_on_fail}{if \code{TRUE}, an R error is executed upon failures}
+
+\item{.test_omit}{Vector of test names to exclude.}
 }
 \description{
 This function is intended to perform a series of checks on a derived data
@@ -25,6 +27,9 @@ nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 
-nm_validate(.data = nm, .spec = nm_spec, .error_on_fail = FALSE)
+nm_validate(.data = nm,
+            .spec = nm_spec,
+            .error_on_fail = FALSE,
+            .test_omit = c('MDV not set to 1 when DV is NA'))
 
 }

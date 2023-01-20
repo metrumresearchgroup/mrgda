@@ -9,6 +9,7 @@
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .study_compare if TRUE (default), tables & figures will be grouped by study
+#' @param .return_output Should the figures and tabled be returned?
 #' @examples
 #'
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
@@ -19,7 +20,7 @@
 #'
 #' @md
 #' @export
-nm_summary <- function(.data, .spec, .study_compare = TRUE){
+nm_summary <- function(.data, .spec, .study_compare = TRUE, .return_output = FALSE){
 
   outputs <- list()
 
@@ -77,8 +78,8 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE){
       c(g_r$flags$study, "short", "MIN", "MEAN", "MAX")
     ) %>%
     dplyr::group_by(short) %>%
-    gt::gt() %>%
-    gt::tab_header(title = "Baseline continuous covariates") %>%
+    gt::gt(data = .) %>%
+    gt::tab_header(data = ., title = "Baseline continuous covariates") %>%
     suppressMessages()
 
   # baseline categorical Covariates
@@ -105,8 +106,8 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE){
     dplyr::rename(Percent = n) %>%
     dplyr::arrange(dplyr::across(c(g_r$flags$study, "short", -"Percent"))) %>%
     dplyr::group_by(dplyr::across(c(g_r$flags$study, "short"))) %>%
-    gt::gt() %>%
-    gt::tab_header(title = "Baseline categorical covariates") %>%
+    gt::gt(data = .) %>%
+    gt::tab_header(data = ., title = "Baseline categorical covariates") %>%
     suppressMessages()
 
   # BLQ counts
@@ -115,14 +116,14 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE){
     dplyr::count(dplyr::across(c(g_r$flags$study, g_r$flags$evid, g_r$flags$blq))) %>%
     dplyr::arrange(dplyr::across(c(g_r$flags$study, g_r$flags$evid, g_r$flags$blq))) %>%
     dplyr::group_by(dplyr::across(c(g_r$flags$study))) %>%
-    gt::gt() %>%
-    gt::tab_header(title = "BLQ summary")
+    gt::gt(data = .) %>%
+    gt::tab_header(data = ., title = "BLQ summary")
 
   # primary keys
   outputs$Tables$Miscellaneous[["Primary key summary"]] <-
     g_r$data %>%
     dplyr::count(dplyr::across(c(g_r$flags$evid, g_r$flags$dvid, g_r$flags$primary_keys))) %>%
-    gt::gt()
+    gt::gt(data = .)
 
   # figures -----------------------------------------------------------------
   outputs$Figures <- list()
@@ -143,31 +144,41 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE){
     suppressMessages()
 
   for (i in unique(blcont_covs$short)) {
-    outputs$Figures$Boxplots[[i]] <-
+
+    p.i <-
       blcont_covs %>%
       dplyr::filter(short == i) %>%
       ggplot2::ggplot() +
       ggplot2::geom_boxplot(ggplot2::aes(x = STUDY, y = BLCOV_VAL)) +
-      #ggplot2::geom_jitter(ggplot2::aes(x = STUDY, y = BLCOV_VAL), height = 0, width = 0.1) +
-      #ggplot2::facet_wrap(~short) +
       ggplot2::ylab(i) +
       ggplot2::xlab("Study")
+
+    outputs$Figures$Boxplots[[i]] <- plotly::ggplotly(p = p.i)
+
+    rm(p.i)
+
   }
 
   # Time varying spaghetti plots
 
   for (i in unique(g_r$flags$tv_cont_cov)) {
-    outputs$Figures$Spaghetti[[i]] <-
+    p.i <-
       g_r$data %>%
       dplyr::select(c(ID = g_r$flags$id,
                       TIME = g_r$flags$time,
-                      COV = i)) %>%
-      dplyr::distinct(ID, COV, .keep_all = TRUE) %>%
+                      VAL = i)) %>%
+      dplyr::distinct(ID, VAL, .keep_all = TRUE) %>%
       ggplot2::ggplot() +
-      ggplot2::geom_point(ggplot2::aes(x = TIME, y = COV)) +
-      ggplot2::geom_line(ggplot2::aes(x = TIME, y = COV, group = ID)) +
+      ggplot2::geom_point(ggplot2::aes(x = TIME, y = VAL, group = ID)) +
+      ggplot2::geom_line(ggplot2::aes(x = TIME, y = VAL, group = ID)) +
       ggplot2::ylab(shorts$short[shorts$name == i]) +
-      ggplot2::xlab("Time")
+      ggplot2::xlab(shorts$short[shorts$name == g_r$flags$time])
+
+
+    outputs$Figures$Spaghetti[[shorts$short[shorts$name == i]]] <-
+      plotly::ggplotly(p = p.i)
+
+    rm(p.i)
   }
 
 
@@ -182,9 +193,12 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE){
     quiet = TRUE
   )
 
-  if(interactive()){
+  if (interactive()) {
     utils::browseURL(nm_summary_temp)
   }
 
-  return((outputs))
+  if (.return_output) {
+    return(outputs)
+  }
+
 }
