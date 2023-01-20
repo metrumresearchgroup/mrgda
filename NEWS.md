@@ -2,8 +2,50 @@
 
 ## New features and changes
 
-- Added `mutate-id` for users to calculate subject identification columns
-  during their data assemblies. (#20)
+- User can now omit tests from being run in `nm_validate()`. Optional argument
+  provided to do this.
+
+- `nm_validate()` and `nm_summary()` now utilize a dictionary of column names 
+  found in `inst/package-data/recognized-flags.csv`. The functions can extract
+  information from the data set without the user explicitly needing to define
+  these columns.
+  
+- `view_sdtm_domains()` allows the user to view a dictionary of common SDTM 
+  domains and a description of the data found within them.
+  
+- `read_src_dir()` reads in all .csv, .xpt or .sas7bdat files from a source data
+  directory into a nested list containing the data from each domain. 
+
+- `read_src_dir()` creates an additional data set informing the user if a subject 
+  has data in each domain. The resulting data.frame has one row per subject with
+  a TRUE/FALSE column indicating if they are in a specific domain.
+
+- `nm_write()` writes out derived data to a .csv file and creates a folder matching
+  the name of the derived data, containing meta data from the assembly.
+
+- `nm_valdiate()` added 4 new pass/fail checks. These include checking for: 
+  non-finite times, MDV not set to 1 when DV is NA, all NUM values being unique
+  and AMT being equal to RATE times DUR.
+
+- `nm_summary()` now outputs a temporary html file in a new tab containing both
+  tables and figures. The figures are now interactive, allowing the user to hover
+  over data points and view subject level information.
+
+- `nm_summary()` added a table showing the distribution of BLQ values in the data.
+  Additionally, new spaghetti plots were added to view time-varying covariates. 
+  
+- `nm_summary()` now allows the user to decide if the tables and boxplots are to
+  be stratified by study or not. 
+
+- `mutate_egfr()` was removed from the package.
+
+## Bug fixes
+
+- `nm_validate()` could not run when a data set did not have the needed data 
+  columns to run a specific check. Protections were added that allow tests to be
+  skipped if the required data columns are not present.
+
+
 
 # mrgda 0.2.1
 
