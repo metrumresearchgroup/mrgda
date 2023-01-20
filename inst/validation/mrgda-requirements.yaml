@@ -3,7 +3,7 @@ VAL-R001:
   tests:
   - NMV-VAL-001
 VAL-R002:
-  description: nm_validate provides anticipated output when duplicates across id, time, primary_keys fails
+  description: nm_validate provides anticipated output when duplicates across id, time, evid, dvid and primary_keys fails
   tests:
   - NMV-VAL-002
 VAL-R003:
