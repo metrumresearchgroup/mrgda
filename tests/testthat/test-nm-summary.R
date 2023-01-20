@@ -30,7 +30,7 @@ test_that("nm_summary baseline continuous covariates: All studies are included i
 
 # Baseline categorical covariates -----------------------------------------
 
-test_that("nm_summary baseline categorical covariates: Values fall within the expected range [NMV-SUM-002]", {
+test_that("nm_summary baseline categorical covariates- Values fall within the expected range [NMV-SUM-002]", {
   bccat <- dat_sum$Tables$Covariates$`Baseline categorical covariates`$`_data`
   expect_true(all(bccat$Percent < 100.1))
 })

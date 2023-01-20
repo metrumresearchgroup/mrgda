@@ -49,7 +49,9 @@ library(mrgda)
 readr::read_csv(system.file("package-data", "recognized-flags.csv", package = "mrgda"), na = ".", show_col_types = FALSE) %>% 
   dplyr::filter(default != "NA") %>% 
   dplyr::mutate(
-    default = dplyr::if_else(grepl("_", default), stringr::str_replace(default, pattern = "_", replacement = " or "), default)
+    default = dplyr::if_else(grepl("_", default, fixed = TRUE), 
+                             gsub("_", " or ", default, fixed = TRUE),
+                             default)
   ) %>% 
   dplyr::rename(
     `Flag name` = name,

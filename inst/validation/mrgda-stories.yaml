@@ -34,7 +34,7 @@ SUM-S001:
 NMW-S001:
   name: nm_write
   description: As a user, I want to write a NONMEM compatible data file along
-  with corresponding meta data.
+    with corresponding meta data.
   ProductRisk: Low
   requirements:
   - NMW-R001
