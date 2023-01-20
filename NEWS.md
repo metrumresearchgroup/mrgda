@@ -6,7 +6,7 @@
   provided to do this.
 
 - `nm_validate()` and `nm_summary()` now utilize a dictionary of column names 
-  found in `inst/package-data/recognized-flags.csv`. The functions can extract
+  found here `system.file("package-data", "recognized-flags.csv", package = "mrgda")`. The functions can extract
   information from the data set without the user explicitly needing to define
   these columns.
   
@@ -23,11 +23,11 @@
 - `nm_write()` writes out derived data to a .csv file and creates a folder matching
   the name of the derived data, containing meta data from the assembly.
 
-- `nm_valdiate()` added 4 new pass/fail checks. These include checking for: 
+- `nm_validate()` added 4 new pass/fail checks. These include checking for: 
   non-finite times, MDV not set to 1 when DV is NA, all NUM values being unique
   and AMT being equal to RATE times DUR.
 
-- `nm_summary()` now outputs a temporary html file in a new tab containing both
+- `nm_summary()` now opens an html document in a new tab containing both
   tables and figures. The figures are now interactive, allowing the user to hover
   over data points and view subject level information.
 
