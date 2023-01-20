@@ -10,7 +10,7 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/NEWS_release.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html</loc>
+    <loc>https://metrumresearchgroup.github.io/mrgda/articles/data-assembly.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/articles/index.html</loc>
@@ -25,16 +25,10 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/news/index.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/calc_egfr.html</loc>
-  </url>
-  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/index.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/mrgda-package.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/mutate_egfr.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/nm_summary.html</loc>
@@ -43,6 +37,15 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/nm_validate.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/nm_write.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/pipe.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/read_src_dir.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/view_sdtm_domains.html</loc>
   </url>
 </urlset>
