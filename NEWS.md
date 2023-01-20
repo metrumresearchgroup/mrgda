@@ -46,7 +46,6 @@
   skipped if the required data columns are not present. (#38)
 
 
-
 # mrgda 0.2.1
 
 ## Bug fixes
