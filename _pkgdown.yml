@@ -11,6 +11,15 @@ navbar:
     href: https://github.com/metrumresearchgroup/mrgda
 
 reference:
+  - title: Read Data
+    desc: Read source data files
+    contents:
+    - read_src_dir
+    - view_sdtm_domains
+  - title: Data Creation
+    desc: Write NONMEM data set
+    contents:
+    - nm_write
   - title: Data Validation
     desc: Check for errors in a NONMEM data set
     contents:
@@ -19,12 +28,3 @@ reference:
     desc: Quick visualizations of a data set
     contents:
     - nm_summary
-  - title: Data Assembly
-    desc: Helper functions for deriving variables
-    contents:
-    - mutate_egfr
-    - mutate_id
-  - title: Data Creation
-    desc: Write NONMEM data set
-    contents:
-    - nm_write
