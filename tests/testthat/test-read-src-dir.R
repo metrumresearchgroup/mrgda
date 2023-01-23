@@ -10,3 +10,9 @@ test_that("read_src_dir provides count of subjects in each domain [NMV-RSD-002]"
   expect_equal(src_list$usubjid$eg[5], FALSE)
 })
 
+path2 <- system.file("example-sdtm-no-subject", package = "mrgda")
+src_list2 <- read_src_dir(.path = path2)
+
+test_that("read_src_dir can handle src dir with all missing USUBJID [NMV-RSD-003]", {
+  expect_true(is.null(src_list2$usubjid))
+})

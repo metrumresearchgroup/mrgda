@@ -46,3 +46,4 @@ RSD-S001:
   requirements:
   - RSD-R001
   - RSD-R002
+  - RSD-R003

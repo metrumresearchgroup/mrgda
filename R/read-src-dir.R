@@ -70,15 +70,23 @@ read_src_dir <- function(.path, .file_types = "detect") {
         }
       },
       .id = "DOMAIN"
-    ) %>%
-    dplyr::mutate(DOMAIN = tools::file_path_sans_ext(DOMAIN)) %>%
-    tidyr::pivot_wider(names_from = DOMAIN, values_from = VALUE)
+    )
 
-  usubjid[is.na(usubjid)] <- FALSE
 
-  .out$usubjid <- usubjid
+  if (nrow(usubjid) > 0) {
 
-  cli::cli_alert_info(glue::glue("{nrow(.out$usubjid)} unique USUBJID across all domains"))
+    usubjid <-
+      usubjid %>%
+      dplyr::mutate(DOMAIN = tools::file_path_sans_ext(DOMAIN)) %>%
+      tidyr::pivot_wider(names_from = DOMAIN, values_from = VALUE)
+
+    usubjid[is.na(usubjid)] <- FALSE
+
+    .out$usubjid <- usubjid
+
+    cli::cli_alert_info(glue::glue("{nrow(.out$usubjid)} unique USUBJID across all domains"))
+
+  }
 
   return(.out)
 

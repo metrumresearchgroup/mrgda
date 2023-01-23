@@ -1,3 +1,9 @@
+# mrgda 0.3.1
+
+## Bug fixes
+
+- `read_src_dir()` now allows for source directories in which all files have no USUBJID.
+
 # mrgda 0.3.0
 
 ## New features and changes
