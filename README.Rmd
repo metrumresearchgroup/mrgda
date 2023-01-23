@@ -10,7 +10,7 @@ mrgda is a NONMEM data assembly helper, providing a set of functions that help
 you assemble, explore and validate your data set.
 
 To use mrgda optimally, you are encouraged to set up your data specification file
-in `yaml` format, similar to the example found [here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml) and discussed further in the `Setup` section below.
+in `yaml` format, similar to the example found [here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml) and discussed further in the `Setup` section below. 
 
 ## Setup
 
