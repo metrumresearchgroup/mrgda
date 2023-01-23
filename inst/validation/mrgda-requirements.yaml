@@ -86,3 +86,7 @@ RSD-R002:
   description: read_src_dir creates additional domain showing distribution of subjects across domains
   tests:
   - NMV-RSD-002
+RSD-R003:
+  description: read_src_dir can handle src dir with all missing USUBJID
+  tests:
+  - NMV-RSD-003
