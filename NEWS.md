@@ -1,3 +1,9 @@
+# mrgda (development)
+
+## Bug fixes
+
+- `nm_write()` now allows for special characters in the file name.
+
 # mrgda 0.3.1
 
 ## Bug fixes
