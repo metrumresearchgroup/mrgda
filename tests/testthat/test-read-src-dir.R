@@ -16,3 +16,9 @@ src_list2 <- read_src_dir(.path = path2)
 test_that("read_src_dir can handle src dir with all missing USUBJID [NMV-RSD-003]", {
   expect_true(is.null(src_list2$usubjid))
 })
+
+test_that("read_src_dir allows user to only load in specific domains [NMV-RSD-004]", {
+  src_list <- read_src_dir(.path = path, .read_domains = c("dm", "lb"))
+  expect_equal(length(src_list), 3)
+  expect_true(ncol(src_list$usubjid) == 3)
+})

@@ -5,17 +5,29 @@
 #'
 #' @param .path Full path to the source data directory.
 #' @param .file_types Type of files being read in (e.g. 'sas7bat'). Setting to 'detect' will determine file type based on the most occurring file type in .path.
+#' @param .read_domains list domains to read in (default is loading all domains)
 #' @examples
 #' path <- system.file("example-sdtm", package = "mrgda")
-#' src_list <- read_src_dir(.path = path)
+#' # Read in all source files
+#' src_list <- read_src_dir(.path = path, .file_types = "detect")
+#'
+#' # Read in only "dm" and "lb" domains
+#' src_list <- read_src_dir(.path = path, .file_types = "detect", .read_domains = c("dm", "lb"))
+#'
 #' @md
 #' @export
-read_src_dir <- function(.path, .file_types = "detect") {
+read_src_dir <- function(.path, .file_types = "detect", .read_domains = NULL) {
   .out <- list()
 
   .files <- list.files(.path, full.names = TRUE)
 
   .extensions <- tools::file_ext(.files)
+
+  if (!is.null(.read_domains)) {
+    .domains <- tools::file_path_sans_ext(basename(.files))
+    .domains_keep <- .domains %in% .read_domains
+    .files <- .files[.domains_keep]
+  }
 
   if (.file_types == "detect") {
     .file_type_use <- names(which.max(table(.extensions)))

@@ -1,3 +1,10 @@
+# mrgda development
+
+## New features and changes
+
+- `read_src_dir()` added a `.read_domains` argument to allow users to only load
+  in specific domains. If not specified, default is to load all in.
+
 # mrgda 0.3.1
 
 ## Bug fixes

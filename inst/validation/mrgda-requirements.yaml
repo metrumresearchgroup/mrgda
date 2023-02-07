@@ -90,3 +90,7 @@ RSD-R003:
   description: read_src_dir can handle src dir with all missing USUBJID
   tests:
   - NMV-RSD-003
+RSD-R004:
+  description: read_src_dir allows user to specify specific domains to load in
+  tests:
+  - NMV-RSD-004
