@@ -6,6 +6,9 @@
 #' @param .path Full path to the source data directory.
 #' @param .file_types Type of files being read in (e.g. 'sas7bat'). Setting to 'detect' will determine file type based on the most occurring file type in .path.
 #' @param .read_domains list domains to read in (default is loading all domains)
+#' @param .subject_col character string of subject identifier column name in source (default is "USUBJID")
+#'
+#'
 #' @examples
 #' path <- system.file("example-sdtm", package = "mrgda")
 #' # Read in all source files
@@ -16,7 +19,10 @@
 #'
 #' @md
 #' @export
-read_src_dir <- function(.path, .file_types = "detect", .read_domains = NULL) {
+read_src_dir <- function(.path,
+                         .file_types = "detect",
+                         .read_domains = NULL,
+                         .subject_col = "USUBJID") {
   .out <- list()
 
   .files <- list.files(.path, full.names = TRUE)
@@ -75,9 +81,11 @@ read_src_dir <- function(.path, .file_types = "detect", .read_domains = NULL) {
     purrr::map_dfr(
       .out,
       ~ {
-        if ("USUBJID" %in% names(.x)) {
+        if (.subject_col %in% names(.x)) {
           return(
-            dplyr::distinct(.x, USUBJID) %>% dplyr::mutate(VALUE = TRUE)
+            dplyr::select(.x, .subject_col) %>%
+              dplyr::distinct() %>%
+              dplyr::mutate(VALUE = TRUE)
           )
         }
       },

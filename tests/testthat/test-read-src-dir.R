@@ -22,3 +22,8 @@ test_that("read_src_dir allows user to only load in specific domains [NMV-RSD-00
   expect_equal(length(src_list), 3)
   expect_true(ncol(src_list$usubjid) == 3)
 })
+
+test_that("read_src_dir allows user to specify unique subject identifier column name in source [NMV-RSD-005]", {
+  src_list <- read_src_dir(.path = path, .file_types = "detect", .subject_col = "STUDYID")
+  expect_equal(nrow(src_list$usubjid), 1)
+})
