@@ -5,6 +5,10 @@
 - `read_src_dir()` added a `.read_domains` argument to allow users to only load
   in specific domains. If not specified, default is to load all in.
 
+## Bug fixes
+
+- `nm_write()` now allows for special characters in the file name.
+
 # mrgda 0.3.1
 
 ## Bug fixes
