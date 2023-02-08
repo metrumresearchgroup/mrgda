@@ -7,6 +7,9 @@
 
 - `read_src_dir()` added a `.subject_col` argument to allow users to specify the
   name of the unique subject identifier column in the source data.
+  
+- `src_dir_summary()` allows the user to easily view all the domains and file 
+  sizes from their source data directory. 
 
 ## Bug fixes
 

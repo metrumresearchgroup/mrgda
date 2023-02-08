@@ -31,8 +31,10 @@ read_src_dir <- function(.path,
 
   if (!is.null(.read_domains)) {
     .domains <- tools::file_path_sans_ext(basename(.files))
-    .domains_keep <- .domains %in% .read_domains
-    .files <- .files[.domains_keep]
+    .domains_keep <- tolower(.domains) %in% tolower(.read_domains)
+    .files_read <- .files[.domains_keep]
+  } else {
+    .files_read <- .files
   }
 
   if (.file_types == "detect") {
@@ -58,7 +60,7 @@ read_src_dir <- function(.path,
     }
 
 
-  for (file.i in .files) {
+  for (file.i in .files_read) {
     if (tools::file_ext(file.i) != .file_type_use) {
       next
     }
