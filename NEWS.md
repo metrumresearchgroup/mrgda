@@ -1,14 +1,14 @@
-# mrgda (development)
+# mrgda 0.3.2
 
 ## Bug fixes
 
-- `nm_write()` now allows for special characters in the file name.
+- `nm_write()` now allows for special characters in the file name. (#46)
 
 # mrgda 0.3.1
 
 ## Bug fixes
 
-- `read_src_dir()` now allows for source directories in which all files have no USUBJID.
+- `read_src_dir()` now allows for source directories in which all files have no USUBJID. (#42)
 
 # mrgda 0.3.0
 
