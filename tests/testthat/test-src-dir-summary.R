@@ -1,5 +1,5 @@
 path <- system.file("example-sdtm", package = "mrgda")
-src_summary <- src_dir_summary(.path = path)
+src_summary <- view_src_dir_summary(.path = path)
 
 test_that("src_dir_summary summarizes all domains and outputs file sizes [NMV-SSD-001]", {
   expect_true(all(c("ae", "dm", "eg", "lb", "mh", "pe", "vs") %in% src_summary$DOMAIN))

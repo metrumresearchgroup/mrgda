@@ -11,17 +11,17 @@
 #' path <- system.file("example-sdtm", package = "mrgda")
 #'
 #' # Summarize source directory
-#' src_dir_summary(.path = path)
+#' view_src_dir_summary(.path = path)
 #'
 #' @md
 #' @export
-src_dir_summary <- function(.path) {
+view_src_dir_summary <- function(.path, .file_types = "detect") {
 
-  .files <- list.files(.path, full.names = TRUE)
+  .files_of_interest <- determine_files_of_interest(.path = .path, .file_types = .file_types)
 
   .domain_summary <- dplyr::tibble()
 
-  for (file.i in .files) {
+  for (file.i in .files_of_interest$files_of_type) {
     .domain <- tools::file_path_sans_ext(basename(file.i))
     size.i <- file.info(file.i)[["size"]]
     .domain_summary <- dplyr::bind_rows(.domain_summary, dplyr::tibble(DOMAIN = .domain, SIZE_KB = size.i/1000))
