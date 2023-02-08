@@ -6,6 +6,7 @@
 #' with each domains name, size and description of its contents
 #'
 #' @param .path Full path to the source data directory.
+#' @param .file_types Type of files being read in (e.g. 'sas7bat'). Setting to 'detect' will determine file type based on the most occurring file type in .path.
 #'
 #' @examples
 #' path <- system.file("example-sdtm", package = "mrgda")

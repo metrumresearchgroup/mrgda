@@ -4,10 +4,12 @@
 \alias{view_src_dir_summary}
 \title{View summary of source data directory}
 \usage{
-view_src_dir_summary(.path)
+view_src_dir_summary(.path, .file_types = "detect")
 }
 \arguments{
 \item{.path}{Full path to the source data directory.}
+
+\item{.file_types}{Type of files being read in (e.g. 'sas7bat'). Setting to 'detect' will determine file type based on the most occurring file type in .path.}
 }
 \description{
 This function takes a path to a source data directory (typically SDTM or ADaM folder),
@@ -18,6 +20,6 @@ with each domains name, size and description of its contents
 path <- system.file("example-sdtm", package = "mrgda")
 
 # Summarize source directory
-view_src_dir(.path = path)
+view_src_dir_summary(.path = path)
 
 }
