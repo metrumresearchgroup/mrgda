@@ -1,4 +1,4 @@
-# mrgda (development)
+# mrgda 0.3.2
 
 ## Bug fixes
 
