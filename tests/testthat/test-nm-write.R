@@ -23,3 +23,9 @@ test_that("nm_write write xpt: xpt data includes correct labels [NMV-NMW-002]", 
     .xpt_in_labels[order(names(.xpt_in_labels))]
   )
 })
+
+test_that("nm_write works with special characters in file name [NMV-NMW-003]", {
+  .temp_csv <- tempfile(fileext = "-pk.csv")
+  nm_write(nm, nm_spec, .temp_csv)
+  expect_equal(nm, readr::read_csv(.temp_csv, na = "."))
+})

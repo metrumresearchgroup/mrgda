@@ -78,6 +78,10 @@ NMW-R002:
   description: nm_write outputs xpt with data and labels
   tests:
   - NMV-NMW-002
+NMW-R003:
+  description: nm_write works with special characters in file names
+  tests:
+  - NMV-NMW-003
 RSD-R001:
   description: read_src_dir reads in all available data files correctly
   tests:
