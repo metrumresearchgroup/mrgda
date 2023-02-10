@@ -2,7 +2,8 @@ nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
 
 .temp_csv <- tempfile(fileext = ".csv")
-.temp_script <- "tests/testthat/test-gather-flags.R"
+.temp_script <- tempfile(fileext = ".R")
+writeLines(text = "2 + 2", con = .temp_script)
 
 nm_write(.data = nm, .spec = nm_spec, .file = .temp_csv, .temp_script)
 .csv_in <- readr::read_csv(.temp_csv, na = ".")

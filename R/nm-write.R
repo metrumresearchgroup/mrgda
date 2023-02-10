@@ -106,14 +106,11 @@ nm_write <- function(.data, .spec, .file, .script_path) {
   cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'sys-info.yml')}"))
 
 
-  .source_folder <- paste0(.meta_data_folder, "/source-scripts")
-  dir.create(.source_folder)
-  cli::cli_alert_success(glue::glue("Directory created: {.source_folder}"))
-
   if (file.exists(.script_path)) {
     .script_path_absolute <- tools::file_path_as_absolute(.script_path)
-    file.copy(.script_path_absolute, .source_folder)
-    cli::cli_alert_success(glue::glue("File written: {file.path(.source_folder, basename(.script_path))}"))
+    .extension <- paste0("data-assembly-script.", tools::file_ext(.script_path))
+    file.copy(.script_path_absolute, file.path(.meta_data_folder, .extension), overwrite = TRUE)
+    cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, .extension)}"))
   } else {
     cli::cli_alert_danger("Invalid .script_path provided")
     stop()
