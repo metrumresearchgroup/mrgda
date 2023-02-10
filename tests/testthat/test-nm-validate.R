@@ -117,14 +117,14 @@ test_that("nm_validate checks if MDV is set to 1 for all rows with NA DV [NMV-VA
   nm_1e$MDV[1] = 0
 
   x = nm_validate(.spec = nm_spec, .data = nm_1e, .error_on_fail = FALSE)
-  expect_true(nrow(rlang::parse_expr(x$`MDV not set to 1 when DV is NA`$debug) %>% rlang::eval_tidy()) == 1)
+  expect_true(nrow(rlang::parse_expr(x$`MDV not set to 1 when DV is NA or 0`$debug) %>% rlang::eval_tidy()) == 1)
 
   x = nm_validate(.spec = nm_spec, .data = nm, .error_on_fail = FALSE)
-  expect_true(nrow(rlang::parse_expr(x$`MDV not set to 1 when DV is NA`$debug) %>% rlang::eval_tidy()) == 0)
+  expect_true(nrow(rlang::parse_expr(x$`MDV not set to 1 when DV is NA or 0`$debug) %>% rlang::eval_tidy()) == 0)
 
   nm_2e <- nm %>% dplyr::select(-MDV)
   x = nm_validate(.spec = nm_spec, .data = nm_2e, .error_on_fail = FALSE)
-  expect_true(is.na(x$`MDV not set to 1 when DV is NA`$success))
+  expect_true(is.na(x$`MDV not set to 1 when DV is NA or 0`$success))
 })
 
 # output ensures only unique NUM values in dataset --------------------

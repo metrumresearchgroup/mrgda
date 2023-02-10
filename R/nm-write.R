@@ -105,7 +105,7 @@ nm_write <- function(.data, .spec, .file, .script_path) {
 
   cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'sys-info.yml')}"))
 
-
+  # Data assembly script
   if (file.exists(.script_path)) {
     .script_path_absolute <- tools::file_path_as_absolute(.script_path)
     .extension <- paste0("data-assembly-script.", tools::file_ext(.script_path))
@@ -115,5 +115,10 @@ nm_write <- function(.data, .spec, .file, .script_path) {
     cli::cli_alert_danger("Invalid .script_path provided")
     stop()
   }
+
+
+  # Write script dependencies
+  dependencies <- find_in_files(.paths = c(here::here("script"), here::here("model")), .string = basename(.file))
+  yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
 
 }
