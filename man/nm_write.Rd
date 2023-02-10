@@ -23,6 +23,7 @@ It also creates a meta data folder, storing the xpt file along with other useful
 \dontrun{
 nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
-nm_write(.data = nm, .spec = nm_spec, .file = "data/derived/pk.csv", .script_path = "script/data-assembly.Rmd")
+nm_write(.data = nm, .spec = nm_spec, .file = "data/derived/pk.csv",
+   .script_path = "script/data-assembly.Rmd")
 }
 }
