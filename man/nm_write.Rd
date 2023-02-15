@@ -4,7 +4,7 @@
 \alias{nm_write}
 \title{Write an NMTRAN data set and corresponding meta data}
 \usage{
-nm_write(.data, .spec, .file, .script_path)
+nm_write(.data, .spec, .file, .this_script)
 }
 \arguments{
 \item{.data}{a data frame}
@@ -13,7 +13,7 @@ nm_write(.data, .spec, .file, .script_path)
 
 \item{.file}{csv file name to write out to (including path)}
 
-\item{.script_path}{file path of data assembly script}
+\item{.this_script}{Data assembly script name (including path)}
 }
 \description{
 This function will take a nonmem ready data frame in R and write it out to a nonmem ready csv.
@@ -24,6 +24,6 @@ It also creates a meta data folder, storing the xpt file along with other useful
 nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
 nm_write(.data = nm, .spec = nm_spec, .file = "data/derived/pk.csv",
-   .script_path = "script/data-assembly.Rmd")
+   .this_script = "script/data-assembly.Rmd")
 }
 }
