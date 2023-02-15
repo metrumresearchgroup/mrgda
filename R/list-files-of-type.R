@@ -1,5 +1,5 @@
 #' @keywords internal
-determine_files_of_interest <- function(.path, .file_types) {
+list_files_of_type <- function(.path, .file_types) {
 
   .out <- list()
 

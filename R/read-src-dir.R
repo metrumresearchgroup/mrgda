@@ -25,7 +25,7 @@ read_src_dir <- function(.path,
                          .subject_col = "USUBJID") {
   .out <- list()
 
-  .files_of_interest <- determine_files_of_interest(.path = .path, .file_types = .file_types)
+  .files_of_interest <- list_files_of_type(.path = .path, .file_types = .file_types)
 
   if (!is.null(.read_domains)) {
     .domains <- tools::file_path_sans_ext(basename(.files_of_interest$files_of_type))
