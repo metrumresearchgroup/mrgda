@@ -11,7 +11,7 @@ vignette: >
 
 ```{r, echo=FALSE, message=FALSE}
 library(dplyr)
-
+library(mrgda)
 ```
 
 # Spec
@@ -52,7 +52,7 @@ mrgda::nm_validate(.data = nm_final, .spec = nm_spec)
 
 # Write Data
 
-```{r}
+```{r, eval=FALSE}
 
 # csv location, typically e.g. "data/derived/pk.csv"
 derived_data_file <- file.path(tempdir(), "pk.csv")
