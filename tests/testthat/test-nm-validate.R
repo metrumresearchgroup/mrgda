@@ -111,7 +111,7 @@ test_that("nm_validate catches all cases of non-finite TIME [NMV-VAL-008]", {
 })
 
 # output catches when MDV incorrectly set for NA DV --------------------
-test_that("nm_validate checks if MDV is set to 1 for all rows with NA DV [NMV-VAL-009]", {
+test_that("nm_validate checks MDV is set to 1 for all rows with NA DV [NMV-VAL-009]", {
   nm_1e <- nm
   nm_1e$DV[1] = NA_real_
   nm_1e$MDV[1] = 0
@@ -127,7 +127,7 @@ test_that("nm_validate checks if MDV is set to 1 for all rows with NA DV [NMV-VA
   expect_true(is.na(x$`MDV not set to 1 when DV is NA or 0`$success))
 })
 
-test_that("nm_validate checks if MDV is set to 1 for all rows with 0 DV [NMV-VAL-009]", {
+test_that("nm_validate checks MDV  is set to 1 for all rows with 0 DV [NMV-VAL-009]", {
   nm_2e <- nm
   nm_2e$DV[1] = 0
   nm_2e$MDV[1] = 0
