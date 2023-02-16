@@ -48,3 +48,13 @@ RSD-S001:
   - RSD-R001
   - RSD-R002
   - RSD-R003
+  - RSD-R004
+  - RSD-R005
+SSD-S001:
+  name: src_dir_summary
+  description: As a user, I want to summarize the domains and their sizes from
+    a source data directory.
+  ProductRisk: Low
+  requirements:
+  - SSD-R001
+  - SSD-R002

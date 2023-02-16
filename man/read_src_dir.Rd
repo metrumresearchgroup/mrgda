@@ -4,17 +4,31 @@
 \alias{read_src_dir}
 \title{Read in every domain in a source data directory.}
 \usage{
-read_src_dir(.path, .file_types = "detect")
+read_src_dir(
+  .path,
+  .file_types = "detect",
+  .read_domains = NULL,
+  .subject_col = "USUBJID"
+)
 }
 \arguments{
 \item{.path}{Full path to the source data directory.}
 
-\item{.file_types}{Type of files being read in (e.g. 'sas7bat'). Setting to 'detect' will determine file type based on the most occurring file type in .path.}
+\item{.file_types}{Type of files being read in (e.g. 'sas7bat'). The default ('detect') will determine file type based on the most occurring file type in .path.}
+
+\item{.read_domains}{Character vector of domains to read in (e.g. c('dm', 'lb') - default is to load all domains).}
+
+\item{.subject_col}{Character string of subject identifier column name in source (default is "USUBJID").}
 }
 \description{
 This function takes a path to a source data directory (typically SDTM or ADaM folder), reads in every data file, and returns a named list of the data objects.
 }
 \examples{
 path <- system.file("example-sdtm", package = "mrgda")
-src_list <- read_src_dir(.path = path)
+# Read in all source files
+src_list <- read_src_dir(.path = path, .file_types = "detect")
+
+# Read in only "dm" and "lb" domains
+src_list <- read_src_dir(.path = path, .file_types = "detect", .read_domains = c("dm", "lb"))
+
 }

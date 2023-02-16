@@ -56,10 +56,13 @@ mrgda::nm_validate(.data = nm_final, .spec = nm_spec)
 
 # csv location, typically e.g. "data/derived/pk.csv"
 derived_data_file <- file.path(tempdir(), "pk.csv")
+temp_script <- tempfile(fileext = ".R")
+writeLines(text = "2 + 2", con = temp_script)
 
 derived_data_file
 
-mrgda::nm_write(.data = nm_final, .spec = nm_spec, .file = derived_data_file)
+mrgda::nm_write(.data = nm_final, .spec = nm_spec, .file = derived_data_file, 
+                .this_script = temp_script)
 
 ```
 

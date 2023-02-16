@@ -4,51 +4,57 @@
 #' This function takes a path to a source data directory (typically SDTM or ADaM folder), reads in every data file, and returns a named list of the data objects.
 #'
 #' @param .path Full path to the source data directory.
-#' @param .file_types Type of files being read in (e.g. 'sas7bat'). Setting to 'detect' will determine file type based on the most occurring file type in .path.
+#' @param .file_types Type of files being read in (e.g. 'sas7bat'). The default ('detect') will determine file type based on the most occurring file type in .path.
+#' @param .read_domains Character vector of domains to read in (e.g. c('dm', 'lb') - default is to load all domains).
+#' @param .subject_col Character string of subject identifier column name in source (default is "USUBJID").
+#'
+#'
 #' @examples
 #' path <- system.file("example-sdtm", package = "mrgda")
-#' src_list <- read_src_dir(.path = path)
+#' # Read in all source files
+#' src_list <- read_src_dir(.path = path, .file_types = "detect")
+#'
+#' # Read in only "dm" and "lb" domains
+#' src_list <- read_src_dir(.path = path, .file_types = "detect", .read_domains = c("dm", "lb"))
+#'
 #' @md
 #' @export
-read_src_dir <- function(.path, .file_types = "detect") {
+read_src_dir <- function(.path,
+                         .file_types = "detect",
+                         .read_domains = NULL,
+                         .subject_col = "USUBJID") {
   .out <- list()
 
-  .files <- list.files(.path, full.names = TRUE)
+  .files_of_interest <- list_files_of_type(.path = .path, .file_types = .file_types)
 
-  .extensions <- tools::file_ext(.files)
-
-  if (.file_types == "detect") {
-    .file_type_use <- names(which.max(table(.extensions)))
-
-    cli::cli_alert_info(paste0("Detected type = '", .file_type_use, "'"))
-
+  if (!is.null(.read_domains)) {
+    .domains <- tools::file_path_sans_ext(basename(.files_of_interest$files_of_type))
+    .domains_keep <- tolower(.domains) %in% tolower(.read_domains)
+    .files_read <- .files_of_interest$files_of_type[.domains_keep]
   } else {
-    .file_type_use <- gsub(".", "", .file_types, fixed = TRUE)
-
+    .files_read <- .files_of_interest$files_of_type
   }
 
 
+
   .read_function <-
-    if (.file_type_use == "xpt") {
+    if (.files_of_interest$type == "xpt") {
       haven::read_xpt
-    } else if (.file_type_use == "sas7bdat") {
+    } else if (.files_of_interest$type == "sas7bdat") {
       haven::read_sas
-    } else if (.file_type_use == "csv") {
+    } else if (.files_of_interest$type == "csv") {
       readr::read_csv
     } else {
       stop("'.file_types' must be 'csv', 'sas7bdat', or 'xpt'")
     }
 
 
-  for (file.i in .files) {
-    if (tools::file_ext(file.i) != .file_type_use) {
-      next
-    }
+  for (file.i in .files_read) {
 
-    data.i <- try(.read_function(file.i))
+    data.i <- try(.read_function(file.i), silent = TRUE)
 
     if (inherits(data.i, "try-error")) {
-      cli::cli_alert_danger(file.i)
+      cli::cli_alert_danger(data.i)
     } else {
       cli::cli_alert_success(file.i)
       .out[[tools::file_path_sans_ext(basename(file.i))]] <- data.i
@@ -59,13 +65,15 @@ read_src_dir <- function(.path, .file_types = "detect") {
   }
 
 
-  usubjid <-
+  subject_table <-
     purrr::map_dfr(
       .out,
       ~ {
-        if ("USUBJID" %in% names(.x)) {
+        if (.subject_col %in% names(.x)) {
           return(
-            dplyr::distinct(.x, USUBJID) %>% dplyr::mutate(VALUE = TRUE)
+            dplyr::select(.x, .subject_col) %>%
+              dplyr::distinct() %>%
+              dplyr::mutate(VALUE = TRUE)
           )
         }
       },
@@ -73,18 +81,22 @@ read_src_dir <- function(.path, .file_types = "detect") {
     )
 
 
-  if (nrow(usubjid) > 0) {
+  if (nrow(subject_table) > 0) {
 
-    usubjid <-
-      usubjid %>%
+    subject_table <-
+      subject_table %>%
       dplyr::mutate(DOMAIN = tools::file_path_sans_ext(DOMAIN)) %>%
       tidyr::pivot_wider(names_from = DOMAIN, values_from = VALUE)
 
-    usubjid[is.na(usubjid)] <- FALSE
+    subject_table[is.na(subject_table)] <- FALSE
 
-    .out$usubjid <- usubjid
+    .out$subject_table <- subject_table
 
-    cli::cli_alert_info(glue::glue("{nrow(.out$usubjid)} unique USUBJID across all domains"))
+    cli::cli_alert_info(glue::glue("{nrow(.out$subject_table)} unique USUBJID across all domains"))
+
+  } else {
+
+    cli::cli_alert_warning(glue::glue(".subject_col '{.subject_col}' not detected in any domain"))
 
   }
 

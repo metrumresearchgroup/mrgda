@@ -1,3 +1,16 @@
+# mrgda development
+
+## New features and changes
+
+- `read_src_dir()` added a `.read_domains` argument to allow users to only load
+  in specific domains. If not specified, default is to load all in.
+
+- `read_src_dir()` added a `.subject_col` argument to allow users to specify the
+  name of the unique subject identifier column in the source data.
+  
+- `src_dir_summary()` allows the user to easily view all the domains and file 
+  sizes from their source data directory. 
+
 # mrgda 0.3.2
 
 ## Bug fixes
