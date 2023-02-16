@@ -10,6 +10,13 @@
   
 - `src_dir_summary()` allows the user to easily view all the domains and file 
   sizes from their source data directory. 
+  
+- `nm_validate()` now checks if MDV is set to 1 when either DV is NA or 0.
+
+- `nm_write()` searches the `script` and `model` directories for any scripts
+  dependent on the data set being written out.
+
+- `nm_write()` now outputs the source script in the meta data folder.
 
 # mrgda 0.3.2
 
