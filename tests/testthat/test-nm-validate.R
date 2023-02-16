@@ -127,6 +127,16 @@ test_that("nm_validate checks if MDV is set to 1 for all rows with NA DV [NMV-VA
   expect_true(is.na(x$`MDV not set to 1 when DV is NA or 0`$success))
 })
 
+test_that("nm_validate checks if MDV is set to 1 for all rows with 0 DV [NMV-VAL-009]", {
+  nm_2e <- nm
+  nm_2e$DV[1] = 0
+  nm_2e$MDV[1] = 0
+
+  x = nm_validate(.spec = nm_spec, .data = nm_2e, .error_on_fail = FALSE)
+  expect_true(nrow(rlang::parse_expr(x$`MDV not set to 1 when DV is NA or 0`$debug) %>% rlang::eval_tidy()) == 1)
+
+})
+
 # output ensures only unique NUM values in dataset --------------------
 test_that("nm_validate checks if all NUM are unique [NMV-VAL-010]", {
   nm_num <- nm

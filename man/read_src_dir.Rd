@@ -14,11 +14,11 @@ read_src_dir(
 \arguments{
 \item{.path}{Full path to the source data directory.}
 
-\item{.file_types}{Type of files being read in (e.g. 'sas7bat'). Setting to 'detect' will determine file type based on the most occurring file type in .path.}
+\item{.file_types}{Type of files being read in (e.g. 'sas7bat'). The default ('detect') will determine file type based on the most occurring file type in .path.}
 
-\item{.read_domains}{list domains to read in (default is loading all domains)}
+\item{.read_domains}{Character vector of domains to read in (e.g. c('dm', 'lb') - default is to load all domains).}
 
-\item{.subject_col}{character string of subject identifier column name in source (default is "USUBJID")}
+\item{.subject_col}{Character string of subject identifier column name in source (default is "USUBJID").}
 }
 \description{
 This function takes a path to a source data directory (typically SDTM or ADaM folder), reads in every data file, and returns a named list of the data objects.

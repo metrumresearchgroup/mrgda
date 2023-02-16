@@ -113,7 +113,7 @@ nm_write <- function(.data, .spec, .file, .this_script) {
     file.copy(.script_path_absolute, file.path(.meta_data_folder, .extension), overwrite = TRUE)
     cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, .extension)}"))
   } else {
-    cli::cli_alert_danger("Invalid .this_script provided")
+    cli::cli_alert_danger(glue::glue("Invalid '.this_script' provided: {.this_script} does not exist"))
     stop()
   }
 

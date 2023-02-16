@@ -23,9 +23,16 @@ view_src_dir_summary <- function(.path, .file_types = "detect") {
   .domain_summary <- dplyr::tibble()
 
   for (file.i in .files_of_interest$files_of_type) {
-    .domain <- tools::file_path_sans_ext(basename(file.i))
+
+    domain.i <- tools::file_path_sans_ext(basename(file.i))
+
     size.i <- file.info(file.i)[["size"]]
-    .domain_summary <- dplyr::bind_rows(.domain_summary, dplyr::tibble(DOMAIN = .domain, SIZE_KB = size.i/1000))
+
+    .domain_summary <- dplyr::bind_rows(
+      .domain_summary,
+      dplyr::tibble(DOMAIN = tolower(domain.i), SIZE_KB = size.i / 1000)
+    )
+
   }
 
   .domain_ref <-

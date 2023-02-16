@@ -4,9 +4,9 @@
 #' This function takes a path to a source data directory (typically SDTM or ADaM folder), reads in every data file, and returns a named list of the data objects.
 #'
 #' @param .path Full path to the source data directory.
-#' @param .file_types Type of files being read in (e.g. 'sas7bat'). Setting to 'detect' will determine file type based on the most occurring file type in .path.
-#' @param .read_domains list domains to read in (default is loading all domains)
-#' @param .subject_col character string of subject identifier column name in source (default is "USUBJID")
+#' @param .file_types Type of files being read in (e.g. 'sas7bat'). The default ('detect') will determine file type based on the most occurring file type in .path.
+#' @param .read_domains Character vector of domains to read in (e.g. c('dm', 'lb') - default is to load all domains).
+#' @param .subject_col Character string of subject identifier column name in source (default is "USUBJID").
 #'
 #'
 #' @examples
@@ -51,10 +51,10 @@ read_src_dir <- function(.path,
 
   for (file.i in .files_read) {
 
-    data.i <- try(.read_function(file.i))
+    data.i <- try(.read_function(file.i), silent = TRUE)
 
     if (inherits(data.i, "try-error")) {
-      cli::cli_alert_danger(file.i)
+      cli::cli_alert_danger(data.i)
     } else {
       cli::cli_alert_success(file.i)
       .out[[tools::file_path_sans_ext(basename(file.i))]] <- data.i
@@ -65,7 +65,7 @@ read_src_dir <- function(.path,
   }
 
 
-  usubjid <-
+  subject_table <-
     purrr::map_dfr(
       .out,
       ~ {
@@ -81,18 +81,22 @@ read_src_dir <- function(.path,
     )
 
 
-  if (nrow(usubjid) > 0) {
+  if (nrow(subject_table) > 0) {
 
-    usubjid <-
-      usubjid %>%
+    subject_table <-
+      subject_table %>%
       dplyr::mutate(DOMAIN = tools::file_path_sans_ext(DOMAIN)) %>%
       tidyr::pivot_wider(names_from = DOMAIN, values_from = VALUE)
 
-    usubjid[is.na(usubjid)] <- FALSE
+    subject_table[is.na(subject_table)] <- FALSE
 
-    .out$usubjid <- usubjid
+    .out$subject_table <- subject_table
 
-    cli::cli_alert_info(glue::glue("{nrow(.out$usubjid)} unique USUBJID across all domains"))
+    cli::cli_alert_info(glue::glue("{nrow(.out$subject_table)} unique USUBJID across all domains"))
+
+  } else {
+
+    cli::cli_alert_warning(glue::glue(".subject_col '{.subject_col}' not detected in any domain"))
 
   }
 
