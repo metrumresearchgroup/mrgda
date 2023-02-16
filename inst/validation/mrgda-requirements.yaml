@@ -103,10 +103,10 @@ RSD-R005:
   tests:
   - NMV-RSD-005
 SSD-R001:
-  description: src_dir_summary outputs all domains with their file sizes from the source directory
+  description: view_src_dir_summary outputs all domains with their file sizes from the source directory
   tests:
   - NMV-SSD-001
 SSD-R002:
-  description: src_dir_summary includes the descriptions of each domain in its output
+  description: view_src_dir_summary includes the descriptions of each domain in its output
   tests:
   - NMV-SSD-002
