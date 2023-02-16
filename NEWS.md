@@ -1,15 +1,25 @@
-# mrgda development
+# mrgda 0.4.0
 
 ## New features and changes
 
-- `read_src_dir()` added a `.read_domains` argument to allow users to only load
-  in specific domains. If not specified, default is to load all in.
+- `nm_validate()` now checks if MDV is set to 1 when DV is either NA or 0. (#55)
+
+- `nm_write()` now determines and saves out the names of other analysis that 
+  depend on the derived data. (#55)
+
+- `nm_write()` now outputs the source script in the meta data folder. (#55)
+
+- `read_src_dir()` added a `.read_domains` argument to allow users to only read
+  in specific domains. If not specified, default is to read all in. (#55)
 
 - `read_src_dir()` added a `.subject_col` argument to allow users to specify the
-  name of the unique subject identifier column in the source data.
-  
+  name of the unique subject identifier column in the source data. (#55)
+
 - `src_dir_summary()` allows the user to easily view all the domains and file 
-  sizes from their source data directory. 
+  sizes from their source data directory. (#55)
+  
+- Added `view_src_dir_summary()` to allow the user to view all the domains and file
+  sizes from their source data directory. (#55)
 
 # mrgda 0.3.2
 
