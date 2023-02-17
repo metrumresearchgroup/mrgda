@@ -82,6 +82,10 @@ NMW-R003:
   description: nm_write works with special characters in file names
   tests:
   - NMV-NMW-003
+NMW-R004:
+  description: nm_write writes out script to source script directory
+  tests:
+  - NMV-NMW-004
 RSD-R001:
   description: read_src_dir reads in all available data files correctly
   tests:

@@ -40,6 +40,7 @@ NMW-S001:
   - NMW-R001
   - NMW-R002
   - NMW-R003
+  - NMW-R004
 RSD-S001:
   name: read_src_dir
   description: As a user, I want to easily load all source files from a directory.
