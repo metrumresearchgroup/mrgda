@@ -122,3 +122,7 @@ SDL-R002:
   description: view_src_data_labels outputs the descrition of each column in each source data domain
   tests:
   - NMV-SDL-002
+WSL-R001:
+  description: write_subj_level writes out a Rds file containing only columns with one value per subject
+  tests:
+  - NMV-WSL-001
