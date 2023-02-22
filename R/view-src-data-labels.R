@@ -32,7 +32,7 @@ view_src_data_labels <- function(.src_list) {
 
       .column_name <- column.i
 
-      if (is.null(attr(.src_list[[domain.i]], "label"))) {
+      if (is.null(attr(.src_list[[domain.i]][[column.i]], "label"))) {
         .column_desc <- "Missing"
       } else {
         .column_desc <- attr(.src_list[[domain.i]][[column.i]], "label")
@@ -42,7 +42,7 @@ view_src_data_labels <- function(.src_list) {
         DOMAIN_NAME = .domain_name,
         DOMAIN_LABEL = .domain_desc,
         COLUMN_NAME = .column_name,
-        COLUN_LABEL = .column_desc
+        COLUMN_LABEL = .column_desc
       )
 
       src_summary <- dplyr::bind_rows(src_summary, temp_df)

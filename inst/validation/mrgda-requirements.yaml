@@ -114,3 +114,11 @@ SSD-R002:
   description: view_src_dir_summary includes the descriptions of each domain in its output
   tests:
   - NMV-SSD-002
+SDL-R001:
+  description: view_src_data_labels outputs the description of each source data domain
+  tests:
+  - NMV-SDL-001
+SDL-R002:
+  description: view_src_data_labels outputs the descrition of each column in each source data domain
+  tests:
+  - NMV-SDL-002
