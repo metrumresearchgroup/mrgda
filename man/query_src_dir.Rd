@@ -12,8 +12,8 @@ query_src_dir(.src_directory, .string)
 \item{.string}{string to search for}
 }
 \description{
-Use this to search across every source data domain and column label for a
-specific string.
+Use this to search for a character string across every source data domain including
+the name, label and contents of each domain.
 }
 \examples{
 path <- system.file("example-sdtm", package = "mrgda")

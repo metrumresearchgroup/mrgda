@@ -1,8 +1,8 @@
 #' Source data query
 #'
 #' @description
-#' Use this to search across every source data domain and column label for a
-#' specific string.
+#' Use this to search for a character string across every source data domain including
+#' the name, label and contents of each domain.
 #'
 #' @param .src_directory file path to the source data directory
 #' @param .string string to search for
@@ -19,13 +19,36 @@ query_src_dir <- function(.src_directory, .string) {
   .src_list <- read_src_dir(.path = .src_directory)
   .src_data_labels <- view_src_data_labels(.src_list)
 
-  .src_data_labels %>%
+  .label_spots <- .src_data_labels %>%
     dplyr::mutate(
       STRINGALL = paste0(DOMAIN_NAME, DOMAIN_LABEL, COLUMN_NAME, COLUMN_LABEL)
     ) %>%
     dplyr::filter(grepl(.string, STRINGALL)) %>%
-    dplyr::select(-STRINGALL) %>%
-    tibble::view("SrcDirQuery")
+    dplyr::transmute(
+      DOMAIN = DOMAIN_NAME,
+      TYPE = "label",
+      LOCATION = COLUMN_NAME
+      )
 
+  .dfs <- .src_list[grepl(.string, .src_list)]
+  .data_spots <- dplyr::tibble()
+
+  for (domain.i in names(.dfs)) {
+    .tempdf <- .dfs[[domain.i]]
+    .name_col <- names(.tempdf[grepl(.string, .tempdf)])
+    for (column.i in .name_col) {
+
+      .data_spots <- dplyr::bind_rows(
+        .data_spots,
+        dplyr::tibble(
+          DOMAIN = domain.i,
+          TYPE = "column",
+          LOCATION = column.i
+        )
+      )
+    }
+  }
+
+  dplyr::bind_rows(.label_spots, .data_spots) %>% tibble::view("QueryResults")
 
 }

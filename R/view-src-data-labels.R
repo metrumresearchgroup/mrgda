@@ -6,14 +6,7 @@
 #'
 #' @param .src_list a named list with each source data domain (ideally use the output of `read_src_dir()`)
 #'
-#' @examples
-#' path <- system.file("example-sdtm", package = "mrgda")
-#' # Read in all source files
-#' src_list <- read_src_dir(.path = path, .file_types = "detect")
-#'
-#' view_src_data_labels(.src_list = src_list)
-#'
-#' @export
+#' @keywords internal
 view_src_data_labels <- function(.src_list) {
 
   src_summary <- dplyr::tibble()
@@ -50,5 +43,5 @@ view_src_data_labels <- function(.src_list) {
     }
   }
 
-  src_summary %>% tibble::view("SourceDataLabels")
+  return(src_summary)
 }

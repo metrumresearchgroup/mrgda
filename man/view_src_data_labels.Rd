@@ -13,11 +13,4 @@ view_src_data_labels(.src_list)
 After loading in your source data, use \code{view_src_data_labels()} to view the
 description of each domain and column.
 }
-\examples{
-path <- system.file("example-sdtm", package = "mrgda")
-# Read in all source files
-src_list <- read_src_dir(.path = path, .file_types = "detect")
-
-view_src_data_labels(.src_list = src_list)
-
-}
+\keyword{internal}
