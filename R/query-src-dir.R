@@ -17,15 +17,15 @@
 query_src_dir <- function(.src_directory, .string) {
 
   .src_list <- read_src_dir(.path = .src_directory)
-  .src_data_labels <- view_src_data_labels(.src_list)
+  .src_data_labels <- gather_data_labels(.src_list)
 
   .label_spots <- .src_data_labels %>%
     dplyr::mutate(
-      STRINGALL = paste0(DOMAIN_NAME, DOMAIN_LABEL, COLUMN_NAME, COLUMN_LABEL)
+      STRINGALL = paste0(DOMAIN, COLUMN_NAME, COLUMN_LABEL)
     ) %>%
     dplyr::filter(grepl(.string, STRINGALL)) %>%
     dplyr::transmute(
-      DOMAIN = DOMAIN_NAME,
+      DOMAIN,
       TYPE = "label",
       LOCATION = COLUMN_NAME
       )

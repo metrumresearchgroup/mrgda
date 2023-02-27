@@ -4,7 +4,13 @@
 \alias{nm_summary}
 \title{Provide diagnostic summary of an NMTRAN dataset}
 \usage{
-nm_summary(.data, .spec, .study_compare = TRUE, .return_output = FALSE)
+nm_summary(
+  .data,
+  .spec,
+  .study_compare = TRUE,
+  .return_output = FALSE,
+  .pk_dvid = -99
+)
 }
 \arguments{
 \item{.data}{a data frame}
@@ -13,7 +19,9 @@ nm_summary(.data, .spec, .study_compare = TRUE, .return_output = FALSE)
 
 \item{.study_compare}{if TRUE (default), tables & figures will be grouped by study}
 
-\item{.return_output}{Should the figures and tabled be returned?}
+\item{.return_output}{Should the figures and tabled be returned to an object (default FALSE)}
+
+\item{.pk_dvid}{numeric DVID value for PK observations (optional)}
 }
 \description{
 This function is intended to provide a high level overview of variables

@@ -36,10 +36,8 @@ view_src_dir_summary <- function(.path, .file_types = "detect") {
   }
 
   .domain_ref <-
-    system.file("package-data", "sdtm-domains.csv", package = "mrgda") %>%
-    readr::read_csv(file = .) %>%
-    dplyr::mutate(DOMAIN = tolower(DOMAIN)) %>%
-    suppressMessages()
+    view_sdtm_domains(FALSE) %>%
+    dplyr::mutate(DOMAIN = tolower(DOMAIN))
 
   .domain_summary %>%
     dplyr::left_join(.domain_ref) %>%
