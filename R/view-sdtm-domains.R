@@ -1,5 +1,7 @@
 #' View SDTM Domain Abbreviations
 #'
+#' @param .view Logical. Should the output be viewed?
+#'
 #' @export
 view_sdtm_domains <- function(.view = TRUE){
 
@@ -8,7 +10,7 @@ view_sdtm_domains <- function(.view = TRUE){
     readr::read_csv(file = .) %>%
     suppressMessages()
 
-  if(.view){
+  if (.view) {
     tibble::view(.sdtm_domains, "SDTM Domains")
   } else {
     return(.sdtm_domains)

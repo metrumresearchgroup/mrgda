@@ -16,39 +16,55 @@
 #' @export
 query_src_dir <- function(.src_directory, .string) {
 
-  .src_list <- read_src_dir(.path = .src_directory)
-  .src_data_labels <- gather_data_labels(.src_list)
+  src_list <- read_src_dir(.path = .src_directory)
 
-  .label_spots <- .src_data_labels %>%
-    dplyr::mutate(
-      STRINGALL = paste0(DOMAIN, COLUMN_NAME, COLUMN_LABEL)
-    ) %>%
-    dplyr::filter(grepl(.string, STRINGALL)) %>%
-    dplyr::transmute(
-      DOMAIN,
-      TYPE = "label",
-      LOCATION = COLUMN_NAME
-      )
+  src_list_char <- purrr::map(
+    src_list, ~ .x %>% dplyr::mutate_all(as.character)
+  )
 
-  .dfs <- .src_list[grepl(.string, .src_list)]
-  .data_spots <- dplyr::tibble()
+  matches <- src_list_char[grepl(.string, src_list_char, ignore.case = TRUE)]
 
-  for (domain.i in names(.dfs)) {
-    .tempdf <- .dfs[[domain.i]]
-    .name_col <- names(.tempdf[grepl(.string, .tempdf)])
-    for (column.i in .name_col) {
-
-      .data_spots <- dplyr::bind_rows(
-        .data_spots,
-        dplyr::tibble(
-          DOMAIN = domain.i,
-          TYPE = "column",
-          LOCATION = column.i
-        )
-      )
-    }
+  if (length(matches) == 0) {
+    stop("No matches found for ", .string)
   }
 
-  dplyr::bind_rows(.label_spots, .data_spots) %>% tibble::view("QueryResults")
+  hits <- dplyr::tibble()
+
+  for (df.i in names(matches)) {
+
+    for (i in 1:nrow(matches[[df.i]])) {
+
+      matches.i <- grepl(.string, matches[[df.i]][i, ], ignore.case = TRUE)
+
+      if (any(matches.i)) {
+
+        hits <-
+          dplyr::bind_rows(
+            hits,
+            dplyr::tibble(
+              DOMAIN = ifelse(
+                df.i != "mrgda_labels",
+                df.i,
+                paste0("mrgda_labels", " (", matches[[df.i]]$DOMAIN[i], ")")
+              ),
+              COLUMN = names(matches[[df.i]])[matches.i],
+              VALUE = as.character(matches[[df.i]][i, ][matches.i]),
+              I = i
+            )
+          )
+      }
+
+    }
+
+  }
+
+  hits %>%
+    dplyr::group_by(DOMAIN, COLUMN, VALUE) %>%
+    dplyr::summarise(
+      MATCHING_ROWS = paste(I, collapse = ", ")
+    ) %>%
+    dplyr::ungroup() %>%
+    dplyr::rename(MATCH = VALUE) %>%
+    tibble::view(x = ., title = paste0("Hits for ", .string))
 
 }
