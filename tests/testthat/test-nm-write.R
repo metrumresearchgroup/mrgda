@@ -5,7 +5,7 @@ nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = 
 .temp_script <- tempfile(fileext = ".R")
 writeLines(text = "2 + 2", con = .temp_script)
 
-nm_write(.data = nm, .spec = nm_spec, .file = .temp_csv, .this_script = .temp_script)
+nm_write(.data = nm, .spec = nm_spec, .file = .temp_csv)
 .csv_in <- readr::read_csv(.temp_csv, na = ".")
 .xpt_in_name <- paste0(gsub(".csv", "", .temp_csv, fixed = TRUE),
                        "/",
@@ -28,7 +28,7 @@ test_that("nm_write write xpt: xpt data includes correct labels [NMV-NMW-002]", 
 
 test_that("nm_write works with special characters in file name [NMV-NMW-003]", {
   .temp_csv <- tempfile(fileext = "-pk.csv")
-  nm_write(.data = nm, .spec = nm_spec, .file = .temp_csv, .this_script = .temp_script)
+  nm_write(.data = nm, .spec = nm_spec, .file = .temp_csv)
   expect_equal(nm, readr::read_csv(.temp_csv, na = "."))
 })
 
