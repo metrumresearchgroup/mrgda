@@ -7,17 +7,15 @@
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .file csv file name to write out to (including path)
-#' @param .this_script Data assembly script name (including path)
 #' @examples
 #'\dontrun{
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 #' nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".")
-#' nm_write(.data = nm, .spec = nm_spec, .file = "data/derived/pk.csv",
-#'    .this_script = "script/data-assembly.Rmd")
+#' nm_write(.data = nm, .spec = nm_spec, .file = "data/derived/pk.csv")
 #'}
 #' @md
 #' @export
-nm_write <- function(.data, .spec, .file, .this_script) {
+nm_write <- function(.data, .spec, .file) {
 
   if (tools::file_ext(.file) != "csv") {
     stop("'.file' must reference a 'csv' file")
@@ -106,16 +104,16 @@ nm_write <- function(.data, .spec, .file, .this_script) {
 
   cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'sys-info.yml')}"))
 
-  # Data assembly script
-  if (file.exists(.this_script)) {
-    .script_path_absolute <- tools::file_path_as_absolute(.this_script)
-    .extension <- paste0("data-assembly-script.", tools::file_ext(.this_script))
-    file.copy(.script_path_absolute, file.path(.meta_data_folder, .extension), overwrite = TRUE)
-    cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, .extension)}"))
-  } else {
-    cli::cli_alert_danger(glue::glue("Invalid '.this_script' provided: {.this_script} does not exist"))
-    stop()
-  }
+  # # Data assembly script
+  # if (file.exists(.this_script)) {
+  #   .script_path_absolute <- tools::file_path_as_absolute(.this_script)
+  #   .extension <- paste0("data-assembly-script.", tools::file_ext(.this_script))
+  #   file.copy(.script_path_absolute, file.path(.meta_data_folder, .extension), overwrite = TRUE)
+  #   cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, .extension)}"))
+  # } else {
+  #   cli::cli_alert_danger(glue::glue("Invalid '.this_script' provided: {.this_script} does not exist"))
+  #   stop()
+  # }
 
 
   # Write script dependencies

@@ -13,7 +13,7 @@ nm_summary(.data, .spec, .study_compare = TRUE, .return_output = FALSE)
 
 \item{.study_compare}{if TRUE (default), tables & figures will be grouped by study}
 
-\item{.return_output}{Should the figures and tabled be returned?}
+\item{.return_output}{Should the figures and tabled be returned to an object (default FALSE)}
 }
 \description{
 This function is intended to provide a high level overview of variables

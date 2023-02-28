@@ -29,7 +29,15 @@ globalVariables(
     "VAL",
     "TIME",
     "DOMAIN",
-    "VALUE"
+    "VALUE",
+    "COLUMN_LABEL",
+    "COLUMN_NAME",
+    "DOMAIN_LABEL",
+    "DOMAIN_NAME",
+    "STRINGALL",
+    "COLUMN",
+    "DV",
+    "DVID"
   )
 )
 

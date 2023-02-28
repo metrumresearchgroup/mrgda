@@ -4,7 +4,10 @@
 \alias{view_sdtm_domains}
 \title{View SDTM Domain Abbreviations}
 \usage{
-view_sdtm_domains()
+view_sdtm_domains(.view = TRUE)
+}
+\arguments{
+\item{.view}{Logical. Should the output be viewed?}
 }
 \description{
 View SDTM Domain Abbreviations

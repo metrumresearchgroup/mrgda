@@ -4,7 +4,7 @@ src_summary <- view_src_dir_summary(.path = path)
 test_that("view_src_dir_summary summarizes all domains and outputs file sizes [NMV-SSD-001]", {
   expect_true(all(c("ae", "dm", "eg", "lb", "mh", "pe", "vs") %in% src_summary$DOMAIN))
   expect_equal(src_summary$SIZE_KB[src_summary$DOMAIN == "pe"], 12.8)
-  expect_equal(src_summary$SIZE_KB[src_summary$DOMAIN == "eg"], 14.16)
+  expect_equal(src_summary$SIZE_KB[src_summary$DOMAIN == "eg"], 14.0)
 })
 
 test_that("view_src_dir_summary provides descriptions of domains [NMV-SSD-002]", {

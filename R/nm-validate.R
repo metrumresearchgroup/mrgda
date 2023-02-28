@@ -143,7 +143,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
       .code = c(
         "{arg_names$.data}",
         "dplyr::select({collapse_covs(c(flags$dv, flags$mdv))})",
-        "dplyr::filter((is.na(as.numeric({collapse_covs(flags$dv)})) | as.numeric({collapse_covs(flags$dv)}) == 0) & {collapse_covs(flags$mdv)} != 1)"
+        "dplyr::filter((is.na(as.numeric({collapse_covs(flags$dv)})) | as.numeric({collapse_covs(flags$dv)}) == 0) & as.numeric({collapse_covs(flags$mdv)}) != 1)"
       ),
       .required_flags = c("dv", "mdv")
     )

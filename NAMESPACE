@@ -2,9 +2,11 @@
 
 S3method(print,nm_validate_results)
 export("%>%")
+export(distinct_subject_columns)
 export(nm_summary)
 export(nm_validate)
 export(nm_write)
+export(query_src_dir)
 export(read_src_dir)
 export(view_sdtm_domains)
 export(view_src_dir_summary)

@@ -65,9 +65,19 @@ read_src_dir <- function(.path,
   }
 
 
-  subject_table <-
+  # mrgda labels ------------------------------------------------------------
+  .out$mrgda_labels <-
+    gather_data_labels(.out) %>%
+    dplyr::left_join(
+      view_sdtm_domains(FALSE) %>% dplyr::mutate(DOMAIN = tolower(DOMAIN))
+    )
+
+
+
+  # mrgda subject -----------------------------------------------------------
+  mrgda_subject <-
     purrr::map_dfr(
-      .out,
+      .out[names(.out)[!grepl("mrgda_", names(.out), fixed = TRUE)]],
       ~ {
         if (.subject_col %in% names(.x)) {
           return(
@@ -81,24 +91,26 @@ read_src_dir <- function(.path,
     )
 
 
-  if (nrow(subject_table) > 0) {
+  if (nrow(mrgda_subject) > 0) {
 
-    subject_table <-
-      subject_table %>%
+    mrgda_subject <-
+      mrgda_subject %>%
       dplyr::mutate(DOMAIN = tools::file_path_sans_ext(DOMAIN)) %>%
       tidyr::pivot_wider(names_from = DOMAIN, values_from = VALUE)
 
-    subject_table[is.na(subject_table)] <- FALSE
+    mrgda_subject[is.na(mrgda_subject)] <- FALSE
 
-    .out$subject_table <- subject_table
+    .out$mrgda_subject <- mrgda_subject
 
-    cli::cli_alert_info(glue::glue("{nrow(.out$subject_table)} unique USUBJID across all domains"))
+    cli::cli_alert_info(glue::glue("{nrow(.out$mrgda_subject)} unique USUBJID across all domains"))
 
   } else {
 
     cli::cli_alert_warning(glue::glue(".subject_col '{.subject_col}' not detected in any domain"))
 
   }
+
+
 
   return(.out)
 

@@ -82,6 +82,10 @@ NMW-R003:
   description: nm_write works with special characters in file names
   tests:
   - NMV-NMW-003
+NMW-R004:
+  description: nm_write writes out script to source script directory
+  tests:
+  - NMV-NMW-004
 RSD-R001:
   description: read_src_dir reads in all available data files correctly
   tests:
@@ -110,3 +114,15 @@ SSD-R002:
   description: view_src_dir_summary includes the descriptions of each domain in its output
   tests:
   - NMV-SSD-002
+SDL-R001:
+  description: gather_data_labels outputs the description of each source data domain
+  tests:
+  - NMV-SDL-001
+SDL-R002:
+  description: gather_data_labels outputs the descrition of each column in each source data domain
+  tests:
+  - NMV-SDL-002
+WSL-R001:
+  description: write_subj_level writes out a Rds file containing only columns with one value per subject
+  tests:
+  - NMV-WSL-001
