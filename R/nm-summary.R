@@ -10,7 +10,6 @@
 #' @param .spec a yspec object
 #' @param .study_compare if TRUE (default), tables & figures will be grouped by study
 #' @param .return_output Should the figures and tabled be returned to an object (default FALSE)
-#' @param .pk_dvid numeric DVID value for PK observations (optional)
 #' @examples
 #'
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
@@ -21,11 +20,7 @@
 #'
 #' @md
 #' @export
-nm_summary <- function(.data,
-                       .spec,
-                       .study_compare = TRUE,
-                       .return_output = FALSE,
-                       .pk_dvid = -99){
+nm_summary <- function(.data, .spec, .study_compare = TRUE, .return_output = FALSE){
 
   outputs <- list()
 
@@ -185,20 +180,6 @@ nm_summary <- function(.data,
 
     rm(p.i)
   }
-
-  # PK Time Plots
-  if (.pk_dvid != -99) {
-    id_most_pk <- g_r$data %>%
-      dplyr::select(
-        ID = g_r$flags$id,
-        DV = g_r$flags$dv,
-        DVID = g_r$flags$dvid) %>%
-      dplyr::filter(DVID == .pk_dvid, !is.na(DV))
-
-
-    outputs$Figures$PK[[""]]
-  }
-
 
 
   # output ------------------------------------------------------------------
