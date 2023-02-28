@@ -34,7 +34,10 @@ globalVariables(
     "COLUMN_NAME",
     "DOMAIN_LABEL",
     "DOMAIN_NAME",
-    "STRINGALL"
+    "STRINGALL",
+    "COLUMN",
+    "DV",
+    "DVID"
   )
 )
 
