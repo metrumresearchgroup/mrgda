@@ -59,3 +59,19 @@ SSD-S001:
   requirements:
   - SSD-R001
   - SSD-R002
+WSL-S001:
+  name: distinct_subject_columns
+  description: As a user, I want to get only the columns with one distinct value
+    from a data set.
+  ProductRisk: Low
+  requirements:
+  - WSL-R001
+QSD-S001:
+  name: query_src_dir
+  description: As a user, I want to search across all source domains for a string
+    either in the column values or labels.
+  ProductRisk: Low
+  requirements:
+  - QSD-R001
+  - QSD-R002
+  - SDL-R001

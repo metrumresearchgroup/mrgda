@@ -1,6 +1,6 @@
 path <- system.file("example-sdtm", package = "mrgda")
 
-test_that("query_src_dir returns all domain and column combinations with a matching string []", {
+test_that("query_src_dir returns all domain and column combinations with a matching string [NMV-QSD-001]", {
   query_race <- query_src_dir(.src_directory = path, .string = "RACE")
   expect_identical(
     query_race$MATCHING_ROWS[query_race$COLUMN == "LBSTNRC" & query_race$MATCH == "NEGATIVE TO TRACE"],
@@ -9,7 +9,7 @@ test_that("query_src_dir returns all domain and column combinations with a match
   expect_false(any(query_race$DOMAIN == "ae"))
 })
 
-test_that("query_src_dir is not case sensitive []", {
+test_that("query_src_dir is not case sensitive [NMV-QSD-002]", {
   expect_identical(
     query_src_dir(.src_directory = path, .string = "RACE"),
     query_src_dir(.src_directory = path, .string = "race")
