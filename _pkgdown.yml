@@ -17,10 +17,12 @@ reference:
     - read_src_dir
     - view_sdtm_domains
     - view_src_dir_summary
+    - query_src_dir
   - title: Data Creation
     desc: Write NONMEM data set
     contents:
     - nm_write
+    - distinct_subject_columns
   - title: Data Validation
     desc: Check for errors in a NONMEM data set
     contents:

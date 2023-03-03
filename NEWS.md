@@ -1,3 +1,15 @@
+# mrgda 0.5.0
+
+## New features and changes
+
+- `query_src_dir()` is a new function that searches through the data in a source directory for a string or pattern. (#64)
+
+- `distinct_subject_columns()` is a new function that takes a data frame and subject column identifier and returns the columns in which the values are unique for every subject. (#64)
+
+- `nm_write()` the experimental feature of including the data assembly source script in the meta data folder has been removed. (#64)
+
+- `read_src_dir()` now returns an additional data object - a data frame containing the column name and labels from every domain. (#64)
+
 # mrgda 0.4.0
 
 ## New features and changes

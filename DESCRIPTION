@@ -1,6 +1,6 @@
 Package: mrgda
 Title: Validate NMTRAN datasets
-Version: 0.4.0
+Version: 0.5.0
 Authors@R: 
     c(
     person(given = "Eric", family = "Anderson", email = "andersone@metrumrg.com", role = c("aut", "cre")),

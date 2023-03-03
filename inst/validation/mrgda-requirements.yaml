@@ -115,14 +115,18 @@ SSD-R002:
   tests:
   - NMV-SSD-002
 SDL-R001:
-  description: gather_data_labels outputs the description of each source data domain
-  tests:
-  - NMV-SDL-001
-SDL-R002:
   description: gather_data_labels outputs the descrition of each column in each source data domain
   tests:
-  - NMV-SDL-002
+  - NMV-SDL-001
 WSL-R001:
-  description: write_subj_level writes out a Rds file containing only columns with one value per subject
+  description: distinct_subject_columns outputs only columns with one value per subject in a data set
   tests:
   - NMV-WSL-001
+QSD-R001:
+  description: query_src_dir outputs all domain labels with a matching string to input
+  tests:
+  - NMV-QSD-001
+QSD-R002:
+  description: query_src_dir is not case sensitive for matching strings
+  tests:
+  - NMV-QSD-002
