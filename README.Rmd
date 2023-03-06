@@ -45,7 +45,7 @@ library(mrgda)
 ```
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=FALSE}
 readr::read_csv(system.file("package-data", "recognized-flags.csv", package = "mrgda"), na = ".", show_col_types = FALSE) %>% 
   dplyr::filter(default != "NA") %>% 
   dplyr::mutate(
@@ -60,6 +60,8 @@ readr::read_csv(system.file("package-data", "recognized-flags.csv", package = "m
   gt::gt() %>% 
   gt::cols_align(align = "center")
 ```
+
+![Flag definitions](man/figures/variable-flags.png)
 
 If you have a column name that is different than the expected one shown above,
 you can define it in your specification file as shown below. Here we are defining 
