@@ -61,7 +61,7 @@ readr::read_csv(system.file("package-data", "recognized-flags.csv", package = "m
   gt::cols_align(align = "center")
 ```
 
-![Flag definitions](man/figures/variable-flags.png)
+![Flag definitions](man/figures/variable-flags.png){width=75%}
 
 If you have a column name that is different than the expected one shown above,
 you can define it in your specification file as shown below. Here we are defining 

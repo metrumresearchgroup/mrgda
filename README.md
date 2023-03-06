@@ -39,7 +39,11 @@ definitions for these flags are as such:
 Other columns will also be utilized, so it is recommended to use the
 following column names in your data:
 
-![Flag definitions](man/figures/variable-flags.png)
+<figure>
+<img src="man/figures/variable-flags.png" style="width:75.0%"
+alt="Flag definitions" />
+<figcaption aria-hidden="true">Flag definitions</figcaption>
+</figure>
 
 If you have a column name that is different than the expected one shown
 above, you can define it in your specification file as shown below. Here
