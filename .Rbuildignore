@@ -11,3 +11,4 @@ pkgr.yml
 ^README\.Rmd$
 ^.drone.yml$
 make-R.R
+inst/example-sdtm-large-ae

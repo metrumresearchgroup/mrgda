@@ -67,7 +67,7 @@ read_src_dir <- function(.path,
 
     .file_size_kb <- .file_sizes$SIZE[.file_sizes$FILE == file.i] / 1000
 
-    cli::cli_progress_message(paste0("Reading in ", basename(file.i), " (", .file_size_kb, " KB)"))
+    cli::cli_progress_message(crayon::yellow(paste0("Reading in ", basename(file.i), " (", .file_size_kb, " KB)")))
     data.i <- try(.read_function(file.i), silent = TRUE)
 
     if (inherits(data.i, "try-error")) {
