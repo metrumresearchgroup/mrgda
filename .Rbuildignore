@@ -12,3 +12,4 @@ pkgr.yml
 ^.drone.yml$
 make-R.R
 inst/example-sdtm-large-ae
+inst/example-sdtm-large-lb

@@ -10,7 +10,6 @@ test_that("gather_flags standard case: Works with standard case [NMV-GAT-001]", 
   expect_equal(c(gather_results$flags$evid, gather_results$flags$dvid), c("EVID", "DVID"))
 })
 
-test_that("gather_flags special cases: Generates error if no flags specified [NMV-GAT-002]", {
-  expect_message(gather_flags(nm, nm_spec_noflags), "No flags found in spec file")
+test_that("gather_flags special cases: Generates message if no flags specified [NMV-GAT-002]", {
+  expect_message(gather_flags(nm, nm_spec_noflags), "No mrgda specific flags found in spec file")
 })
-

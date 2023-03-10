@@ -11,7 +11,10 @@ gather_flags <- function(.data, .spec){
   # Check if all flags are NULL
   .flags_bin <- purrr::map(.flags, ~ is.null(.x))
   if (all(.flags_bin == TRUE)) {
-    message("No flags found in spec file")
+    .any_mrgda_specific <- FALSE
+    cli::cli_alert_info("No mrgda specific flags found in spec file")
+  } else {
+    .any_mrgda_specific <- TRUE
   }
 
   for (flag.i in names(.flags[unlist(.flags_bin)])) {
@@ -45,6 +48,7 @@ gather_flags <- function(.data, .spec){
 
   list_return[["data"]] <- .data
   list_return[["flags"]] <- .flags
+  list_return[["any_mrgda_specific"]] <- .any_mrgda_specific
 
   return(list_return)
 

@@ -26,6 +26,10 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE, .return_output = FAL
 
   g_r <- gather_flags(.data, .spec)
 
+  if (!g_r$any_mrgda_specific) {
+    return(invisible(NULL))
+  }
+
   g_r$data <- g_r$data %>% yspec::ys_add_factors(.spec, .suffix = "")
 
   if (is.null(g_r$flags$study) & .study_compare) {
