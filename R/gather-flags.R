@@ -3,6 +3,8 @@ gather_flags <- function(.data, .spec){
   recognized_flags <-
     system.file("package-data", "recognized-flags.csv", package = "mrgda") %>%
     readr::read_csv(file = .) %>%
+    dplyr::select(-Description) %>%
+    dplyr::rename(name = `Flag name`, default = `Default Column`) %>%
     suppressMessages()
 
   .flags <- yspec::pull_meta(.spec, "flags")[recognized_flags$name] %>%
