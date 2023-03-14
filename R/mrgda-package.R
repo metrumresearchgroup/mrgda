@@ -41,6 +41,8 @@ globalVariables(
     "Default Column",
     "Detected Columns",
     "Flag name",
+    "Flag",
+    "desc",
     "Description"
   )
 )

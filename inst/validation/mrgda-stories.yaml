@@ -82,6 +82,5 @@ VSF-S001:
   ProductRisk: Low
   requirements:
   - VSF-R001
-  - VSF-R002
   - GAT-R001
   - GAT-R002

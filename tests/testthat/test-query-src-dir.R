@@ -7,6 +7,7 @@ test_that("query_src_dir returns all domain and column combinations with a match
     "19, 20, 38, 58, 59, 80, 81"
   )
   expect_false(any(query_race$DOMAIN == "ae"))
+  expect_error(query_src_dir(path, "stringnotfound"))
 })
 
 test_that("query_src_dir is not case sensitive [NMV-QSD-002]", {

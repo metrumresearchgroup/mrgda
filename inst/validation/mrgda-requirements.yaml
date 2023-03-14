@@ -131,10 +131,6 @@ QSD-R002:
   tests:
   - NMV-QSD-002
 VSF-R001:
-  description: view_spec_flags shows when flags are undefined and outputs those at the top
-  tests:
-  - NMV-VSF-001
-VSF-R002:
   description: view_spec_flags combines all column names when more than one is defined for a flag
   tests:
-  - NMV-VSF-002
+  - NMV-VSF-001

@@ -169,5 +169,7 @@ if (basename(getwd()) == "docs") {
 ```
 
 ```{r, include=TRUE}
-covr::package_coverage()
+covr::package_coverage(type = "all", 
+                       line_exclusions = c("R/print-aesthetics.R", "R/list-files-of-type.R", 
+                                           "R/find-in-files.R", "R/gather-flags.R"))
 ```

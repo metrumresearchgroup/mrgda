@@ -174,20 +174,18 @@ If you encounter a clear bug, please file an issue with a minimal
 reproducible example on [mrgda](https://github.com/mrgda/issues).
 
 ``` r
-covr::package_coverage()
-#> mrgda Coverage: 81.79%
-#> R/print-aesthetics.R: 0.00%
-#> R/list-files-of-type.R: 66.67%
-#> R/nm-validate.R: 66.67%
-#> R/find-in-files.R: 80.00%
+covr::package_coverage(type = "all", 
+                       line_exclusions = c("R/print-aesthetics.R", "R/list-files-of-type.R", 
+                                           "R/find-in-files.R", "R/gather-flags.R"))
+#> mrgda Coverage: 89.18%
+#> R/nm-validate.R: 80.70%
 #> R/nm-write.R: 81.36%
-#> R/view-sdtm-domains.R: 85.71%
 #> R/view-mrgda-flags.R: 93.33%
 #> R/nm-summary.R: 93.38%
 #> R/read-src-dir.R: 93.94%
-#> R/query-src-dir.R: 97.06%
 #> R/distinct-subject-columns.R: 100.00%
 #> R/gather-data-labels.R: 100.00%
-#> R/gather-flags.R: 100.00%
+#> R/query-src-dir.R: 100.00%
+#> R/view-sdtm-domains.R: 100.00%
 #> R/view-src-dir-summary.R: 100.00%
 ```
