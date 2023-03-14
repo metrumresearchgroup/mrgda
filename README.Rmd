@@ -168,6 +168,6 @@ if (basename(getwd()) == "docs") {
 }
 ```
 
-```{r, include=FALSE}
+```{r, include=TRUE}
 covr::package_coverage()
 ```

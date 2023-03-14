@@ -39,7 +39,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
   # Check inputs
   stopifnot(".data must be a data.frame" = inherits(.data, "data.frame"))
   stopifnot(".spec must be a yspec object" = inherits(.spec, "yspec"))
-  stopifnot(".error_on_fail must be a logical" = is.logical(.error_on_fail))
+  stopifnot(".error_on_fail must be a logical" = inherits(.error_on_fail, "logical"))
 
   # argument names ----------------------------------------------------------
   arg_names <- as.list(as.character(match.call())[-1])

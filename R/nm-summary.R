@@ -1,6 +1,9 @@
 #' Provide diagnostic summary of an NMTRAN dataset
 #'
+#'
 #' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' This function is intended to provide a high level overview of variables
 #' derived during a data assembly. The output of this function will provide
 #' the user with a pdf file containing a series of tables to help the user
