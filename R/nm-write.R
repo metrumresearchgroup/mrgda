@@ -83,9 +83,10 @@ nm_write <- function(.data, .spec, .file) {
       file = file.path(.meta_data_folder, "data-diff.txt"),
       suppress_warnings = TRUE
     )
+    cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'data-diff.txt')}"))
+  } else {
+    cli::cli_alert_info("No differences between previous and current data set")
   }
-
-  cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'data-diff.txt')}"))
 
 
   .sys_info <- Sys.info()
