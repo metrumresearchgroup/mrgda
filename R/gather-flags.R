@@ -1,3 +1,4 @@
+#' @keywords internal
 gather_flags <- function(.data, .spec, .verbose = FALSE){
 
   list_return <- list()
