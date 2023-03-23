@@ -87,8 +87,8 @@ VSF-S001:
 LFOT-S001:
   name: list_files_of_type
   description: As a user, I want a function that takes in a directory and gives
-  back the files of a specified type in that directory (and if not type
-  specified, give back the mode file type.)
+    back the files of a specified type in that directory (and if not type
+    specified, give back the mode file type.)
   ProductRisk: High
   requirements:
   - LFOT-R001
