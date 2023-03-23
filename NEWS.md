@@ -2,7 +2,7 @@
 
 ## New features and changes
 
-- Added `view_spec_flags()` to allow the user to view a summary of how mrgda flags in the specification file are assigned to the data set. (#67)
+- Added `view_mrgda_flags()` to allow the user to view a summary of how mrgda flags in the specification file are assigned to the data set. (#67)
 
 - `read_src_dir()` now outputs the name and size of the current file its reading in. (#67)
 
