@@ -134,3 +134,15 @@ VSF-R001:
   description: view_spec_flags combines all column names when more than one is defined for a flag
   tests:
   - NMV-VSF-001
+LFOT-R001:
+  description: list_files_of_type check detect works in test dir
+  tests:
+  - LFOT-001
+LFOT-R002:
+  description: list_files_of_type check xpt works in test dir
+  tests:
+  - LFOT-002
+LFOT-R003:
+  description: list_files_of_type check sas7bdat does not work in test dir
+  tests:
+  - LFOT-003
