@@ -1,6 +1,9 @@
 #' Provide diagnostic summary of an NMTRAN dataset
 #'
+#'
 #' @description
+#' `r lifecycle::badge("experimental")`
+#'
 #' This function is intended to provide a high level overview of variables
 #' derived during a data assembly. The output of this function will provide
 #' the user with a pdf file containing a series of tables to help the user
@@ -25,6 +28,10 @@ nm_summary <- function(.data, .spec, .study_compare = TRUE, .return_output = FAL
   outputs <- list()
 
   g_r <- gather_flags(.data, .spec)
+
+  if (!g_r$any_mrgda_specific) {
+    return(invisible(NULL))
+  }
 
   g_r$data <- g_r$data %>% yspec::ys_add_factors(.spec, .suffix = "")
 

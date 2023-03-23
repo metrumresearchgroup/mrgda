@@ -4,7 +4,7 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-## Overview
+## Overview 
 
 mrgda is a NONMEM data assembly helper, providing a set of functions that help 
 you assemble, explore and validate your data set.
@@ -45,7 +45,7 @@ library(mrgda)
 ```
 
 
-```{r, echo=FALSE}
+```{r, echo=FALSE, eval=FALSE}
 readr::read_csv(system.file("package-data", "recognized-flags.csv", package = "mrgda"), na = ".", show_col_types = FALSE) %>% 
   dplyr::filter(default != "NA") %>% 
   dplyr::mutate(
@@ -60,6 +60,8 @@ readr::read_csv(system.file("package-data", "recognized-flags.csv", package = "m
   gt::gt() %>% 
   gt::cols_align(align = "center")
 ```
+
+![Flag definitions](man/figures/variable-flags.png){width=75%}
 
 If you have a column name that is different than the expected one shown above,
 you can define it in your specification file as shown below. Here we are defining 
@@ -166,6 +168,8 @@ if (basename(getwd()) == "docs") {
 }
 ```
 
-```{r, include=FALSE}
-covr::package_coverage()
+```{r, include=TRUE}
+covr::package_coverage(type = "all", 
+                       line_exclusions = c("R/print-aesthetics.R", "R/list-files-of-type.R", 
+                                           "R/find-in-files.R", "R/gather-flags.R"))
 ```

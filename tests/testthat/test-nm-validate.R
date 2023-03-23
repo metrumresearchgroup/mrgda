@@ -60,6 +60,9 @@ test_that("nm_validate catches missing covariates [NMV-VAL-004]", {
   expect_equal(n_val_df$WT[1], NA_real_)
   expect_equal(n_val_df$WTBL[2], NA_real_)
   expect_equal(n_val_df$SEX[4], NA_real_)
+
+  df_noflags <- nm_validate(nm, nm_spec_noflags)
+  expect_equal(df_noflags$`Non-unique baseline covariates`$debug, "bl_cat_cov, bl_cont_cov")
 })
 
 
@@ -162,5 +165,5 @@ test_that("nm_validate checks if AMT always equals RATE times DUR [NMV-VAL-011]"
   expect_equal(
     nrow(rlang::parse_expr(x$`All dosing AMT values are equivalent to RATE * DUR`$debug) %>% rlang::eval_tidy()),
     1)
-
 })
+

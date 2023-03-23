@@ -37,7 +37,13 @@ globalVariables(
     "STRINGALL",
     "COLUMN",
     "DV",
-    "DVID"
+    "DVID",
+    "Default Column",
+    "Detected Columns",
+    "Flag name",
+    "Flag",
+    "desc",
+    "Description"
   )
 )
 

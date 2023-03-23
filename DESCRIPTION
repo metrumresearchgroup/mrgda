@@ -31,7 +31,8 @@ Imports:
     data.table,
     yaml,
     plotly,
-    here
+    here,
+    crayon
 Suggests: 
     knitr,
     testthat (>= 3.0.0),

@@ -24,6 +24,7 @@ Packages:
   - mrggsave
   - diffdf
   - plotly
+  - progress
 
 Repos:
   - CRAN: https://cran.rstudio.com

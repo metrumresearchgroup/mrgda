@@ -6,6 +6,17 @@
 #' fails, the function will output a description of the problem and code to
 #' use for debugging.
 #'
+#' @details The following checks are run on the given NONMEM data set:
+#' \itemize{
+#'  \item{Are duplicate records present? (based on EVID, DVID and any primary_keys flags)}
+#'  \item{Does each subject have only one distinct value for each baseline covariates?}
+#'  \item{Are any subjects missing covariate values?}
+#'  \item{Do any non-finite TIME values exist?}
+#'  \item{Is MDV derived appropriately?}
+#'  \item{Are all NUM values unique?}
+#'  \item{Is AMT calculated correctly using RATE and DUR?}
+#' }
+#'
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .error_on_fail if `TRUE`, an R error is executed upon failures
@@ -28,7 +39,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
   # Check inputs
   stopifnot(".data must be a data.frame" = inherits(.data, "data.frame"))
   stopifnot(".spec must be a yspec object" = inherits(.spec, "yspec"))
-  stopifnot(".error_on_fail must be a logical" = is.logical(.error_on_fail))
+  stopifnot(".error_on_fail must be a logical" = inherits(.error_on_fail, "logical"))
 
   # argument names ----------------------------------------------------------
   arg_names <- as.list(as.character(match.call())[-1])
@@ -48,10 +59,21 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
     paste(unique(.covs), collapse = ", ")
   }
 
-  pass_fail <- function(.code, .required_flags) {
+  pass_fail <- function(.code, .required_flags, .at_least_one_required_flags = NULL) {
 
 
     .ans <- list()
+
+    if(!is.null(.at_least_one_required_flags)){
+
+      if (all(unlist(purrr::map(flags[.at_least_one_required_flags], ~ is.null(.x))))) {
+
+        .ans$debug <- glue::glue_collapse(.at_least_one_required_flags, sep = ", ") %>% glue::glue()
+        .ans$success <- as.logical(NA)
+        return(.ans)
+      }
+
+    }
 
     if (any(unlist(purrr::map(flags[.required_flags], ~ is.null(.x))))) {
 
@@ -111,7 +133,8 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
         "dplyr::ungroup()",
         "dplyr::filter(n > 1)"
       ),
-      .required_flags = c("id")
+      .required_flags = c("id"),
+      .at_least_one_required_flags = c("bl_cat_cov", "bl_cont_cov")
     )
 
   # Missing baseline covariates ---------------------------------------------
@@ -123,7 +146,8 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
         "dplyr::select({collapse_covs(c(flags$id, flags$bl_cat_cov, flags$bl_cont_cov, flags$tv_cont_cov, flags$tv_cat_cov))})",
         "dplyr::filter(!complete.cases(.))"
       ),
-      .required_flags = c("id")
+      .required_flags = c("id"),
+      .at_least_one_required_flags = c("bl_cat_cov", "bl_cont_cov", "tv_cat_cov", "tv_cont_cov")
     )
 
   # Non-finite time values
@@ -167,7 +191,7 @@ nm_validate <- function(.data, .spec, .error_on_fail = TRUE, .test_omit = NULL){
     pass_fail(
       .code = c(
         "{arg_names$.data}",
-        "dplyr::select({collapse_covs(c(flags$amt, flags$rate, flags$dur, flags$evid))})",
+        "dplyr::select({collapse_covs(c(flags$amt, flags$rate, flags$dur))})",
         "dplyr::filter(signif({collapse_covs(flags$amt)},2) != signif({collapse_covs(flags$rate)} * {collapse_covs(flags$dur)}, 2))"
       ),
       .required_flags = c("amt", "rate", "dur")
@@ -200,6 +224,8 @@ print.nm_validate_results <- function(x, ...) {
 
   cli::cli_h1("nm_validate() results:")
 
+  cat("\n")
+
   num_passed <- purrr::map_lgl(x, ~ .x$success) %>% sum(., na.rm = TRUE)
   num_fail <- purrr::map_lgl(x, ~ !.x$success) %>% sum(., na.rm = TRUE)
   num_skipped <- purrr::map_lgl(x, ~ is.na(.x$success)) %>% sum(., na.rm = TRUE)
@@ -219,8 +245,6 @@ print.nm_validate_results <- function(x, ...) {
 
     for (i in 1:length(passes)) {
 
-      cat("\n")
-
       cli::cli_alert_success("{names(passes)[i]}")
     }
 
@@ -239,7 +263,6 @@ print.nm_validate_results <- function(x, ...) {
 
     for (i in 1:length(failures)) {
 
-      cat("\n")
 
       cli::cli_alert_danger("{names(failures)[i]} -- Copy/paste and run the following code:")
 
@@ -260,15 +283,18 @@ print.nm_validate_results <- function(x, ...) {
         }
       }) %>% purrr::compact()
 
-    for (i in 1:length(skipped)) {
 
-      cat("\n")
+    flags_missing <-
+      paste(unique(sort(unlist(
+        purrr::map(skipped, ~ unlist(strsplit(
+          .x$debug, ", ", fixed = TRUE
+        )))
+      ))),
+      collapse = ", ")
 
-      cli::cli_alert_warning("{names(skipped)[i]} -- Test not run due to following flags not found:")
+    cat("\n")
 
-      cat(gsub("%>%", "%>%\n", as.character(skipped[[i]]$debug, fixed = TRUE)))
-      cat("\n")
-    }
+    cli::cli_alert_warning("Some tests skipped due to missing flags: {crayon::blue(flags_missing)}")
 
   }
 

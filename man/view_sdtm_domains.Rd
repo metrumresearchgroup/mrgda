@@ -7,8 +7,12 @@
 view_sdtm_domains(.view = TRUE)
 }
 \arguments{
-\item{.view}{Logical. Should the output be viewed?}
+\item{.view}{Logical. Should the output be viewed? (default is TRUE)}
 }
 \description{
 View SDTM Domain Abbreviations
+}
+\examples{
+view_sdtm_domains(.view = TRUE)
+
 }

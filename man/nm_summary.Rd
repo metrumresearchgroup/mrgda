@@ -16,6 +16,8 @@ nm_summary(.data, .spec, .study_compare = TRUE, .return_output = FALSE)
 \item{.return_output}{Should the figures and tabled be returned to an object (default FALSE)}
 }
 \description{
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#experimental}{\figure{lifecycle-experimental.svg}{options: alt='[Experimental]'}}}{\strong{[Experimental]}}
+
 This function is intended to provide a high level overview of variables
 derived during a data assembly. The output of this function will provide
 the user with a pdf file containing a series of tables to help the user

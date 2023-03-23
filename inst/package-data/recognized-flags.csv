@@ -1,19 +1,19 @@
-name,default
-id,ID
-dv,DV
-amt,AMT
-study,STUDYID_STUDY
-primary_keys,NA
-time,TAFD_TIME
-bl_cat_cov,NA
-bl_cont_cov,NA
-tv_cat_cov,NA
-tv_cont_cov,NA
-num,NUM
-mdv,MDV
-evid,EVID
-dvid,DVID
-blq,BQL_BLQ
-occ,OCC
-rate,RATE
-dur,DUR
+Flag name,Default Column,Description
+id,ID, Unique subject identifier
+dv,DV,Dependent variable
+amt,AMT,Dose amount
+study,STUDYID_STUDY,Study identifier
+primary_keys,NA, Columns in a table that are distinctive for each record
+time,TAFD_TIME,Continuous time
+bl_cat_cov,NA,Baseline categorical covariates
+bl_cont_cov,NA,Baseline continuous covariates
+tv_cat_cov,NA,Time-varying categorical covariates
+tv_cont_cov,NA,Time-varying continuous covariates
+num,NUM,Unique row identifier
+mdv,MDV,Missing dependent variable flag
+evid,EVID,Event identifier
+dvid,DVID,Dependent variable identifier
+blq,BQL_BLQ,Below limit of quantification flag
+occ,OCC,Occasion
+rate,RATE,Dose rate
+dur,DUR,Dose duration

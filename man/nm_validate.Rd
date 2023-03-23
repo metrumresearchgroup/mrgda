@@ -21,6 +21,18 @@ set by leveraging the data specification used during assembly. If a check
 fails, the function will output a description of the problem and code to
 use for debugging.
 }
+\details{
+The following checks are run on the given NONMEM data set:
+\itemize{
+\item{Are duplicate records present? (based on EVID, DVID and any primary_keys flags)}
+\item{Does each subject have only one distinct value for each baseline covariates?}
+\item{Are any subjects missing covariate values?}
+\item{Do any non-finite TIME values exist?}
+\item{Is MDV derived appropriately?}
+\item{Are all NUM values unique?}
+\item{Is AMT calculated correctly using RATE and DUR?}
+}
+}
 \examples{
 
 nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))

@@ -1,3 +1,17 @@
+# mrgda development
+
+## New features and changes
+
+- Added `view_spec_flags()` to allow the user to view a summary of how mrgda flags in the specification file are assigned to the data set.
+
+- `read_src_dir()` now outputs the name and size of the current file its reading in.
+
+## Bug fixes
+
+- `nm_summary()` now will only run if all required flags are available.
+
+- `nm_validate()` has stricter requirements for the data it needs defined to run each check.
+
 # mrgda 0.5.0
 
 ## New features and changes

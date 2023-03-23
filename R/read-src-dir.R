@@ -48,9 +48,26 @@ read_src_dir <- function(.path,
       stop("'.file_types' must be 'csv', 'sas7bdat', or 'xpt'")
     }
 
+  .file_sizes <- dplyr::tibble()
 
   for (file.i in .files_read) {
 
+    .file_sizes <-
+      dplyr::bind_rows(
+        .file_sizes,
+        dplyr::tibble(
+          FILE = file.i,
+          SIZE = file.info(file.i)[["size"]]
+        )
+      )
+
+  }
+
+  for (file.i in .files_read) {
+
+    .file_size_kb <- .file_sizes$SIZE[.file_sizes$FILE == file.i] / 1000
+
+    cli::cli_progress_message(crayon::yellow(paste0("Reading in ", basename(file.i), " (", .file_size_kb, " KB)")))
     data.i <- try(.read_function(file.i), silent = TRUE)
 
     if (inherits(data.i, "try-error")) {
@@ -70,7 +87,8 @@ read_src_dir <- function(.path,
     gather_data_labels(.out) %>%
     dplyr::left_join(
       view_sdtm_domains(FALSE) %>% dplyr::mutate(DOMAIN = tolower(DOMAIN))
-    )
+    ) %>%
+    suppressMessages()
 
 
 

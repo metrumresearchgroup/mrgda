@@ -23,7 +23,7 @@ nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 
 # Source Data
 
-```{r}
+```{r, eval=FALSE}
 src_path <- system.file("example-sdtm", package = "mrgda")
 
 list.files(src_path)
@@ -61,8 +61,7 @@ writeLines(text = "2 + 2", con = temp_script)
 
 derived_data_file
 
-mrgda::nm_write(.data = nm_final, .spec = nm_spec, .file = derived_data_file, 
-                .this_script = temp_script)
+mrgda::nm_write(.data = nm_final, .spec = nm_spec, .file = derived_data_file)
 
 ```
 

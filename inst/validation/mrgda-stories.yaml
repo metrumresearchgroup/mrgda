@@ -1,5 +1,5 @@
 VAL-S001:
-  name: nm_validate
+  name: NONMEM data validation checks
   description: As a user, I want to easily perform checks of a data set following
     data assembly. I want the checks to provide a pass/fail for various variables and
     variable relationships.
@@ -75,3 +75,12 @@ QSD-S001:
   - QSD-R001
   - QSD-R002
   - SDL-R001
+VSF-S001:
+  name: Setup mrgda flags in spec
+  description: As a user, I want a tool to output a summary of what data columns
+    are being assigned to each mrgda flag in the data specification file.
+  ProductRisk: Low
+  requirements:
+  - VSF-R001
+  - GAT-R001
+  - GAT-R002

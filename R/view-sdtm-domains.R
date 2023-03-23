@@ -1,6 +1,9 @@
 #' View SDTM Domain Abbreviations
 #'
-#' @param .view Logical. Should the output be viewed?
+#' @param .view Logical. Should the output be viewed? (default is TRUE)
+#'
+#' @examples
+#' view_sdtm_domains(.view = TRUE)
 #'
 #' @export
 view_sdtm_domains <- function(.view = TRUE){
