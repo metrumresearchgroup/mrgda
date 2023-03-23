@@ -6,6 +6,7 @@
 #'
 #' @param .src_directory file path to the source data directory
 #' @param .string string to search for
+#' @param .file_types Type of files being read in (e.g. 'sas7bat'). The default ('detect') will determine file type based on the most occurring file type in .path.
 #'
 #' @examples
 #' path <- system.file("example-sdtm", package = "mrgda")
@@ -14,9 +15,9 @@
 #' query_src_dir(.src_directory = path, .string = "RACE")
 #'
 #' @export
-query_src_dir <- function(.src_directory, .string) {
+query_src_dir <- function(.src_directory, .string, .file_types = "detect") {
 
-  src_list <- read_src_dir(.path = .src_directory)
+  src_list <- read_src_dir(.path = .src_directory, .file_types = .file_types)
 
   src_list_char <- purrr::map(
     src_list, ~ .x %>% dplyr::mutate_all(as.character)

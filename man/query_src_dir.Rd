@@ -4,12 +4,14 @@
 \alias{query_src_dir}
 \title{Source data query}
 \usage{
-query_src_dir(.src_directory, .string)
+query_src_dir(.src_directory, .string, .file_types = "detect")
 }
 \arguments{
 \item{.src_directory}{file path to the source data directory}
 
 \item{.string}{string to search for}
+
+\item{.file_types}{Type of files being read in (e.g. 'sas7bat'). The default ('detect') will determine file type based on the most occurring file type in .path.}
 }
 \description{
 Use this to search for a character string across every source data domain including
