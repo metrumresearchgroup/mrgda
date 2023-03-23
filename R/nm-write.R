@@ -21,6 +21,8 @@ nm_write <- function(.data, .spec, .file) {
     stop("'.file' must reference a 'csv' file")
   }
 
+  .flags <- gather_flags(.data, .spec)
+
   # Read in Current Version for Diff ----------------------------------------
   if (file.exists(.file)) {
     .current_nm <- readr::read_csv(.file) %>% suppressMessages()
@@ -80,6 +82,8 @@ nm_write <- function(.data, .spec, .file) {
     diff_df(
       .base = .current_nm,
       .compare = readr::read_csv(.file) %>% suppressMessages(),
+      .unique_row_identifier = .flags$flags$num,
+      .unique_subject_identifier = .flags$flags$id,
       .file = file.path(.meta_data_folder, "data-diff.txt")
     )
     cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'data-diff.txt')}"))
