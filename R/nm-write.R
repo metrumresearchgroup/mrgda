@@ -66,16 +66,6 @@ nm_write <- function(.data, .spec, .file) {
   cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
 
 
-  yspec::ys_document(
-    x = .spec,
-    output_dir = .meta_data_folder,
-    quiet = TRUE,
-    stem = "define"
-  ) %>% suppressWarnings()
-
-  cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'define.pdf')}"))
-
-
   if (!is.null(.current_nm)) {
     diff_df(
       .base = .current_nm,
