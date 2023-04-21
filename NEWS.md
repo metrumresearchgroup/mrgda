@@ -1,3 +1,9 @@
+# mrgda 0.5.2
+
+## Bug fixes
+
+- `nm_write()` no longer renders a define document for the data specification. (#75)
+
 # mrgda 0.5.1
 
 ## New features and changes
