@@ -7,6 +7,9 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/LICENSE.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/NEWS_release.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/articles/data-assembly.html</loc>
   </url>
   <url>
@@ -20,6 +23,12 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/news/index.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/distinct_subject_columns.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/gather_data_labels.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/index.html</loc>
@@ -40,9 +49,18 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/pipe.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/query_src_dir.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/read_src_dir.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/view_mrgda_flags.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/view_sdtm_domains.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/view_src_dir_summary.html</loc>
   </url>
 </urlset>

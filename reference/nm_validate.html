@@ -20,7 +20,7 @@ use for debugging."><!-- mathjax --><script src="https://cdnjs.cloudflare.com/aj
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
       </span>
     </div>
 
@@ -90,6 +90,16 @@ use for debugging.</p>
 <dd><p>Vector of test names to exclude.</p></dd>
 
 </dl></div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>The following checks are run on the given NONMEM data set:</p><ul><li><p>Are duplicate records present? (based on EVID, DVID and any primary_keys flags)</p></li>
+<li><p>Does each subject have only one distinct value for each baseline covariates?</p></li>
+<li><p>Are any subjects missing covariate values?</p></li>
+<li><p>Do any non-finite TIME values exist?</p></li>
+<li><p>Is MDV derived appropriately?</p></li>
+<li><p>Are all NUM values unique?</p></li>
+<li><p>Is AMT calculated correctly using RATE and DUR?</p></li>
+</ul></div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
@@ -115,18 +125,14 @@ use for debugging.</p>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">nm_validate() results:</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> No duplicate records</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Non-unique baseline covariates</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> No missing covariates</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> Non-finite TIME values</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> MDV not set to 1 when DV is NA or 0</span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> All NUM values are unique</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> <span style="color: #00BB00;">✔</span> All dosing AMT values are equivalent to RATE * DUR</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [ FAIL 0 | SKIP 0 | <span style="color: #00BB00;">PASS</span> 6 ]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [ FAIL 0 | SKIP 0 | <span style="color: #00BB00;">PASS</span> 7 ]</span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>

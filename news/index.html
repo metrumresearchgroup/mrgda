@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.3.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
       </span>
     </div>
 
@@ -58,11 +58,64 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.2" id="mrgda-052">mrgda 0.5.2<a class="anchor" aria-label="anchor" href="#mrgda-052"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-5-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-2"></a></h3>
+<ul><li>
+<code><a href="../reference/nm_write.html">nm_write()</a></code> no longer renders a define document for the data specification. (#75)</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.1" id="mrgda-051">mrgda 0.5.1<a class="anchor" aria-label="anchor" href="#mrgda-051"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-0-5-1">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-5-1"></a></h3>
+<ul><li><p>Added <code><a href="../reference/view_mrgda_flags.html">view_mrgda_flags()</a></code> to allow the user to view a summary of how mrgda flags in the specification file are assigned to the data set. (#67)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now outputs the name and size of the current file its reading in. (#67)</p></li>
+<li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> now allows the user to specify file types. (#67)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-5-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-1"></a></h3>
+<ul><li><p><code><a href="../reference/nm_summary.html">nm_summary()</a></code> now will only run if all required flags are available. (#67)</p></li>
+<li><p><code><a href="../reference/nm_validate.html">nm_validate()</a></code> has stricter requirements for the data it needs defined to run each check. (#67)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> Allows non-detect method for file type discovery. (#67)</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.5.0" id="mrgda-050">mrgda 0.5.0<a class="anchor" aria-label="anchor" href="#mrgda-050"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-0-5-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-5-0"></a></h3>
+<ul><li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> is a new function that searches through the data in a source directory for a string or pattern. (#64)</p></li>
+<li><p><code><a href="../reference/distinct_subject_columns.html">distinct_subject_columns()</a></code> is a new function that takes a data frame and subject column identifier and returns the columns in which the values are unique for every subject. (#64)</p></li>
+<li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> the experimental feature of including the data assembly source script in the meta data folder has been removed. (#64)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now returns an additional data object - a data frame containing the column name and labels from every domain. (#64)</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.4.0" id="mrgda-040">mrgda 0.4.0<a class="anchor" aria-label="anchor" href="#mrgda-040"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-0-4-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-4-0"></a></h3>
+<ul><li><p><code><a href="../reference/nm_validate.html">nm_validate()</a></code> now checks if MDV is set to 1 when DV is either NA or 0. (#55)</p></li>
+<li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> now determines and saves out the names of other analysis that depend on the derived data. (#55)</p></li>
+<li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> now outputs the source script in the meta data folder. (#55)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> added a <code>.read_domains</code> argument to allow users to only read in specific domains. If not specified, default is to read all in. (#55)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> added a <code>.subject_col</code> argument to allow users to specify the name of the unique subject identifier column in the source data. (#55)</p></li>
+<li><p>Added <code><a href="../reference/view_src_dir_summary.html">view_src_dir_summary()</a></code> to allow the user to view all the domains and file sizes from their source data directory. (#55)</p></li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.3.2" id="mrgda-032">mrgda 0.3.2<a class="anchor" aria-label="anchor" href="#mrgda-032"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-3-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-2"></a></h3>
+<ul><li>
+<code><a href="../reference/nm_write.html">nm_write()</a></code> now allows for special characters in the file name. (#46)</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.1" id="mrgda-031">mrgda 0.3.1<a class="anchor" aria-label="anchor" href="#mrgda-031"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-0-3-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-1"></a></h3>
 <ul><li>
-<code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now allows for source directories in which all files have no USUBJID.</li>
+<code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now allows for source directories in which all files have no USUBJID. (#42)</li>
 </ul></div>
 </div>
     <div class="section level2">
