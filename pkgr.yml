@@ -25,6 +25,7 @@ Packages:
   - diffdf
   - plotly
   - progress
+  - mrgvalidate
 
 Repos:
   - CRAN: https://cran.rstudio.com
