@@ -1,3 +1,13 @@
+# mrgda 0.6.0 development
+
+## New features and changes
+
+- Removed `nm_summary()`. (#81)
+
+## Bug fixes
+
+- `read_src_dir()` fixed error message when source domains fail to read in. (#81)
+
 # mrgda 0.5.2
 
 ## Bug fixes

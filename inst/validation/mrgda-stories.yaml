@@ -18,19 +18,6 @@ VAL-S001:
   - VAL-R011
   - GAT-R001
   - GAT-R002
-SUM-S001:
-  name: nm_summary
-  description: As a user, I want a convienent way to review high level attributes of
-    various variables after completing a data assembly.
-  ProductRisk: Low
-  requirements:
-  - SUM-R001
-  - SUM-R002
-  - SUM-R003
-  - SUM-R004
-  - SUM-R005
-  - GAT-R001
-  - GAT-R002
 NMW-S001:
   name: nm_write
   description: As a user, I want to write a NONMEM compatible data file along
