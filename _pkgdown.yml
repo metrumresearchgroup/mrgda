@@ -28,7 +28,3 @@ reference:
     desc: Check for errors in a NONMEM data set
     contents:
     - nm_validate
-  - title: Data Exploration
-    desc: Quick visualizations of a data set
-    contents:
-    - nm_summary

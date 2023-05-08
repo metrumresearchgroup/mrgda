@@ -71,7 +71,7 @@ read_src_dir <- function(.path,
     data.i <- try(.read_function(file.i), silent = TRUE)
 
     if (inherits(data.i, "try-error")) {
-      cli::cli_alert_danger(data.i)
+      cli::cli_alert_danger(file.i)
     } else {
       cli::cli_alert_success(file.i)
       .out[[tools::file_path_sans_ext(basename(file.i))]] <- data.i
