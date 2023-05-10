@@ -3,8 +3,8 @@
 ## New features and changes
 
 - Removed `nm_summary()`. (#81)
-- `nm_write()` now pulls the base data to compare to from svn (#)
-- `nm_write()` now runs addiitional diff checks at the ID level (#)
+- `nm_write()` now pulls the base data to compare to from svn (#83)
+- `nm_write()` now runs additional diff checks at the ID level (#83)
 
 ## Bug fixes
 
