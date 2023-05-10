@@ -23,16 +23,13 @@ Imports:
     tidyr,
     yspec,
     tibble,
-    ggplot2,
-    gt,
-    rmarkdown,
     diffdf,
     haven,
     data.table,
     yaml,
-    plotly,
     here,
-    crayon
+    crayon,
+    progress
 Suggests: 
     knitr,
     testthat (>= 3.0.0),
