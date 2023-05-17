@@ -7,6 +7,9 @@
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .file csv file name to write out to (including path)
+#' @param .prev_file csv file name of previous version (defaults to .file)
+#' @param .compare_from_svn logical. Should the data comparison be done on the latest svn version? (If not, local version is used)
+#' @param .return_base_compare logical. Should the two current and previous versions of the datasets be returned?
 #' @examples
 #'\dontrun{
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
@@ -15,19 +18,16 @@
 #'}
 #' @md
 #' @export
-nm_write <- function(.data, .spec, .file) {
+nm_write <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE) {
 
   if (tools::file_ext(.file) != "csv") {
     stop("'.file' must reference a 'csv' file")
   }
 
-  # Read in Current Version for Diff ----------------------------------------
-  if (file.exists(.file)) {
-    .current_nm <- readr::read_csv(.file) %>% suppressMessages()
-  } else {
-    .current_nm <- NULL
-  }
+  .prev_file <- ifelse(is.null(.prev_file), .file, .prev_file)
 
+  # Base Version for Diff ----------------------------------------
+  base_df <- get_base_df(.prev_file, .compare_from_svn)$base_df
 
   # Write Out New Version ---------------------------------------------------
   data.table::fwrite(
@@ -60,24 +60,21 @@ nm_write <- function(.data, .spec, .file) {
     data = yspec::ys_add_labels(.data, .spec),
     path = file.path(.meta_data_folder, paste0(.data_name, ".xpt")),
     version = 5, # Use version 5
-    name = substr(gsub("[^[:alnum:]]", "", .data_name), 1, 8) # Max of 8 chars
+    name = paste0("a", substr(gsub("[^[:alnum:]]", "", .data_name), 1, 7)) # Max of 8 chars
   )
 
   cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
 
 
-  if (!is.null(.current_nm)) {
-    diff_df(
-      .base = .current_nm,
-      .compare = readr::read_csv(.file) %>% suppressMessages(),
-      .file = file.path(.meta_data_folder, "data-diff.txt")
-    )
-    cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'data-diff.txt')}"))
-  } else {
-    cli::cli_alert_info("No differences between previous and current data set")
+  # Execute data diffs ------------------------------------------------------
+  compare_df <- readr::read_csv(.file) %>% suppressMessages()
+
+  if (!is.null(base_df)) {
+    execute_data_diffs(base_df, compare_df, .meta_data_folder)
   }
 
 
+  # Store system info -------------------------------------------------------
   .sys_info <- Sys.info()
   .r_version <- R.Version()
   .sys_time <- Sys.time()
@@ -94,20 +91,24 @@ nm_write <- function(.data, .spec, .file) {
 
   cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'sys-info.yml')}"))
 
-  # # Data assembly script
-  # if (file.exists(.this_script)) {
-  #   .script_path_absolute <- tools::file_path_as_absolute(.this_script)
-  #   .extension <- paste0("data-assembly-script.", tools::file_ext(.this_script))
-  #   file.copy(.script_path_absolute, file.path(.meta_data_folder, .extension), overwrite = TRUE)
-  #   cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, .extension)}"))
-  # } else {
-  #   cli::cli_alert_danger(glue::glue("Invalid '.this_script' provided: {.this_script} does not exist"))
-  #   stop()
-  # }
 
-
-  # Write script dependencies
+  # Determine and save dependencies -----------------------------------------
   dependencies <- find_in_files(.paths = c(here::here("script"), here::here("model")), .string = basename(.file))
   yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
+
+
+
+  # Return ------------------------------------------------------------------
+  if (.return_base_compare) {
+    return(
+      list(
+        base_df = base_df,
+        compare_df = compare_df
+      )
+    )
+
+  } else {
+    return(NULL)
+  }
 
 }

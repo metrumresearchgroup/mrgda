@@ -4,7 +4,14 @@
 \alias{nm_write}
 \title{Write an NMTRAN data set and corresponding meta data}
 \usage{
-nm_write(.data, .spec, .file)
+nm_write(
+  .data,
+  .spec,
+  .file,
+  .prev_file = NULL,
+  .compare_from_svn = TRUE,
+  .return_base_compare = FALSE
+)
 }
 \arguments{
 \item{.data}{a data frame}
@@ -12,6 +19,12 @@ nm_write(.data, .spec, .file)
 \item{.spec}{a yspec object}
 
 \item{.file}{csv file name to write out to (including path)}
+
+\item{.prev_file}{csv file name of previous version (defaults to .file)}
+
+\item{.compare_from_svn}{logical. Should the data comparison be done on the latest svn version? (If not, local version is used)}
+
+\item{.return_base_compare}{logical. Should the two current and previous versions of the datasets be returned?}
 }
 \description{
 This function will take a nonmem ready data frame in R and write it out to a nonmem ready csv.
