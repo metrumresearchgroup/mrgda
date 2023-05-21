@@ -28,45 +28,50 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
   )
   # cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'data-diff.txt')}"))
 
-  cli::cli_alert("Diffs since last version:")
+  cli::cli_alert_info("Diffs since last version:")
 
   if(!is.null(full_diff$NumDiff)){
 
-    cli::boxx(
-      header = 'Columns in common',
-      padding = 0,
-      col = 'blue',
-      knitr::kable(
-        x = full_diff$NumDiff,
-        align = 'c',
-        format = "simple"
+    print(
+      cli::boxx(
+        header = 'Columns in common',
+        padding = 0,
+        col = 'blue',
+        knitr::kable(
+          x = full_diff$NumDiff,
+          align = 'c',
+          format = "simple"
+        )
       )
     )
-
   }
 
   if(!is.null(full_diff$ExtColsBase)){
 
-    cli::boxx(
-      padding = 0,
-      col = 'red',
-      knitr::kable(
-        x = tibble::tibble("Columns Dropped" = full_diff$ExtColsBase$COLUMNS),
-        align = 'c',
-        format = "simple"
+    print(
+      cli::boxx(
+        padding = 0,
+        col = 'red',
+        knitr::kable(
+          x = tibble::tibble("Columns Dropped" = full_diff$ExtColsBase$COLUMNS),
+          align = 'c',
+          format = "simple"
+        )
       )
     )
   }
 
   if(!is.null(full_diff$ExtColsComp)){
 
-    cli::boxx(
-      padding = 0,
-      col = 'green',
-      knitr::kable(
-        x = tibble::tibble("Columns Added" = full_diff$ExtColsComp$COLUMNS),
-        align = 'c',
-        format = "simple"
+    print(
+      cli::boxx(
+        padding = 0,
+        col = 'green',
+        knitr::kable(
+          x = tibble::tibble("Columns Added" = full_diff$ExtColsComp$COLUMNS),
+          align = 'c',
+          format = "simple"
+        )
       )
     )
 
