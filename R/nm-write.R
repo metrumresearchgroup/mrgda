@@ -39,7 +39,7 @@ nm_write <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_svn =
     na = "."
   )
 
-  cli::cli_alert_success(glue::glue("File written: {.file}"))
+  # cli::cli_alert_success(glue::glue("File written: {.file}"))
 
   # Prepare Meta Data Folder ------------------------------------------------
   .data_location <- dirname(.file)
@@ -49,11 +49,11 @@ nm_write <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_svn =
   # Create directory anew if it exists
   if (dir.exists(.meta_data_folder)) {
     unlink(.meta_data_folder, recursive = TRUE)
-    cli::cli_alert_info(glue::glue("Directory removed: {.meta_data_folder}"))
+    # cli::cli_alert_info(glue::glue("Directory removed: {.meta_data_folder}"))
   }
 
   dir.create(.meta_data_folder)
-  cli::cli_alert_success(glue::glue("Directory created: {.meta_data_folder}"))
+  # cli::cli_alert_success(glue::glue("Directory created: {.meta_data_folder}"))
 
   # Write Out Meta Data -----------------------------------------------------
   haven::write_xpt(
@@ -63,7 +63,7 @@ nm_write <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_svn =
     name = paste0("a", substr(gsub("[^[:alnum:]]", "", .data_name), 1, 7)) # Max of 8 chars
   )
 
-  cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
+  # cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
 
 
   # Execute data diffs ------------------------------------------------------
@@ -89,12 +89,12 @@ nm_write <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_svn =
 
   yaml::write_yaml(.sys_print, file = file.path(.meta_data_folder, "sys-info.yml"))
 
-  cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'sys-info.yml')}"))
+  # cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'sys-info.yml')}"))
 
 
   # Determine and save dependencies -----------------------------------------
   dependencies <- find_in_files(.paths = c(here::here("script"), here::here("model")), .string = basename(.file))
-  yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
+  # yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
 
 
 

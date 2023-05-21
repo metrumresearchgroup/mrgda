@@ -19,19 +19,62 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
     stop(.output_dir, " does not exist")
   }
 
-  # Clear out NUM -----------------------------------------------------------
-  .base_df$NUM <- NULL
-  .compare_df$NUM <- NULL
-
   # Diffs across entire data ------------------------------------------------
-  diffdf::diffdf(
+  full_diff <- diffdf::diffdf(
     base = .base_df,
     compare = .compare_df,
     file = file.path(.output_dir, "data-diff.txt"),
     suppress_warnings = TRUE
   )
-  cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'data-diff.txt')}"))
+  # cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'data-diff.txt')}"))
 
+  cli::cli_alert("Diffs since last version:")
+
+  if(!is.null(full_diff$NumDiff)){
+
+    cli::boxx(
+      header = 'Columns in common',
+      padding = 0,
+      col = 'blue',
+      knitr::kable(
+        x = full_diff$NumDiff,
+        align = 'c',
+        format = "simple"
+      )
+    )
+
+  }
+
+  if(!is.null(full_diff$ExtColsBase)){
+
+    cli::boxx(
+      padding = 0,
+      col = 'red',
+      knitr::kable(
+        x = tibble::tibble("Columns Dropped" = full_diff$ExtColsBase$COLUMNS),
+        align = 'c',
+        format = "simple"
+      )
+    )
+  }
+
+  if(!is.null(full_diff$ExtColsComp)){
+
+    cli::boxx(
+      padding = 0,
+      col = 'green',
+      knitr::kable(
+        x = tibble::tibble("Columns Added" = full_diff$ExtColsComp$COLUMNS),
+        align = 'c',
+        format = "simple"
+      )
+    )
+
+  }
+
+  # Clear out NUM -----------------------------------------------------------
+  .base_df$NUM <- NULL
+  .compare_df$NUM <- NULL
 
   # Diffs by id -------------------------------------------------------------
   datas_have_id <- (.id_col %in% names(.base_df)) & (.id_col %in% names(.compare_df))
@@ -44,7 +87,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
       file = file.path(.output_dir, "subject-columns-diff.txt"),
       suppress_warnings = TRUE
     )
-    cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'subject-columns-diff.txt')}"))
+    # cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'subject-columns-diff.txt')}"))
 
     id_diffs <- list()
     ids = unique(.base_df[[.id_col]])
@@ -83,7 +126,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
         na = "."
       )
 
-      cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'id-diffs.csv')}"))
+      # cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'id-diffs.csv')}"))
 
     }
   }
