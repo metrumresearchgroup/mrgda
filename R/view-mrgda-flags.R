@@ -1,14 +1,13 @@
 #' View mrgda flags found in spec
+#' `r lifecycle::badge("deprecated")`
 #'
 #' @description
-#' `r lifecycle::badge("deprecated")`
 #' Users can manually specify flags in the specification file to describe
 #' columns in their data set. `mrgda` also attempts to automatically detect
 #' specific columns commonly found in NONMEM data sets.
 #'
 #'
 #' @details
-#' `r lifecycle::badge("deprecated")`
 #' Use this function to view a summary of how columns in the data set are
 #' currently being described. The output has the following columns:
 #'

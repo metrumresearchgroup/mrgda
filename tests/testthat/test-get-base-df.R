@@ -28,13 +28,11 @@ test_that("get_base_df returns a data frame for base_df if the file exists", {
 
 test_that("get_base_df returns TRUE for from_svn if .compare_from_svn is TRUE and the file exists in SVN", {
   svn_dir1 <- tempdir()
-  dir.create(svn_dir1)
 
   system(paste0("rm -rf ", svn_dir1))
   system(paste0("svnadmin create ", svn_dir1))
 
   svn_dir2 <- tempdir()
-  dir.create(svn_dir2)
 
   system(paste0("svn co file:///", svn_dir1, " ", svn_dir2))
   setwd(svn_dir2)

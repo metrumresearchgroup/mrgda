@@ -45,7 +45,10 @@ globalVariables(
     "desc",
     "Description",
     "Variable",
-    "No of Differences"
+    "No of Differences",
+    "Major",
+    "Minor",
+    "File"
   )
 )
 

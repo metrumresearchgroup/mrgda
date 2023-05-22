@@ -2,7 +2,8 @@
 % Please edit documentation in R/view-mrgda-flags.R
 \name{view_mrgda_flags}
 \alias{view_mrgda_flags}
-\title{View mrgda flags found in spec}
+\title{View mrgda flags found in spec
+\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}}
 \usage{
 view_mrgda_flags(.data, .spec, .view = TRUE)
 }
@@ -14,13 +15,11 @@ view_mrgda_flags(.data, .spec, .view = TRUE)
 \item{.view}{Logical. Should the output be viewed? (default is TRUE)}
 }
 \description{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 Users can manually specify flags in the specification file to describe
 columns in their data set. \code{mrgda} also attempts to automatically detect
 specific columns commonly found in NONMEM data sets.
 }
 \details{
-\ifelse{html}{\href{https://lifecycle.r-lib.org/articles/stages.html#deprecated}{\figure{lifecycle-deprecated.svg}{options: alt='[Deprecated]'}}}{\strong{[Deprecated]}}
 Use this function to view a summary of how columns in the data set are
 currently being described. The output has the following columns:
 
