@@ -30,52 +30,57 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
 
   cli::cli_alert_info("Diffs since last version:")
 
-  if(!is.null(full_diff$NumDiff)){
+  print_diffs <- tibble::tibble(
+    name = "N Rows Diff (new - prev)",
+    value = as.character(nrow(.compare_df) - nrow(.base_df))
+  )
 
-    print(
-      cli::boxx(
-        header = 'Columns in common',
-        padding = 0,
-        col = 'blue',
-        knitr::kable(
-          x = full_diff$NumDiff,
-          align = 'c',
-          format = "simple"
-        )
-      )
-    )
-  }
+  if (!is.null(full_diff$ExtColsBase)) {
 
-  if(!is.null(full_diff$ExtColsBase)){
-
-    print(
-      cli::boxx(
-        padding = 0,
-        col = 'red',
-        knitr::kable(
-          x = tibble::tibble("Columns Dropped" = full_diff$ExtColsBase$COLUMNS),
-          align = 'c',
-          format = "simple"
-        )
-      )
-    )
-  }
-
-  if(!is.null(full_diff$ExtColsComp)){
-
-    print(
-      cli::boxx(
-        padding = 0,
-        col = 'green',
-        knitr::kable(
-          x = tibble::tibble("Columns Added" = full_diff$ExtColsComp$COLUMNS),
-          align = 'c',
-          format = "simple"
-        )
+    print_diffs <- dplyr::bind_rows(
+      print_diffs,
+      tibble::tibble(
+        name = "New Columns",
+        value = paste(full_diff$ExtColsBase$COLUMNS, collapse = ", ")
       )
     )
 
   }
+
+  if (!is.null(full_diff$ExtColsComp)) {
+
+    print_diffs <- dplyr::bind_rows(
+      print_diffs,
+      tibble::tibble(
+        name = "Removed Columns",
+        value = paste(full_diff$ExtColsComp$COLUMNS, collapse = ", ")
+      )
+    )
+
+  }
+
+
+  if (!is.null(full_diff$NumDiff)) {
+
+    print_diffs <- dplyr::bind_rows(
+      print_diffs,
+      full_diff$NumDiff %>%
+        dplyr::transmute(name = Variable, value = paste0("N Diffs: ", `No of Differences`))
+    )
+  }
+
+  print(
+    cli::boxx(
+      header = "Differences since previous version:",
+      padding = 0,
+      knitr::kable(
+        x = print_diffs,
+        align = 'c',
+        format = "simple"
+      )
+    )
+  )
+
 
   # Clear out NUM -----------------------------------------------------------
   .base_df$NUM <- NULL

@@ -43,7 +43,9 @@ globalVariables(
     "Flag name",
     "Flag",
     "desc",
-    "Description"
+    "Description",
+    "Variable",
+    "No of Differences"
   )
 )
 
