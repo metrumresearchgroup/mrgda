@@ -1,6 +1,6 @@
 test_lookup_path <- system.file("derived/endpoint-version-lookup.yaml", package = "mrgda")
 
-test_that("get_data_version returns expected output", {
+test_that("get_data_version returns expected output [NMV-GDV-001]", {
   test_endpoint <- "pk"
 
   test_output <- get_data_version(test_endpoint, test_lookup_path)

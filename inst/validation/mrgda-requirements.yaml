@@ -51,19 +51,19 @@ GAT-R002:
   tests:
   - NMV-GAT-002
 NMW-R001:
-  description: nm_write outputs csv with correct data format
+  description: write_derived outputs csv with correct data format
   tests:
   - NMV-NMW-001
 NMW-R002:
-  description: nm_write outputs xpt with data and labels
+  description: write_derived outputs xpt with data and labels
   tests:
   - NMV-NMW-002
 NMW-R003:
-  description: nm_write works with special characters in file names
+  description: write_derived works with special characters in file names
   tests:
   - NMV-NMW-003
 NMW-R004:
-  description: nm_write writes out script to source script directory
+  description: write_derived writes out script to source script directory
   tests:
   - NMV-NMW-004
 RSD-R001:
@@ -110,10 +110,6 @@ QSD-R002:
   description: query_src_dir is not case sensitive for matching strings
   tests:
   - NMV-QSD-002
-VSF-R001:
-  description: view_mrgda_flags combines all column names when more than one is defined for a flag
-  tests:
-  - NMV-VSF-001
 LFOT-R001:
   description: list_files_of_type check detect works in test dir
   tests:
@@ -126,3 +122,11 @@ LFOT-R003:
   description: list_files_of_type check sas7bdat does not work in test dir
   tests:
   - LFOT-003
+GDV-R001:
+  description: get_data_version pulls relevant information from lookup yaml
+  tests:
+  - NMV-GDV-001
+GBD-R001:
+  description: get_base_df outputs expected diffs between data sets
+  tests:
+  - NMV-GBD-001
