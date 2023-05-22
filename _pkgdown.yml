@@ -18,7 +18,6 @@ reference:
     - view_sdtm_domains
     - view_src_dir_summary
     - query_src_dir
-    - view_mrgda_flags
   - title: Data Creation
     desc: Write NONMEM data set
     contents:
