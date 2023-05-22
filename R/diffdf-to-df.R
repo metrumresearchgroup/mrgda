@@ -32,7 +32,8 @@ diffdf_to_df <- function(.diffdf_obj){
     return(NULL)
   }
 
-  .diffdf_obj[names(.diffdf_obj)[.var_diffs]][[1]] %>%
+  .diffdf_obj[names(.diffdf_obj)[.var_diffs]] %>%
+    dplyr::bind_rows() %>%
     dplyr::mutate_all(as.character) %>%
     dplyr::rename(ROWNUMBER = "..ROWNUMBER..")
 
