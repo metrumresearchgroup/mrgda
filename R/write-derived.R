@@ -74,7 +74,7 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
       .compare_df = compare_df,
       .output_dir = .meta_data_folder,
       .id_col = "ID",
-      .header = paste0("Diffs from", ifelse(base_df_list$from_svn, " svn", " local"), ":")
+      .header = paste0("Compared from: ", ifelse(base_df_list$from_svn, "svn", "local"))
     )
   }
 
