@@ -4,7 +4,13 @@
 \alias{execute_data_diffs}
 \title{Execute Differences Between Data Frames}
 \usage{
-execute_data_diffs(.base_df, .compare_df, .output_dir, .id_col = "ID")
+execute_data_diffs(
+  .base_df,
+  .compare_df,
+  .output_dir,
+  .id_col = "ID",
+  .header = ""
+)
 }
 \arguments{
 \item{.base_df}{A data frame that serves as the base for comparison.}
@@ -13,8 +19,9 @@ execute_data_diffs(.base_df, .compare_df, .output_dir, .id_col = "ID")
 
 \item{.output_dir}{A string representing the directory where the output difference files will be stored.}
 
-\item{.id_col}{A string representing the column name to be used for subject-based differences.
-Default is "ID".}
+\item{.id_col}{A string representing the column name to be used for subject-based differences.}
+
+\item{.header}{A string representing a box header.}
 }
 \value{
 No return value, but this function will write files to the specified output directory

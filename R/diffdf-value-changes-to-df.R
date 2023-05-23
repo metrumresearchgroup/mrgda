@@ -16,11 +16,11 @@
 #' df1 <- data.frame(A = c(1,2,3), B = c(4,5,6))
 #' df2 <- data.frame(A = c(1,2,4), B = c(4,5,7))
 #' diffdf_obj <- diffdf::diffdf(df1, df2)
-#' df <- diffdf_to_df(diffdf_obj)
+#' df <- diffdf_value_changes_to_df(diffdf_obj)
 #' }
 #'
-#' @export
-diffdf_to_df <- function(.diffdf_obj){
+#' @keywords internal
+diffdf_value_changes_to_df <- function(.diffdf_obj){
 
   if (!inherits(.diffdf_obj, "diffdf")) {
     stop(".diffdf_obj must be a diffdf object")

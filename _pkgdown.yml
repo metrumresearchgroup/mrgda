@@ -21,9 +21,14 @@ reference:
   - title: Data Creation
     desc: Write NONMEM data set
     contents:
+    - write_derived
     - nm_write
     - distinct_subject_columns
   - title: Data Validation
     desc: Check for errors in a NONMEM data set
     contents:
     - nm_validate
+  - title: Data Management
+    desc: Data versioning helpers
+    contents:
+    - get_data_version

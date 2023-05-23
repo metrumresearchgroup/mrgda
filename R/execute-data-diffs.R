@@ -7,13 +7,13 @@
 #' @param .compare_df A data frame to compare against the base data frame.
 #' @param .output_dir A string representing the directory where the output difference files will be stored.
 #' @param .id_col A string representing the column name to be used for subject-based differences.
-#'        Default is "ID".
+#' @param .header A string representing a box header.
 #'
 #' @return No return value, but this function will write files to the specified output directory
 #'         containing the differences between the input data frames.
 #'
 #' @keywords internal
-execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID"){
+execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID", .header = ""){
 
   if (!dir.exists(.output_dir)) {
     stop(.output_dir, " does not exist")
@@ -71,7 +71,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
 
   print(
     cli::boxx(
-      header = "Differences since previous version:",
+      header = .header,
       padding = 0,
       knitr::kable(
         x = print_diffs,
@@ -125,7 +125,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
 
     if (length(id_diffs) > 0) {
 
-      id_diffs_out <- purrr::map_dfr(id_diffs, diffdf_to_df, .id = .id_col)
+      id_diffs_out <- purrr::map_dfr(id_diffs, diffdf_value_changes_to_df, .id = .id_col)
 
       data.table::fwrite(
         x = id_diffs_out,

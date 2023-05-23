@@ -27,7 +27,8 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
   .prev_file <- ifelse(is.null(.prev_file), .file, .prev_file)
 
   # Base Version for Diff ----------------------------------------
-  base_df <- get_base_df(.prev_file, .compare_from_svn)$base_df
+  base_df_list <- get_base_df(.prev_file, .compare_from_svn)
+  base_df <- base_df_list$base_df
 
   # Write Out New Version ---------------------------------------------------
   data.table::fwrite(
@@ -38,8 +39,6 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
     row.names = FALSE,
     na = "."
   )
-
-  # cli::cli_alert_success(glue::glue("File written: {.file}"))
 
   # Prepare Meta Data Folder ------------------------------------------------
   .data_location <- dirname(.file)
@@ -70,7 +69,13 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
   compare_df <- readr::read_csv(.file) %>% suppressMessages()
 
   if (!is.null(base_df)) {
-    execute_data_diffs(base_df, compare_df, .meta_data_folder)
+    execute_data_diffs(
+      .base_df = base_df,
+      .compare_df = compare_df,
+      .output_dir = .meta_data_folder,
+      .id_col = "ID",
+      .header = paste0("Differences since previous version", ifelse(base_df_list$from_svn, " (svn)", " (local)"), ":")
+    )
   }
 
 
@@ -96,7 +101,7 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
   dependencies <- find_in_files(.paths = c(here::here("script"), here::here("model")), .string = basename(.file))
   # yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
 
-
+  cli::cli_alert_success(glue::glue("File written: {.file}"))
 
   # Return ------------------------------------------------------------------
   if (.return_base_compare) {
