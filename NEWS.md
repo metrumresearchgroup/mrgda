@@ -3,8 +3,16 @@
 ## New features and changes
 
 - Removed `nm_summary()`. (#81)
-- `nm_write()` now pulls the base data to compare to from svn (#83)
-- `nm_write()` now runs additional diff checks at the ID level (#83)
+
+- `nm_write()` now pulls the base data to compare to from svn. (#83)
+
+- `nm_write()` now runs additional diff checks at the ID level. (#83)
+
+- Add `get_data_version()` to assist with data versioning. (#87)
+
+- Add `write_derived()` to write out csv files along with meta information about the data. (#87)
+
+- `view_mrgda_flags()` was removed from the package. (#87)
 
 ## Bug fixes
 
