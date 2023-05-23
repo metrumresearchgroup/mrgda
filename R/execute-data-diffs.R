@@ -101,7 +101,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
       dplyr::arrange(get(.id_col))
 
     compare_sl <-
-      distinct_subject_columns(.base_df, .subject_col = .id_col) %>%
+      distinct_subject_columns(.compare_df, .subject_col = .id_col) %>%
       dplyr::arrange(get(.id_col))
 
     sl_equal <-  dplyr::all_equal(base_sl, compare_sl, convert = TRUE)
