@@ -74,7 +74,7 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
       .compare_df = compare_df,
       .output_dir = .meta_data_folder,
       .id_col = "ID",
-      .header = paste0("Differences since previous version", ifelse(base_df_list$from_svn, " (svn)", " (local)"), ":")
+      .header = paste0("Diffs from", ifelse(base_df_list$from_svn, " svn", " local"), ":")
     )
   }
 
@@ -102,6 +102,7 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
   # yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
 
   cli::cli_alert_success(glue::glue("File written: {.file}"))
+  cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
 
   # Return ------------------------------------------------------------------
   if (.return_base_compare) {
@@ -113,7 +114,7 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
     )
 
   } else {
-    return(NULL)
+    return(invisible(NULL))
   }
 
 }
