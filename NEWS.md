@@ -14,6 +14,8 @@
 
 - `view_mrgda_flags()` was removed from the package. (#87)
 
+- `write_derived()` print messages were cleaned up. (#92)
+
 ## Bug fixes
 
 - `read_src_dir()` fixed error message when source domains fail to read in. (#81)
