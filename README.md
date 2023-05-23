@@ -6,6 +6,10 @@
 mrgda is a data assembly helper, providing a set of functions that help
 you assemble, explore and validate your data set.
 
+An example data assembly script highlighting many `mrgda` functions can
+be found
+[here](https://ghe.metrumrg.com/templates/msproject/blob/master/script/data-assembly.Rmd).
+
 ## Documentation
 
 Public documentation of all functions is hosted at
