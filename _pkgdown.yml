@@ -18,13 +18,17 @@ reference:
     - view_sdtm_domains
     - view_src_dir_summary
     - query_src_dir
-    - view_mrgda_flags
   - title: Data Creation
     desc: Write NONMEM data set
     contents:
+    - write_derived
     - nm_write
     - distinct_subject_columns
   - title: Data Validation
     desc: Check for errors in a NONMEM data set
     contents:
     - nm_validate
+  - title: Data Management
+    desc: Data versioning helpers
+    contents:
+    - get_data_version

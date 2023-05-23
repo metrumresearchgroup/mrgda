@@ -6,124 +6,11 @@
 
 ## Overview 
 
-mrgda is a NONMEM data assembly helper, providing a set of functions that help 
+mrgda is a data assembly helper, providing a set of functions that help 
 you assemble, explore and validate your data set.
 
-To use mrgda optimally, you are encouraged to set up your data specification file
-in `yaml` format, similar to the example found [here](https://github.com/metrumresearchgroup/mrgda/blob/main/inst/derived/pk.yml) and discussed further in the `Setup` section below. 
-
-## Setup
-
-`nm_validate()` and `nm_summary()` extract knowledge from your data through the
-use of column flags that can be setup in your data specification file. Some flags
-change project to project, such as ones defining covariates. These need to be
-defined in the data specification file as such:
-
-```{r, eval=FALSE}
-SETUP:
-  flags:
-    bl_cat_cov: [SEX, RACE]
-    bl_cont_cov: [WTBL, BMIBL, AGEBL]
-    tv_cat_cov: [HEPAT]
-    tv_cont_cov: [WT]
-```
-
-Every column name that fits each category is listed as shown above. The definitions
-for these flags are as such:
-
-* `bl_cat_cov` - baseline categorical covariates
-* `bl_cont_cov` - baseline continuous covariates
-* `tv_cat_cov` - time-varying categorical covariates
-* `tv_cont_cov` - time-varying continuous covariates
-
-Other columns will also be utilized, so it is recommended to use the following
-column names in your data:
-
-```{r, include = FALSE}
-library(dplyr)
-library(mrgda)
-```
-
-
-```{r, echo=FALSE, eval=FALSE}
-readr::read_csv(system.file("package-data", "recognized-flags.csv", package = "mrgda"), na = ".", show_col_types = FALSE) %>% 
-  dplyr::filter(default != "NA") %>% 
-  dplyr::mutate(
-    default = dplyr::if_else(grepl("_", default, fixed = TRUE), 
-                             gsub("_", " or ", default, fixed = TRUE),
-                             default)
-  ) %>% 
-  dplyr::rename(
-    `Flag name` = name,
-    `Column name` = default
-  ) %>% 
-  gt::gt() %>% 
-  gt::cols_align(align = "center")
-```
-
-![Flag definitions](man/figures/variable-flags.png){width=75%}
-
-If you have a column name that is different than the expected one shown above,
-you can define it in your specification file as shown below. Here we are defining 
-our `study` column name as `STUDYN`.
-
-```{r, eval=FALSE}
-SETUP:
-  flags:
-    study: [STUDYN]
-    bl_cat_cov: [SEX, RACE]
-    bl_cont_cov: [WTBL, BMIBL, AGEBL]
-    tv_cat_cov: [HEPAT]
-    tv_cont_cov: [WT]
-```
-
-## Usage
-
-```{r, include=FALSE}
-nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
-nm_final_corrected <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
-nm_final <- nm_final_corrected
-nm_final$NUM[2] <- 1
-nm_ex_df <- dplyr::tibble(
-     AGE = c(45, 82, 73),
-     WT = c(64, 23, 92),
-     SC = c(1.02, 1.04, 1.98),
-     SEX = c(1, 2, 1),
-     RACE = c(1, 2, 3))
-```
-
-### Data validation
-
-To validate your data, simply provide `nm_validate()` with your NONMEM data set 
-and data specification. It's output will indicate the result of a series of 
-pass/fail validation checks.
-
-```{r, comment=NA}
-library(mrgda)
-nm_validate(.data = nm_final_corrected, .spec = nm_spec, .error_on_fail = FALSE)
-```
-
-If an error is found in the data, you will be provided with code to help debug 
-where the problem occurs.
-
-```{r}
-nm_validate(.data = nm_final, .spec = nm_spec, .error_on_fail = FALSE)
-```
-
-### Data summary
-
-To explore your data, provide `nm_summary()` with your NONMEM data set 
-and data specification. A html document will be generated with tables and 
-figures to help you visualize your data.
-
-```{r, eval=FALSE}
-nm_summary(.data = nm, .spec = nm_spec)
-```
-
-![Baseline continuous covariates table](man/figures/bl-cont-cov-table.png)
-
-![Baseline continuous covariates figure](man/figures/cov-boxplot.png)
-
+An example data assembly script highlighting many `mrgda` functions can be found
+[here](https://ghe.metrumrg.com/templates/msproject/blob/master/script/data-assembly.Rmd).
 
 ## Documentation
 Public documentation of all functions is hosted at [https://metrumresearchgroup.github.io/mrgda/](https://metrumresearchgroup.github.io/mrgda/)
@@ -168,8 +55,8 @@ if (basename(getwd()) == "docs") {
 }
 ```
 
-```{r, include=TRUE}
-covr::package_coverage(type = "all", 
-                       line_exclusions = c("R/print-aesthetics.R", "R/list-files-of-type.R", 
-                                           "R/find-in-files.R", "R/gather-flags.R"))
+```{r, include=FALSE}
+# covr::package_coverage(type = "all", 
+#                        line_exclusions = c("R/print-aesthetics.R", "R/list-files-of-type.R", 
+#                                            "R/find-in-files.R", "R/gather-flags.R"))
 ```

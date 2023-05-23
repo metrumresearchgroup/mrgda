@@ -68,7 +68,6 @@ VSF-S001:
     are being assigned to each mrgda flag in the data specification file.
   ProductRisk: Low
   requirements:
-  - VSF-R001
   - GAT-R001
   - GAT-R002
 LFOT-S001:
