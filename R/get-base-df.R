@@ -24,7 +24,7 @@ get_base_df <- function(.prev_file, .compare_from_svn){
     setwd(here::here())
 
     base_temp <- tempfile(fileext = ".csv")
-    export_try <- try(system(paste0("svn export ", base ," ", base_temp, " -q -q")))
+    export_try <- try(system(paste0("svn export ", base ," ", base_temp, " > /dev/null 2>&1")))
 
     if (export_try == 0) {
       from_svn <- TRUE

@@ -28,6 +28,11 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
   )
   # cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'data-diff.txt')}"))
 
+  if (length(full_diff) == 0) {
+    cli::cli_alert_info("No diffs since last version found")
+    return(invisible(NULL))
+  }
+
   cli::cli_alert_info("Diffs since last version:")
 
   print_diffs <- tibble::tibble(
@@ -91,12 +96,26 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
 
   if (datas_have_id) {
 
-    diffdf::diffdf(
-      base = distinct_subject_columns(.base_df, .subject_col = .id_col),
-      compare = distinct_subject_columns(.compare_df, .subject_col = .id_col),
-      file = file.path(.output_dir, "subject-columns-diff.txt"),
-      suppress_warnings = TRUE
-    )
+    base_sl <-
+      distinct_subject_columns(.base_df, .subject_col = .id_col) %>%
+      dplyr::arrange(get(.id_col))
+
+    compare_sl <-
+      distinct_subject_columns(.compare_df, .subject_col = .id_col) %>%
+      dplyr::arrange(get(.id_col))
+
+    sl_equal <-  dplyr::all_equal(base_sl, compare_sl, convert = TRUE)
+
+    if (inherits(sl_equal, "character")) {
+
+      diffdf::diffdf(
+        base = base_sl,
+        compare = compare_sl,
+        file = file.path(.output_dir, "subject-columns-diff.txt"),
+        suppress_warnings = TRUE
+      )
+
+    }
     # cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'subject-columns-diff.txt')}"))
 
     id_diffs <- list()
@@ -108,7 +127,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
       base_df.i <- .base_df[.base_df[[.id_col]] == id.i, ]
       compare_df.i <- .compare_df[.compare_df[[.id_col]] == id.i, ]
 
-      equal.i <- all.equal(base_df.i, compare_df.i)
+      equal.i <- dplyr::all_equal(base_df.i, compare_df.i, convert = TRUE)
 
       if (inherits(equal.i, "character")) {
         id_diffs[[paste0(.id_col, ":", id.i)]] <-
