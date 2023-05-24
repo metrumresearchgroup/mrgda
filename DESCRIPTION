@@ -29,7 +29,8 @@ Imports:
     yaml,
     here,
     crayon,
-    progress
+    progress,
+    forcats
 Suggests: 
     knitr,
     testthat (>= 3.0.0),

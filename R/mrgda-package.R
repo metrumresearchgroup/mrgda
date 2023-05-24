@@ -48,7 +48,8 @@ globalVariables(
     "No of Differences",
     "Major",
     "Minor",
-    "File"
+    "File",
+    "USUBJID"
   )
 )
 

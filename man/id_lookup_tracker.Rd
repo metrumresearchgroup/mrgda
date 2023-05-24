@@ -31,7 +31,7 @@ Theoph2 <-
 df_with_id <-
   id_lookup_tracker(
     Theoph2,
-    .lookup_path = paste0(tempdir(), ".csv")
+    .lookup_path = paste0(tempdir(), ".csv"),
     .subject_col = "USUBJID"
   )
 
