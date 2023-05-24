@@ -13,6 +13,16 @@
 #' @param .lookup_path A string containing the file path of the ID lookup csv file
 #' @param .subject_col A character string containing the column name of the subject identifying column in the data
 #'
+#' @details
+#' This function creates a lookup for subject IDs. If an ID column already exists in the data,
+#' or the specified subject column does not exist the function will stop.
+#' If a lookup file does not exist at the specified path, the function
+#' will create a new lookup and write it to the provided path. If a lookup file does exist,
+#' the function will assign ID to the data according to the lookup.
+#'
+#' If subjects exist in the data but not in the lookup, they will be added to the lookup
+#' and assigned an unique ID value.
+#'
 #' @examples
 #' Theoph2 <-
 #'   Theoph %>%
@@ -25,6 +35,8 @@
 #'     .lookup_path = paste0(tempdir(), ".csv"),
 #'     .subject_col = "USUBJID"
 #'   )
+#'
+#' @return A data frame with an additional ID column, which contains the numeric IDs for each subject in the subject column.
 #'
 #' @export
 id_lookup_tracker <- function(.data, .lookup_path, .subject_col = "USUBJID") {
