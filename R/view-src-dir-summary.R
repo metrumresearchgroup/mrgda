@@ -18,7 +18,7 @@
 #' @export
 view_src_dir_summary <- function(.path, .file_types = "detect") {
 
-  .files_of_interest <- list_files_of_type(.path = .path, .file_types = .file_types)
+  .files_of_interest <- list_files_of_type(.path = .path, .file_types = .file_types) %>% suppressMessages()
 
   .domain_summary <- dplyr::tibble()
 

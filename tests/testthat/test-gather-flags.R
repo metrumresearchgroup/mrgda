@@ -1,5 +1,5 @@
 nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
-nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
+nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE) %>% suppressMessages()
 nm_spec_noflags <- yspec::ys_load(system.file("derived", "pk-noflags.yml", package = "mrgda"))
 nm_spec_parflags <- yspec::ys_load(system.file("derived", "pk-partial_flags.yml", package = "mrgda"))
 nm_spec_nocont <- yspec::ys_load(system.file("derived", "pk-missing-cont.yml", package = "mrgda"))

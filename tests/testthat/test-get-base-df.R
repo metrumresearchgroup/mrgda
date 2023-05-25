@@ -34,11 +34,11 @@ test_that("get_base_df output check returns TRUE for from_svn if .compare_from_s
 
   svn_dir2 <- tempdir()
 
-  system(paste0("svn co file:///", svn_dir1, " ", svn_dir2))
+  system(paste0("svn co file:///", svn_dir1, " ", svn_dir2, " -q -q"))
   setwd(svn_dir2)
   write.csv(mtcars, "df.csv", row.names = FALSE)
-  system("svn add df.csv")
-  system("svn commit -m 'test' df.csv")
+  system("svn add df.csv -q -q")
+  system("svn commit -m 'test' df.csv -q -q")
 
   result <- get_base_df(file.path(svn_dir2, "df.csv"), TRUE)
   expect_true(result$from_svn)

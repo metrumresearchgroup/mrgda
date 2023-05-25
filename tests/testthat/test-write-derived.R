@@ -5,12 +5,12 @@ nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = 
 .temp_script <- tempfile(fileext = ".R")
 writeLines(text = "2 + 2", con = .temp_script)
 
-write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv)
-.csv_in <- readr::read_csv(.temp_csv, na = ".")
+write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv) %>% suppressMessages()
+.csv_in <- readr::read_csv(.temp_csv, na = ".") %>% suppressMessages()
 .xpt_in_name <- paste0(gsub(".csv", "", .temp_csv, fixed = TRUE),
                        "/",
                        gsub(".csv", ".xpt", basename(.temp_csv), fixed = TRUE))
-.xpt_in <- haven::read_xpt(.xpt_in_name)
+.xpt_in <- haven::read_xpt(.xpt_in_name) %>% suppressMessages()
 .xpt_in_labels <- purrr::map(.xpt_in, ~ attr(.x, "label"))
 
 # Baseline continuous covariates tests ------------------------------------
@@ -28,8 +28,8 @@ test_that("write_derived write xpt: xpt data includes correct labels [NMV-NMW-00
 
 test_that("write_derived works with special characters in file name [NMV-NMW-003]", {
   .temp_csv <- tempfile(fileext = "-pk.csv")
-  write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv)
-  expect_equal(nm, readr::read_csv(.temp_csv, na = "."))
+  write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv) %>% suppressMessages()
+  expect_equal(nm, readr::read_csv(.temp_csv, na = ".") %>% suppressMessages())
 })
 
 test_that("write_derived writes out script to source script directory [NMV-NMW-004]", {

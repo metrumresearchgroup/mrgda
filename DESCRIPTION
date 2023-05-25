@@ -1,6 +1,6 @@
 Package: mrgda
 Title: Validate NMTRAN datasets
-Version: 0.5.2.8001
+Version: 0.5.2.8002
 Authors@R: 
     c(
     person(given = "Eric", family = "Anderson", email = "andersone@metrumrg.com", role = c("aut", "cre")),
@@ -29,7 +29,8 @@ Imports:
     yaml,
     here,
     crayon,
-    progress
+    progress,
+    forcats
 Suggests: 
     knitr,
     testthat (>= 3.0.0),
