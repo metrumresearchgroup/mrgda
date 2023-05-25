@@ -2,9 +2,9 @@
 
 S3method(print,nm_validate_results)
 export("%>%")
+export(assign_id)
 export(distinct_subject_columns)
 export(get_data_version)
-export(id_lookup_tracker)
 export(nm_validate)
 export(nm_write)
 export(query_src_dir)
