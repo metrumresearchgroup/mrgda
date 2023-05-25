@@ -59,8 +59,8 @@ assign_id <- function(.data, .lookup_file, .subject_col = "USUBJID") {
       dplyr::select(c("ID", .subject_col)) %>%
       dplyr::distinct()
 
-    stopifnot(nrow(id_lookup %>% dplyr::count(!!sym(.subject_col)) %>% dplyr::filter(n > 1)) == 0)
-    stopifnot(nrow(id_lookup %>% dplyr::count(ID) %>% dplyr::filter(n > 1)) == 0)
+    stopifnot(is_unique_by_subject(id_lookup, .subject_col))
+    stopifnot(is_unique_by_subject(id_lookup, "ID"))
 
     readr::write_csv(x = id_lookup, file = .lookup_file)
 
@@ -75,8 +75,11 @@ assign_id <- function(.data, .lookup_file, .subject_col = "USUBJID") {
     id_lookup <- readr::read_csv(.lookup_file) %>% suppressMessages()
   }
 
+  stopifnot(!anyNA(id_lookup))
+  new_id_check <- !all(.data[[.subject_col]] %in% id_lookup[[.subject_col]])
+
   # New subjects coming into existing data set
-  if (!all(.data[[.subject_col]] %in% id_lookup[[.subject_col]])) {
+  if (new_id_check) {
 
     missing_ids <-
       .data %>%
@@ -91,8 +94,8 @@ assign_id <- function(.data, .lookup_file, .subject_col = "USUBJID") {
       id_lookup %>%
       dplyr::bind_rows(missing_ids)
 
-    stopifnot(nrow(id_lookup %>% dplyr::count(!!sym(.subject_col)) %>% dplyr::filter(n > 1)) == 0)
-    stopifnot(nrow(id_lookup %>% dplyr::count(ID) %>% dplyr::filter(n > 1)) == 0)
+    stopifnot(is_unique_by_subject(id_lookup, .subject_col))
+    stopifnot(is_unique_by_subject(id_lookup, "ID"))
 
     readr::write_csv(id_lookup, file = .lookup_file)
 
