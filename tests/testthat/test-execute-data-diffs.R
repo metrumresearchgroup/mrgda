@@ -1,71 +1,42 @@
-# Helper function for generating dummy data
-generate_dummy_data <- function(n = 5, same_id = FALSE) {
-  data.frame(
-    ID = if (same_id)
-      rep(1:n / 2, each = 2)
-    else
-      1:n,
-    NUM = rnorm(n),
-    VAR = rnorm(n)
-  )
-}
+# Create temporary directory for testing
+temp_dir <- tempdir()
 
-read_file <- function(file) {
-  readLines(file, warn = FALSE)
-}
+# Create test data frames
+.base_df <- data.frame(
+  ID = c(1, 2, 3),
+  A = c("a", "b", "c"),
+  B = c(1, 2, 2.5)
+)
 
+.compare_df <- data.frame(
+  ID = c(1, 2, 3, 4),
+  A = c("a", "b", "c", "d"),
+  B = c(1, 2, 3, 4)
+)
 
-test_that("Error when directory does not exist", {
-  dir <- "non_existing_directory"
-  expect_error(
-    execute_data_diffs(generate_dummy_data(), generate_dummy_data(), dir),
-    paste(dir, "does not exist")
-  )
+# 1. Test: The function properly identifies and outputs differences in the data frames.
+test_that("The function identifies and outputs differences", {
+  execute_data_diffs(.base_df, .compare_df, temp_dir)
+  diffs <- suppressMessages(readr::read_csv(file.path(temp_dir, "diffs.csv")))
+  expect_equal(diffs$name[1], "N Rows Diff (new - prev)")
+  expect_equal(diffs$value[1], "1")
 })
 
-
-
-test_that("No differences with identical data frames", {
-  dir <- tempdir()
-  base_df <- generate_dummy_data()
-  compare_df <- base_df
-
-  execute_data_diffs(base_df, compare_df, dir)
-
-  # Check output files
-  diff_file <- read_file(file.path(dir, "data-diff.txt"))
-  expect_equal("No issues were found!", diff_file)
+# 2. Test: The function handles non-existent directories correctly.
+test_that("The function throws error for non-existent directories", {
+  expect_error(execute_data_diffs(.base_df, .compare_df, "non_existent_directory"))
 })
 
-
-test_that("Differences detected with different data frames", {
-  dir <- tempdir()
-  base_df <- generate_dummy_data()
-  compare_df <- generate_dummy_data()  # Different data
-
-  execute_data_diffs(base_df, compare_df, dir)
-
-  # Check output files
-  diff_file <- read_file(file.path(dir, "data-diff.txt"))
-  expect_true(length(diff_file) > 0) # File should not be empty
-  expect_true(any(grepl("Differences", diff_file))) # There should be lines indicating differences
+# 3. Test: The function correctly writes the output files.
+test_that("The function writes the output files", {
+  execute_data_diffs(.base_df, .compare_df, temp_dir)
+  expect_true(file.exists(file.path(temp_dir, "diffs.csv")))
 })
 
-
-test_that("Differences detected for the same 'ID'", {
-  dir <- tempdir()
-  base_df <- generate_dummy_data(same_id = TRUE)
-  compare_df <-
-    generate_dummy_data(same_id = TRUE)  # Different data, same 'ID'
-
-  execute_data_diffs(base_df, compare_df, dir)
-
-  # Check output files
-  diff_file <- read_file(file.path(dir, "data-diff.txt"))
-  expect_true(length(diff_file) > 0) # File should not be empty
-  expect_true(any(grepl("Differences", diff_file))) # There should be lines indicating differences
-
-  id_diff_df <- read.csv(file.path(dir, "id-diffs.csv"))
-  expect_true(nrow(id_diff_df) > 0)
-  expect_true(inherits(id_diff_df, "data.frame")) # There should be lines indicating differences
+# 4. Test: The function properly identifies and outputs differences based on IDs.
+test_that("The function identifies and outputs differences based on IDs", {
+  execute_data_diffs(.base_df, .compare_df, temp_dir)
+  id_diffs <- suppressMessages(readr::read_csv(file.path(temp_dir, "id-diffs.csv")))
+  expect_equal(nrow(id_diffs), 1)
+  expect_equal(id_diffs$ID[1], 3)
 })
