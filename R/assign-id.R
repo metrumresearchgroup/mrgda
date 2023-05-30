@@ -56,7 +56,7 @@ assign_id <- function(.data, .lookup_file, .subject_col = "USUBJID") {
       dplyr::mutate(
         ID =  as.numeric(forcats::fct_inorder(!!sym(.subject_col)))
       ) %>%
-      dplyr::select(c("ID", .subject_col)) %>%
+      dplyr::select(dplyr::all_of(c("ID", .subject_col))) %>%
       dplyr::distinct()
 
     stopifnot(is_unique_by_subject(id_lookup, .subject_col))
@@ -121,6 +121,14 @@ assign_id <- function(.data, .lookup_file, .subject_col = "USUBJID") {
 
   stopifnot(ncol(.data_w_id) == ncol(.data) + 1)
   stopifnot(nrow(.data_w_id) == nrow(.data))
+  stopifnot(!is.null(.data_w_id$ID))
+  stopifnot(!anyNA(.data_w_id$ID))
+  stopifnot(
+    .data_w_id %>%
+      dplyr::select(dplyr::all_of(c("ID", .subject_col))) %>%
+      dplyr::distinct() %>%
+      is_unique_by_subject(.df = ., .column = "ID")
+  )
 
   return(.data_w_id)
 

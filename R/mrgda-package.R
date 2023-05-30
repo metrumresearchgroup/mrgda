@@ -49,7 +49,11 @@ globalVariables(
     "Major",
     "Minor",
     "File",
-    "USUBJID"
+    "USUBJID",
+    "VARIABLE",
+    "BASE",
+    "COMPARE",
+    "Column"
   )
 )
 
