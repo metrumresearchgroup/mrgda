@@ -125,6 +125,14 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
 
       id_diffs_out <- purrr::map_dfr(id_diffs, diffdf_value_changes_to_df, .id = .id_col)
 
+      id_diffs_out <-
+        id_diffs_out %>%
+        dplyr::group_by(ID, VARIABLE, BASE, COMPARE) %>%
+        dplyr::summarise(`N Occurrences` = dplyr::n()) %>%
+        suppressMessages() %>%
+        dplyr::ungroup() %>%
+        dplyr::mutate(ID = gsub("ID:", "", ID, fixed = TRUE))
+
       data.table::fwrite(
         x = id_diffs_out,
         file = file.path(.output_dir, 'id-diffs.csv'),
