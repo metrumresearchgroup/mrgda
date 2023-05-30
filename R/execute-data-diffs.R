@@ -98,7 +98,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
   if (datas_have_id) {
 
     id_diffs <- list()
-    ids <- unique(.base_df[[.id_col]])
+    ids <- unique(dplyr::intersect(.base_df[[.id_col]], .compare_df[[.id_col]]))
     pb <- progress::progress_bar$new(total = length(ids))
 
     for (id.i in ids) {
