@@ -14,7 +14,9 @@
 
 - `view_mrgda_flags()` was removed from the package. (#87)
 
-- `write_derived()` print messages were cleaned up. (#92)
+- `write_derived()` print messages were cleaned up. (#92, #97)
+
+- `assign_id()` function added to package. (#93)
 
 ## Bug fixes
 
