@@ -1,4 +1,4 @@
-test_that("assign_id function works correctly", {
+test_that("assign_id function works correctly [NMV-AID-001]", {
 
   # Generate a sample dataframe for the tests
   .data <- data.frame(USUBJID = c("A", "B", "C"))

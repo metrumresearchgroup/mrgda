@@ -1,13 +1,13 @@
 
 
 # Test if function throws an error when the input is not a diffdf object
-test_that("Function correctly throws an error for non-diffdf input", {
+test_that("Function correctly throws an error for non-diffdf input [NMV-DIF-001]", {
   expect_error(diffdf_value_changes_to_df(data.frame(a = 1:5, b = 6:10)),
                ".diffdf_obj must be a diffdf object")
 })
 
 # Test if function correctly returns NULL for diffdf object without any VarDiff_ fields
-test_that("Function correctly returns NULL for diffdf object without VarDiff_ fields",
+test_that("Function correctly returns NULL for diffdf object without VarDiff_ fields [NMV-DIF-002]",
           {
             df1 <- data.frame(a = 1:5, b = 6:10)
             df2 <- data.frame(a = 1:5, b = 6:10)
@@ -17,7 +17,7 @@ test_that("Function correctly returns NULL for diffdf object without VarDiff_ fi
           })
 
 # Test if function correctly returns a dataframe for diffdf object with VarDiff_ fields
-test_that("Function correctly returns a dataframe for diffdf object with VarDiff_ fields",
+test_that("Function correctly returns a dataframe for diffdf object with VarDiff_ fields [NMV-DIF-003]",
           {
             df1 <- data.frame(a = 1:2, b = 6:7)
             df2 <- data.frame(a = 1:2, b = 7:8)

@@ -12,7 +12,7 @@
 #######################################################
 
 PKGNAME <- "mrgda"
-PKGVERSION <- "0.5.2"
+PKGVERSION <- "0.6.0"
 STYLE_REF_DIR <- "docx-ref-header-image" # set to NULL if not using style ref
 
 # set up directories and clear existing output dirs, if they exist
@@ -59,16 +59,28 @@ spec <- mrgvalprep::read_spec_yaml(
 )
 
 # make docs
-mrgvalidate::create_package_docs(
+# mrgvalidate::create_validation_docs(
+#   product_name = PKGNAME,
+#   version = PKGVERSION,
+#   language = "R",
+#   repo_url = "https://github.com/metrumresearchgroup/mrgda",
+#   specs = spec,
+#   release_notes_file = file.path("NEWS_release.md"),
+#   auto_test_dir = test_dir,
+#   output_dir = docs_dir,
+#   style_dir = style_ref_path,
+#   write = TRUE,
+#   cleanup_rmd = TRUE
+# )
+
+mrgvalidate::create_validation_docs(
   product_name = PKGNAME,
   version = PKGVERSION,
-  language = "R",
-  repo_url = "https://github.com/metrumresearchgroup/mrgda",
   specs = spec,
-  release_notes_file = file.path("NEWS_release.md"),
   auto_test_dir = test_dir,
+  man_test_dir = NULL,
+  roles = NULL,
+  style_dir = NULL,
   output_dir = docs_dir,
-  style_dir = style_ref_path,
-  write = TRUE,
-  cleanup_rmd = TRUE
+  write = TRUE
 )

@@ -130,3 +130,35 @@ GBD-R001:
   description: get_base_df outputs expected diffs between data sets
   tests:
   - NMV-GBD-001
+AID-R001:
+  description: assign_id consistently assigns correct ID to subjects across multiple data sets
+  tests:
+  - NMV-AID-001
+DIF-R001:
+  description: diffdf_value_changes_to_df prevents invalid inputs
+  tests:
+  - NMV-DIF-001
+DIF-R002:
+  description: diffdf_value_changes_to_df works with special case where there are not variable differences
+  tests:
+  - NMV-DIF-002
+DIF-R003:
+  description: diffdf_value_changes_to_df correctly returns expected dataframe
+  tests:
+  - NMV-DIF-003
+EDD-R001:
+  description: execute_data_diffs identifies and outputs differences
+  tests:
+  - NMV-EDD-001
+EDD-R002:
+  description: execute_data_diffs throws error for non-existent directories
+  tests:
+  - NMV-EDD-002
+EDD-R003:
+  description: execute_data_diffs writes the output files
+  tests:
+  - NMV-EDD-003
+EDD-R004:
+  description: execute_data_diffs identifies and outputs differences based on IDs
+  tests:
+  - NMV-EDD-004
