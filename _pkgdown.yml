@@ -32,3 +32,4 @@ reference:
     desc: Data versioning helpers
     contents:
     - get_data_version
+    - assign_id
