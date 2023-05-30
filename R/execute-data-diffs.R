@@ -23,7 +23,6 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
   full_diff <- diffdf::diffdf(
     base = .base_df,
     compare = .compare_df,
-    file = file.path(.output_dir, "data-diff.txt"),
     suppress_warnings = TRUE
   )
   # cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'data-diff.txt')}"))
@@ -74,6 +73,8 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
     )
   }
 
+  readr::write_csv(print_diffs, file.path(.output_dir, "diffs.csv"))
+
   print(
     cli::boxx(
       header = .header,
@@ -96,30 +97,8 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
 
   if (datas_have_id) {
 
-    base_sl <-
-      distinct_subject_columns(.base_df, .subject_col = .id_col) %>%
-      dplyr::arrange(get(.id_col))
-
-    compare_sl <-
-      distinct_subject_columns(.compare_df, .subject_col = .id_col) %>%
-      dplyr::arrange(get(.id_col))
-
-    sl_equal <-  dplyr::all_equal(base_sl, compare_sl, convert = TRUE)
-
-    if (inherits(sl_equal, "character")) {
-
-      diffdf::diffdf(
-        base = base_sl,
-        compare = compare_sl,
-        file = file.path(.output_dir, "subject-columns-diff.txt"),
-        suppress_warnings = TRUE
-      )
-
-    }
-    # cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'subject-columns-diff.txt')}"))
-
     id_diffs <- list()
-    ids = unique(.base_df[[.id_col]])
+    ids <- unique(.base_df[[.id_col]])
     pb <- progress::progress_bar$new(total = length(ids))
 
     for (id.i in ids) {
