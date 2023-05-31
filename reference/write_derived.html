@@ -18,7 +18,7 @@ It also creates a meta data folder, storing the xpt file along with other useful
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.1</span>
       </span>
     </div>
 
@@ -61,7 +61,8 @@ It also creates a meta data folder, storing the xpt file along with other useful
 <span>  <span class="va">.file</span>,</span>
 <span>  .prev_file <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  .compare_from_svn <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  .return_base_compare <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  .return_base_compare <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  .execute_diffs <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -89,6 +90,10 @@ It also creates a meta data folder, storing the xpt file along with other useful
 
 <dt>.return_base_compare</dt>
 <dd><p>logical. Should the two current and previous versions of the datasets be returned?</p></dd>
+
+
+<dt>.execute_diffs</dt>
+<dd><p>logical. Should the diffs be executed?</p></dd>
 
 </dl></div>
 
