@@ -2,34 +2,31 @@
 % Please edit documentation in R/get-data-version.R
 \name{get_data_version}
 \alias{get_data_version}
-\title{Get Data Version}
+\title{Get data version}
 \usage{
-get_data_version(.endpoint, .lookup_path)
+get_data_version(.endpoint, .lookup_path, .version = "current")
 }
 \arguments{
 \item{.endpoint}{A character string denoting the endpoint to be used for file naming.}
 
 \item{.lookup_path}{The path to the YAML file containing version information.}
+
+\item{.version}{Specify if you want current or previous data version (defaults to current)}
 }
 \value{
-A list containing the information of the latest version and
-the corresponding file name.
+A list containing the information of the current or previous data version
+and the corresponding file name.
 }
 \description{
-Reads the latest version of data from a YAML file and
-constructs the filename for that data version.
-}
-\details{
-Get data version
-
 This function reads a YAML file containing version information about data and
-returns the latest version along with the corresponding file name.
+returns the previous or current version along with the corresponding file name.
 }
 \examples{
 # Make sure the yaml file exists at the specified path before running
 get_data_version(
   .endpoint = "pk",
-  .lookup_path = system.file("derived/data-version-lookup.yaml", package = "mrgda")
+  .lookup_path = system.file("derived/data-version-lookup.yaml", package = "mrgda"),
+  .version = "current"
   )
 
 }

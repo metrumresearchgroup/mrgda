@@ -2,38 +2,25 @@
 % Please edit documentation in R/assign-id.R
 \name{assign_id}
 \alias{assign_id}
-\title{Subject ID Assignment Tracking}
+\title{Assign Subject IDs (creates an ID column)}
 \usage{
-assign_id(.data, .lookup_file, .subject_col = "USUBJID")
+assign_id(.data, .previously_derived_path = NULL, .subject_col = "USUBJID")
 }
 \arguments{
 \item{.data}{A data.frame to have ID column mutated onto.}
 
-\item{.lookup_file}{A string containing the file path of the ID lookup csv file}
+\item{.previously_derived_path}{A string containing the file path of the previous derived data set}
 
 \item{.subject_col}{A character string containing the column name of the subject identifying column in the data}
 }
-\value{
-A data frame with an additional ID column, which contains the numeric IDs for each subject in the subject column.
-}
 \description{
 Upon first use, an ID column will be mutated to the given data set according
-to the specified subject column. In addition, an ID lookup csv file will be
-created containing the assigned ID for each subject.
+to the specified subject column.
 
-For each future use, ID's will be assigned according to the lookup csv file. If
-new subjects are added to the data, the lookup file will be modified to include
-the new subjects to assign them each a unique identifier.
-}
-\details{
-This function creates a lookup for subject IDs. If an ID column already exists in the data,
-or the specified subject column does not exist the function will stop.
-If a lookup file does not exist at the specified path, the function
-will create a new lookup and write it to the provided path. If a lookup file does exist,
-the function will assign ID to the data according to the lookup.
-
-If subjects exist in the data but not in the lookup, they will be added to the lookup
-and assigned an unique ID value.
+For each subsequent use, IDs will be assigned to match the previous derived data
+set. If new subjects are found in the data, they will be assigned a
+unique value not present in the previous derived data (starting at the maximum
+of the previous IDs plus 1).
 }
 \examples{
 Theoph2 <-
@@ -44,7 +31,6 @@ Theoph2 <-
 df_with_id <-
   assign_id(
     Theoph2,
-    .lookup_file = paste0(tempfile(), ".csv"),
     .subject_col = "USUBJID"
   )
 
