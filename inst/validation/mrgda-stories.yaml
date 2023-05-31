@@ -19,7 +19,7 @@ VAL-S001:
   - GAT-R001
   - GAT-R002
 NMW-S001:
-  name: nm_write
+  name: write_derived
   description: As a user, I want to write a NONMEM compatible data file along
     with corresponding meta data.
   ProductRisk: Low
@@ -28,6 +28,14 @@ NMW-S001:
   - NMW-R002
   - NMW-R003
   - NMW-R004
+  - GBD-R001
+  - DIF-R001
+  - DIF-R002
+  - DIF-R003
+  - EDD-R001
+  - EDD-R002
+  - EDD-R003
+  - EDD-R004
 RSD-S001:
   name: read_src_dir
   description: As a user, I want to easily load all source files from a directory.
@@ -80,3 +88,17 @@ LFOT-S001:
   - LFOT-R001
   - LFOT-R002
   - LFOT-R003
+GDV-S001:
+  name: get_data_version
+  description: As a user, I want to systematically track data versions across
+    multiple data updates.
+  ProductRisk: Low
+  requirements:
+  - GDV-R001
+AID-S001:
+  name: assign_id
+  description: As a user, I want to track the ID assigned to each subject and
+    store a lookup table to apply to multiple data sets.
+  ProductRisk: Low
+  requirements:
+  - AID-R001

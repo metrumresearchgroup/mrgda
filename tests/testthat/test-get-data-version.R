@@ -3,7 +3,8 @@ test_lookup_path <- system.file("derived/endpoint-version-lookup.yaml", package 
 test_that("get_data_version returns expected output [NMV-GDV-001]", {
   test_endpoint <- "pk"
 
-  test_output <- get_data_version(test_endpoint, test_lookup_path)
+  test_output <- get_data_version(test_endpoint, test_lookup_path, .version = "current")
+  test_output2 <- get_data_version(test_endpoint, test_lookup_path, .version = "previous")
 
   expect_true(inherits(test_output, "list"))
   expect_length(test_output, 2)
@@ -28,4 +29,10 @@ test_that("get_data_version returns expected output [NMV-GDV-001]", {
   expect_equal(test_output$info$Minor, 3)
   expect_equal(test_output$info$MasterVersion, "pk-1-2")
   expect_equal(test_output$file, "pk-1-3")
+
+  # Explicit example testing
+  expect_equal(test_output2$info$Major, 1)
+  expect_equal(test_output2$info$Minor, 2)
+  expect_equal(test_output2$info$MasterVersion, "pk-1-1")
+  expect_equal(test_output2$file, "pk-1-2")
 })
