@@ -10,6 +10,7 @@
 #' @param .prev_file csv file name of previous version (defaults to .file)
 #' @param .compare_from_svn logical. Should the data comparison be done on the latest svn version? (If not, local version is used)
 #' @param .return_base_compare logical. Should the two current and previous versions of the datasets be returned?
+#' @param .execute_diffs logical. Should the diffs be executed?
 #' @examples
 #'\dontrun{
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
@@ -18,7 +19,7 @@
 #'}
 #' @md
 #' @export
-write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE) {
+write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
 
   if (tools::file_ext(.file) != "csv") {
     stop("'.file' must reference a 'csv' file")
@@ -83,7 +84,7 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
   # Execute data diffs ------------------------------------------------------
   compare_df <- readr::read_csv(.file) %>% suppressMessages()
 
-  if (!is.null(base_df)) {
+  if (!is.null(base_df) & .execute_diffs) {
     execute_data_diffs(
       .base_df = base_df,
       .compare_df = compare_df,

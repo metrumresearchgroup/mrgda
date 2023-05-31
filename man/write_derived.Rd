@@ -10,7 +10,8 @@ write_derived(
   .file,
   .prev_file = NULL,
   .compare_from_svn = TRUE,
-  .return_base_compare = FALSE
+  .return_base_compare = FALSE,
+  .execute_diffs = TRUE
 )
 }
 \arguments{
@@ -25,6 +26,8 @@ write_derived(
 \item{.compare_from_svn}{logical. Should the data comparison be done on the latest svn version? (If not, local version is used)}
 
 \item{.return_base_compare}{logical. Should the two current and previous versions of the datasets be returned?}
+
+\item{.execute_diffs}{logical. Should the diffs be executed?}
 }
 \description{
 This function will take a data frame in R and write it out to csv.
