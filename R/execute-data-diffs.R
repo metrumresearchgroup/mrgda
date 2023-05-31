@@ -20,10 +20,14 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
   }
 
   # Diffs across entire data ------------------------------------------------
-  full_diff <- diffdf::diffdf(
-    base = .base_df,
-    compare = .compare_df,
-    suppress_warnings = TRUE
+  full_diff <- suppressMessages(
+    diffdf::diffdf(
+      base = .base_df,
+      compare = .compare_df,
+      suppress_warnings = TRUE,
+      strict_numeric = FALSE,
+      strict_factor = FALSE
+    )
   )
   # cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'data-diff.txt')}"))
 
@@ -109,11 +113,15 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
       equal.i <- dplyr::all_equal(base_df.i, compare_df.i, convert = TRUE)
 
       if (inherits(equal.i, "character")) {
-        id_diffs[[paste0(.id_col, ":", id.i)]] <-
-          diffdf::diffdf(
-            base = base_df.i,
-            compare = compare_df.i,
-            suppress_warnings = TRUE
+        id_diffs[[as.character(id.i)]] <-
+          suppressMessages(
+            diffdf::diffdf(
+              base = base_df.i,
+              compare = compare_df.i,
+              suppress_warnings = TRUE,
+              strict_numeric = FALSE,
+              strict_factor = FALSE
+            )
           )
       }
 
@@ -125,13 +133,17 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
 
       id_diffs_out <- purrr::map_dfr(id_diffs, diffdf_value_changes_to_df, .id = .id_col)
 
+      if (nrow(id_diffs_out) == 0) {
+        return(invisible(NULL))
+      }
+
       id_diffs_out <-
         id_diffs_out %>%
+        dplyr::mutate_all(as.character) %>%
         dplyr::group_by(ID, VARIABLE, BASE, COMPARE) %>%
         dplyr::summarise(`N Occurrences` = dplyr::n()) %>%
         suppressMessages() %>%
-        dplyr::ungroup() %>%
-        dplyr::mutate(ID = gsub("ID:", "", ID, fixed = TRUE))
+        dplyr::ungroup()
 
       data.table::fwrite(
         x = id_diffs_out,

@@ -39,4 +39,6 @@ test_that("The function identifies and outputs differences based on IDs [NMV-EDD
   id_diffs <- suppressMessages(readr::read_csv(file.path(temp_dir, "id-diffs.csv")))
   expect_equal(nrow(id_diffs), 1)
   expect_equal(id_diffs$ID[1], 3)
+  expect_equal(id_diffs$BASE[1], 2.5)
+  expect_equal(id_diffs$COMPARE[1], 3)
 })
