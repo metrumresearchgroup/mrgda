@@ -1,3 +1,13 @@
+# mrgda 0.6.1
+
+## New features and changes
+
+- `write_derived()` now allows users to turn off executing diffs. (#100)
+
+## Bug fixes
+
+- `write_derived()` fixed error created by different classes in ID diff. (#100)
+
 # mrgda 0.6.0 
 
 ## New features and changes
