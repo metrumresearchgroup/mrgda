@@ -7,15 +7,6 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/LICENSE.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/NEWS_release.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/articles/data-assembly.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/articles/index.html</loc>
-  </url>
-  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/authors.html</loc>
   </url>
   <url>
@@ -25,19 +16,31 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/news/index.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/assign_id.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/diffdf_value_changes_to_df.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/distinct_subject_columns.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/execute_data_diffs.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/gather_data_labels.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/get_base_df.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/get_data_version.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/index.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/mrgda-package.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/nm_summary.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/nm_validate.html</loc>
@@ -55,12 +58,12 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/read_src_dir.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/view_mrgda_flags.html</loc>
-  </url>
-  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/view_sdtm_domains.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/view_src_dir_summary.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/write_derived.html</loc>
   </url>
 </urlset>

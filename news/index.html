@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
       </span>
     </div>
 
@@ -25,16 +25,6 @@
       <ul class="nav navbar-nav"><li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/data-assembly.html">Data Assembly with mrgda</a>
-    </li>
-  </ul></li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -58,6 +48,25 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="0.6.0" id="mrgda-060">mrgda 0.6.0<a class="anchor" aria-label="anchor" href="#mrgda-060"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-0-6-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-6-0"></a></h3>
+<ul><li><p>Removed <code>nm_summary()</code>. (#81)</p></li>
+<li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> now pulls the base data to compare to from svn. (#83)</p></li>
+<li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> now runs additional diff checks at the ID level. (#83)</p></li>
+<li><p>Add <code><a href="../reference/get_data_version.html">get_data_version()</a></code> to assist with data versioning. (#87)</p></li>
+<li><p>Add <code><a href="../reference/write_derived.html">write_derived()</a></code> to write out csv files along with meta information about the data. (#87)</p></li>
+<li><p><code>view_mrgda_flags()</code> was removed from the package. (#87)</p></li>
+<li><p><code><a href="../reference/write_derived.html">write_derived()</a></code> print messages were cleaned up. (#92, #97)</p></li>
+<li><p><code><a href="../reference/assign_id.html">assign_id()</a></code> function added to package. (#93)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-6-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-0"></a></h3>
+<ul><li>
+<code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> fixed error message when source domains fail to read in. (#81)</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.2" id="mrgda-052">mrgda 0.5.2<a class="anchor" aria-label="anchor" href="#mrgda-052"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-0-5-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-2"></a></h3>
@@ -69,13 +78,13 @@
 <h2 class="page-header" data-toc-text="0.5.1" id="mrgda-051">mrgda 0.5.1<a class="anchor" aria-label="anchor" href="#mrgda-051"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-5-1">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-5-1"></a></h3>
-<ul><li><p>Added <code><a href="../reference/view_mrgda_flags.html">view_mrgda_flags()</a></code> to allow the user to view a summary of how mrgda flags in the specification file are assigned to the data set. (#67)</p></li>
+<ul><li><p>Added <code>view_mrgda_flags()</code> to allow the user to view a summary of how mrgda flags in the specification file are assigned to the data set. (#67)</p></li>
 <li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now outputs the name and size of the current file its reading in. (#67)</p></li>
 <li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> now allows the user to specify file types. (#67)</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-5-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-1"></a></h3>
-<ul><li><p><code><a href="../reference/nm_summary.html">nm_summary()</a></code> now will only run if all required flags are available. (#67)</p></li>
+<ul><li><p><code>nm_summary()</code> now will only run if all required flags are available. (#67)</p></li>
 <li><p><code><a href="../reference/nm_validate.html">nm_validate()</a></code> has stricter requirements for the data it needs defined to run each check. (#67)</p></li>
 <li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> Allows non-detect method for file type discovery. (#67)</p></li>
 </ul></div>
@@ -123,15 +132,15 @@
 <div class="section level3">
 <h3 id="new-features-and-changes-0-3-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-3-0"></a></h3>
 <ul><li><p>User can now omit tests from being run in <code><a href="../reference/nm_validate.html">nm_validate()</a></code>. Optional argument provided to do this. (#38)</p></li>
-<li><p><code><a href="../reference/nm_validate.html">nm_validate()</a></code> and <code><a href="../reference/nm_summary.html">nm_summary()</a></code> now utilize a dictionary of column names found here <code>system.file("package-data", "recognized-flags.csv", package = "mrgda")</code>. The functions can extract information from the data set without the user explicitly needing to define these columns. (#38)</p></li>
+<li><p><code><a href="../reference/nm_validate.html">nm_validate()</a></code> and <code>nm_summary()</code> now utilize a dictionary of column names found here <code>system.file("package-data", "recognized-flags.csv", package = "mrgda")</code>. The functions can extract information from the data set without the user explicitly needing to define these columns. (#38)</p></li>
 <li><p><code><a href="../reference/view_sdtm_domains.html">view_sdtm_domains()</a></code> allows the user to view a dictionary of common SDTM domains and a description of the data found within them. (#38)</p></li>
 <li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> reads in all .csv, .xpt or .sas7bdat files from a source data directory into a nested list containing the data from each domain.(#38)</p></li>
 <li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> creates an additional data set informing the user if a subject has data in each domain. The resulting data.frame has one row per subject with a TRUE/FALSE column indicating if they are in a specific domain. (#38)</p></li>
 <li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> writes out derived data to a .csv file and creates a folder matching the name of the derived data, containing meta data from the assembly. (#31, #36, #38)</p></li>
 <li><p><code><a href="../reference/nm_validate.html">nm_validate()</a></code> added 4 new pass/fail checks. These include checking for: non-finite times, MDV not set to 1 when DV is NA, all NUM values being unique and AMT being equal to RATE times DUR. (#38)</p></li>
-<li><p><code><a href="../reference/nm_summary.html">nm_summary()</a></code> now opens an html document in a new tab containing both tables and figures. The figures are now interactive, allowing the user to hover over data points and view subject level information. (#30)</p></li>
-<li><p><code><a href="../reference/nm_summary.html">nm_summary()</a></code> added a table showing the distribution of BLQ values in the data. Additionally, new spaghetti plots were added to view time-varying covariates. (#30)</p></li>
-<li><p><code><a href="../reference/nm_summary.html">nm_summary()</a></code> now allows the user to decide if the tables and boxplots are to be stratified by study or not. (#30)</p></li>
+<li><p><code>nm_summary()</code> now opens an html document in a new tab containing both tables and figures. The figures are now interactive, allowing the user to hover over data points and view subject level information. (#30)</p></li>
+<li><p><code>nm_summary()</code> added a table showing the distribution of BLQ values in the data. Additionally, new spaghetti plots were added to view time-varying covariates. (#30)</p></li>
+<li><p><code>nm_summary()</code> now allows the user to decide if the tables and boxplots are to be stratified by study or not. (#30)</p></li>
 <li><p><code>mutate_egfr()</code> was removed from the package. (#38)</p></li>
 </ul></div>
 <div class="section level3">
@@ -161,7 +170,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-0"></a></h3>
 <ul><li>
-<code><a href="../reference/nm_summary.html">nm_summary()</a></code> did not create readable continuous and categorical covariate figures when a large number of covariates were present. (#2)</li>
+<code>nm_summary()</code> did not create readable continuous and categorical covariate figures when a large number of covariates were present. (#2)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -170,7 +179,7 @@
 <h3 id="new-features-and-changes-0-1-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-1-0"></a></h3>
 <ul><li><p><code>mrgda</code> initial aim is to assist users in verifying the accuracy of data sets intended for NONMEM, following their derivation.</p></li>
 <li><p>The main feature, <code><a href="../reference/nm_validate.html">nm_validate()</a></code> asks the user to provide the derived data set and spec file as inputs. The function identifies columns in the data set using the spec file and runs a series of validation tests. It outputs a pass/fail for each test.</p></li>
-<li><p>A supporting feature is <code><a href="../reference/nm_summary.html">nm_summary()</a></code>. Its purpose is to provide the user with quick visual summaries of their data. It outputs these summaries in either tables or figures, depending on the users preference.</p></li>
+<li><p>A supporting feature is <code>nm_summary()</code>. Its purpose is to provide the user with quick visual summaries of their data. It outputs these summaries in either tables or figures, depending on the users preference.</p></li>
 </ul></div>
 </div>
   </div>

@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.5.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.6.0</span>
       </span>
     </div>
 
@@ -25,16 +25,6 @@
       <ul class="nav navbar-nav"><li>
   <a href="../reference/index.html">Reference</a>
 </li>
-<li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-    Articles
-     
-    <span class="caret"></span>
-  </a>
-  <ul class="dropdown-menu" role="menu"><li>
-      <a href="../articles/data-assembly.html">Data Assembly with mrgda</a>
-    </li>
-  </ul></li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -76,18 +66,19 @@
           <p><code><a href="query_src_dir.html">query_src_dir()</a></code> </p>
         </td>
         <td><p>Source data query</p></td>
-      </tr><tr><td>
-          <p><code><a href="view_mrgda_flags.html">view_mrgda_flags()</a></code> </p>
-        </td>
-        <td><p>View mrgda flags found in spec</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="data-creation">Data Creation <a href="#data-creation" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p><p>Write NONMEM data set</p>
         </th>
       </tr></tbody><tbody><tr><td>
+          <p><code><a href="write_derived.html">write_derived()</a></code> </p>
+        </td>
+        <td><p>Write a derived data set and corresponding meta data</p></td>
+      </tr><tr><td>
           <p><code><a href="nm_write.html">nm_write()</a></code> </p>
         </td>
-        <td><p>Write an NMTRAN data set and corresponding meta data</p></td>
+        <td><p>Write an NMTRAN data set and corresponding meta data
+<a href="https://lifecycle.r-lib.org/articles/stages.html#deprecated" class="external-link"><img src="figures/lifecycle-deprecated.svg" alt="[Deprecated]"></a></p></td>
       </tr><tr><td>
           <p><code><a href="distinct_subject_columns.html">distinct_subject_columns()</a></code> </p>
         </td>
@@ -101,13 +92,17 @@
         </td>
         <td><p>Validate an NMTRAN dataset</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
-          <h2 id="data-exploration">Data Exploration <a href="#data-exploration" class="anchor" aria-hidden="true"></a></h2>
-          <p class="section-desc"></p><p>Quick visualizations of a data set</p>
+          <h2 id="data-management">Data Management <a href="#data-management" class="anchor" aria-hidden="true"></a></h2>
+          <p class="section-desc"></p><p>Data versioning helpers</p>
         </th>
       </tr></tbody><tbody><tr><td>
-          <p><code><a href="nm_summary.html">nm_summary()</a></code> </p>
+          <p><code><a href="get_data_version.html">get_data_version()</a></code> </p>
         </td>
-        <td><p>Provide diagnostic summary of an NMTRAN dataset</p></td>
+        <td><p>Get data version</p></td>
+      </tr><tr><td>
+          <p><code><a href="assign_id.html">assign_id()</a></code> </p>
+        </td>
+        <td><p>Assign Subject IDs (creates an ID column)</p></td>
       </tr></tbody></table></div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
