@@ -1,3 +1,9 @@
+# mrgda 0.6.2
+
+## New features and changes
+
+- `write_derived()` now shows number of IDs change now displayed in diff. (#102)
+
 # mrgda 0.6.1
 
 ## New features and changes
