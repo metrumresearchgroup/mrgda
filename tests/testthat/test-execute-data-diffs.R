@@ -20,6 +20,9 @@ test_that("The function identifies and outputs differences [NMV-EDD-001]", {
   diffs <- suppressMessages(readr::read_csv(file.path(temp_dir, "diffs.csv")))
   expect_equal(diffs$name[1], "N Rows Diff")
   expect_equal(diffs$value[1], "1 row(s) added")
+  execute_data_diffs(.compare_df, .base_df, temp_dir)
+  diffs <- suppressMessages(readr::read_csv(file.path(temp_dir, "diffs.csv")))
+  expect_equal(diffs$value[3], "1 ID(s) removed")
 })
 
 # 2. Test: The function handles non-existent directories correctly.
