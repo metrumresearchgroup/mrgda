@@ -9,7 +9,7 @@ execute_data_diffs(
   .compare_df,
   .output_dir,
   .id_col = "ID",
-  .base_from_svn
+  .base_from_svn = FALSE
 )
 }
 \arguments{
