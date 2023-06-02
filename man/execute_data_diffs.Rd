@@ -9,7 +9,7 @@ execute_data_diffs(
   .compare_df,
   .output_dir,
   .id_col = "ID",
-  .header = ""
+  .base_from_svn
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ execute_data_diffs(
 
 \item{.id_col}{A string representing the column name to be used for subject-based differences.}
 
-\item{.header}{A string representing a box header.}
+\item{.base_from_svn}{Logical. Was base df exported from svn?}
 }
 \value{
 No return value, but this function will write files to the specified output directory

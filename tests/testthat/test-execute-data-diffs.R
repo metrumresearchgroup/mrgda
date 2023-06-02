@@ -16,26 +16,26 @@ temp_dir <- tempdir()
 
 # 1. Test: The function properly identifies and outputs differences in the data frames.
 test_that("The function identifies and outputs differences [NMV-EDD-001]", {
-  execute_data_diffs(.base_df, .compare_df, temp_dir)
+  execute_data_diffs(.base_df, .compare_df, temp_dir, .base_from_svn = FALSE)
   diffs <- suppressMessages(readr::read_csv(file.path(temp_dir, "diffs.csv")))
-  expect_equal(diffs$name[1], "N Rows Diff (new - prev)")
-  expect_equal(diffs$value[1], "1")
+  expect_equal(diffs$name[1], "N Rows Diff")
+  expect_equal(diffs$value[1], "1 row(s) added")
 })
 
 # 2. Test: The function handles non-existent directories correctly.
 test_that("The function throws error for non-existent directories [NMV-EDD-002]", {
-  expect_error(execute_data_diffs(.base_df, .compare_df, "non_existent_directory"))
+  expect_error(execute_data_diffs(.base_df, .compare_df, "non_existent_directory", .base_from_svn = FALSE))
 })
 
 # 3. Test: The function correctly writes the output files.
 test_that("The function writes the output files [NMV-EDD-003]", {
-  execute_data_diffs(.base_df, .compare_df, temp_dir)
+  execute_data_diffs(.base_df, .compare_df, temp_dir, .base_from_svn = FALSE)
   expect_true(file.exists(file.path(temp_dir, "diffs.csv")))
 })
 
 # 4. Test: The function properly identifies and outputs differences based on IDs.
 test_that("The function identifies and outputs differences based on IDs [NMV-EDD-004]", {
-  execute_data_diffs(.base_df, .compare_df, temp_dir)
+  execute_data_diffs(.base_df, .compare_df, temp_dir, .base_from_svn = FALSE)
   id_diffs <- suppressMessages(readr::read_csv(file.path(temp_dir, "id-diffs.csv")))
   expect_equal(nrow(id_diffs), 1)
   expect_equal(id_diffs$ID[1], 3)
