@@ -13,7 +13,7 @@
 #'         containing the differences between the input data frames.
 #'
 #' @keywords internal
-execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID", .base_from_svn){
+execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID", .base_from_svn = FALSE){
 
   if (!dir.exists(.output_dir)) {
     stop(.output_dir, " does not exist")
