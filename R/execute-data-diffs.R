@@ -41,7 +41,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
   n_row_diff <- nrow(.compare_df) - nrow(.base_df)
 
   n_row_diff_msg <- dplyr::case_when(
-    n_row_diff == 0 ~ "No change in n rows",
+    n_row_diff == 0 ~ "No change in N rows",
     n_row_diff < 0 ~ paste0(gsub("-", "", as.character(n_row_diff), fixed=TRUE), " row(s) removed"),
     n_row_diff > 0 ~ paste0(n_row_diff, " row(s) added")
   )
@@ -85,6 +85,29 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
     )
   }
 
+
+  datas_have_id <- (.id_col %in% names(.base_df)) & (.id_col %in% names(.compare_df))
+
+  if(datas_have_id){
+
+    n_id_diff <- length(unique(.compare_df[[.id_col]])) - length(unique(.base_df[[.id_col]]))
+
+    n_id_diff_msg <- dplyr::case_when(
+      n_id_diff == 0 ~ "No change in N IDs",
+      n_id_diff < 0 ~ paste0(gsub("-", "", as.character(n_id_diff), fixed=TRUE), " ID(s) removed"),
+      n_id_diff > 0 ~ paste0(n_row_diff, " ID(s) added")
+    )
+
+    print_diffs <-
+      print_diffs <- dplyr::bind_rows(
+        print_diffs,
+        tibble::tibble(
+          name = "N IDs Diff",
+          value = n_id_diff_msg
+        )
+      )
+  }
+
   print_diffs <- dplyr::bind_rows(
     print_diffs,
     tibble::tibble(
@@ -118,11 +141,8 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
     return(invisible(NULL))
   }
 
-  .base_df <- .base_df %>% dplyr::select(dplyr::all_of(names_in_common))
-  .compare_df <- .compare_df %>% dplyr::select(dplyr::all_of(names_in_common))
 
   # Diffs by id -------------------------------------------------------------
-  datas_have_id <- (.id_col %in% names(.base_df)) & (.id_col %in% names(.compare_df))
 
   if (datas_have_id) {
 
@@ -132,8 +152,13 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
 
     for (id.i in ids) {
 
-      base_df.i <- .base_df[.base_df[[.id_col]] == id.i, ]
-      compare_df.i <- .compare_df[.compare_df[[.id_col]] == id.i, ]
+      base_df.i <-
+        .base_df[.base_df[[.id_col]] == id.i, ] %>%
+        dplyr::select(dplyr::all_of(names_in_common))
+
+      compare_df.i <-
+        .compare_df[.compare_df[[.id_col]] == id.i, ] %>%
+        dplyr::select(dplyr::all_of(names_in_common))
 
       equal.i <- dplyr::all_equal(base_df.i, compare_df.i, convert = TRUE)
 
