@@ -29,7 +29,6 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
 
   # Base Version for Diff ----------------------------------------
   base_df_list <- get_base_df(.prev_file, .compare_from_svn)
-  base_df <- base_df_list$base_df
 
   # Write Out New Version ---------------------------------------------------
   data.table::fwrite(
@@ -84,13 +83,13 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
   # Execute data diffs ------------------------------------------------------
   compare_df <- readr::read_csv(.file) %>% suppressMessages()
 
-  if (!is.null(base_df) & .execute_diffs) {
+  if (!is.null(base_df_list$base_df) & .execute_diffs) {
     execute_data_diffs(
-      .base_df = base_df,
+      .base_df = base_df_list$base_df,
       .compare_df = compare_df,
       .output_dir = .meta_data_folder,
       .id_col = "ID",
-      .header = paste0("Compared from: ", ifelse(base_df_list$from_svn, "svn", "local"))
+      .base_from_svn = base_df_list$from_svn
     )
   }
 
@@ -124,8 +123,9 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
   if (.return_base_compare) {
     return(
       list(
-        base_df = base_df,
-        compare_df = compare_df
+        base_df = base_df_list$base_df,
+        compare_df = compare_df,
+        base_from_svn = base_df_list$from_svn
       )
     )
 
