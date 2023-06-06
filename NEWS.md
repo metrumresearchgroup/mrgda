@@ -1,3 +1,9 @@
+# mrgda development
+
+## New features and changes
+
+- `assign_id()` now only outputs console message when new ID's present. (#104)
+
 # mrgda 0.6.2
 
 ## New features and changes
