@@ -46,11 +46,13 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
 
     .count_id <- .data_with_id %>% dplyr::distinct(ID)
 
-    if (.new_id) {
+    if (!.new_id) {
       print(
         cli::boxx(
-          header = "New IDs Assigned",
-          label = c(paste0("Number of subjects assigned: ", nrow(.count_id))))
+          header = "IDs Assigned",
+          label = c("Number of subjects previously assigned: 0",
+                    paste0("Number of subjects newly assigned: ", nrow(.count_id))
+                    ))
       )
     }
 
@@ -99,6 +101,14 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
               .to_add = max(id_lookup$ID, na.rm = TRUE),
               .new_id = TRUE)
 
+    print(
+      cli::boxx(
+        header = "IDs Assigned",
+        label = c(paste0("Number of subjects previously assigned: ", nrow(id_lookup)),
+                  paste0("Number of subjects newly assigned: ", nrow(missing_ids))
+        ))
+    )
+
     id_lookup <- id_lookup %>% dplyr::bind_rows(missing_ids)
 
     stopifnot(is_unique_by_subject(id_lookup, .subject_col))
@@ -107,7 +117,10 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
   } else {
     print(
       cli::boxx(
-        label = "No new IDs assigned")
+        header = "IDs Assigned",
+        label = c(paste0("Number of subjects previously assigned: ", nrow(id_lookup)),
+                  "Number of subjects newly assigned: 0"
+        ))
     )
   }
 
