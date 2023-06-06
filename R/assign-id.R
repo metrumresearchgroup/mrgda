@@ -36,7 +36,7 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
     stop("Subject column not found in data")
   }
 
-  make_id <- function(.data, .subject_col, .to_add = 0){
+  make_id <- function(.data, .subject_col, .to_add = 0, .new_id = FALSE){
 
     .data_with_id <-
       .data %>%
@@ -46,11 +46,13 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
 
     .count_id <- .data_with_id %>% dplyr::distinct(ID)
 
-    print(
-      cli::boxx(
-        header = "New IDs Assigned",
-        label = c(paste0("Number of subjects assigned: ", nrow(.count_id))))
-    )
+    if (.new_id) {
+      print(
+        cli::boxx(
+          header = "New IDs Assigned",
+          label = c(paste0("Number of subjects assigned: ", nrow(.count_id))))
+      )
+    }
 
     return(.data_with_id)
   }
@@ -94,7 +96,8 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
       dplyr::distinct(!!sym(.subject_col)) %>%
       make_id(.data = .,
               .subject_col = .subject_col,
-              .to_add = max(id_lookup$ID, na.rm = TRUE))
+              .to_add = max(id_lookup$ID, na.rm = TRUE),
+              .new_id = TRUE)
 
     id_lookup <- id_lookup %>% dplyr::bind_rows(missing_ids)
 
