@@ -64,7 +64,16 @@ test_that("assign_id function works correctly [NMV-AID-001]", {
 
     expect_true(data_w_id2$ID[data_w_id2$USUBJID == "C"] == 3)
     expect_true(nrow(data_w_id2) == 7)
+  })
 
+  test_that("assign_id throws error if previous data set doesn't have ID or subject column", {
+
+    data <- data.frame(USUBJID = c("A", "B", "C", "D"))
+    lookup_path <- paste0(tempfile(), ".csv")
+    write.csv(data, lookup_path)
+
+    expect_error(assign_id(.data = data, .previously_derived_path = lookup_path), "ID column not found in previous data")
+    expect_error(assign_id(.data = data, .subject_col = "USUBJID2"), "Subject column not found in data")
   })
 
 })

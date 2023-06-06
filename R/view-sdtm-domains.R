@@ -1,22 +1,16 @@
 #' View SDTM Domain Abbreviations
 #'
-#' @param .view Logical. Should the output be viewed? (default is TRUE)
+#' @description
+#' Helper function to view typical SDTM domains. Both the abbreviation and domain
+#' description is provided.
 #'
 #' @examples
-#' view_sdtm_domains(.view = TRUE)
+#' view_sdtm_domains()
 #'
 #' @export
-view_sdtm_domains <- function(.view = TRUE){
+view_sdtm_domains <- function(){
 
-  .sdtm_domains <-
     system.file("package-data", "sdtm-domains.csv", package = "mrgda") %>%
     readr::read_csv(file = .) %>%
     suppressMessages()
-
-  if (.view) {
-    tibble::view(.sdtm_domains, "SDTM Domains")
-  } else {
-    return(.sdtm_domains)
-  }
-
 }
