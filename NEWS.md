@@ -1,8 +1,12 @@
-# mrgda development
+# mrgda 0.7.0
 
 ## New features and changes
 
 - `assign_id()` now only outputs console message when new ID's present. (#104)
+
+- `read_src_dir()` no longer outputs subject column domain. (#106)
+
+- `query_src_dir()` returns a data.frame now instead of a view of the output. (#106)
 
 # mrgda 0.6.2
 
