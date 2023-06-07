@@ -33,99 +33,61 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
   }
 
   if (is.null(.data[[.subject_col]])) {
-    stop("Subject column not found in data")
+    stop(paste0(.subject_col, " not found in data"))
   }
 
-  make_id <- function(.data, .subject_col, .to_add = 0, .new_id = FALSE, .lookup = NULL){
+  if (!is.null(.previously_derived_path)) {
+    previously_derived <-
+      data.table::fread(.previously_derived_path) %>%
+      suppressMessages()
 
-    .data_with_id <-
-      .data %>%
-      dplyr::mutate(
-        ID = as.numeric(forcats::fct_inorder(!!sym(.subject_col))) + .to_add
-      )
-
-    .count_id <- .data_with_id %>% dplyr::distinct(ID)
-
-    if (!.new_id) {
-      .previous_ids = 0
-      .update_ids = nrow(.count_id)
-    } else {
-      .previous_ids = nrow(.lookup)
-      .update_ids = nrow(.count_id)
+    if (is.null(previously_derived[["ID"]])) {
+      stop("ID column not found in previous data")
     }
 
-    print(
-      cli::boxx(
-        header = "IDs Assigned",
-        label = c(paste0("Number of subjects previously assigned: ", .previous_ids),
-                  paste0("Number of subjects newly assigned: ", .update_ids)
-                  ))
-    )
+    if (is.null(previously_derived[[.subject_col]])) {
+      stop(paste0(.subject_col, " not found in previous data"))
+    }
 
-    return(.data_with_id)
-  }
-
-  # Assigns IDs from scratch if no path
-  if(is.null(.previously_derived_path)){
-    return(make_id(.data, .subject_col))
-  }
-
-  # Assigns IDs from scratch if no previous file
-  if(!file.exists(.previously_derived_path)){
-    return(make_id(.data, .subject_col))
-  }
-
-  previous_data <- readr::read_csv(.previously_derived_path) %>% suppressMessages()
-
-  if (is.null(previous_data[["ID"]])) {
-    stop("ID column not found in previous data ")
-  }
-
-  if (is.null(previous_data[[.subject_col]])) {
-    stop("Subject column not found in previous data ")
-  }
-
-  id_lookup <-
-    previous_data %>%
-    dplyr::select(dplyr::all_of(c("ID", .subject_col))) %>%
-    dplyr::distinct()
-
-  stopifnot(!anyNA(id_lookup))
-
-  new_id_check <- !all(.data[[.subject_col]] %in% id_lookup[[.subject_col]])
-
-  # New subjects coming into existing data set
-  if (new_id_check) {
-
-    missing_ids <-
-      .data %>%
-      dplyr::left_join(id_lookup) %>%
-      dplyr::filter(is.na(ID)) %>%
-      dplyr::distinct(!!sym(.subject_col)) %>%
-      make_id(.data = .,
-              .subject_col = .subject_col,
-              .to_add = max(id_lookup$ID, na.rm = TRUE),
-              .new_id = TRUE,
-              .lookup = id_lookup)
-
-    id_lookup <- id_lookup %>% dplyr::bind_rows(missing_ids)
-
-    stopifnot(is_unique_by_subject(id_lookup, .subject_col))
-    stopifnot(is_unique_by_subject(id_lookup, "ID"))
+    prev_id_lookup <-
+      previously_derived %>%
+      dplyr::select(dplyr::all_of(c("ID", .subject_col))) %>%
+      dplyr::distinct()
 
   } else {
-    print(
-      cli::boxx(
-        header = "IDs Assigned",
-        label = c(paste0("Number of subjects previously assigned: ", nrow(id_lookup)),
-                  "Number of subjects newly assigned: 0"
-        ))
-    )
+    prev_id_lookup <-
+      .data %>%
+      dplyr::mutate(ID = NA_real_) %>%
+      dplyr::select(dplyr::all_of(c("ID", .subject_col))) %>%
+      dplyr::slice(0)
   }
+
+  data_join_id_lookup <-
+    .data %>%
+    dplyr::left_join(prev_id_lookup) %>%
+    dplyr::mutate(
+      mrgda_MAX_ID = ifelse(all(is.na(ID)), 0, max(ID, na.rm = TRUE)),
+      mrgda_SUBJ_NEED_ID = ifelse(is.na(ID), !!sym(.subject_col), NA),
+      ID = ifelse(
+        is.na(ID),
+        as.numeric(forcats::fct_inorder(mrgda_SUBJ_NEED_ID)) + mrgda_MAX_ID,
+        ID)
+    ) %>%
+    dplyr::select(-mrgda_SUBJ_NEED_ID, -mrgda_MAX_ID)
+
+  print(
+    cli::boxx(
+      header = "ID Summary",
+      label = c(
+        paste0("Number of subjects previously assigned: ", nrow(prev_id_lookup)),
+        paste0("Number of subjects newly assigned: ", nrow(data_join_id_lookup) - nrow(prev_id_lookup))
+      )
+    )
+  )
 
   .data_w_id <-
     .data %>%
-    dplyr::left_join(id_lookup) %>%
+    dplyr::left_join(data_join_id_lookup) %>%
     suppressMessages()
 
   stopifnot(ncol(.data_w_id) == ncol(.data) + 1)

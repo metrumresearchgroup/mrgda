@@ -4,13 +4,20 @@ test_that("assign_id function works correctly [NMV-AID-001]", {
   .data <- data.frame(USUBJID = c("A", "B", "C"))
   .new_data_file <- paste0(tempfile(), ".csv")
 
+  data.table::fwrite(
+    x = assign_id(.data),
+    file = .new_data_file,
+    sep = ",",
+    quote = FALSE,
+    row.names = FALSE,
+    na = "."
+  )
+
   expect_true(nrow(assign_id(.data, .previously_derived_path = .new_data_file)) == 3) %>% suppressMessages()
   expect_true(ncol(assign_id(.data, .previously_derived_path = .new_data_file)) == 2) %>% suppressMessages()
 
   expect_true(nrow(assign_id(.data)) == 3) %>% suppressMessages()
   expect_true(ncol(assign_id(.data)) == 2) %>% suppressMessages()
-
-  write.csv(assign_id(.data), .new_data_file)
 
 
   expect_true(nrow(assign_id(.data, .previously_derived_path = .new_data_file)) == 3) %>% suppressMessages()
@@ -32,7 +39,7 @@ test_that("assign_id function works correctly [NMV-AID-001]", {
   .data_without_subject <- .data
   names(.data_without_subject)[1] <- "SUBJ"
   test_that("Function correctly detects absence of subject column", {
-    expect_error(assign_id(.data_without_subject, .new_data_file, .subject_col = "USUBJID"), "Subject column not found in data")
+    expect_error(assign_id(.data_without_subject, .new_data_file, .subject_col = "USUBJID"), "USUBJID not found in data")
   })
 
   # Test 5: Testing that the function adds new IDs correctly
@@ -70,10 +77,17 @@ test_that("assign_id function works correctly [NMV-AID-001]", {
 
     data <- data.frame(USUBJID = c("A", "B", "C", "D"))
     lookup_path <- paste0(tempfile(), ".csv")
-    write.csv(data, lookup_path)
+    data.table::fwrite(
+      x = data,
+      file = lookup_path,
+      sep = ",",
+      quote = FALSE,
+      row.names = FALSE,
+      na = "."
+    )
 
     expect_error(assign_id(.data = data, .previously_derived_path = lookup_path), "ID column not found in previous data")
-    expect_error(assign_id(.data = data, .subject_col = "USUBJID2"), "Subject column not found in data")
+    expect_error(assign_id(.data = data, .subject_col = "USUBJID2"), "USUBJID2 not found in data")
   })
 
 })
