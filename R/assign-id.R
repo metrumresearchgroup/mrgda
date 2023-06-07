@@ -28,6 +28,7 @@
 #' @export
 assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "USUBJID") {
 
+  # Check if the subject column does exist and ID doesn't exist in .data
   if (!is.null(.data[["ID"]])) {
     stop("Data already contains ID")
   }
@@ -35,6 +36,11 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
   if (is.null(.data[[.subject_col]])) {
     stop(paste0(.subject_col, " not found in data"))
   }
+
+  # If a previously derived data path is provided -
+  ## 1) Read in to data.frame
+  ## 2) Check if both ID and .subject_col exist in the previous data
+  ## 3) Select only ID and .subject_col columns and run distinct
 
   if (!is.null(.previously_derived_path)) {
     previously_derived <-
@@ -55,12 +61,17 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
       dplyr::distinct()
 
   } else {
+    # If no previous data available, make empty tibble with columns ID and .subject_col
     prev_id_lookup <-
       .data %>%
       dplyr::mutate(ID = NA_real_) %>%
       dplyr::select(dplyr::all_of(c("ID", .subject_col))) %>%
       dplyr::slice(0)
   }
+
+  # If previous derived data has ID, join onto .data
+  # For subjects without ID, create a new unique ID for them
+  # If some subjects had previous ID, new ID's started at 1 plus the max ID in the previous data
 
   data_join_id_lookup <-
     .data %>%
@@ -73,7 +84,7 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
         as.numeric(forcats::fct_inorder(mrgda_SUBJ_NEED_ID)) + mrgda_MAX_ID,
         ID)
     ) %>%
-    dplyr::select(-mrgda_SUBJ_NEED_ID, -mrgda_MAX_ID)
+    dplyr::select(-starts_wth("mrgda_"))
 
   print(
     cli::boxx(
@@ -85,11 +96,13 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
     )
   )
 
+  # Join on new ID lookup to the original data
   .data_w_id <-
     .data %>%
     dplyr::left_join(data_join_id_lookup) %>%
     suppressMessages()
 
+  # Perform final checks on the data
   stopifnot(ncol(.data_w_id) == ncol(.data) + 1)
   stopifnot(nrow(.data_w_id) == nrow(.data))
   stopifnot(!is.null(.data_w_id$ID))
