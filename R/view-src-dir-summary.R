@@ -36,7 +36,7 @@ view_src_dir_summary <- function(.path, .file_types = "detect") {
   }
 
   .domain_ref <-
-    view_sdtm_domains(FALSE) %>%
+    view_sdtm_domains() %>%
     dplyr::mutate(DOMAIN = tolower(DOMAIN))
 
   .domain_summary %>%

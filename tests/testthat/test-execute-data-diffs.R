@@ -45,3 +45,10 @@ test_that("The function identifies and outputs differences based on IDs [NMV-EDD
   expect_equal(id_diffs$BASE[1], 2.5)
   expect_equal(id_diffs$COMPARE[1], 3)
 })
+
+# 4. Test: The function properly identifies and outputs differences based on IDs.
+test_that("The function returns nothing if there are no diffs detected", {
+  df <- execute_data_diffs(.base_df, .base_df, temp_dir)
+  expect_true(is.null(df))
+  expect_message(execute_data_diffs(.base_df, .base_df, temp_dir), "No diffs since last version found")
+})
