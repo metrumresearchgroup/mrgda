@@ -84,7 +84,7 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
         as.numeric(forcats::fct_inorder(mrgda_SUBJ_NEED_ID)) + mrgda_MAX_ID,
         ID)
     ) %>%
-    dplyr::select(tidyr::-starts_wth("mrgda_"))
+    dplyr::select(-tidyr::starts_with("mrgda_"))
 
   print(
     cli::boxx(
