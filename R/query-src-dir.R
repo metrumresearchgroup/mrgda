@@ -65,7 +65,6 @@ query_src_dir <- function(.src_directory, .string, .file_types = "detect") {
       MATCHING_ROWS = paste(I, collapse = ", ")
     ) %>%
     dplyr::ungroup() %>%
-    dplyr::rename(MATCH = VALUE) %>%
-    tibble::view(x = ., title = paste0("Hits for ", .string))
+    dplyr::rename(MATCH = VALUE)
 
 }
