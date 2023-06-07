@@ -6,7 +6,6 @@
 #' @param .path Full path to the source data directory.
 #' @param .file_types Type of files being read in (e.g. 'sas7bat'). The default ('detect') will determine file type based on the most occurring file type in .path.
 #' @param .read_domains Character vector of domains to read in (e.g. c('dm', 'lb') - default is to load all domains).
-#' @param .subject_col Character string of subject identifier column name in source (default is "USUBJID").
 #'
 #'
 #' @examples
@@ -21,8 +20,7 @@
 #' @export
 read_src_dir <- function(.path,
                          .file_types = "detect",
-                         .read_domains = NULL,
-                         .subject_col = "USUBJID") {
+                         .read_domains = NULL) {
   .out <- list()
 
   .files_of_interest <- list_files_of_type(.path = .path, .file_types = .file_types)
@@ -89,46 +87,6 @@ read_src_dir <- function(.path,
       view_sdtm_domains() %>% dplyr::mutate(DOMAIN = tolower(DOMAIN))
     ) %>%
     suppressMessages()
-
-
-
-  # mrgda subject -----------------------------------------------------------
-  mrgda_subject <-
-    purrr::map_dfr(
-      .out[names(.out)[!grepl("mrgda_", names(.out), fixed = TRUE)]],
-      ~ {
-        if (.subject_col %in% names(.x)) {
-          return(
-            dplyr::select(.x, .subject_col) %>%
-              dplyr::distinct() %>%
-              dplyr::mutate(VALUE = TRUE)
-          )
-        }
-      },
-      .id = "DOMAIN"
-    )
-
-
-  if (nrow(mrgda_subject) > 0) {
-
-    mrgda_subject <-
-      mrgda_subject %>%
-      dplyr::mutate(DOMAIN = tools::file_path_sans_ext(DOMAIN)) %>%
-      tidyr::pivot_wider(names_from = DOMAIN, values_from = VALUE)
-
-    mrgda_subject[is.na(mrgda_subject)] <- FALSE
-
-    .out$mrgda_subject <- mrgda_subject
-
-    cli::cli_alert_info(glue::glue("{nrow(.out$mrgda_subject)} unique USUBJID across all domains"))
-
-  } else {
-
-    cli::cli_alert_warning(glue::glue(".subject_col '{.subject_col}' not detected in any domain"))
-
-  }
-
-
 
   return(.out)
 
