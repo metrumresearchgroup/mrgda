@@ -36,7 +36,7 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
     stop("Subject column not found in data")
   }
 
-  make_id <- function(.data, .subject_col, .to_add = 0, .new_id = FALSE){
+  make_id <- function(.data, .subject_col, .to_add = 0, .new_id = FALSE, .lookup = NULL){
 
     .data_with_id <-
       .data %>%
@@ -47,14 +47,20 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
     .count_id <- .data_with_id %>% dplyr::distinct(ID)
 
     if (!.new_id) {
-      print(
-        cli::boxx(
-          header = "IDs Assigned",
-          label = c("Number of subjects previously assigned: 0",
-                    paste0("Number of subjects newly assigned: ", nrow(.count_id))
-                    ))
-      )
+      .previous_ids = 0
+      .update_ids = nrow(.count_id)
+    } else {
+      .previous_ids = nrow(.lookup)
+      .update_ids = nrow(.count_id)
     }
+
+    print(
+      cli::boxx(
+        header = "IDs Assigned",
+        label = c(paste0("Number of subjects previously assigned: ", .previous_ids),
+                  paste0("Number of subjects newly assigned: ", .update_ids)
+                  ))
+    )
 
     return(.data_with_id)
   }
@@ -99,15 +105,8 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
       make_id(.data = .,
               .subject_col = .subject_col,
               .to_add = max(id_lookup$ID, na.rm = TRUE),
-              .new_id = TRUE)
-
-    print(
-      cli::boxx(
-        header = "IDs Assigned",
-        label = c(paste0("Number of subjects previously assigned: ", nrow(id_lookup)),
-                  paste0("Number of subjects newly assigned: ", nrow(missing_ids))
-        ))
-    )
+              .new_id = TRUE,
+              .lookup = id_lookup)
 
     id_lookup <- id_lookup %>% dplyr::bind_rows(missing_ids)
 
