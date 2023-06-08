@@ -95,7 +95,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
     n_id_diff_msg <- dplyr::case_when(
       n_id_diff == 0 ~ "No change in N IDs",
       n_id_diff < 0 ~ paste0(gsub("-", "", as.character(n_id_diff), fixed=TRUE), " ID(s) removed"),
-      n_id_diff > 0 ~ paste0(n_row_diff, " ID(s) added")
+      n_id_diff > 0 ~ paste0(n_id_diff, " ID(s) added")
     )
 
     print_diffs <-
@@ -160,20 +160,22 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
         .compare_df[.compare_df[[.id_col]] == id.i, ] %>%
         dplyr::select(dplyr::all_of(names_in_common))
 
-      equal.i <- dplyr::all_equal(base_df.i, compare_df.i, convert = TRUE)
-
-      if (inherits(equal.i, "character")) {
-        id_diffs[[as.character(id.i)]] <-
-          suppressMessages(
-            diffdf::diffdf(
-              base = base_df.i,
-              compare = compare_df.i,
-              suppress_warnings = TRUE,
-              strict_numeric = FALSE,
-              strict_factor = FALSE
-            )
+      diff.i <-
+        suppressMessages(
+          diffdf::diffdf(
+            base = base_df.i,
+            compare = compare_df.i,
+            suppress_warnings = TRUE,
+            strict_numeric = FALSE,
+            strict_factor = FALSE
           )
+        )
+
+      if (length(diff.i) > 0) {
+        id_diffs[[as.character(id.i)]] <- diff.i
       }
+
+      rm(diff.i)
 
       pb$tick()
 
