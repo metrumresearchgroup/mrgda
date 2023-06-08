@@ -41,7 +41,6 @@ view_src_dir_summary <- function(.path, .file_types = "detect") {
 
   .domain_summary %>%
     dplyr::left_join(.domain_ref) %>%
-    suppressMessages() %>%
-    tibble::view("Source-Summary")
+    suppressMessages()
 
 }
