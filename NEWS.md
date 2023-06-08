@@ -1,3 +1,9 @@
+# mrgda 0.7.1
+
+## Bug fixes
+
+- `nm_write()` N IDs diff now shows number of IDs that changed. (#108)
+
 # mrgda 0.7.0
 
 ## New features and changes
