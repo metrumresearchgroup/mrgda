@@ -160,20 +160,22 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
         .compare_df[.compare_df[[.id_col]] == id.i, ] %>%
         dplyr::select(dplyr::all_of(names_in_common))
 
-      equal.i <- suppressWarnings(dplyr::all_equal(base_df.i, compare_df.i, convert = TRUE))
-
-      if (inherits(equal.i, "character")) {
-        id_diffs[[as.character(id.i)]] <-
-          suppressMessages(
-            diffdf::diffdf(
-              base = base_df.i,
-              compare = compare_df.i,
-              suppress_warnings = TRUE,
-              strict_numeric = FALSE,
-              strict_factor = FALSE
-            )
+      diff.i <-
+        suppressMessages(
+          diffdf::diffdf(
+            base = base_df.i,
+            compare = compare_df.i,
+            suppress_warnings = TRUE,
+            strict_numeric = FALSE,
+            strict_factor = FALSE
           )
+        )
+
+      if (length(diff.i) > 0) {
+        id_diffs[[as.character(id.i)]] <- diff.i
       }
+
+      rm(diff.i)
 
       pb$tick()
 
