@@ -1,3 +1,9 @@
+# mrgda 0.7.2
+
+## Bug fixes
+
+- `assign_id()` now does not create duplicate records. (#110)
+
 # mrgda 0.7.1
 
 ## Bug fixes
