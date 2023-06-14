@@ -8,9 +8,9 @@
 #'
 #' @examples
 #'\dontrun{
-#' check_dups(.domain_df = src_list$dm, .domain_name = "dm", .cols_check = NULL, .subject_col = "USUBJID", .domain_filter = NULL)
-#' check_dups(.domain_df = src_list$ex, .domain_name = "ex", .cols_check = c("USUBJID", "EXSTDTC", "EXTRT"))
-#' check_dups(.domain_df = src_list$pc, .domain_name = "pc", .domain_filter = "PCSTAT != 'NOT DONE'")
+#' sdtm_check_duplicates(.domain_df = src_list$dm, .domain_name = "dm", .cols_check = NULL, .subject_col = "USUBJID", .domain_filter = NULL)
+#' sdtm_check_duplicates(.domain_df = src_list$ex, .domain_name = "ex", .cols_check = c("USUBJID", "EXSTDTC", "EXTRT"))
+#' sdtm_check_duplicates(.domain_df = src_list$pc, .domain_name = "pc", .domain_filter = "PCSTAT != 'NOT DONE'")
 #'}
 #' @export
 sdtm_check_duplicates <- function(.domain_df,
