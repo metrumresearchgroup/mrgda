@@ -20,14 +20,10 @@ sdtm_check_duplicates <- function(.domain_df,
                                   .domain_filter = NULL) {
 
   # Check if cols_check actually exist in data
-
-  # Drop all blank or NA rows so that they are not caught as dups
-  for(col.i in .cols_check) {
-    .domain_df[[col.i]] <- as.character(.domain_df[[col.i]])
-    .domain_df[[col.i]] <- tidyr::replace_na(.domain_df[[col.i]], "")
-    keep.i <- nchar(trimws(.domain_df[[col.i]])) > 0
-    .domain_df <- .domain_df[keep.i, ]
-  }
+  assertthat::assert_that(
+    all(.cols_check %in% names(.domain_df)),
+    msg = "All columns in .cols_check are not in .domain_df"
+  )
 
   if(!is.null(.domain_filter)) {
     .domain_filter <- paste0("dplyr::filter(.domain_df, ", .domain_filter, ")")
@@ -52,6 +48,20 @@ sdtm_check_duplicates <- function(.domain_df,
       dplyr::pull(UNIQUE_COLS)
 
     .cols_check <- stringr::str_split_fixed(get_domain_value, ",", n=Inf)[1,]
+    .cols_check <- .cols_check[.cols_check %in% names(.domain_df)]
+
+    assertthat::assert_that(
+      length(.cols_check) > 0,
+      msg = "No default columns for .domain_name found in .domain_df. Please define .cols_check"
+    )
+  }
+
+  # Drop all blank or NA rows so that they are not caught as dups
+  for(col.i in .cols_check) {
+    .domain_df[[col.i]] <- as.character(.domain_df[[col.i]])
+    .domain_df[[col.i]] <- tidyr::replace_na(.domain_df[[col.i]], "")
+    keep.i <- nchar(trimws(.domain_df[[col.i]])) > 0
+    .domain_df <- .domain_df[keep.i, ]
   }
 
   output_list <-
@@ -95,4 +105,3 @@ execute_dups <- function(.data,
   return(return_list)
 
 }
-
