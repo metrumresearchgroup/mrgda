@@ -18,10 +18,12 @@ sdtm_check_missing_datetime <- function(.domain_df,
                                     .subject_col = "USUBJID",
                                     .domain_filter = NULL) {
   # Check if cols_check actually exist in data
-  assertthat::assert_that(
-    all(.cols_check %in% names(.domain_df)),
-    msg = "All columns in .cols_check are not in .domain_df"
-  )
+  if(!is.null(.cols_check)){
+    assertthat::assert_that(
+      all(.cols_check %in% names(.domain_df)),
+      msg = "All columns in .cols_check are not in .domain_df"
+    )
+  }
 
   if(!is.null(.domain_filter)) {
     .domain_filter <- paste0("dplyr::filter(.domain_df, ", .domain_filter, ")")
