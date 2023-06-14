@@ -34,7 +34,7 @@ sdtm_check_duplicates <- function(.domain_df,
     .domain_df <- rlang::parse_expr(.domain_filter) %>% rlang::eval_tidy()
   }
 
-  domain_lookup <- readr::read_csv(here::here("doc/sdtm-lookup.csv")) %>%
+  domain_lookup <- readr::read_csv(system.file("package-data/sdtm-lookup.csv", package = "mrgda")) %>%
     dplyr::mutate(DOMAIN = tolower(DOMAIN)) %>%
     suppressMessages()
 
