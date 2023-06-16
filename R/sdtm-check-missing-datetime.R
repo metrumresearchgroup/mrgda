@@ -3,7 +3,7 @@
 #' @param .domain_df source data (data.frame)
 #' @param .domain_name Name of source domain (character)
 #' @param .col_check Column to search for missing date/times (ie. c("EXSTDTC"))
-#' @param .subject_col Column name of subject identifier (character)
+#' @param .time_col Column name of subject identifier (character)
 #' @param .domain_filter Code to use inside a dplyr::filter on the source data.frame before duplicates check
 #'
 #' @examples
@@ -13,34 +13,24 @@
 #'}
 #' @export
 sdtm_check_missing_datetime <- function(.domain_df,
-                                    .domain_name,
-                                    .cols_check = NULL,
-                                    .subject_col = "USUBJID",
-                                    .domain_filter = NULL) {
-  # Check if cols_check actually exist in data
-  if(!is.null(.cols_check)){
-    assertthat::assert_that(
-      all(.cols_check %in% names(.domain_df)),
-      msg = "All columns in .cols_check are not in .domain_df"
-    )
-  }
+                                        .domain_name,
+                                        .time_col = NULL,
+                                        .subject_col = "USUBJID",
+                                        .domain_filter = NULL) {
 
   if(!is.null(.domain_filter)) {
     .domain_filter <- paste0("dplyr::filter(.domain_df, ", .domain_filter, ")")
     .domain_df <- rlang::parse_expr(.domain_filter) %>% rlang::eval_tidy()
   }
 
-  domain_lookup <- readr::read_csv(system.file("package-data/sdtm-lookup.csv", package = "mrgda")) %>%
-    dplyr::mutate(DOMAIN = tolower(DOMAIN)) %>%
-    suppressMessages()
-
+  domain_lookup <- get_sdtm_lookup()
   domain_in_lookup <- .domain_name %in% domain_lookup$DOMAIN
 
-  if(is.null(.cols_check)) {
+  if(is.null(.time_col)) {
 
     assertthat::assert_that(
       domain_in_lookup,
-      msg = "No default columns for provided for .domain_name. Please define .cols_check"
+      msg = "No default column for provided for .domain_name. Please define .time_col"
     )
 
     get_domain_value = domain_lookup %>%
@@ -49,23 +39,24 @@ sdtm_check_missing_datetime <- function(.domain_df,
 
     assertthat::assert_that(
       !is.na(get_domain_value),
-      msg = "No default time column provided for .domain_name. Please define .cols_check"
+      msg = "No default time column provided for .domain_name. Please define .time_col"
     )
 
-    check_column_in_data <- get_domain_value %in% names(.domain_df)
+    .time_col <- get_domain_value
+  }
 
+  # Check if cols_check actually exist in data
+  if(!is.null(.time_col)){
     assertthat::assert_that(
-      check_column_in_data,
-      msg = "Default time column for .domain_name not in data. Please define in .cols_check"
+      all(.time_col %in% names(.domain_df)),
+      msg = ".time_col is not in .domain_df, please define .time_col"
     )
-
-    .cols_check <- get_domain_value
   }
 
   output_list <-
     execute_missing(
       .data = .domain_df,
-      .cols_check = .cols_check,
+      .cols_check = .time_col,
       .subject_col = .subject_col,
       .domain_name = .domain_name
     )

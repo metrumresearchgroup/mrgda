@@ -19,35 +19,24 @@ sdtm_check_duplicates <- function(.domain_df,
                                   .subject_col = "USUBJID",
                                   .domain_filter = NULL) {
 
-  # Check if cols_check actually exist in data
-  if(!is.null(.cols_check)){
-    assertthat::assert_that(
-      all(.cols_check %in% names(.domain_df)),
-      msg = "All columns in .cols_check are not in .domain_df"
-    )
-  }
-
   if(!is.null(.domain_filter)) {
     .domain_filter <- paste0("dplyr::filter(.domain_df, ", .domain_filter, ")")
     .domain_df <- rlang::parse_expr(.domain_filter) %>% rlang::eval_tidy()
   }
 
-  domain_lookup <- readr::read_csv(system.file("package-data/sdtm-lookup.csv", package = "mrgda")) %>%
-    dplyr::mutate(DOMAIN = tolower(DOMAIN)) %>%
-    suppressMessages()
-
+  domain_lookup <- get_sdtm_lookup()
   domain_in_lookup <- .domain_name %in% domain_lookup$DOMAIN
 
   if(is.null(.cols_check)) {
 
     assertthat::assert_that(
       domain_in_lookup,
-      msg = "No default columns for provided for .domain_name. Please define .cols_check"
+      msg = "No default columns provided for .domain_name. Please define .cols_check"
     )
 
     get_domain_value = domain_lookup %>%
       dplyr::filter(DOMAIN == .domain_name) %>%
-      dplyr::pull(UNIQUE_COLS)
+      dplyr::pull(ALL_COLS)
 
     .cols_check <- stringr::str_split_fixed(get_domain_value, ",", n=Inf)[1,]
     .cols_check <- .cols_check[.cols_check %in% names(.domain_df)]
@@ -57,6 +46,12 @@ sdtm_check_duplicates <- function(.domain_df,
       msg = "No default columns for .domain_name found in .domain_df. Please define .cols_check"
     )
   }
+
+  # Check if cols_check actually exist in data
+  assertthat::assert_that(
+    all(.cols_check %in% names(.domain_df)),
+    msg = "All columns in .cols_check are not in .domain_df"
+  )
 
   # Drop all blank or NA rows so that they are not caught as dups
   for(col.i in .cols_check) {
