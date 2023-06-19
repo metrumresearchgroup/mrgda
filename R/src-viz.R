@@ -29,7 +29,7 @@ src_viz <- function(.src_list) {
 
   # Define the UI
   ui <- shinydashboard::dashboardPage(
-    shinydashboard::dashboardHeader(title = "Data Viewer"),
+    shinydashboard::dashboardHeader(title = "src viz"),
     shinydashboard::dashboardSidebar(
       shiny::selectInput("select_df", "Domain(s) View:",
                          choices = names(.src_list),
