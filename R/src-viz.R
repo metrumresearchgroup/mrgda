@@ -1,6 +1,22 @@
-
-# src_list <- mrgda::read_src_dir(here::here("inst", "example-sdtm"))
-
+#' src_viz
+#'
+#' This function provides a Shiny app for visualizing source data organized by different domains and subjects.
+#'
+#' @param .src_list A named list of data.frames where each data.frame represents a different domain of source data.
+#' The names of the list items should correspond to the domain names. One of the list items should be named "mrgda_labels"
+#' and contain column labels for the various domains.
+#'
+#' The Shiny app provided by this function consists of a dashboard with two main sections: "Domains" and "Subject Drilldown".
+#' In the "Domains" section, users can select a domain from the provided list and view related summary information and data.
+#' In the "Subject Drilldown" section, users can enter a subject ID and choose the domains they want to display. The selected
+#' domains' data related to the entered subject ID will be shown.
+#'
+#' @return A Shiny app for visualizing the source data.
+#' @examples
+#' \dontrun{
+#' read_src_dir(here::here("inst", "example-sdtm")) %>% src_viz()
+#' }
+#' @internal
 src_viz <- function(.src_list){
 
   domain_names <- names(.src_list)[!grepl("mrgda", names(.src_list), fixed=TRUE)]
@@ -76,35 +92,35 @@ src_viz <- function(.src_list){
           ),
 
           shinydashboard::tabItem(tabName = "subjects",
-                  shiny::fluidRow(
-                    shiny::column(
-                      width = 3,
-                      shinydashboard::box(
-                        width = NULL,
-                        status = "primary",
-                        solidHeader = TRUE,
-                        title = "Subject ID",
-                        shiny::textInput("usubjid", "USUBJID", value = "")
-                      )
-                    ),
-                    shiny::column(
-                      width = 9,
-                      shinydashboard::box(
-                        width = NULL,
-                        title = "Domains to Display",
-                        status = "primary",
-                        solidHeader = TRUE,
-                        shiny::checkboxGroupInput(
-                          "subjectDomains",
-                          "Domains to Display",
-                          choices = domain_names,
-                          selected = domain_names,
-                          inline = TRUE
-                        )
-                      )
-                    )
-                  ),
-                  shiny::uiOutput("subjectUI")
+                                  shiny::fluidRow(
+                                    shiny::column(
+                                      width = 3,
+                                      shinydashboard::box(
+                                        width = NULL,
+                                        status = "primary",
+                                        solidHeader = TRUE,
+                                        title = "Subject ID",
+                                        shiny::textInput("usubjid", "USUBJID", value = "")
+                                      )
+                                    ),
+                                    shiny::column(
+                                      width = 9,
+                                      shinydashboard::box(
+                                        width = NULL,
+                                        title = "Domains to Display",
+                                        status = "primary",
+                                        solidHeader = TRUE,
+                                        shiny::checkboxGroupInput(
+                                          "subjectDomains",
+                                          "Domains to Display",
+                                          choices = domain_names,
+                                          selected = domain_names,
+                                          inline = TRUE
+                                        )
+                                      )
+                                    )
+                                  ),
+                                  shiny::uiOutput("subjectUI")
           )
         )
       )
@@ -163,7 +179,7 @@ src_viz <- function(.src_list){
       req(input$domainLabels_rows_selected)
       table(rV$domainData[[rV$domainLabels$COLUMN_NAME[input$domainLabels_rows_selected]]]) %>%
         as.data.frame() %>%
-        rename(Value = Var1, N = Freq) %>%
+        dplyr::rename(Value = Var1, N = Freq) %>%
         dplyr::arrange(-N) %>%
         DT::datatable(
           rownames = FALSE,
@@ -228,7 +244,3 @@ src_viz <- function(.src_list){
   shiny::shinyApp(ui = ui, server = server, options = list(launch.browser = TRUE))
 
 }
-
- src_viz(src_list)
-
-
