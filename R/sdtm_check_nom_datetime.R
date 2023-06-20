@@ -80,7 +80,7 @@ execute_nom_datetime <- function(.data,
   missing_datetime <-
     .data %>%
     dplyr::select(dplyr::all_of(c(.datetime_col, .subject_col, .nomtime_cols))) %>%
-    dplyr::filter(is.na(!!sym(.datetime_col)) | stringr::str_length(!!sym(.datetime_col)) == 0)
+    dplyr::filter(is.na(!!sym(.datetime_col)) | stringr::str_length(!!sym(.datetime_col)) < 16)
 
   max_able_to_fix <- 0
 
