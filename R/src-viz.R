@@ -36,7 +36,7 @@ src_viz <- function(.src_list) {
                          multiple=TRUE,
                          selected = names(.src_list)[1]),
       shiny::textInput("usubjid_filter", "USUBJID Filter:"),
-      shiny::selectInput("color_by", "Color By:", choices = color_cols)
+      shiny::selectInput("color_by", "Split By:", choices = color_cols)
     ),
     shinydashboard::dashboardBody(shiny::uiOutput("dfDisplay"))
   )
@@ -78,26 +78,11 @@ src_viz <- function(.src_list) {
 
                 tableOpts = list(
                   scrollX = TRUE,
-                  rowCallback = DT::JS(
-                    "function(row, data) {",
-                    "if (typeof window.lastCOLOR === 'undefined') {",
-                    "window.lastCOLOR = null;",
-                    "window.colorFlag = false;",
-                    "}",
-                    paste0("if (window.lastCOLOR !== data[", colorIndex, "]) {"),
-                    "window.colorFlag = !window.colorFlag;",
-                    paste0("window.lastCOLOR = data[", colorIndex, "];"),
-                    "}",
-                    "if(window.colorFlag) {",
-                    "$(row).css('background-color', '#FFFFFF');",
-                    "} else {",
-                    "$(row).css('background-color', '#DDDDDD');",
-                    "}",
-                    "}"
-                  )
+                  searchHighlight = TRUE,
+                  rowGroup = list(dataSrc = colorIndex)
                 )
               } else {
-                tableOpts = list(scrollX = TRUE)
+                tableOpts = list(scrollX = TRUE, rowGroup = list(dataSrc = colorIndex))
               }
 
               # Retrieve labels and modify column names
@@ -119,8 +104,10 @@ src_viz <- function(.src_list) {
                 data,
                 rownames = FALSE,
                 escape = FALSE,
+                filter = "top",
                 selection = "single",
                 class = 'compact cell-border',
+                extensions = 'RowGroup',
                 options = tableOpts
               )
 
