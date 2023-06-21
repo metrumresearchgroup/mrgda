@@ -1,4 +1,9 @@
-#' Check if duplicates exist in SDTM domain
+#' Check if duplicates exist in source data domain
+#'
+#' @description
+#' Checks if any duplicates records exist in a given data.frame. Some commonly used
+#' domains have default columns to use for the duplicates check, however the .cols_check
+#' argument can be used to customize the columns to be used for the duplicate check.
 #'
 #' @param .domain_df source data (data.frame)
 #' @param .domain_name Name of source domain (character)

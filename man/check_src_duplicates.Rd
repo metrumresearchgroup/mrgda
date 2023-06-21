@@ -2,7 +2,7 @@
 % Please edit documentation in R/check-src-duplicates.R
 \name{check_src_duplicates}
 \alias{check_src_duplicates}
-\title{Check if duplicates exist in SDTM domain}
+\title{Check if duplicates exist in source data domain}
 \usage{
 check_src_duplicates(
   .domain_df,
@@ -21,7 +21,9 @@ check_src_duplicates(
 \item{.subject_col}{Column name of subject identifier (character)}
 }
 \description{
-Check if duplicates exist in SDTM domain
+Checks if any duplicates records exist in a given data.frame. Some commonly used
+domains have default columns to use for the duplicates check, however the .cols_check
+argument can be used to customize the columns to be used for the duplicate check.
 }
 \examples{
 \dontrun{

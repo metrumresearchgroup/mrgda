@@ -21,7 +21,9 @@ check_src_missing_datetime(
 \item{.subject_col}{Column name of subject identifier (character)}
 }
 \description{
-Check if missing datetimes in SDTM domain
+Checks if there are any missing datetime records in a given data.frame. Some commonly used
+domains have default datetime columns to use for this check, however the .time_col
+argument can be used to indicate which variable should be checked.
 }
 \examples{
 \dontrun{

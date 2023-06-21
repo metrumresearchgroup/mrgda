@@ -1,5 +1,5 @@
 src_list <- mrgda::read_src_dir(system.file("example-sdtm", package = "mrgda")) %>% suppressMessages()
-res <- check_src(src_list)
+res <- check_src(src_list, .return_details = TRUE)
 
 test_that("check_src ran tests across all relevant domains", {
 

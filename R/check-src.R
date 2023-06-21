@@ -1,10 +1,18 @@
 #' Run all source data checks
 #'
+#' @description
+#' This will run all source data checks available in the `mrgda` package. When
+#' given a list of source data.frames it will perform a series of checks on each.
+#' A high level summary of the passing/failing checks will be provided in the console
+#' and more in depth results can be accessed by setting the `.return_details` argument to
+#' `TRUE`.
+#'
 #' @param .src_list List of all soure domain data.frames
 #' @param .subject_col Column name of subject identifier (character)
+#' @param .return_details Return list of all summary checks be returned (TRUE/FALSE)
 #'
 #' @export
-check_src <- function(.src_list, .subject_col = "USUBJID") {
+check_src <- function(.src_list, .subject_col = "USUBJID", .return_details = FALSE) {
 
   return_list <- list()
 
@@ -63,7 +71,11 @@ check_src <- function(.src_list, .subject_col = "USUBJID") {
   )
 
 
-  return(return_list)
+  if(.return_details) {
+    return(return_list)
+  } else {
+    return(invisible(NULL))
+  }
 }
 
 

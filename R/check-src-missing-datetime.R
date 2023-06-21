@@ -1,5 +1,10 @@
 #' Check if missing datetimes in SDTM domain
 #'
+#' @description
+#' Checks if there are any missing datetime records in a given data.frame. Some commonly used
+#' domains have default datetime columns to use for this check, however the .time_col
+#' argument can be used to indicate which variable should be checked.
+#'
 #' @param .domain_df source data (data.frame)
 #' @param .domain_name Name of source domain (character)
 #' @param .time_col Column name of datetime variable (character)
