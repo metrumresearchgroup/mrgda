@@ -55,7 +55,8 @@ globalVariables(
     "COMPARE",
     "Column",
     "mrgda_MAX_ID",
-    "mrgda_SUBJ_NEED_ID"
+    "mrgda_SUBJ_NEED_ID",
+    "MRGDA_ISSUE_ID"
   )
 )
 
