@@ -19,13 +19,18 @@ sdtm_check_duplicates <- function(.domain_df,
                                   .subject_col = "USUBJID",
                                   .domain_filter = NULL) {
 
-  if(!is.null(.domain_filter)) {
+  domain_lookup <- get_sdtm_lookup(.subject_col)
+  domain_in_lookup <- .domain_name %in% domain_lookup$DOMAIN
+  filter_in_lookup <- domain_lookup$FILTER_EXP[domain_lookup$DOMAIN == .domain_name]
+
+  if(is.null(.domain_filter) & !is.na(filter_in_lookup)) {
+    .domain_filter <- filter_in_lookup
+  }
+
+  if (!is.null(.domain_filter)) {
     .domain_filter <- paste0("dplyr::filter(.domain_df, ", .domain_filter, ")")
     .domain_df <- rlang::parse_expr(.domain_filter) %>% rlang::eval_tidy()
   }
-
-  domain_lookup <- get_sdtm_lookup()
-  domain_in_lookup <- .domain_name %in% domain_lookup$DOMAIN
 
   if(is.null(.cols_check)) {
 
@@ -89,13 +94,15 @@ execute_dups <- function(.data,
     dplyr::count() %>%
     dplyr::filter(n > 1)
 
+  pct_duplicate <- round(nrow(test_df)*2/nrow(.data)*100,2)
+
   if (nrow(test_df) == 0) {
     return_list$Result <- "Pass"
-    return_list$NRecordsFail <- NULL
+    return_list$PctRecordsFail <- NULL
     return_list$IssueRecords <- NULL
   } else {
     return_list$Result <- "Fail"
-    return_list$NRecordsFail <- paste0(nrow(test_df), "/", nrow(.data))
+    return_list$PctRecordsFail <- paste0(pct_duplicate, "%")
     return_list$IssueRecords <- test_df
   }
 

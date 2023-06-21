@@ -38,13 +38,17 @@ sdtm_check_missing_subjects <- function(.domain_df1,
 
   subjects_1 <- unique(.domain_df1[[.subject_col]])
   subjects_2 <- unique(.domain_df2[[.subject_col]])
+  n_df1Only <- length(subjects_1[!subjects_1 %in% subjects_2])
+  n_df2Only <- length(subjects_2[!subjects_2 %in% subjects_1])
 
   output_list <- list()
   output_list$Name <- paste0(.domain_name1, " and ", .domain_name2, " missing subjects check")
-  output_list$Result <- ifelse(n_df1 == 0 & n_df2 == 0, "Pass", "Fail")
+  output_list$Result <- ifelse(n_df1Only == 0 & n_df2Only == 0, "Pass", "Fail")
   output_list$NSubjectsBoth <- length(subjects_1[subjects_1 %in% subjects_2])
-  output_list$NDf1Only <- length(subjects_1[!subjects_1 %in% subjects_2])
-  output_list$NDf2Only <- length(subjects_2[!subjects_2 %in% subjects_1])
+  df1name <- paste0("N", .domain_name1, "Only")
+  output_list[[df1name]] <- n_df1Only
+  df2name <- paste0("N", .domain_name2, "Only")
+  output_list[[df2name]] <- n_df2Only
 
   return(output_list)
 

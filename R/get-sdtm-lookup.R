@@ -1,5 +1,5 @@
 #' @keywords internal
-get_sdtm_lookup <- function() {
+get_sdtm_lookup <- function(.subject_col) {
   readr::read_csv(system.file("package-data/sdtm-lookup.csv", package = "mrgda")) %>%
     dplyr::mutate(
       DOMAIN = tolower(DOMAIN),

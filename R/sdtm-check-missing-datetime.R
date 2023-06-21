@@ -18,13 +18,18 @@ sdtm_check_missing_datetime <- function(.domain_df,
                                         .subject_col = "USUBJID",
                                         .domain_filter = NULL) {
 
-  if(!is.null(.domain_filter)) {
+  domain_lookup <- get_sdtm_lookup(.subject_col)
+  domain_in_lookup <- .domain_name %in% domain_lookup$DOMAIN
+  filter_in_lookup <- domain_lookup$FILTER_EXP[domain_lookup$DOMAIN == .domain_name]
+
+  if(is.null(.domain_filter) & !is.na(filter_in_lookup)) {
+    .domain_filter <- filter_in_lookup
+  }
+
+  if (!is.null(.domain_filter)) {
     .domain_filter <- paste0("dplyr::filter(.domain_df, ", .domain_filter, ")")
     .domain_df <- rlang::parse_expr(.domain_filter) %>% rlang::eval_tidy()
   }
-
-  domain_lookup <- get_sdtm_lookup()
-  domain_in_lookup <- .domain_name %in% domain_lookup$DOMAIN
 
   if(is.null(.time_col)) {
 
@@ -37,10 +42,9 @@ sdtm_check_missing_datetime <- function(.domain_df,
       dplyr::filter(DOMAIN == .domain_name) %>%
       dplyr::pull(TIME_COL)
 
-    assertthat::assert_that(
-      !is.na(get_domain_value),
-      msg = "No default time column provided for .domain_name. Please define .time_col"
-    )
+    if (is.na(get_domain_value)) {
+      return(NULL)
+    }
 
     .time_col <- get_domain_value
   }
@@ -79,7 +83,9 @@ execute_missing <- function(.data,
     dplyr::select(dplyr::all_of(c(.cols_check, .subject_col))) %>%
     dplyr::filter(is.na(!!sym(.cols_check)) | stringr::str_length(!!sym(.cols_check)) == 0)
 
-  return_list$NRecordsFail <- paste0(nrow(test_df), "/", nrow(.data))
+  pct_duplicate <- round(nrow(test_df)*2/nrow(.data)*100,2)
+
+  return_list$PctRecordsFail <- paste0(pct_duplicate, "%")
 
   if (nrow(test_df) > 0) {
     test_df <-

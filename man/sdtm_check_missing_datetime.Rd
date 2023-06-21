@@ -7,7 +7,7 @@
 sdtm_check_missing_datetime(
   .domain_df,
   .domain_name,
-  .cols_check = NULL,
+  .time_col = NULL,
   .subject_col = "USUBJID",
   .domain_filter = NULL
 )
@@ -17,7 +17,7 @@ sdtm_check_missing_datetime(
 
 \item{.domain_name}{Name of source domain (character)}
 
-\item{.subject_col}{Column name of subject identifier (character)}
+\item{.time_col}{Column name of subject identifier (character)}
 
 \item{.domain_filter}{Code to use inside a dplyr::filter on the source data.frame before duplicates check}
 
