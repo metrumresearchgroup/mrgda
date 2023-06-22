@@ -1,3 +1,13 @@
+# mrgda 0.7.2 development
+
+## New features and changes
+
+- add `check-src-duplicates.R` function to the package to perform source data duplicate checks. (#113)
+
+- add `check-src-missing-datetime.R` function to the package to check for missing values. (#113)
+
+- add `check-src.R` to run all source data checks. (#113)
+
 # mrgda 0.7.2
 
 ## Bug fixes
