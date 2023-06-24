@@ -4,12 +4,12 @@
 \alias{view_src}
 \title{view_src function}
 \usage{
-view_src(.df, .subject_col = "USUBJID")
+view_src(.df, .subject_col)
 }
 \arguments{
 \item{.df}{A dataframe that you want to process and view.}
 
-\item{.subject_col}{A character string specifying the subject column, default is "USUBJID". If this column is
+\item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
 }
 \value{

@@ -5,7 +5,7 @@
 #' subject column is present, it is used to group rows in the table.
 #'
 #' @param .df A dataframe that you want to process and view.
-#' @param .subject_col A character string specifying the subject column, default is "USUBJID". If this column is
+#' @param .subject_col A character string specifying the subject column. If this column is
 #' present in the dataframe, it will be used to group rows in the datatable.
 #'
 #' @return An instance of DT::datatable class with the processed dataframe.
@@ -15,7 +15,7 @@
 #' their labels, if any. The labels are extracted from column attributes.
 #'
 #' @export
-view_src <- function(.df, .subject_col = "USUBJID"){
+view_src <- function(.df, .subject_col){
 
   tableOpts = list(
     pageLength = 5,
