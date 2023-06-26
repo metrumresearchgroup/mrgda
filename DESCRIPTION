@@ -35,11 +35,11 @@ Imports:
     stringr,
     shiny,
     shinydashboard,
-    DT
-Suggests: 
+    DT,
     knitr,
+    readr
+Suggests: 
     testthat (>= 3.0.0),
-    readr,
     withr (>= 2.5.0)
 Config/testthat/edition: 3
 VignetteBuilder: 
