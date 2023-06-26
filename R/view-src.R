@@ -14,7 +14,7 @@
 #' The columns with less than 20 unique values are converted to factors. It also modifies column names to include
 #' their labels, if any. The labels are extracted from column attributes.
 #'
-#' @export
+#' @keywords internal
 view_src <- function(.df, .subject_col){
 
   tableOpts = list(

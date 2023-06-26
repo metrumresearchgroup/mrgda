@@ -24,3 +24,4 @@ This function modifies the input dataframe by converting columns with fewer than
 It adds labels to the column names and sets up a datatable with a range of options. If the specified
 subject column is present, it is used to group rows in the table.
 }
+\keyword{internal}
