@@ -16,8 +16,8 @@ reference:
     contents:
     - read_src_dir
     - view_sdtm_domains
-    - view_src_dir_summary
     - query_src_dir
+    - src_viz
   - title: Data Creation
     desc: Write NONMEM data set
     contents:
