@@ -56,7 +56,8 @@ globalVariables(
     "Column",
     "mrgda_MAX_ID",
     "mrgda_SUBJ_NEED_ID",
-    "MRGDA_ISSUE_ID"
+    "MRGDA_ISSUE_ID",
+    "MRGDA_PARSE_DATETIME"
   )
 )
 

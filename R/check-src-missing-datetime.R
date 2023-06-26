@@ -39,7 +39,8 @@ check_src_missing_datetime <- function(.domain_df,
 
   test_df <-
     .domain_df %>%
-    dplyr::filter(is.na(!!sym(.time_col)) | stringr::str_length(!!sym(.time_col)) == 0)
+    dplyr::mutate(MRGDA_PARSE_DATETIME = anytime::anytime(!!sym(.time_col))) %>%
+    dplyr::filter(is.na(MRGDA_PARSE_DATETIME) | stringr::str_length(!!sym(.time_col)) < 16)
 
   output_list <-
     checks_summary(
