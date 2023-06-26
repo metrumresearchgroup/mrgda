@@ -15,7 +15,7 @@ test_that("read_src_dir allows user to only load in specific domains [NMV-RSD-00
 
 test_that("read_src_dir outputs a dataframe with labels from each domain", {
   expect_true(all(c("ae", "dm", "lb", "vs") %in% unique(src_list$mrgda_labels$DOMAIN)))
-  expect_equal(names(src_list$mrgda_labels), c("DOMAIN", "COLUMN_NAME", "COLUMN_LABEL", "DOMAIN_NAME"))
+  expect_equal(names(src_list$mrgda_labels), c("DOMAIN", "COLUMN_NAME", "COLUMN_LABEL"))
 })
 
 test_that("read_src_dir works with a directory containing sas7bdat files", {

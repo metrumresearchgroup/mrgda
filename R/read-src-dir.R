@@ -82,11 +82,7 @@ read_src_dir <- function(.path,
 
   # mrgda labels ------------------------------------------------------------
   .out$mrgda_labels <-
-    gather_data_labels(.out) %>%
-    dplyr::left_join(
-      view_sdtm_domains() %>% dplyr::mutate(DOMAIN = tolower(DOMAIN))
-    ) %>%
-    suppressMessages()
+    gather_data_labels(.out)
 
   return(.out)
 

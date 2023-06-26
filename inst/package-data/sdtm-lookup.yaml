@@ -1,60 +1,80 @@
 ae:
+  DESCRIPTION: ["Adverse Events"]
   UNIQUE_COLS: ["STUDYID","AETERM"]
   TIME_COL: ["AESTDTC"]
 cm:
+  DESCRIPTION: ["Concomitant Medications"]
   UNIQUE_COLS: ["STUDYID","CMTRT"]
   TIME_COL: ["CMSTDTC"]
 co:
+  DESCRIPTION: ["Comments"]
   UNIQUE_COLS: ["STUDYID"]
   TIME_COL: ~
 dm:
+  DESCRIPTION: ["Demographics"]
   UNIQUE_COLS: ["STUDYID"]
   TIME_COL: ~
 ds:
+  DESCRIPTION: ["Disposition"]
   UNIQUE_COLS: ["STUDYID","DSTERM"]
   TIME_COL: ["DSDTC"]
 eg:
+  DESCRIPTION: ["ECG Test Results"]
   UNIQUE_COLS: ["STUDYID","VISITNUM","EGTESTCD"]
   TIME_COL: ~
 ex:
+  DESCRIPTION: ["Dosing"]
   UNIQUE_COLS: ["STUDYID","EXTRT"]
   TIME_COL: ["EXSTDTC"]
 ie:
+  DESCRIPTION: ["Inclusion/Exclusion Criterion Not Met"]
   UNIQUE_COLS: ["STUDYID","IETESTCD"]
   TIME_COL: ~
 is:
+  DESCRIPTION: ["Immunogenicity Specimen Assessments"]
   UNIQUE_COLS: ["STUDYID","ISDTC"]
   TIME_COL: ["ISDTC"]
 lb:
+  DESCRIPTION: ["Laboratory Test Results"]
   UNIQUE_COLS: ["STUDYID","LBTESTCD"]
   TIME_COL: ["LBDTC"]
 mh:
+  DESCRIPTION: ["Medical History"]
   UNIQUE_COLS: ["STUDYID","MHTERM"]
   TIME_COL: ~
 pc:
+  DESCRIPTION: ["PK Concentrations"]
   UNIQUE_COLS: ["STUDYID","PCTEST"]
   TIME_COL: ["PCDTC"]
 pe:
+  DESCRIPTION: ["Physical Examination"]
   UNIQUE_COLS: ["STUDYID","VISITNUM","PETESTCD","PESEQ"]
   TIME_COL: ~
 qs:
+  DESCRIPTION: ["Questionnaires"]
   UNIQUE_COLS: ["STUDYID","QSTESTCD"]
   TIME_COL: ["QSSTDTC"]
 rs:
+  DESCRIPTION: ["Disease Response"]
   UNIQUE_COLS: ["STUDYID"]
   TIME_COL: ["RSDTC"]
 sv:
+  DESCRIPTION: ["Subject Visits"]
   UNIQUE_COLS: ["STUDYID","VISITNUM"]
   TIME_COL: ~
 tr:
+  DESCRIPTION: ["Tumor Results"]
   UNIQUE_COLS: ["STUDYID"]
   TIME_COL: ["TRDTC"]
 tu:
+  DESCRIPTION: ["Tumor Identification"]
   UNIQUE_COLS: ["STUDYID","TUDTC"]
   TIME_COL: ["TUDTC"]
 tv:
+  DESCRIPTION: ["Trial Visits"]
   UNIQUE_COLS: ["STUDYID","VISITNUM","ARMCD"]
   TIME_COL: ~
 vs:
+  DESCRIPTION: ["Vital Signs"]
   UNIQUE_COLS: ["STUDYID","VSTESTCD"]
   TIME_COL: ["VSDTC"]

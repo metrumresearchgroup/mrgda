@@ -15,9 +15,8 @@ reference:
     desc: Read source data files
     contents:
     - read_src_dir
-    - view_sdtm_domains
-    - view_src_dir_summary
     - query_src_dir
+    - src_viz
   - title: Data Creation
     desc: Write NONMEM data set
     contents:
@@ -28,6 +27,9 @@ reference:
     desc: Check for errors in a NONMEM data set
     contents:
     - nm_validate
+    - check_src
+    - check_src_duplicates
+    - check_src_missing_datetime
   - title: Data Management
     desc: Data versioning helpers
     contents:
