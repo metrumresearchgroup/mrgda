@@ -12,9 +12,9 @@ test_that("check_src ran tests across all relevant domains", {
   expect_equal(res$dm$Duplicates$Result, "Pass")
   expect_equal(res$lb$Duplicates$Result, "Fail")
 
-  expect_equal(res$ae$MissingDatetimes$Result, "Pass")
+  expect_equal(res$ae$MissingDatetimes$Result, "Fail")
   expect_equal(res$lb$MissingDatetimes$Result, "Pass")
-  expect_equal(res$vs$MissingDatetimes$Result, "Pass")
+  expect_equal(res$vs$MissingDatetimes$Result, "Fail")
 
   expect_true(nrow(res$lb$Duplicates$IssueRecords) == 21)
   expect_true(is.null(res$dm$MissingDatetimes))

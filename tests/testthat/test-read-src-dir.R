@@ -10,7 +10,7 @@ test_that("read_src_dir ae domain: check data is read in correctly [NMV-RSD-001]
 
 test_that("read_src_dir allows user to only load in specific domains [NMV-RSD-004]", {
   src_list <- read_src_dir(.path = path, .read_domains = c("dm", "lb")) %>% suppressMessages()
-  expect_equal(length(src_list), 3)
+  expect_equal(length(src_list), 4)
 })
 
 test_that("read_src_dir outputs a dataframe with labels from each domain", {
@@ -24,8 +24,8 @@ test_that("read_src_dir works with a directory containing sas7bdat files", {
   haven::write_sas(Theoph, path = file.path(dir, "theoph.sas7bdat"))
   src_list2 <- read_src_dir(dir, .file_types = "sas7bdat")
 
-  expect_true(length(src_list2) == 3)
-  expect_true(all(names(src_list2) %in% c("mtcars", "theoph", "mrgda_labels")))
+  expect_true(length(src_list2) == 4)
+  expect_true(all(names(src_list2) %in% c("mtcars", "theoph", "mrgda_labels", "mrgda_src_meta")))
   expect_true(!is.null(src_list2$mtcars))
   expect_true(!is.null(src_list2$theoph))
   expect_equal(src_list2$theoph, haven::read_sas(file.path(dir, "theoph.sas7bdat")) %>% suppressMessages())
@@ -36,8 +36,8 @@ test_that("read_src_dir works with a directory containing csv files", {
   dir <- system.file("derived", package = "mrgda")
   src_list2 <- read_src_dir(dir, .file_types = "csv")
 
-  expect_true(length(src_list2) == 3)
-  expect_true(all(names(src_list2) %in% c("pk-errors", "pk", "mrgda_labels")))
+  expect_true(length(src_list2) == 4)
+  expect_true(all(names(src_list2) %in% c("pk-errors", "pk", "mrgda_labels", "mrgda_src_meta")))
   expect_true(!is.null(src_list2$pk))
   expect_equal(src_list2$pk, readr::read_csv(system.file("derived/pk.csv", package = "mrgda")) %>% suppressMessages())
 

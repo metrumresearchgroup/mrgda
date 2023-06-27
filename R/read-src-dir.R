@@ -61,6 +61,9 @@ read_src_dir <- function(.path,
 
   }
 
+  n_pass = 0
+  n_fail = 0
+
   for (file.i in .files_read) {
 
     .file_size_kb <- .file_sizes$SIZE[.file_sizes$FILE == file.i] / 1000
@@ -70,9 +73,11 @@ read_src_dir <- function(.path,
 
     if (inherits(data.i, "try-error")) {
       cli::cli_alert_danger(file.i)
+      n_fail <- n_fail + 1
     } else {
       cli::cli_alert_success(file.i)
       .out[[tools::file_path_sans_ext(basename(file.i))]] <- data.i
+      n_pass <- n_pass + 1
     }
 
     rm(data.i)
@@ -83,6 +88,22 @@ read_src_dir <- function(.path,
   # mrgda labels ------------------------------------------------------------
   .out$mrgda_labels <-
     gather_data_labels(.out)
+
+  # meta data
+  .out$mrgda_src_meta$type <- .files_of_interest$type
+  .out$mrgda_src_meta$path <- .path
+
+  print(
+    cli::boxx(
+      header = "read_src_dir Summary",
+      label = c(
+        paste0("Number of domains successfully loaded: ", n_pass),
+        paste0("Number of domains that failed to load: ", n_fail)
+      )
+    )
+  )
+
+
 
   return(.out)
 

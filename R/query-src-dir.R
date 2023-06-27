@@ -18,6 +18,7 @@
 query_src_dir <- function(.src_directory, .string, .file_types = "detect") {
 
   src_list <- read_src_dir(.path = .src_directory, .file_types = .file_types)
+  src_list$mrgda_src_meta <- NULL
 
   src_list_char <- purrr::map(
     src_list, ~ .x %>% dplyr::mutate_all(as.character)

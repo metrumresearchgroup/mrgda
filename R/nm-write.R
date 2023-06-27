@@ -2,6 +2,8 @@
 #' `r lifecycle::badge("deprecated")`
 #'
 #' @description
+#' `nm_write` is deprecated as of mrgda version 0.7.0. Please use `write_derived` instead.
+#'
 #' This function will take a nonmem ready data frame in R and write it out to a nonmem ready csv.
 #' It also creates a meta data folder, storing the xpt file along with other useful information.
 #'

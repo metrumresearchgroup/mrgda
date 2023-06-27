@@ -37,7 +37,8 @@ Imports:
     shinydashboard,
     DT,
     knitr,
-    readr
+    readr,
+    anytime
 Suggests: 
     testthat (>= 3.0.0),
     withr (>= 2.5.0)
