@@ -66,9 +66,7 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
     distinct_subject_columns(.data, .subject_col = "ID") %>%
       dplyr::mutate_all(as.character) %>%
       tidyr::pivot_longer(-ID, names_to = c("Column"), values_to = "Value") %>%
-      dplyr::mutate(ID_SORT = as.numeric(ID)) %>%
-      dplyr::arrange(ID_SORT, Column) %>%
-      dplyr::select(-ID_SORT) %>%
+      dplyr::arrange(as.numeric(ID), Column) %>%
       data.table::fwrite(
         x = .,
         file = file.path(.meta_data_folder, paste0("subject-level", ".csv")),
