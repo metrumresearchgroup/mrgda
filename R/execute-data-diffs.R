@@ -33,6 +33,12 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
 
   if (length(full_diff) == 0) {
     cli::cli_alert_info("No diffs since last version found")
+
+    readr::write_csv(
+      tibble::tribble(~name, ~value),
+      file.path(.output_dir, "diffs.csv")
+    )
+
     return(invisible(NULL))
   }
 
@@ -56,7 +62,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
     print_diffs <- dplyr::bind_rows(
       print_diffs,
       tibble::tibble(
-        name = "New Columns",
+        name = "Removed Columns",
         value = paste(full_diff$ExtColsBase$COLUMNS, collapse = ", ")
       )
     )
@@ -68,7 +74,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
     print_diffs <- dplyr::bind_rows(
       print_diffs,
       tibble::tibble(
-        name = "Removed Columns",
+        name = "New Columns",
         value = paste(full_diff$ExtColsComp$COLUMNS, collapse = ", ")
       )
     )
@@ -186,6 +192,12 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
       id_diffs_out <- purrr::map_dfr(id_diffs, diffdf_value_changes_to_df, .id = .id_col)
 
       if (nrow(id_diffs_out) == 0) {
+
+        readr::write_csv(
+          tibble::tribble(~ID, ~VARIABLE, ~BASE, ~COMPARE,~`N Occurrences`),
+          file.path(.output_dir, 'id-diffs.csv')
+        )
+
         return(invisible(NULL))
       }
 
