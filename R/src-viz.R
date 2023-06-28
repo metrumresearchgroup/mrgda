@@ -25,6 +25,8 @@ src_viz <- function(.src_list, .subject_col = "USUBJID") {
     stop("The input must be a list of data frames.")
   }
 
+  .box_title <- .src_list$mrgda_src_meta$path
+
   .src_list <- .src_list[!grepl("mrgda", names(.src_list), fixed = TRUE)]
 
   ui <-
@@ -34,7 +36,7 @@ src_viz <- function(.src_list, .subject_col = "USUBJID") {
       shinydashboard::dashboardBody(
         shinydashboard::box(
           width = 12,
-          title = "Domains",
+          title = .box_title,
           status = "primary",
           solidHeader = TRUE,
           shiny::fluidRow(
