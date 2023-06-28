@@ -29,16 +29,14 @@ get_base_df <- function(.prev_file, .compare_from_svn){
       system(paste0("svn info -r HEAD ", base, " | grep Revision | awk '{print $2}'"), intern = TRUE)
     )
 
-    if (length(prev_rev) == 0) {
-      # Dummy revision that will break
-      prev_rev <- paste0(rep(9, 100), collapse = "")
-    }
+    if (length(prev_rev) > 0) {
 
-    export_try <- try(system(paste0("svn export -r ", prev_rev, " ", base ," ", base_temp, " > /dev/null 2>&1")))
+      export_try <- try(system(paste0("svn export -r ", prev_rev, " ", base ," ", base_temp, " > /dev/null 2>&1")))
 
-    if (export_try == 0) {
-      from_svn <- TRUE
-      base <- base_temp
+      if (export_try == 0) {
+        from_svn <- TRUE
+        base <- base_temp
+      }
     }
 
   }
