@@ -26,7 +26,7 @@ get_base_df <- function(.prev_file, .compare_from_svn){
     base_temp <- tempfile(fileext = ".csv")
 
     prev_rev <- try(
-      system(paste0("svn info -r HEAD ", base, " | grep Revision | awk '{print $2}'"), intern = TRUE)
+      system(paste0("svn info 2>/dev/null -r HEAD ", base, " | grep Revision | awk '{print $2}'"), intern = TRUE)
     )
 
     if (length(prev_rev) > 0) {

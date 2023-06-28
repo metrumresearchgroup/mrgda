@@ -11,7 +11,8 @@ temp_dir <- tempdir()
 .compare_df <- data.frame(
   ID = c(1, 2, 3, 4),
   A = c("a", "b", "c", "d"),
-  B = c(1, 2, 3, 4)
+  B = c(1, 2, 3, 4),
+  C = c(4, 5, 6, 7)
 )
 
 # 1. Test: The function properly identifies and outputs differences in the data frames.
@@ -20,9 +21,11 @@ test_that("The function identifies and outputs differences [NMV-EDD-001]", {
   diffs <- suppressMessages(readr::read_csv(file.path(temp_dir, "diffs.csv")))
   expect_equal(diffs$name[1], "N Rows Diff")
   expect_equal(diffs$value[1], "1 row(s) added")
+  expect_equal(diffs$name[2], "New Columns")
+  expect_equal(diffs$value[2], "C")
   execute_data_diffs(.compare_df, .base_df, temp_dir)
   diffs <- suppressMessages(readr::read_csv(file.path(temp_dir, "diffs.csv")))
-  expect_equal(diffs$value[3], "1 ID(s) removed")
+  expect_equal(diffs$value[4], "1 ID(s) removed")
 })
 
 # 2. Test: The function handles non-existent directories correctly.
