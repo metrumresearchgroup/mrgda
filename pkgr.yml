@@ -1,37 +1,19 @@
 Version: 1
 
+Descriptions:
+  - DESCRIPTION
+
 Packages:
-  - assertr
-  - cli
-  - dplyr
-  - glue
-  - lifecycle
-  - magrittr
-  - purrr
-  - readr
-  - rlang
-  - tidyr
-  - withr
-  - yspec
   - devtools
-  - testthat
-  - pmtables
-  - covr
-  - markdown
-  - DT
-  - htmltools
-  - ggplot2
-  - mrggsave
-  - diffdf
-  - plotly
-  - progress
-  - mrgvalidate
+  - pkgdown
 
 Repos:
   - CRAN: https://cran.rstudio.com
-  - MPN: https://mpn.metworx.com/snapshots/stable/2022-08-31 # used for mrg packages
+  - MPN: https://mpn.metworx.com/snapshots/stable/2023-05-14 # used for mrg packages
 
-Lockfile:
-    Type: renv
+# Lockfile:
+#     Type: renv
+
+Library: /data/Projects/package_dev/temp_lib
 
 Rpath: ${R_EXE_4_1}
