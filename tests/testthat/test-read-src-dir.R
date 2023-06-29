@@ -19,7 +19,8 @@ test_that("read_src_dir outputs a dataframe with labels from each domain", {
 })
 
 test_that("read_src_dir works with a directory containing sas7bdat files", {
-  dir <- tempdir()
+  dir <- local_svn_repo()
+  withr::defer(unlink(dir, recursive = TRUE))
   haven::write_xpt(mtcars, path = file.path(dir, "mtcars.xpt"))
   haven::write_xpt(Theoph, path = file.path(dir, "theoph.xpt"), label = NULL)
   src_list2 <- read_src_dir(dir, .file_types = "xpt")
