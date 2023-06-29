@@ -24,7 +24,7 @@ distinct_subject_columns <- function(.data, .subject_col) {
     dplyr::pull(name)
 
   .data %>%
-    dplyr::select(all_of(c(.subject_col, unique_subject_columns))) %>%
+    dplyr::select(dplyr::all_of(c(.subject_col, unique_subject_columns))) %>%
     dplyr::distinct()
 
 }
