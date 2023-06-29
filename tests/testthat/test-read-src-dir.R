@@ -20,15 +20,15 @@ test_that("read_src_dir outputs a dataframe with labels from each domain", {
 
 test_that("read_src_dir works with a directory containing sas7bdat files", {
   dir <- tempdir()
-  haven::write_sas(mtcars, path = file.path(dir, "mtcars.sas7bdat"))
-  haven::write_sas(Theoph, path = file.path(dir, "theoph.sas7bdat"))
-  src_list2 <- read_src_dir(dir, .file_types = "sas7bdat")
+  haven::write_xpt(mtcars, path = file.path(dir, "mtcars.xpt"))
+  haven::write_xpt(Theoph, path = file.path(dir, "theoph.xpt"), label = NULL)
+  src_list2 <- read_src_dir(dir, .file_types = "xpt")
 
   expect_true(length(src_list2) == 4)
   expect_true(all(names(src_list2) %in% c("mtcars", "theoph", "mrgda_labels", "mrgda_src_meta")))
   expect_true(!is.null(src_list2$mtcars))
   expect_true(!is.null(src_list2$theoph))
-  expect_equal(src_list2$theoph, haven::read_sas(file.path(dir, "theoph.sas7bdat")) %>% suppressMessages())
+  expect_equal(src_list2$theoph, haven::read_xpt(file.path(dir, "theoph.xpt")) %>% suppressMessages())
 
 })
 
