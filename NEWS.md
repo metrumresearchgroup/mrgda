@@ -1,8 +1,4 @@
-# mrgda 0.7.2 development
-
-## Bug fixes
-
-- `write-derived.R` The printed message for columns "added" or "removed" is now correct. (#126)
+# mrgda 0.7.2.9000
 
 ## New features and changes
 
@@ -17,6 +13,10 @@
 - `write-derived.R` now always explicitly exports the HEAD version from svn for data diffs. (#126)
 
 - `write-derived.R` now arranges subject-level data by numerical ID. (#126)
+
+## Bug fixes
+
+- `write-derived.R` The printed message for columns "added" or "removed" is now correct. (#126)
 
 # mrgda 0.7.2
 
