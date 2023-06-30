@@ -1,4 +1,4 @@
-# mrgda 0.7.2 development
+# mrgda 0.7.2.9000
 
 ## New features and changes
 
@@ -7,6 +7,16 @@
 - add `check-src-missing-datetime.R` function to the package to check for missing values. (#113)
 
 - add `check-src.R` to run all source data checks. (#113)
+
+- add `src-viz.R` function to the package to view all source domains in a shiny app. (#120)
+
+- `write-derived.R` now always explicitly exports the HEAD version from svn for data diffs. (#126)
+
+- `write-derived.R` now arranges subject-level data by numerical ID. (#126)
+
+## Bug fixes
+
+- `write-derived.R` The printed message for columns "added" or "removed" is now correct. (#126)
 
 # mrgda 0.7.2
 
