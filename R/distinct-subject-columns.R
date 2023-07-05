@@ -13,10 +13,10 @@ distinct_subject_columns <- function(.data, .subject_col) {
     .data %>%
     dplyr::mutate_all(as.character) %>%
     dplyr::mutate_all(~tidyr::replace_na(.x, "mrgda_NA")) %>%
-    dplyr::group_by(dplyr::across(.subject_col)) %>%
+    dplyr::group_by(!!sym(.subject_col)) %>%
     dplyr::summarise_all(~length(unique(.x))) %>%
     dplyr::ungroup() %>%
-    tidyr::pivot_longer(-.subject_col) %>%
+    tidyr::pivot_longer(-!!sym(.subject_col)) %>%
     dplyr::group_by(name) %>%
     dplyr::filter(all(value == 1)) %>%
     dplyr::ungroup() %>%
@@ -24,7 +24,7 @@ distinct_subject_columns <- function(.data, .subject_col) {
     dplyr::pull(name)
 
   .data %>%
-    dplyr::select(c(.subject_col, unique_subject_columns)) %>%
+    dplyr::select(dplyr::all_of(c(.subject_col, unique_subject_columns))) %>%
     dplyr::distinct()
 
 }

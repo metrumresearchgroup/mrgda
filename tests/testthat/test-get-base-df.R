@@ -26,21 +26,30 @@ test_that("get_base_df output check: returns a data frame for base_df if the fil
 })
 
 
+
 test_that("get_base_df output check returns TRUE for from_svn if .compare_from_svn is TRUE and the file exists in SVN [NMV-GBD-001]", {
-  svn_dir1 <- tempdir()
+  svn_dir1 <- local_svn_repo()
+  withr::defer(unlink(svn_dir1, recursive = TRUE))
 
   system(paste0("rm -rf ", svn_dir1))
   system(paste0("svnadmin create ", svn_dir1))
 
-  svn_dir2 <- tempdir()
 
-  system(paste0("svn co file:///", svn_dir1, " ", svn_dir2, " -q -q"))
-  setwd(svn_dir2)
-  write.csv(mtcars, "df.csv", row.names = FALSE)
-  system("svn add df.csv -q -q")
-  system("svn commit -m 'test' df.csv -q -q")
+  svn_dir2 <- local_svn_repo()
+  withr::defer(unlink(svn_dir2, recursive = TRUE))
 
-  result <- get_base_df(file.path(svn_dir2, "df.csv"), TRUE)
-  expect_true(result$from_svn)
-  expect_true(all(result$base_df == mtcars))
+  withr::with_dir(svn_dir2, {
+
+    system(paste0("svn co file:///", svn_dir1, " ", svn_dir2, " -q -q"))
+
+    write.csv(mtcars, "df.csv", row.names = FALSE)
+    system("svn add df.csv -q -q")
+    system("svn commit -m 'test' df.csv -q -q")
+
+    result <- get_base_df(file.path(svn_dir2, "df.csv"), TRUE)
+    expect_true(result$from_svn)
+    expect_true(all(result$base_df == mtcars))
+  })
+
+
 })

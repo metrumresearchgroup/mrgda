@@ -1,9 +1,17 @@
 nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
 
+svn_dir <- local_svn_repo()
+withr::defer(unlink(svn_dir, recursive = TRUE))
+
+.temp_csv <- tempfile(fileext = ".csv", tmpdir = svn_dir)
+.temp_script <- tempfile(fileext = ".R", tmpdir = svn_dir)
+writeLines(text = "2 + 2", con = .temp_script)
+
 .temp_csv <- tempfile(fileext = ".csv")
 
-write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv) %>% suppressMessages()
+
+write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv, .compare_from_svn = FALSE) %>% suppressMessages()
 .csv_in <- readr::read_csv(.temp_csv, na = ".") %>% suppressMessages()
 .xpt_in_name <- paste0(gsub(".csv", "", .temp_csv, fixed = TRUE),
                        "/",
@@ -40,7 +48,7 @@ test_that("subject level data gets written out correctly", {
 
 test_that("write_derived works with special characters in file name [NMV-NMW-003]", {
   .temp_csv <- tempfile(fileext = "-pk.csv")
-  write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv) %>% suppressMessages()
+  write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv, .compare_from_svn = FALSE) %>% suppressMessages()
   expect_equal(nm, readr::read_csv(.temp_csv, na = ".") %>% suppressMessages())
 })
 
