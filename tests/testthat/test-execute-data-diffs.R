@@ -113,5 +113,5 @@ test_that("The function works if .id_col is NULL or not present", {
   )
   expect_false(rlang::is_empty(lst$summary_diffs))
   expect_false(rlang::is_empty(lst$variable_diffs))
-  expect_false("USUBJID" %in% names(lst$variable_diffs))
+  expect_false("ID" %in% names(lst$variable_diffs))
 })
