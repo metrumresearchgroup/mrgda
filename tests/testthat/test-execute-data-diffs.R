@@ -23,8 +23,8 @@ test_that("The function identifies and outputs differences [NMV-EDD-001]", {
   execute_data_diffs(.base_df, .compare_df, temp_dir)
   diff_path <- file.path(temp_dir, "diffs.csv")
   id_diff_path <- file.path(temp_dir, "id-diffs.csv")
-  on.exit(fs::file_delete(diff_path))
-  on.exit(fs::file_delete(id_diff_path), add = TRUE)
+  on.exit(unlink(diff_path))
+  on.exit(unlink(id_diff_path), add = TRUE)
 
   diffs <- suppressMessages(readr::read_csv(diff_path))
   expect_equal(diffs$name[1], "N Rows Diff")
@@ -46,10 +46,10 @@ test_that("The function writes the output files [NMV-EDD-003]", {
   execute_data_diffs(.base_df, .compare_df, temp_dir)
   diff_path <- file.path(temp_dir, "diffs.csv")
   id_diff_path <- file.path(temp_dir, "id-diffs.csv")
-  on.exit(fs::file_delete(diff_path))
-  on.exit(fs::file_delete(id_diff_path), add = TRUE)
-  expect_true(fs::file_exists(diff_path))
-  expect_true(fs::file_exists(id_diff_path))
+  on.exit(unlink(diff_path))
+  on.exit(unlink(id_diff_path), add = TRUE)
+  expect_true(file.exists(diff_path))
+  expect_true(file.exists(id_diff_path))
 })
 
 # 4. Test: The function properly identifies and outputs differences based on IDs.
@@ -72,8 +72,8 @@ test_that("The function returns nothing if there are no diffs detected", {
 test_that("The function uses .id_col for grouping correctly", {
   diff_path <- file.path(temp_dir, "diffs.csv")
   id_diff_path <- file.path(temp_dir, "id-diffs.csv")
-  on.exit(fs::file_delete(diff_path))
-  on.exit(fs::file_delete(id_diff_path), add = TRUE)
+  on.exit(unlink(diff_path))
+  on.exit(unlink(id_diff_path), add = TRUE)
 
   # With diffs
   execute_data_diffs(.base_df2, .compare_df2, temp_dir, .id_col = "USUBJID")
@@ -91,8 +91,8 @@ test_that("The function doesn't save csvs if .output_dir is NULL", {
   lst <- execute_data_diffs(.base_df2, .compare_df2, .output_dir = NULL, .id_col = "USUBJID")
   diff_path <- file.path(temp_dir, "diffs.csv")
   id_diff_path <- file.path(temp_dir, "id-diffs.csv")
-  expect_true(!fs::file_exists(diff_path))
-  expect_true(!fs::file_exists(id_diff_path))
+  expect_true(!file.exists(diff_path))
+  expect_true(!file.exists(id_diff_path))
 
   # Also test that objects are invisibly returned
   expect_false(rlang::is_empty(lst$summary_diffs))
