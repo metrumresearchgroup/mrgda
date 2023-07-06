@@ -55,3 +55,29 @@ test_that("The function returns nothing if there are no diffs detected", {
   expect_true(is.null(df))
   expect_message(execute_data_diffs(.base_df, .base_df, temp_dir), "No diffs since last version found")
 })
+
+test_that("The function uses .id_col for grouping correctly", {
+  # Create test data frames
+  .base_df2 <- data.frame(
+    USUBJID = c(1, 2, 3),
+    A = c("a", "b", "c"),
+    B = c(1, 2, 2.5)
+  )
+
+  .compare_df2 <- data.frame(
+    USUBJID = c(1, 2, 3, 4),
+    A = c("a", "b", "c", "d"),
+    B = c(1, 2, 3, 4),
+    C = c(4, 5, 6, 7)
+  )
+
+  # With diffs
+  execute_data_diffs(.base_df2, .compare_df2, temp_dir, .id_col = "USUBJID")
+  df <- readr::read_csv(file.path(temp_dir, "id-diffs.csv"))
+  expect_true("USUBJID" %in% names(df))
+
+  # With no diffs (creates/saves out csv differently)
+  execute_data_diffs(.base_df2, .base_df2, temp_dir, .id_col = "USUBJID")
+  df <- readr::read_csv(file.path(temp_dir, "id-diffs.csv"))
+  expect_true("USUBJID" %in% names(df))
+})

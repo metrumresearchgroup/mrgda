@@ -194,7 +194,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
       if (nrow(id_diffs_out) == 0) {
 
         readr::write_csv(
-          tibble::tribble(~ID, ~VARIABLE, ~BASE, ~COMPARE,~`N Occurrences`),
+          tibble::tribble(~ID, ~VARIABLE, ~BASE, ~COMPARE,~`N Occurrences`) %>% dplyr::rename(!!sym(.id_col) := "ID"),
           file.path(.output_dir, 'id-diffs.csv')
         )
 
@@ -204,7 +204,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
       id_diffs_out <-
         id_diffs_out %>%
         dplyr::mutate_all(as.character) %>%
-        dplyr::group_by(ID, VARIABLE, BASE, COMPARE) %>%
+        dplyr::group_by(!!sym(.id_col), VARIABLE, BASE, COMPARE) %>%
         dplyr::summarise(`N Occurrences` = dplyr::n()) %>%
         suppressMessages() %>%
         dplyr::ungroup()
