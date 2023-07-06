@@ -7,7 +7,7 @@
 execute_data_diffs(
   .base_df,
   .compare_df,
-  .output_dir,
+  .output_dir = NULL,
   .id_col = "ID",
   .base_from_svn = FALSE
 )
@@ -17,9 +17,11 @@ execute_data_diffs(
 
 \item{.compare_df}{A data frame to compare against the base data frame.}
 
-\item{.output_dir}{A string representing the directory where the output difference files will be stored.}
+\item{.output_dir}{A string representing the directory where the output difference files will be stored.
+Set to \code{NULL} to skip saving output files.}
 
-\item{.id_col}{A string representing the column name to be used for subject-based differences.}
+\item{.id_col}{A string representing the column name to be used for subject-based differences.
+Set to \code{NULL} for data frames not containing an ID column.}
 
 \item{.base_from_svn}{Logical. Was base df exported from svn?}
 }
@@ -31,4 +33,3 @@ containing the differences between the input data frames.
 This function executes the comparison of two data frames, generates
 the differences, and writes them to specified output files.
 }
-\keyword{internal}
