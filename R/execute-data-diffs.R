@@ -6,18 +6,23 @@
 #' @param .base_df A data frame that serves as the base for comparison.
 #' @param .compare_df A data frame to compare against the base data frame.
 #' @param .output_dir A string representing the directory where the output difference files will be stored.
+#'        Set to `NULL` to skip saving output files.
 #' @param .id_col A string representing the column name to be used for subject-based differences.
+#'        Set to `NULL` for data frames not containing an ID column.
 #' @param .base_from_svn Logical. Was base df exported from svn?
 #'
 #' @return No return value, but this function will write files to the specified output directory
 #'         containing the differences between the input data frames.
 #'
-#' @keywords internal
-execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID", .base_from_svn = FALSE){
+#' @export
+execute_data_diffs <- function(.base_df, .compare_df, .output_dir = NULL, .id_col = "ID", .base_from_svn = FALSE){
 
-  if (!dir.exists(.output_dir)) {
-    stop(.output_dir, " does not exist")
+  if(!is.null(.output_dir)){
+    if (!dir.exists(.output_dir)) {
+      stop(.output_dir, " does not exist")
+    }
   }
+
 
   # Diffs across entire data ------------------------------------------------
   full_diff <- suppressMessages(
@@ -34,10 +39,12 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
   if (length(full_diff) == 0) {
     cli::cli_alert_info("No diffs since last version found")
 
-    readr::write_csv(
-      tibble::tribble(~name, ~value),
-      file.path(.output_dir, "diffs.csv")
-    )
+    if(!is.null(.output_dir)){
+      readr::write_csv(
+        tibble::tribble(~name, ~value),
+        file.path(.output_dir, "diffs.csv")
+      )
+    }
 
     return(invisible(NULL))
   }
@@ -92,7 +99,13 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
   }
 
 
-  datas_have_id <- (.id_col %in% names(.base_df)) & (.id_col %in% names(.compare_df))
+  datas_have_id <- (.id_col %in% names(.base_df)) && (.id_col %in% names(.compare_df))
+
+  if(!datas_have_id && !is.null(.id_col)){
+    warning(glue::glue("The specified `.id_col` ({.id_col}) is not present in one or both of the data frames"))
+  }
+
+  datas_have_id <- (!is.null(.id_col)) && datas_have_id
 
   if(datas_have_id){
 
@@ -104,14 +117,13 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
       n_id_diff > 0 ~ paste0(n_id_diff, " ID(s) added")
     )
 
-    print_diffs <-
-      print_diffs <- dplyr::bind_rows(
-        print_diffs,
-        tibble::tibble(
-          name = "N IDs Diff",
-          value = n_id_diff_msg
-        )
+    print_diffs <- dplyr::bind_rows(
+      print_diffs,
+      tibble::tibble(
+        name = "N IDs Diff",
+        value = n_id_diff_msg
       )
+    )
   }
 
   print_diffs <- dplyr::bind_rows(
@@ -122,7 +134,9 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
     )
   )
 
-  readr::write_csv(print_diffs, file.path(.output_dir, "diffs.csv"))
+  if(!is.null(.output_dir)){
+    readr::write_csv(print_diffs, file.path(.output_dir, "diffs.csv"))
+  }
 
   print(
     cli::boxx(
@@ -193,33 +207,57 @@ execute_data_diffs <- function(.base_df, .compare_df, .output_dir, .id_col = "ID
 
       if (nrow(id_diffs_out) == 0) {
 
-        readr::write_csv(
-          tibble::tribble(~ID, ~VARIABLE, ~BASE, ~COMPARE,~`N Occurrences`),
-          file.path(.output_dir, 'id-diffs.csv')
-        )
+        if(!is.null(.output_dir)){
 
+          readr::write_csv(
+            tibble::tribble(~ID, ~VARIABLE, ~BASE, ~COMPARE,~`N Occurrences`) %>% dplyr::rename(!!sym(.id_col) := "ID"),
+            file.path(.output_dir, 'id-diffs.csv')
+          )
+
+        }
         return(invisible(NULL))
       }
 
       id_diffs_out <-
         id_diffs_out %>%
         dplyr::mutate_all(as.character) %>%
-        dplyr::group_by(ID, VARIABLE, BASE, COMPARE) %>%
+        dplyr::group_by(!!sym(.id_col), VARIABLE, BASE, COMPARE) %>%
         dplyr::summarise(`N Occurrences` = dplyr::n()) %>%
         suppressMessages() %>%
         dplyr::ungroup()
 
-      data.table::fwrite(
-        x = id_diffs_out,
-        file = file.path(.output_dir, 'id-diffs.csv'),
-        sep = ",",
-        quote = FALSE,
-        row.names = FALSE,
-        na = "."
-      )
+      if(!is.null(.output_dir)){
+        data.table::fwrite(
+          x = id_diffs_out,
+          file = file.path(.output_dir, 'id-diffs.csv'),
+          sep = ",",
+          quote = FALSE,
+          row.names = FALSE,
+          na = "."
+        )
+      }
 
       # cli::cli_alert_success(glue::glue("File written: {file.path(.output_dir, 'id-diffs.csv')}"))
 
     }
+  }else{
+    id_diffs_out <- diffdf_value_changes_to_df(full_diff)
+    if(!is.null(id_diffs_out)){
+      id_diffs_out <- id_diffs_out %>%
+        dplyr::mutate_all(as.character) %>%
+        dplyr::group_by(VARIABLE, BASE, COMPARE) %>%
+        dplyr::summarise(`N Occurrences` = dplyr::n()) %>%
+        suppressMessages() %>%
+        dplyr::ungroup()
+    }
   }
+
+  return(
+    invisible(
+      list(
+        summary_diffs = print_diffs,
+        variable_diffs = id_diffs_out
+      )
+    )
+  )
 }
