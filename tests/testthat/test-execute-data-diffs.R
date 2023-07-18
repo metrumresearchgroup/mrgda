@@ -20,98 +20,46 @@ temp_dir <- tempdir()
 
 # 1. Test: The function properly identifies and outputs differences in the data frames.
 test_that("The function identifies and outputs differences [NMV-EDD-001]", {
-  execute_data_diffs(.base_df, .compare_df, temp_dir)
-  diff_path <- file.path(temp_dir, "diffs.csv")
-  id_diff_path <- file.path(temp_dir, "id-diffs.csv")
-  on.exit(unlink(diff_path))
-  on.exit(unlink(id_diff_path), add = TRUE)
-
-  diffs <- suppressMessages(readr::read_csv(diff_path))
+  diffs_list <- execute_data_diffs(.base_df, .compare_df, "ID")
+  diffs <- diffs_list$diffs
   expect_equal(diffs$name[1], "N Rows Diff")
   expect_equal(diffs$value[1], "1 row(s) added")
   expect_equal(diffs$name[2], "New Columns")
   expect_equal(diffs$value[2], "C")
-  execute_data_diffs(.compare_df, .base_df, temp_dir)
-  diffs <- suppressMessages(readr::read_csv(diff_path))
-  expect_equal(diffs$value[4], "1 ID(s) removed")
+  expect_equal(diffs$value[5], "1 ID(s) added")
 })
 
-# 2. Test: The function handles non-existent directories correctly.
-test_that("The function throws error for non-existent directories [NMV-EDD-002]", {
-  expect_error(execute_data_diffs(.base_df, .compare_df, "non_existent_directory"))
-})
-
-# 3. Test: The function correctly writes the output files.
-test_that("The function writes the output files [NMV-EDD-003]", {
-  execute_data_diffs(.base_df, .compare_df, temp_dir)
-  diff_path <- file.path(temp_dir, "diffs.csv")
-  id_diff_path <- file.path(temp_dir, "id-diffs.csv")
-  on.exit(unlink(diff_path))
-  on.exit(unlink(id_diff_path), add = TRUE)
-  expect_true(file.exists(diff_path))
-  expect_true(file.exists(id_diff_path))
-})
 
 # 4. Test: The function properly identifies and outputs differences based on IDs.
 test_that("The function identifies and outputs differences based on IDs [NMV-EDD-004]", {
-  execute_data_diffs(.base_df, .compare_df, temp_dir)
-  id_diffs <- suppressMessages(readr::read_csv(file.path(temp_dir, "id-diffs.csv")))
+  diffs <- execute_data_diffs(.base_df, .compare_df, "ID")
+  id_diffs <- diffs$subject_diffs
   expect_equal(nrow(id_diffs), 1)
-  expect_equal(id_diffs$ID[1], 3)
-  expect_equal(id_diffs$BASE[1], 2.5)
-  expect_equal(id_diffs$COMPARE[1], 3)
+  expect_equal(id_diffs$ID[1], "3")
+  expect_equal(id_diffs$BASE[1], "2.5")
+  expect_equal(id_diffs$COMPARE[1], "3")
 })
 
 # 4. Test: The function properly identifies and outputs differences based on IDs.
 test_that("The function returns nothing if there are no diffs detected", {
-  df <- execute_data_diffs(.base_df, .base_df, temp_dir)
-  expect_true(is.null(df))
-  expect_message(execute_data_diffs(.base_df, .base_df, temp_dir), "No diffs since last version found")
-})
-
-test_that("The function uses .id_col for grouping correctly", {
-  diff_path <- file.path(temp_dir, "diffs.csv")
-  id_diff_path <- file.path(temp_dir, "id-diffs.csv")
-  on.exit(unlink(diff_path))
-  on.exit(unlink(id_diff_path), add = TRUE)
-
-  # With diffs
-  execute_data_diffs(.base_df2, .compare_df2, temp_dir, .id_col = "USUBJID")
-  df <- suppressMessages(readr::read_csv(file.path(temp_dir, "id-diffs.csv")))
-  expect_true("USUBJID" %in% names(df))
-
-  # With no diffs (creates/saves out csv differently)
-  execute_data_diffs(.base_df2, .base_df2, temp_dir, .id_col = "USUBJID")
-  df <- suppressMessages(readr::read_csv(file.path(temp_dir, "id-diffs.csv")))
-  expect_true("USUBJID" %in% names(df))
+  df <- execute_data_diffs(.base_df, .base_df, "ID")
+  expect_true(nrow(df$diffs) == 0)
+  expect_true(nrow(df$subject_diffs) == 0)
+  expect_message(execute_data_diffs(.base_df, .base_df, "ID"), "No diffs since last version found")
 })
 
 
-test_that("The function doesn't save csvs if .output_dir is NULL", {
-  lst <- execute_data_diffs(.base_df2, .compare_df2, .output_dir = NULL, .id_col = "USUBJID")
-  diff_path <- file.path(temp_dir, "diffs.csv")
-  id_diff_path <- file.path(temp_dir, "id-diffs.csv")
-  expect_true(!file.exists(diff_path))
-  expect_true(!file.exists(id_diff_path))
 
-  # Also test that objects are invisibly returned
-  expect_false(rlang::is_empty(lst$summary_diffs))
-  expect_false(rlang::is_empty(lst$variable_diffs))
-})
+test_that("The function works if .suject_col is NULL", {
+  lst <- execute_data_diffs(.base_df2, .compare_df2, .subject_col = NULL)
+  expect_false(rlang::is_empty(lst$diffs))
+  expect_true(nrow(lst$subject_diffs) == 0)
 
-test_that("The function works if .id_col is NULL or not present", {
-  # .id_col is NULL
-  lst <- execute_data_diffs(.base_df2, .compare_df2, .output_dir = NULL, .id_col = NULL)
-  expect_false(rlang::is_empty(lst$summary_diffs))
-  expect_false(rlang::is_empty(lst$variable_diffs))
-  expect_false("USUBJID" %in% names(lst$variable_diffs))
+  x <-  try(execute_data_diffs(.base_df2, .compare_df2, .subject_col = "ID"), silent = TRUE)
 
-  # .id_col is a string not present in the datasets
-  expect_warning(
-    lst <- execute_data_diffs(.base_df2, .compare_df2, .output_dir = NULL, .id_col = "ID"),
-    "The specified `.id_col`"
+  expect_equal(
+    as.character(x),
+    "Error in execute_data_diffs(.base_df2, .compare_df2, .subject_col = \"ID\") : \n  The specified `.subject_col` (ID) is not present in one or both of the data frames\n"
   )
-  expect_false(rlang::is_empty(lst$summary_diffs))
-  expect_false(rlang::is_empty(lst$variable_diffs))
-  expect_false("ID" %in% names(lst$variable_diffs))
+
 })

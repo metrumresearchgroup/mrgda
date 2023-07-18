@@ -4,24 +4,15 @@
 \alias{execute_data_diffs}
 \title{Execute Differences Between Data Frames}
 \usage{
-execute_data_diffs(
-  .base_df,
-  .compare_df,
-  .output_dir = NULL,
-  .id_col = "ID",
-  .base_from_svn = FALSE
-)
+execute_data_diffs(.base_df, .compare_df, .subject_col, .base_from_svn = FALSE)
 }
 \arguments{
 \item{.base_df}{A data frame that serves as the base for comparison.}
 
 \item{.compare_df}{A data frame to compare against the base data frame.}
 
-\item{.output_dir}{A string representing the directory where the output difference files will be stored.
-Set to \code{NULL} to skip saving output files.}
-
-\item{.id_col}{A string representing the column name to be used for subject-based differences.
-Set to \code{NULL} for data frames not containing an ID column.}
+\item{.subject_col}{A string representing the column name to be used for subject-based differences.
+Set to \code{NULL} for data frames not containing an subject column.}
 
 \item{.base_from_svn}{Logical. Was base df exported from svn?}
 }

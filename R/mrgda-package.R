@@ -58,7 +58,8 @@ globalVariables(
     "mrgda_SUBJ_NEED_ID",
     "MRGDA_ISSUE_ID",
     "MRGDA_PARSE_DATETIME",
-    "ID_SORT"
+    "ID_SORT",
+    ".output_dir"
   )
 )
 
