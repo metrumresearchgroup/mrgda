@@ -38,7 +38,8 @@ Imports:
     DT,
     knitr,
     readr,
-    anytime
+    anytime,
+    rstatix
 Suggests: 
     testthat (>= 3.0.0),
     withr (>= 2.5.0)
