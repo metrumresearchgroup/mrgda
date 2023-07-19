@@ -84,12 +84,30 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
   compare_df <- readr::read_csv(.file) %>% suppressMessages()
 
   if (!is.null(base_df_list$base_df) & .execute_diffs) {
-    execute_data_diffs(
-      .base_df = base_df_list$base_df,
-      .compare_df = compare_df,
-      .output_dir = .meta_data_folder,
-      .id_col = "ID",
-      .base_from_svn = base_df_list$from_svn
+    diffs <-
+      execute_data_diffs(
+        .base_df = base_df_list$base_df,
+        .compare_df = compare_df,
+        .subject_col = "ID",
+        .base_from_svn = base_df_list$from_svn
+      )
+
+    data.table::fwrite(
+      x = diffs$diffs,
+      file = file.path(.output_dir, 'diffs.csv'),
+      sep = ",",
+      quote = FALSE,
+      row.names = FALSE,
+      na = "."
+    )
+
+    data.table::fwrite(
+      x = diffs$subject_diffs,
+      file = file.path(.output_dir, 'subject-diffs.csv'),
+      sep = ",",
+      quote = FALSE,
+      row.names = FALSE,
+      na = "."
     )
   }
 
@@ -114,7 +132,7 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
 
   # Determine and save dependencies -----------------------------------------
   dependencies <- find_in_files(.paths = c(here::here("script"), here::here("model")), .string = basename(.file))
-  # yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
+  yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
 
   cli::cli_alert_success(glue::glue("File written: {.file}"))
   cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
