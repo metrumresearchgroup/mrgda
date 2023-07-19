@@ -108,6 +108,8 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
   if(is.null(.subject_col)){
 
     out$diffs <- print_diffs
+    out$subject_diffs <- NULL
+    out$value_diffs <- diffdf_value_changes_to_df(full_diff)
 
     print(
       cli::boxx(

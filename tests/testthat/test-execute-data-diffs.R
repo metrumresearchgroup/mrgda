@@ -53,7 +53,8 @@ test_that("The function returns nothing if there are no diffs detected", {
 test_that("The function works if .suject_col is NULL", {
   lst <- execute_data_diffs(.base_df2, .compare_df2, .subject_col = NULL)
   expect_false(rlang::is_empty(lst$diffs))
-  expect_true(nrow(lst$subject_diffs) == 0)
+  expect_equal(lst$value_diffs$BASE[1], "2.5")
+  expect_true(is.null(lst$subject_diffs))
 
   x <-  try(execute_data_diffs(.base_df2, .compare_df2, .subject_col = "ID"), silent = TRUE)
 
