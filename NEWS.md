@@ -18,7 +18,7 @@
 
 - `execute-data-diffs.R` now returns a list of diffs and does not write out. (#135)
 
-- `assign-id.R` no longer prints a message. (#136)
+- `assign-id.R` prints a simplified message. (#136)
 
 ## Bug fixes
 
