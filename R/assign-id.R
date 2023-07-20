@@ -84,19 +84,9 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
         as.numeric(forcats::fct_inorder(mrgda_SUBJ_NEED_ID)) + mrgda_MAX_ID,
         ID)
     ) %>%
-    dplyr::select(-tidyr::starts_with("mrgda_")) %>% 
+    dplyr::select(-tidyr::starts_with("mrgda_")) %>%
     dplyr::select(dplyr::all_of(c("ID", .subject_col))) %>%
     dplyr::distinct()
-
-  print(
-    cli::boxx(
-      header = "ID Summary",
-      label = c(
-        paste0("Number of subjects previously assigned: ", nrow(prev_id_lookup)),
-        paste0("Number of subjects newly assigned: ", nrow(data_join_id_lookup) - nrow(prev_id_lookup))
-      )
-    )
-  )
 
   # Join on new ID lookup to the original data
   .data_w_id <-
@@ -114,6 +104,15 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
       dplyr::select(dplyr::all_of(c("ID", .subject_col))) %>%
       dplyr::distinct() %>%
       is_unique_by_subject(.df = ., .column = "ID")
+  )
+
+  print(
+    cli::boxx(
+      header = "ID Summary",
+      label = c(
+        paste0("Number of subjects detected and assigned IDs: ", length(unique(.data_w_id$ID)))
+      )
+    )
   )
 
   return(.data_w_id)

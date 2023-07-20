@@ -94,7 +94,7 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
 
     data.table::fwrite(
       x = diffs$diffs,
-      file = file.path(.output_dir, 'diffs.csv'),
+      file = file.path(.meta_data_folder, 'diffs.csv'),
       sep = ",",
       quote = FALSE,
       row.names = FALSE,
@@ -103,7 +103,7 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
 
     data.table::fwrite(
       x = diffs$subject_diffs,
-      file = file.path(.output_dir, 'subject-diffs.csv'),
+      file = file.path(.meta_data_folder, 'subject-diffs.csv'),
       sep = ",",
       quote = FALSE,
       row.names = FALSE,
