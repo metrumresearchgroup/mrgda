@@ -12,6 +12,8 @@ writeLines(text = "2 + 2", con = .temp_script)
 
 
 write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv, .compare_from_svn = FALSE) %>% suppressMessages()
+# Run again to create a diff
+write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv, .compare_from_svn = FALSE) %>% suppressMessages()
 .csv_in <- readr::read_csv(.temp_csv, na = ".") %>% suppressMessages()
 .xpt_in_name <- paste0(gsub(".csv", "", .temp_csv, fixed = TRUE),
                        "/",
@@ -28,6 +30,14 @@ test_that("write_derived write xpt: xpt data includes correct labels [NMV-NMW-00
   expect_equal(
     yspec::ys_get_short(nm_spec)[order(names(yspec::ys_get_short(nm_spec)))],
     .xpt_in_labels[order(names(.xpt_in_labels))]
+  )
+})
+
+
+test_that("write_derived makes a blank diff file when no diffs", {
+  diffs <- read.csv(paste0(gsub(".csv", "" , .temp_csv, fixed=TRUE), "/diffs.csv"))
+  expect_true(
+    all(names(diffs) == c("name", "value"))
   )
 })
 
