@@ -14,6 +14,12 @@
 
 - `write-derived.R` now arranges subject-level data by numerical ID. (#126)
 
+- `write-derived.R` now always writes out subject level diffs even if they are empty. (#135)
+
+- `execute-data-diffs.R` now returns a list of diffs and does not write out. (#135)
+
+- `assign-id.R` no longer prints a message. (#136)
+
 ## Bug fixes
 
 - `write-derived.R` The printed message for columns "added" or "removed" is now correct. (#126)
