@@ -164,7 +164,8 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
   # Clear out NUM -----------------------------------------------------------
   .base_df$NUM <- NULL
   .compare_df$NUM <- NULL
-
+  names_in_common <- names_in_common[names_in_common != "NUM"]
+  
   # Diffs by id -------------------------------------------------------------
   id_diffs <- list()
   ids <- unique(dplyr::intersect(.base_df[[.subject_col]], .compare_df[[.subject_col]]))
