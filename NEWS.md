@@ -1,4 +1,4 @@
-# mrgda 0.7.2.9000
+# mrgda 0.8.0
 
 ## New features and changes
 

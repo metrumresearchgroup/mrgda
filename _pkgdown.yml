@@ -23,6 +23,7 @@ reference:
     - write_derived
     - nm_write
     - distinct_subject_columns
+    - execute_data_diffs
   - title: Data Validation
     desc: Check for errors in a NONMEM data set
     contents:
