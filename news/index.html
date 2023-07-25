@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1</span>
       </span>
     </div>
 
@@ -47,6 +47,34 @@
       
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.8.1" id="mrgda-081">mrgda 0.8.1<a class="anchor" aria-label="anchor" href="#mrgda-081"></a></h2>
+<div class="section level3">
+<h3 id="bug-fixes-0-8-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-1"></a></h3>
+<ul><li>
+<code><a href="../reference/execute_data_diffs.html">execute_data_diffs()</a></code> Since the NUM column is excluded from subject level diffs, it needed to be removed from the list of columns used for the subject level diffs. (#138)</li>
+</ul></div>
+</div>
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.8.0" id="mrgda-080">mrgda 0.8.0<a class="anchor" aria-label="anchor" href="#mrgda-080"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-0-8-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-8-0"></a></h3>
+<ul><li><p>add <code>check-src-duplicates.R</code> function to the package to perform source data duplicate checks. (#113)</p></li>
+<li><p>add <code>check-src-missing-datetime.R</code> function to the package to check for missing values. (#113)</p></li>
+<li><p>add <code>check-src.R</code> to run all source data checks. (#113)</p></li>
+<li><p>add <code>src-viz.R</code> function to the package to view all source domains in a shiny app. (#120)</p></li>
+<li><p><code>write-derived.R</code> now always explicitly exports the HEAD version from svn for data diffs. (#126)</p></li>
+<li><p><code>write-derived.R</code> now arranges subject-level data by numerical ID. (#126)</p></li>
+<li><p><code>write-derived.R</code> now always writes out subject level diffs even if they are empty. (#135)</p></li>
+<li><p><code>execute-data-diffs.R</code> now returns a list of diffs and does not write out. (#135)</p></li>
+<li><p><code>assign-id.R</code> prints a simplified message. (#136)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-8-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-0"></a></h3>
+<ul><li>
+<code>write-derived.R</code> The printed message for columns “added” or “removed” is now correct. (#126)</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.7.2" id="mrgda-072">mrgda 0.7.2<a class="anchor" aria-label="anchor" href="#mrgda-072"></a></h2>
 <div class="section level3">
@@ -154,7 +182,7 @@
 <li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> now outputs the source script in the meta data folder. (#55)</p></li>
 <li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> added a <code>.read_domains</code> argument to allow users to only read in specific domains. If not specified, default is to read all in. (#55)</p></li>
 <li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> added a <code>.subject_col</code> argument to allow users to specify the name of the unique subject identifier column in the source data. (#55)</p></li>
-<li><p>Added <code><a href="../reference/view_src_dir_summary.html">view_src_dir_summary()</a></code> to allow the user to view all the domains and file sizes from their source data directory. (#55)</p></li>
+<li><p>Added <code>view_src_dir_summary()</code> to allow the user to view all the domains and file sizes from their source data directory. (#55)</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -179,7 +207,7 @@
 <h3 id="new-features-and-changes-0-3-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-3-0"></a></h3>
 <ul><li><p>User can now omit tests from being run in <code><a href="../reference/nm_validate.html">nm_validate()</a></code>. Optional argument provided to do this. (#38)</p></li>
 <li><p><code><a href="../reference/nm_validate.html">nm_validate()</a></code> and <code>nm_summary()</code> now utilize a dictionary of column names found here <code>system.file("package-data", "recognized-flags.csv", package = "mrgda")</code>. The functions can extract information from the data set without the user explicitly needing to define these columns. (#38)</p></li>
-<li><p><code><a href="../reference/view_sdtm_domains.html">view_sdtm_domains()</a></code> allows the user to view a dictionary of common SDTM domains and a description of the data found within them. (#38)</p></li>
+<li><p><code>view_sdtm_domains()</code> allows the user to view a dictionary of common SDTM domains and a description of the data found within them. (#38)</p></li>
 <li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> reads in all .csv, .xpt or .sas7bdat files from a source data directory into a nested list containing the data from each domain.(#38)</p></li>
 <li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> creates an additional data set informing the user if a subject has data in each domain. The resulting data.frame has one row per subject with a TRUE/FALSE column indicating if they are in a specific domain. (#38)</p></li>
 <li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> writes out derived data to a .csv file and creates a folder matching the name of the derived data, containing meta data from the assembly. (#31, #36, #38)</p></li>

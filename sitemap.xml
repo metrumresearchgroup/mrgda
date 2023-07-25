@@ -19,6 +19,15 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/assign_id.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/check_src.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/check_src_duplicates.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/check_src_missing_datetime.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/diffdf_value_changes_to_df.html</loc>
   </url>
   <url>
@@ -58,10 +67,10 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/read_src_dir.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/view_sdtm_domains.html</loc>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/src_viz.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/view_src_dir_summary.html</loc>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/view_src.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/write_derived.html</loc>

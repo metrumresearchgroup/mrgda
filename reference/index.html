@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1</span>
       </span>
     </div>
 
@@ -55,17 +55,13 @@
         </td>
         <td><p>Read in every domain in a source data directory.</p></td>
       </tr><tr><td>
-          <p><code><a href="view_sdtm_domains.html">view_sdtm_domains()</a></code> </p>
-        </td>
-        <td><p>View SDTM Domain Abbreviations</p></td>
-      </tr><tr><td>
-          <p><code><a href="view_src_dir_summary.html">view_src_dir_summary()</a></code> </p>
-        </td>
-        <td><p>View summary of source data directory</p></td>
-      </tr><tr><td>
           <p><code><a href="query_src_dir.html">query_src_dir()</a></code> </p>
         </td>
         <td><p>Source data query</p></td>
+      </tr><tr><td>
+          <p><code><a href="src_viz.html">src_viz()</a></code> </p>
+        </td>
+        <td><p>Source Visualizer Shiny App</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="data-creation">Data Creation <a href="#data-creation" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p><p>Write NONMEM data set</p>
@@ -83,6 +79,10 @@
           <p><code><a href="distinct_subject_columns.html">distinct_subject_columns()</a></code> </p>
         </td>
         <td><p>Determine columns with only one unique per subject.</p></td>
+      </tr><tr><td>
+          <p><code><a href="execute_data_diffs.html">execute_data_diffs()</a></code> </p>
+        </td>
+        <td><p>Execute Differences Between Data Frames</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="data-validation">Data Validation <a href="#data-validation" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p><p>Check for errors in a NONMEM data set</p>
@@ -91,6 +91,18 @@
           <p><code><a href="nm_validate.html">nm_validate()</a></code> </p>
         </td>
         <td><p>Validate an NMTRAN dataset</p></td>
+      </tr><tr><td>
+          <p><code><a href="check_src.html">check_src()</a></code> </p>
+        </td>
+        <td><p>Run all source data checks</p></td>
+      </tr><tr><td>
+          <p><code><a href="check_src_duplicates.html">check_src_duplicates()</a></code> </p>
+        </td>
+        <td><p>Check if duplicates exist in source data domain</p></td>
+      </tr><tr><td>
+          <p><code><a href="check_src_missing_datetime.html">check_src_missing_datetime()</a></code> </p>
+        </td>
+        <td><p>Check if missing datetimes in SDTM domain</p></td>
       </tr></tbody><tbody><tr><th colspan="2">
           <h2 id="data-management">Data Management <a href="#data-management" class="anchor" aria-hidden="true"></a></h2>
           <p class="section-desc"></p><p>Data versioning helpers</p>

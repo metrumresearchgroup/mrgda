@@ -18,7 +18,7 @@ the differences, and writes them to specified output files."><!-- mathjax --><sc
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.7.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1</span>
       </span>
     </div>
 
@@ -55,13 +55,7 @@ the differences, and writes them to specified output files.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">execute_data_diffs</span><span class="op">(</span></span>
-<span>  <span class="va">.base_df</span>,</span>
-<span>  <span class="va">.compare_df</span>,</span>
-<span>  <span class="va">.output_dir</span>,</span>
-<span>  .id_col <span class="op">=</span> <span class="st">"ID"</span>,</span>
-<span>  .base_from_svn <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">execute_data_diffs</span><span class="op">(</span><span class="va">.base_df</span>, <span class="va">.compare_df</span>, <span class="va">.subject_col</span>, .base_from_svn <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -74,12 +68,9 @@ the differences, and writes them to specified output files.</p>
 <dd><p>A data frame to compare against the base data frame.</p></dd>
 
 
-<dt>.output_dir</dt>
-<dd><p>A string representing the directory where the output difference files will be stored.</p></dd>
-
-
-<dt>.id_col</dt>
-<dd><p>A string representing the column name to be used for subject-based differences.</p></dd>
+<dt>.subject_col</dt>
+<dd><p>A string representing the column name to be used for subject-based differences.
+Set to <code>NULL</code> for data frames not containing an subject column.</p></dd>
 
 
 <dt>.base_from_svn</dt>
