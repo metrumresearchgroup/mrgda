@@ -82,7 +82,7 @@ src_viz <- function(.src_list, .subject_col = "USUBJID") {
           .df <- .df[rows_keep, ]
         }
 
-        view_src(.df, .subject_col)
+        view_src(.df, .subject_col, .view = "viewer")
       })
     })
   }

@@ -2,15 +2,29 @@
 % Please edit documentation in R/view-src.R
 \name{view_src}
 \alias{view_src}
-\title{view_src function}
+\title{create_datatable function}
 \usage{
-view_src(.df, .subject_col)
+view_src(
+  .df,
+  .subject_col = NULL,
+  .view = c("viewer", "window"),
+  .full_width = FALSE,
+  .wrap_col_len = 50
+)
 }
 \arguments{
 \item{.df}{A dataframe that you want to process and view.}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
+
+\item{.view}{Defaults to \code{"viewer"}. If \code{"window"} is specified, the table will show in a separate browser window.}
+
+\item{.full_width}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, the table will be stretched horizontally to fill the
+available space.}
+
+\item{.wrap_col_len}{Numeric value for wrapping long text. Text with more characters than this value will be
+wrapped to the next line.}
 }
 \value{
 An instance of DT::datatable class with the processed dataframe.

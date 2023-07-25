@@ -2,15 +2,20 @@ test_that("view_src correctly modifies dataframe", {
 
   # Create a test dataframe
   df <- data.frame(
-    USUBJID1 = c(1,2,3,4,5,6),
-    sex = c("M", "F", "F", "M", "M", "F"),
-    age = c(22,25,26,30,32,24)
-  )
+    sex = sample(c("M", "F"), 50, replace = TRUE),
+    age = sample(c(22,25,26,30,32,24), 50, replace = TRUE),
+    Weight = round(rnorm(50, 75, 15), 1)
+  ) %>%
+    dplyr::mutate(
+      USUBJID1 = paste0("STUDY-1001-3053-", 1:dplyr::n()),
+      notes = rep("this is a very long line that should probably be wrapped", dplyr::n())
+      ) %>%
+    dplyr::relocate(USUBJID1)
 
   attr(df$USUBJID1, "label") <- "Subject"
 
   # Test the function on the test dataframe
-  result <- view_src(df, "USUBJID1")
+  result <- view_src(df, "USUBJID1", .view = "viewer")
 
   # Check that the output is a datatables object
   expect_true(inherits(result, "datatables"))
