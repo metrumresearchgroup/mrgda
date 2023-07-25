@@ -21,16 +21,20 @@
 #'
 #' @importFrom dplyr across
 #'
-#' @keywords internal
+#' @export
 view_src <- function(
     .df,
     .subject_col = NULL,
     .view = c("viewer", "window"),
-    .full_width = FALSE,
-    .wrap_col_len = 50
+    .full_width = FALSE
 ){
 
   .view <- match.arg(.view)
+
+  # dont autofit width for few number of columns
+  # Otherwise DT will not align the headers properly (known open bug)
+  autoWidth <- if(ncol(.df) <= 6) FALSE else TRUE
+  # autoWidth <- TRUE
 
   # Determine widths
   if(isTRUE(.full_width)){
@@ -39,14 +43,9 @@ view_src <- function(
     col_width <- "30px"
   }
 
-  # Wrap columns over a specified length
-  wrap_names <- names(which(purrr::map(.df, ~max(nchar(.x))) > .wrap_col_len))
-  .df <- .df %>% dplyr::mutate(across(wrap_names, ~ gsub("\n", "<br>", stringr::str_wrap(.x, .wrap_col_len))))
-
 
   tableOpts = list(
-    # dom = "B<lf<\"datatables-scroll\"t>ipr>",
-    dom = "B<lf<t>ipr>",
+    dom = "B<lf<\"datatables-scroll\"t>ipr>",
     pageLength = 100,
     lengthMenu = c(25,100,500,1000),
     initComplete = htmlwidgets::JS("
@@ -56,15 +55,13 @@ view_src <- function(
       });
     }"),
     scrolly = "15vh",
-    # paging = FALSE,
     scrollX = TRUE,
     scrollY = 300,
     scrollCollapse=TRUE,
     colReorder = TRUE,
     searchHighlight = TRUE,
-    autoWidth = TRUE,
+    autoWidth = autoWidth,
     select = list(style = 'os', items = 'row'),
-    buttons = list('colvis'),
     columnDefs = list(list(className = 'dt-center', targets = "_all"),
                       list(width = col_width, targets = "_all"),
                       list(type = 'natural', targets = "_all")
@@ -73,10 +70,9 @@ view_src <- function(
 
   if (!is.null(.subject_col) && .subject_col %in% names(.df)) {
     .df <- .df %>% dplyr::relocate(!!sym(.subject_col))
-    # colorIndex <- which(names(.df) == .subject_col)
-    # tableOpts$rowGroup <- list(dataSrc = colorIndex - 1)
-    # if(colorIndex != 0) colorIndex <- 0:colorIndex
-    tableOpts$fixedColumns <- list(leftColumns = 1)
+    colorIndex <- which(names(.df) == .subject_col)
+    tableOpts$rowGroup <- list(dataSrc = colorIndex - 1)
+    tableOpts$fixedColumns <- list(leftColumns = colorIndex)
   }
 
   # Convert columns with less than 20 unique values to factors
@@ -104,11 +100,8 @@ view_src <- function(
     filter = list(position = 'top', clear = FALSE),
     selection = "none",
     # style = "bootstrap4",
-    # class = 'compact cell-border',
     class = 'cell-border hover order-column nowrap stripe',
-    # class = 'table-bordered table-hover nowrap',
-    # class = 'cell-border nowrap',
-    extensions = c("RowGroup", "Buttons", "ColReorder", "FixedColumns"),
+    extensions = c("RowGroup", "ColReorder", "FixedColumns"),
     plugins = 'natural',
     options = tableOpts
   ) %>%
