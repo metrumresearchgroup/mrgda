@@ -1,3 +1,9 @@
+# mrgda 0.8.1
+
+## Bug fixes
+
+- `execute_data_diffs()` Since the NUM column is excluded from subject level diffs, it needed to be removed from the list of columns       used for the subject level diffs. (#138)
+
 # mrgda 0.8.0
 
 ## New features and changes
