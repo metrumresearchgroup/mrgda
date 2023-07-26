@@ -57,7 +57,7 @@ view_src <- function(
     ),
     scrolly = "15vh",
     scrollX = TRUE,
-    scrollY = 300,
+    scrollY = 800,
     scrollCollapse=TRUE,
     colReorder = TRUE,
     searchHighlight = TRUE,
