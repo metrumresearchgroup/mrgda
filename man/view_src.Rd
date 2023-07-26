@@ -7,8 +7,8 @@
 view_src(
   .df,
   .subject_col = NULL,
-  .view = c("viewer", "window"),
-  .full_width = FALSE
+  .group_id = FALSE,
+  .view = c("viewer", "window")
 )
 }
 \arguments{
@@ -17,13 +17,9 @@ view_src(
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
 
+\item{.group_id}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, group by specified or found subject column}
+
 \item{.view}{Defaults to \code{"viewer"}. If \code{"window"} is specified, the table will show in a separate browser window.}
-
-\item{.full_width}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, the table will be stretched horizontally to fill the
-available space.}
-
-\item{.wrap_col_len}{Numeric value for wrapping long text. Text with more characters than this value will be
-wrapped to the next line.}
 }
 \value{
 An instance of DT::datatable class with the processed dataframe.

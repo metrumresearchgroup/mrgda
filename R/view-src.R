@@ -7,11 +7,8 @@
 #' @param .df A dataframe that you want to process and view.
 #' @param .subject_col A character string specifying the subject column. If this column is
 #' present in the dataframe, it will be used to group rows in the datatable.
+#' @param .group_id Logical (`TRUE`/`FALSE`). If `TRUE`, group by specified or found subject column
 #' @param .view Defaults to `"viewer"`. If `"window"` is specified, the table will show in a separate browser window.
-#' @param .full_width Logical (`TRUE`/`FALSE`). If `TRUE`, the table will be stretched horizontally to fill the
-#' available space.
-#' @param .wrap_col_len Numeric value for wrapping long text. Text with more characters than this value will be
-#' wrapped to the next line.
 #'
 #' @return An instance of DT::datatable class with the processed dataframe.
 #' It also includes options for datatable setup such as searchHighlight, scrollX, and pageLength set to TRUE, 5
@@ -25,8 +22,8 @@
 view_src <- function(
     .df,
     .subject_col = NULL,
-    .view = c("viewer", "window"),
-    .full_width = FALSE
+    .group_id = FALSE,
+    .view = c("viewer", "window")
 ){
 
   .view <- match.arg(.view)
@@ -36,13 +33,8 @@ view_src <- function(
   autoWidth <- if(ncol(.df) <= 6) FALSE else TRUE
 
 
-  # Determine widths
-  if(isTRUE(.full_width)){
-    col_width <- paste0(100/ncol(.df), "%")
-  }else{
-    col_width <- "30px"
-  }
-
+  # Set basic options
+  col_width <- "30px"
   base_font_size <- 9
 
   # Table options
@@ -84,8 +76,11 @@ view_src <- function(
 
     .df <- .df %>% dplyr::relocate(!!!syms(.subject_col))
     fix_col_index <- purrr::map_dbl(.subject_col, ~ grep(paste0("^",.x, "$"), names(.df)))
-    # TODO: change this to color grouping
-    # tableOpts$rowGroup <- list(dataSrc = fix_col_index - 1)
+
+    if(isTRUE(.group_id)){
+      tableOpts$rowGroup <- list(dataSrc = fix_col_index - 1)
+    }
+
     tableOpts$fixedColumns <- list(leftColumns = max(fix_col_index))
 
     # Add color column
