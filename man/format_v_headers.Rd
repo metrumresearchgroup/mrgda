@@ -4,10 +4,12 @@
 \alias{format_v_headers}
 \title{Format headers as bold, and include column attributes (label and class)}
 \usage{
-format_v_headers(.df)
+format_v_headers(.df, base_font_size)
 }
 \arguments{
 \item{.df}{A dataframe that you want to process and view.}
+
+\item{base_font_size}{font size used to format the header}
 }
 \description{
 Format headers as bold, and include column attributes (label and class)

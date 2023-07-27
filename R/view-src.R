@@ -115,7 +115,7 @@ v <- function(
 
 
   # Format headers as bold, and include column attributes (label and class)
-  names_with_labels <- format_v_headers(.df)
+  names_with_labels <- format_v_headers(.df, base_font_size)
 
 
   # Convert columns with less than 20 unique values to factors
@@ -158,9 +158,10 @@ utils::globalVariables(c("."))
 #' Format headers as bold, and include column attributes (label and class)
 #'
 #' @inheritParams v
+#' @param base_font_size font size used to format the header
 #'
 #' @keywords internal
-format_v_headers <- function(.df){
+format_v_headers <- function(.df, base_font_size){
   col_attributes <- purrr::map(colnames(.df), ~ {
     list(col_lbl = attr(.df[[.x]], "label"), col_class = readr::guess_parser(as.character(.df[[.x]])))
   })
