@@ -22,6 +22,8 @@ test_that("src_viz app structure", {
   expect_true(inherits(app, "shiny.appobj"))
   expect_true(app$options$launch.browser)
 
+  error_msg <- testthat::capture_error(src_viz(df_list, .subject_col = "hello"))
+  expect_equal(error_msg$message, ".subject_col (hello) is not present in any dataframe")
 })
 
 
