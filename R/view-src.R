@@ -5,28 +5,36 @@
 #' subject column is present, it is used to group rows in the table.
 #'
 #' @param .df A dataframe that you want to process and view.
-#' @param .subject_col A character string specifying the subject column. If this column is
+#' @param .subject_cols A character vector specifying the subject columns. If these columns are
 #' present in the dataframe, it will be used to group rows in the datatable.
-#' @param .group_id Logical (`TRUE`/`FALSE`). If `TRUE`, group by specified or found subject column
-#' @param .view Defaults to `"viewer"`. If `"window"` is specified, the table will show in a separate browser window.
+#' @param .freeze_cols A character vector specifying columns to freeze when scrolling horizontally.
+#' `.subject_cols` will automatically be appended to this list (i.e. `.subject_cols` are always frozen).
+#' @param .group_id Logical (`TRUE`/`FALSE`). If `TRUE`, add breaks between each unique `.subject_cols` grouping.
+#'
+#' @details
+#' If `.subject_cols` is `NULL`, the column names `"USUBJID"` and `"ID"` will be searched and set if present.
+#' If `.subject_cols` are present in the dataframe, they will be frozen and alternate in color.
+#'
+#' Columns with less than 20 unique values are converted to factors. This can be helpful for filtering, which
+#' will show up as the shiny equivalent of `selectInput`, as opposed to the default `textInput` for character columns.
+#'
+#' Columns with label attributes will be appended to column headers as a new line.
+#'
+#' You can *drag and drop* columns to move them around in the table. If a column is dragged to a frozen column's location,
+#' the new column will be frozen instead.
 #'
 #' @return An instance of DT::datatable class with the processed dataframe.
-#' It also includes options for datatable setup such as searchHighlight, scrollX, and pageLength set to TRUE, 5
-#' respectively by default. If .subject_col exists in the dataframe, it is used to group rows.
-#' The columns with less than 20 unique values are converted to factors. It also modifies column names to include
-#' their labels, if any. The labels are extracted from column attributes.
 #'
 #' @importFrom dplyr across n
 #'
 #' @export
-view_src <- function(
+v <- function(
     .df,
-    .subject_col = NULL,
-    .group_id = FALSE,
-    .view = c("viewer", "window")
+    .subject_cols = NULL,
+    .freeze_cols = NULL,
+    .group_id = FALSE
 ){
 
-  .view <- match.arg(.view)
 
   # Dont autofit width for few number of columns
   # otherwise DT will not align the headers properly (known open bug)
@@ -44,7 +52,7 @@ view_src <- function(
     lengthMenu = c(25,100,500,1000),
     headerCallback = DT::JS(
       "function(thead) {",
-      glue("$(thead).css('font-size', '{base_font_size+3}pt');"),
+      glue("$(thead).css('font-size', '{base_font_size+1}pt');"),
       "}"
     ),
     scrolly = "15vh",
@@ -64,36 +72,44 @@ view_src <- function(
     list(type = 'natural', targets = "_all")
   )
 
-  # If no .subject_col specified, look for USUBJID and ID
-  if(is.null(.subject_col)){
+  # If no .subject_cols specified, look for USUBJID and ID
+  if(is.null(.subject_cols)){
     id_cols <- grepl("^(?i)ID$|^(?i)USUBJID$", names(.df))
-    if(any(id_cols)) .subject_col <- names(.df)[id_cols]
+    if(any(id_cols)) .subject_cols <- names(.df)[id_cols]
   }
 
-  # Fix .subject_col column
-  if (!is.null(.subject_col)) {
-    stopifnot(.subject_col %in% names(.df))
+  .freeze_cols <- c(.subject_cols, .freeze_cols)
 
-    .df <- .df %>% dplyr::relocate(!!!syms(.subject_col))
-    fix_col_index <- purrr::map_dbl(.subject_col, ~ grep(paste0("^",.x, "$"), names(.df)))
+  # Fix .subject_cols column
+  if (!is.null(.freeze_cols)) {
+    stopifnot(.freeze_cols %in% names(.df))
 
-    if(isTRUE(.group_id)){
-      tableOpts$rowGroup <- list(dataSrc = fix_col_index - 1)
-    }
-
+    .df <- .df %>% dplyr::relocate(!!!syms(.freeze_cols))
+    fix_col_index <- purrr::map_dbl(.freeze_cols, ~ grep(paste0("^",.x, "$"), names(.df)))
     tableOpts$fixedColumns <- list(leftColumns = max(fix_col_index))
 
-    # Add color column
-    .df <- .df %>%
-      dplyr::group_by(dplyr::across(all_of(.subject_col))) %>%
-      dplyr::mutate(group_id = dplyr::cur_group_id()) %>%
-      dplyr::mutate(color = ifelse(group_id %% 2 == 1, "white", "#e2e2e2")) %>%
-      dplyr::ungroup() %>% dplyr::select(-group_id)
+    if (!is.null(.subject_cols)) {
+      stopifnot(.subject_cols %in% names(.df))
 
-    # Hides color column in output
-    color_id <- grep("color", names(.df)) - 1
-    columnDefs <- c(columnDefs, list(list(targets = color_id, visible = F)))
+      # Optionally break by .subject_cols
+      if(isTRUE(.group_id)){
+        tableOpts$rowGroup <- list(dataSrc = fix_col_index - 1)
+      }
+
+      # Add color column
+      .df <- .df %>%
+        dplyr::group_by(dplyr::across(all_of(.subject_cols))) %>%
+        dplyr::mutate(group_id = dplyr::cur_group_id()) %>%
+        dplyr::mutate(color = ifelse(group_id %% 2 == 1, "white", "#ececec")) %>%
+        dplyr::ungroup() %>% dplyr::select(-group_id)
+    }
   }
+
+  if(!("color" %in% names(.df))) .df <- .df %>% dplyr::mutate(color = "white")
+
+  # Hides color column in output
+  color_id <- grep("color", names(.df)) - 1
+  columnDefs <- c(columnDefs, list(list(targets = color_id, visible = F)))
 
   # Assign columnDefs to table options
   tableOpts$columnDefs <- columnDefs
@@ -112,7 +128,7 @@ view_src <- function(
   names_with_labels <- purrr::map2_chr(colnames(.df), labels, ~{
     sub_txt <- if(!is.null(.y)){
       .y <- paste0("(", .y, ")")
-      paste0("<br>", glue("<span style='color: #8A8B8C; font-size: {base_font_size+1}pt'>"), .y, "</span>")
+      paste0("<br>", glue("<span style='color: #8A8B8C; font-size: {base_font_size}pt'>"), .y, "</span>")
     }else{
       ""
     }
@@ -122,7 +138,7 @@ view_src <- function(
 
 
   # Return the .df table
-  .df_view <- DT::datatable(
+  DT::datatable(
     .df,
     colnames = names_with_labels,
     rownames = FALSE,
@@ -130,12 +146,12 @@ view_src <- function(
     filter = list(position = 'top', clear = FALSE),
     selection = "none",
     # style = "bootstrap4",
-    class = 'cell-border hover order-column nowrap stripe',
+    class = 'cell-border hover order-column nowrap',
     extensions = c("RowGroup", "ColReorder", "FixedColumns"),
     plugins = 'natural',
     options = tableOpts
   ) %>%
-    DT::formatStyle(0:ncol(.df), target = "cell", border = '0.5px solid #bbbbbb', padding= "1px") %>%
+    DT::formatStyle(0:ncol(.df), target = "cell", border = '1px solid #bbbbbb', padding= "1px") %>%
     DT::formatStyle(0, target= 'row',lineHeight='85%') %>%
     DT::formatStyle(0:ncol(.df), fontSize = paste0(base_font_size, "pt")) %>%
     DT::formatStyle(0:ncol(.df), "color",
@@ -143,14 +159,9 @@ view_src <- function(
     )
 
 
-  if(.view == "window"){
-    html_file <- tempfile(fileext = ".html")
-    htmlwidgets::saveWidget(.df_view, html_file, selfcontained = TRUE)
-    browseURL(html_file)
-  }else{
-    .df_view
-  }
-
 }
+
+
+
 
 

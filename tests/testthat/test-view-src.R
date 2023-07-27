@@ -1,4 +1,4 @@
-test_that("view_src correctly modifies dataframe", {
+test_that("v correctly modifies dataframe", {
 
   # Create a test dataframe - additional columns are for manually inspecting the view
   df <- data.frame(
@@ -8,15 +8,14 @@ test_that("view_src correctly modifies dataframe", {
   ) %>%
     dplyr::mutate(
       ID = 1:dplyr::n(),
-      USUBJID = paste0("STUDY-1001-3053-", 1:dplyr::n()),
-      notes = rep("this is a very long line that should probably be wrapped", dplyr::n())
+      USUBJID = paste0("STUDY-1001-3053-", 1:dplyr::n())
       ) %>%
     dplyr::relocate(ID, USUBJID)
 
   attr(df$USUBJID, "label") <- "Subject"
 
   # Test the function on the test dataframe
-  result <- view_src(df, "USUBJID", .view = "viewer")
+  result <- v(df, "USUBJID")
 
   # Check that the output is a datatables object
   expect_true(inherits(result, "datatables"))
