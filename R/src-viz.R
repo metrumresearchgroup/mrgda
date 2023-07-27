@@ -139,9 +139,8 @@ check_subject_col <- function(.src_list, id_cols = c("ID", "USUBJID")){
   }) %>% dplyr::mutate(dataset = names(.src_list)) %>%
     tidyr::pivot_longer(all_of(id_cols), names_to = "id_col", values_to = "present")
 
-
   if(!any(id_col_df$present)){
-    # No global filter if no id_cols are found
+    # Set to NULL if none are found
     subject_col <- NULL
   }else{
     # Use the id_col with the most occurrences across the datasets
