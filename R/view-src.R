@@ -40,7 +40,6 @@ v <- function(
   # otherwise DT will not align the headers properly (known open bug)
   autoWidth <- if(ncol(.df) <= 6) FALSE else TRUE
 
-
   # Set basic options
   col_width <- "30px"
   base_font_size <- 9
@@ -101,7 +100,7 @@ v <- function(
         dplyr::group_by(dplyr::across(all_of(.subject_cols))) %>%
         dplyr::mutate(group_id = dplyr::cur_group_id()) %>%
         dplyr::mutate(color = ifelse(.data$group_id %% 2 == 1, "white", "#ececec")) %>%
-        dplyr::ungroup() %>% dplyr::select(-.data$group_id)
+        dplyr::ungroup() %>% dplyr::select(-"group_id")
     }
   }
 
@@ -114,6 +113,11 @@ v <- function(
   # Assign columnDefs to table options
   tableOpts$columnDefs <- columnDefs
 
+
+  # Format headers as bold, and include column attributes (label and class)
+  names_with_labels <- format_v_headers(.df)
+
+
   # Convert columns with less than 20 unique values to factors
   .df <- purrr::map_dfr(.df, ~ {
     if(length(unique(.x)) < 20){
@@ -122,20 +126,6 @@ v <- function(
       .x
     }
   })
-
-  # Format headers as bold, and include label attributes (if any)
-  labels <- purrr::map(colnames(.df), ~ attr(.df[[.x]], "label"))
-  names_with_labels <- purrr::map2_chr(colnames(.df), labels, ~{
-    sub_txt <- if(!is.null(.y)){
-      .y <- paste0("(", .y, ")")
-      paste0("<br>", glue("<span style='color: #8A8B8C; font-size: {base_font_size}pt'>"), .y, "</span>")
-    }else{
-      ""
-    }
-    paste0("<b>", .x, "</b>", sub_txt)
-  })
-
-
 
   # Return the .df table
   DT::datatable(
@@ -162,6 +152,52 @@ v <- function(
 }
 
 
+# needed for gsub piping
+utils::globalVariables(c("."))
 
+#' Format headers as bold, and include column attributes (label and class)
+#'
+#' @inheritParams v
+#'
+#' @keywords internal
+format_v_headers <- function(.df){
+  col_attributes <- purrr::map(colnames(.df), ~ {
+    list(col_lbl = attr(.df[[.x]], "label"), col_class = readr::guess_parser(as.character(.df[[.x]])))
+  })
+
+  names_with_labels <- purrr::map2_chr(colnames(.df), col_attributes, function(col_name, col_attr){
+    # Label attributes
+    lbl_sub_txt <- if(!is.null(col_attr$col_lbl)){
+      col_attr$col_lbl <- paste0("(", col_attr$col_lbl, ")")
+      paste0("<br>", glue("<span style='color: #8A8B8C; font-size: {base_font_size}pt'>"), col_attr$col_lbl, "</span>")
+    }else{
+      ""
+    }
+
+    # Rename class
+    class_name <- dplyr::case_when(
+      col_attr$col_class == "character" ~ "<chr>",
+      col_attr$col_class == "double" ~ "<dbl>",
+      col_attr$col_class == "datetime" ~ "<dttm>",
+      TRUE ~ col_attr$col_class
+    ) %>% gsub(">", "&gt;", .) %>% gsub("<", "&lt;", .)
+
+    # Define color based on class
+    class_color <- dplyr::case_when(
+      col_attr$col_class == "character" ~ "#D63A33",
+      col_attr$col_class == "double" ~ "#6BA93C",
+      col_attr$col_class == "datetime" ~ "#3366A4",
+      TRUE ~ "black"
+    )
+
+    class_sub_text <- paste0("<br>", glue("<i><span style='color: {class_color}; font-size: {base_font_size}pt'>"),
+                             class_name, "</span></i>")
+
+    # Create overall header
+    paste0("<b>", col_name, "</b>", lbl_sub_txt, class_sub_text)
+  })
+
+  return(names_with_labels)
+}
 
 
