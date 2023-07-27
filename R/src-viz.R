@@ -104,7 +104,7 @@ src_viz <- function(.src_list, .subject_col = NULL) {
         if(has_subject_col){
           v(.df_filter, .subject_col)
         }else{
-          v(.df, .subject_col = NULL)
+          v(.df, .subject_cols = NULL)
         }
 
 
@@ -127,6 +127,8 @@ src_viz <- function(.src_list, .subject_col = NULL) {
 #' @inheritParams src_viz
 #' @param id_cols vector of id columns to search for
 #'
+#' @importFrom tidyselect all_of
+#'
 #' @keywords internal
 check_subject_col <- function(.src_list, id_cols = c("ID", "USUBJID")){
   # Look for USUBJID and ID columns across datasets
@@ -143,7 +145,7 @@ check_subject_col <- function(.src_list, id_cols = c("ID", "USUBJID")){
     subject_col <- NULL
   }else{
     # Use the id_col with the most occurrences across the datasets
-    id_count <- id_col_df %>% dplyr::count(id_col, present)
+    id_count <- id_col_df %>% dplyr::count(.data$id_col, .data$present)
     subject_col <- id_count$id_col[id_count$n == max(id_count$n)]
     # Use USUBJID if they are the same frequency
     if(length(subject_col) > 1){

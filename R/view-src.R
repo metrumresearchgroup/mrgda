@@ -100,8 +100,8 @@ v <- function(
       .df <- .df %>%
         dplyr::group_by(dplyr::across(all_of(.subject_cols))) %>%
         dplyr::mutate(group_id = dplyr::cur_group_id()) %>%
-        dplyr::mutate(color = ifelse(group_id %% 2 == 1, "white", "#ececec")) %>%
-        dplyr::ungroup() %>% dplyr::select(-group_id)
+        dplyr::mutate(color = ifelse(.data$group_id %% 2 == 1, "white", "#ececec")) %>%
+        dplyr::ungroup() %>% dplyr::select(-.data$group_id)
     }
   }
 
