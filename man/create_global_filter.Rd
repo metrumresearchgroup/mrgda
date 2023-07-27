@@ -7,7 +7,8 @@
 create_global_filter(.subject_col)
 }
 \arguments{
-\item{.subject_col}{A string specifying the name of the subject column for filtering. Defaults to "USUBJID".}
+\item{.subject_col}{A string specifying the name of the subject column for global filtering, allowing users to filter all datasets at once.
+Defaults to NULL.}
 }
 \description{
 Create global filter

@@ -70,7 +70,7 @@ test_that("check_subject_col determines the correct column", {
 test_that("create_global_filter creates the correct UI", {
 
   filter_ui <- create_global_filter(.subject_col = NULL)
-  expect_equal(filter_ui, htmltools::div())
+  expect_equal(filter_ui, shiny::div())
 
   id_col <- "USUBJID"
   filter_ui <- create_global_filter(.subject_col = id_col)

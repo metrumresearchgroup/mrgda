@@ -4,18 +4,22 @@
 #' produces a tabbed visualizer where each tab corresponds to a domain. A global filter is provided to filter the data by a subject column.
 #'
 #' @param .src_list A named list of data frames. Each data frame represents a domain that should be visualized. The list names should be the domain names.
-#' @param .subject_col A string specifying the name of the subject column for filtering. Defaults to "USUBJID".
+#' @param .subject_col A string specifying the name of the subject column for global filtering, allowing users to filter all datasets at once.
+#' Defaults to NULL.
+#'
+#' @details
+#' If `.subject_col` is set to `NULL`, will search for `"ID"` and `"USUBJID"`, and set the most commonly found column
+#' to this argument.
 #'
 #' @return A Shiny App for visualizing source data from various domains.
 #' @note The Shiny App will be launched in the system's default web browser.
 #' @note This function assumes the use of the shinydashboard, shiny and purrr packages, and they should be installed and loaded.
 #'
-#' @usage
-#' src_viz(.src_list, .subject_col = "USUBJID")
 #'
 #' @examples
 #' \dontrun{
-#' src_viz(read_src_dir(system.file("example-sdtm", package = "mrgda")), .subject_col = "USUBJID")
+#' df_list <- read_src_dir(system.file("example-sdtm", package = "mrgda"))
+#' src_viz(df_list, .subject_col = "USUBJID")
 #' }
 #'
 #' @export
@@ -166,7 +170,7 @@ create_global_filter <- function(.subject_col){
       )
 
   }else{
-    global_filter_ui <- htmltools::div()
+    global_filter_ui <- shiny::div()
   }
 
   return(global_filter_ui)
