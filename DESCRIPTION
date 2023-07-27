@@ -21,6 +21,7 @@ Imports:
     purrr,
     rlang (>= 1.0.2),
     tidyr,
+    tidyselect,
     yspec,
     tibble,
     diffdf,
