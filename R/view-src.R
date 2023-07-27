@@ -112,11 +112,11 @@ view_src <- function(
   names_with_labels <- purrr::map2_chr(colnames(.df), labels, ~{
     sub_txt <- if(!is.null(.y)){
       .y <- paste0("(", .y, ")")
-      paste0("<br>", glue("<i><span style='color: #8A8B8C; font-size: {base_font_size+1.5}pt'>"), .y, "</i></span> ")
+      paste0("<br>", glue("<span style='color: #8A8B8C; font-size: {base_font_size+1}pt'>"), .y, "</span>")
     }else{
       ""
     }
-    paste0("<i>", .x, "</b>", sub_txt)
+    paste0("<b>", .x, "</b>", sub_txt)
   })
 
 
