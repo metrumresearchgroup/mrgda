@@ -7,7 +7,7 @@
 src_viz(.src_list, .subject_col = "USUBJID")
 }
 \arguments{
-\item{.src_list}{A list of data frames. Each data frame represents a domain that should be visualized. The list names should be the domain names.}
+\item{.src_list}{A named list of data frames. Each data frame represents a domain that should be visualized. The list names should be the domain names.}
 
 \item{.subject_col}{A string specifying the name of the subject column for filtering. Defaults to "USUBJID".}
 }
