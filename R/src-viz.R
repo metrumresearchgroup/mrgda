@@ -95,13 +95,16 @@ src_viz <- function(.src_list, .subject_col = NULL) {
         do_rows_filter <- has_subject_col && nchar(trimws(input$subject_filter)) > 0
 
         if(do_rows_filter){
-          .df_filter <- .df %>% dplyr::filter(!!sym(.subject_col) == trimws(input$subject_filter))
+          .df_filter <- .df %>% dplyr::filter(grepl(trimws(input$subject_filter), !!sym(.subject_col)))
         }else{
           .df_filter <- .df
         }
 
         # Allows for some dataframes to not have .subject_col
         if(has_subject_col){
+          if(nrow(.df_filter) == 0){
+            .df_filter[1, .subject_col] <- "<b>No subjects found</b>"
+          }
           v(.df_filter, .subject_col)
         }else{
           v(.df, .subject_cols = NULL)
