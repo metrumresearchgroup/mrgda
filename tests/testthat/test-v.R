@@ -1,3 +1,5 @@
+path <- system.file("example-sdtm", package = "mrgda")
+
 test_that("v correctly modifies dataframe", {
 
   # Create a test dataframe - additional columns are for manually inspecting the view
@@ -32,8 +34,10 @@ test_that("v correctly modifies dataframe", {
 })
 
 test_that("v errors for large dataset when interactive", {
-  path_lg <- system.file("example-sdtm-large-lb", "lb.xpt", package = "mrgda")
-  df_large <- haven::read_xpt(path_lg) %>% dplyr::slice(1:10000)
+  df <- haven::read_xpt(file.path(path, "lb.xpt"))
+
+  desired_rows <- 10000
+  df_large <- purrr::map_dfr(seq_len(ceiling(desired_rows / nrow(df))), ~ df)
 
   rlang::with_interactive(value = TRUE, {
     error_msg <- testthat::capture_error(v(df_large))

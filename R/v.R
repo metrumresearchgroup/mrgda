@@ -27,6 +27,7 @@
 #'
 #' @importFrom dplyr across n
 #' @importFrom tidyselect where
+#' @importFrom utils object.size
 #'
 #' @export
 v <- function(

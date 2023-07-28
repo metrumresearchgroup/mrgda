@@ -107,7 +107,7 @@ src_viz <- function(.src_list, .subject_col = NULL) {
           }
           v(.df_filter, .subject_col)
         }else{
-          v(.df, .subject_cols = NULL)
+          v(.df, .subject_col = NULL)
         }
 
 
