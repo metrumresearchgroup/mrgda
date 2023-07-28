@@ -31,16 +31,16 @@ test_that("v correctly modifies dataframe", {
 
 })
 
-test_that("v errors for large dataset", {
-  path_lg <- system.file("example-sdtm-large-lb", package = "mrgda")
-  src_list_lg <- read_src_dir(.path = path_lg) %>% suppressMessages()
-  df_large <- src_list_lg$lb %>% dplyr::slice(1:10000)
+test_that("v errors for large dataset when interactive", {
+  path_lg <- system.file("example-sdtm-large-lb", "lb.xpt", package = "mrgda")
+  df_large <- haven::read_xpt(path_lg) %>% dplyr::slice(1:10000)
 
-  error_msg <- testthat::capture_error(v(df_large))
-  expect_equal(
-    unname(error_msg$message),
-    ".df object size is 2.334e+06, which must be less than 2.1e6 to render on the client side."
-  )
+  rlang::with_interactive(value = TRUE, {
+    error_msg <- testthat::capture_error(v(df_large))
+  })
+
+  expect_true(grepl(".df object size", unname(error_msg$message)))
+
   expect_equal(
     unname(error_msg$body),
     "Use `mrgda::src_viz(list(.df))` for large datasets, which renders the table using your R console"

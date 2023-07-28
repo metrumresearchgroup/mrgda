@@ -37,7 +37,7 @@ v <- function(
 ){
 
 
-  if(interactive() && object.size(.df) > 2.1e6){
+  if(rlang::is_interactive() && object.size(.df) > 2.1e6){
     size <- format(as.numeric(object.size(.df)), scientific = TRUE, digits = 4)
     msg <- c(
       "x" = glue(".df object size is {size}, which must be less than 2.1e6 to render on the client side."),
@@ -157,7 +157,7 @@ v <- function(
                     backgroundColor = DT::styleEqual(sort(unique(.df$color)), sort(unique(.df$color)))
     ) %>% suppressWarnings()
 
-  .df_view
+  return(.df_view)
 }
 
 
