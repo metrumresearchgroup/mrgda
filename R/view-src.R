@@ -51,7 +51,7 @@ v <- function(
     lengthMenu = c(25,100,500,1000),
     headerCallback = DT::JS(
       "function(thead) {",
-      glue("$(thead).css('font-size', '{base_font_size+1}pt');"),
+      glue("$(thead).css('font-size', '{base_font_size}pt');"),
       "}"
     ),
     scrolly = "15vh",
@@ -158,10 +158,9 @@ utils::globalVariables(c("."))
 #' Format headers as bold, and include column attributes (label and class)
 #'
 #' @inheritParams v
-#' @param base_font_size font size used to format the header
 #'
 #' @keywords internal
-format_v_headers <- function(.df, base_font_size){
+format_v_headers <- function(.df){
   col_attributes <- purrr::map(colnames(.df), ~ {
     list(col_lbl = attr(.df[[.x]], "label"), col_class = readr::guess_parser(as.character(.df[[.x]])))
   })
@@ -170,7 +169,7 @@ format_v_headers <- function(.df, base_font_size){
     # Label attributes
     lbl_sub_txt <- if(!is.null(col_attr$col_lbl)){
       col_attr$col_lbl <- paste0("(", col_attr$col_lbl, ")")
-      paste0("<br>", glue("<span style='color: #8A8B8C; font-size: {base_font_size}pt'>"), col_attr$col_lbl, "</span>")
+      paste0("<br>", glue("<span style='color: #8A8B8C;'>"), col_attr$col_lbl, "</span>")
     }else{
       ""
     }
@@ -191,7 +190,7 @@ format_v_headers <- function(.df, base_font_size){
       TRUE ~ "black"
     )
 
-    class_sub_text <- paste0("<br>", glue("<i><span style='color: {class_color}; font-size: {base_font_size}pt'>"),
+    class_sub_text <- paste0("<br>", glue("<i><span style='color: {class_color};'>"),
                              class_name, "</span></i>")
 
     # Create overall header
