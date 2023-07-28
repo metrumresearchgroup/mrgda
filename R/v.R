@@ -157,12 +157,7 @@ v <- function(
                     backgroundColor = DT::styleEqual(sort(unique(.df$color)), sort(unique(.df$color)))
     ) %>% suppressWarnings()
 
-  if(interactive()){
-    html_file <- tempfile(fileext = ".html")
-    htmlwidgets::saveWidget(.df_view, html_file)
-    rstudioapi::viewer(html_file, height = "maximize")
-  }
-  return(invisible(.df_view))
+  .df_view
 }
 
 
