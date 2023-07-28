@@ -111,7 +111,7 @@ v <- function(
 
   if(!("color" %in% names(.df))) .df <- .df %>% dplyr::mutate(color = "white")
 
-  caption <- make_v_caption(.df, base_font_size + 2)
+  caption <- make_v_caption(.df, .subject_col, base_font_size + 2)
 
   # Hides color column in output
   color_id <- grep("color", names(.df)) - 1

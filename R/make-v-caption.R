@@ -4,7 +4,7 @@
 #' @param font_size font size of the caption
 #'
 #' @keywords internal
-make_v_caption <- function(.df, font_size){
+make_v_caption <- function(.df, .subject_col, font_size){
   style <- glue('caption-side: top; text-align: left; color:#0053a0; font-size:{font_size}pt;
                 font-weight: bold; position: fixed;left: 12em; top: 1em; padding: 3px')
 

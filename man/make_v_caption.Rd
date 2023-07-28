@@ -4,10 +4,13 @@
 \alias{make_v_caption}
 \title{Make the caption for \code{v()}, returning the number of subjects}
 \usage{
-make_v_caption(.df, font_size)
+make_v_caption(.df, .subject_col, font_size)
 }
 \arguments{
 \item{.df}{A dataframe that you want to process and view.}
+
+\item{.subject_col}{A character string specifying the subject column. If this column is
+present in the dataframe, it will be used to group rows in the datatable.}
 
 \item{font_size}{font size of the caption}
 }
