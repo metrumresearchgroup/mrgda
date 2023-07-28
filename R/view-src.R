@@ -115,7 +115,7 @@ v <- function(
 
 
   # Format headers as bold, and include column attributes (label and class)
-  names_with_labels <- format_v_headers(.df, base_font_size)
+  names_with_labels <- format_v_headers(.df)
 
 
   # Convert columns with less than 20 unique values to factors
