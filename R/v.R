@@ -5,15 +5,15 @@
 #' subject column is present, it is used to group rows in the table.
 #'
 #' @param .df A dataframe that you want to process and view.
-#' @param .subject_cols A character vector specifying the subject columns. If these columns are
+#' @param .subject_col A character string specifying the subject column. If this column is
 #' present in the dataframe, it will be used to group rows in the datatable.
 #' @param .freeze_cols A character vector specifying columns to freeze when scrolling horizontally.
-#' `.subject_cols` will automatically be appended to this list (i.e. `.subject_cols` are always frozen).
-#' @param .group_id Logical (`TRUE`/`FALSE`). If `TRUE`, add breaks between each unique `.subject_cols` grouping.
+#' `.subject_col` will automatically be appended to this list (i.e. `.subject_col` is always frozen).
+#' @param .digits number of digits to round numeric columns to.
 #'
 #' @details
-#' If `.subject_cols` is `NULL`, the column names `"USUBJID"` and `"ID"` will be searched and set if present.
-#' If `.subject_cols` are present in the dataframe, they will be frozen and alternate in color.
+#' If `.subject_col` is `NULL`, the column names `"USUBJID"` and `"ID"` will be searched and set if present.
+#' If `.subject_col` is present in the dataframe, it will be frozen and alternate in color.
 #'
 #' Columns with less than 20 unique values are converted to factors. This can be helpful for filtering, which
 #' will show up as the shiny equivalent of `selectInput`, as opposed to the default `textInput` for character columns.
@@ -23,26 +23,36 @@
 #' You can *drag and drop* columns to move them around in the table. If a column is dragged to a frozen column's location,
 #' the new column will be frozen instead.
 #'
-#' @return An instance of DT::datatable class with the processed dataframe.
+#' @return An instance of `DT::datatable` class with the processed dataframe.
 #'
 #' @importFrom dplyr across n
+#' @importFrom tidyselect where
 #'
 #' @export
 v <- function(
     .df,
-    .subject_cols = NULL,
+    .subject_col = NULL,
     .freeze_cols = NULL,
-    .group_id = FALSE
+    .digits = 3
 ){
 
+
+  if(interactive() && object.size(.df) > 2.1e6){
+    size <- format(as.numeric(object.size(.df)), scientific = TRUE, digits = 4)
+    msg <- c(
+      "x" = glue(".df object size is {size}, which must be less than 2.1e6 to render on the client side."),
+      "i"= "Use `mrgda::src_viz(list(.df))` for large datasets, which renders the table using your R console"
+    )
+    cli::cli_abort(msg)
+  }
 
   # Dont autofit width for few number of columns
   # otherwise DT will not align the headers properly (known open bug)
   autoWidth <- if(ncol(.df) <= 6) FALSE else TRUE
 
   # Set basic options
-  col_width <- "30px"
-  base_font_size <- 9
+  col_width <- "1px"
+  base_font_size <- 10
 
   # Table options
   tableOpts = list(
@@ -51,7 +61,7 @@ v <- function(
     lengthMenu = c(25,100,500,1000),
     headerCallback = DT::JS(
       "function(thead) {",
-      glue("$(thead).css('font-size', '{base_font_size}pt');"),
+      glue("$(thead).css('font-size', '{base_font_size-0.5}pt');"),
       "}"
     ),
     scrolly = "15vh",
@@ -71,15 +81,15 @@ v <- function(
     list(type = 'natural', targets = "_all")
   )
 
-  # If no .subject_cols specified, look for USUBJID and ID
-  if(is.null(.subject_cols)){
+  # If no .subject_col specified, look for USUBJID and ID
+  if(is.null(.subject_col)){
     id_cols <- grepl("^(?i)ID$|^(?i)USUBJID$", names(.df))
-    if(any(id_cols)) .subject_cols <- names(.df)[id_cols]
+    if(any(id_cols)) .subject_col <- names(.df)[id_cols]
   }
 
-  .freeze_cols <- c(.subject_cols, .freeze_cols)
+  .freeze_cols <- c(.subject_col, .freeze_cols)
 
-  # Fix .subject_cols column
+  # Fix .freeze_cols and color coat .subject_col
   if (!is.null(.freeze_cols)) {
     stopifnot(.freeze_cols %in% names(.df))
 
@@ -87,17 +97,12 @@ v <- function(
     fix_col_index <- purrr::map_dbl(.freeze_cols, ~ grep(paste0("^",.x, "$"), names(.df)))
     tableOpts$fixedColumns <- list(leftColumns = max(fix_col_index))
 
-    if (!is.null(.subject_cols)) {
-      stopifnot(.subject_cols %in% names(.df))
-
-      # Optionally break by .subject_cols
-      if(isTRUE(.group_id)){
-        tableOpts$rowGroup <- list(dataSrc = fix_col_index - 1)
-      }
+    if (!is.null(.subject_col)) {
+      stopifnot(.subject_col %in% names(.df))
 
       # Add color column
       .df <- .df %>%
-        dplyr::group_by(dplyr::across(all_of(.subject_cols))) %>%
+        dplyr::group_by(dplyr::across(all_of(.subject_col))) %>%
         dplyr::mutate(group_id = dplyr::cur_group_id()) %>%
         dplyr::mutate(color = ifelse(.data$group_id %% 2 == 1, "white", "#ececec")) %>%
         dplyr::ungroup() %>% dplyr::select(-"group_id")
@@ -105,6 +110,8 @@ v <- function(
   }
 
   if(!("color" %in% names(.df))) .df <- .df %>% dplyr::mutate(color = "white")
+
+  caption <- make_v_caption(.df, base_font_size + 2)
 
   # Hides color column in output
   color_id <- grep("color", names(.df)) - 1
@@ -117,6 +124,8 @@ v <- function(
   # Format headers as bold, and include column attributes (label and class)
   names_with_labels <- format_v_headers(.df)
 
+  # Round numeric columns to 3 decimal places
+  .df <- .df %>% dplyr::mutate(across(where(is.numeric),\(x) prettyNum2(x, .digits)))
 
   # Convert columns with less than 20 unique values to factors
   .df <- purrr::map_dfr(.df, ~ {
@@ -128,14 +137,14 @@ v <- function(
   })
 
   # Return the .df table
-  DT::datatable(
+  .df_view <- DT::datatable(
     .df,
+    caption = caption,
     colnames = names_with_labels,
     rownames = FALSE,
     escape = FALSE,
     filter = list(position = 'top', clear = FALSE),
     selection = "none",
-    # style = "bootstrap4",
     class = 'cell-border hover order-column nowrap',
     extensions = c("RowGroup", "ColReorder", "FixedColumns"),
     plugins = 'natural',
@@ -146,58 +155,14 @@ v <- function(
     DT::formatStyle(0:ncol(.df), fontSize = paste0(base_font_size, "pt")) %>%
     DT::formatStyle(0:ncol(.df), "color",
                     backgroundColor = DT::styleEqual(sort(unique(.df$color)), sort(unique(.df$color)))
-    )
+    ) %>% suppressWarnings()
 
-
-}
-
-
-# needed for gsub piping
-utils::globalVariables(c("."))
-
-#' Format headers as bold, and include column attributes (label and class)
-#'
-#' @inheritParams v
-#'
-#' @keywords internal
-format_v_headers <- function(.df){
-  col_attributes <- purrr::map(colnames(.df), ~ {
-    list(col_lbl = attr(.df[[.x]], "label"), col_class = readr::guess_parser(as.character(.df[[.x]])))
-  })
-
-  names_with_labels <- purrr::map2_chr(colnames(.df), col_attributes, function(col_name, col_attr){
-    # Label attributes
-    lbl_sub_txt <- if(!is.null(col_attr$col_lbl)){
-      col_attr$col_lbl <- paste0("(", col_attr$col_lbl, ")")
-      paste0("<br>", glue("<span style='color: #8A8B8C;'>"), col_attr$col_lbl, "</span>")
-    }else{
-      ""
-    }
-
-    # Rename class
-    class_name <- dplyr::case_when(
-      col_attr$col_class == "character" ~ "<chr>",
-      col_attr$col_class == "double" ~ "<dbl>",
-      col_attr$col_class == "datetime" ~ "<dttm>",
-      TRUE ~ col_attr$col_class
-    ) %>% gsub(">", "&gt;", .) %>% gsub("<", "&lt;", .)
-
-    # Define color based on class
-    class_color <- dplyr::case_when(
-      col_attr$col_class == "character" ~ "#D63A33",
-      col_attr$col_class == "double" ~ "#6BA93C",
-      col_attr$col_class == "datetime" ~ "#3366A4",
-      TRUE ~ "black"
-    )
-
-    class_sub_text <- paste0("<br>", glue("<i><span style='color: {class_color};'>"),
-                             class_name, "</span></i>")
-
-    # Create overall header
-    paste0("<b>", col_name, "</b>", lbl_sub_txt, class_sub_text)
-  })
-
-  return(names_with_labels)
+  if(interactive()){
+    html_file <- tempfile(fileext = ".html")
+    htmlwidgets::saveWidget(.df_view, html_file)
+    rstudioapi::viewer(html_file, height = "maximize")
+  }
+  return(invisible(.df_view))
 }
 
 

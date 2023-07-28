@@ -1,3 +1,6 @@
+
+# This script tests all src_viz related functions
+
 test_that("src_viz input validation", {
   # Test with non-list input
   non_list_input <- data.frame(a = 1:5, b = 6:10)
