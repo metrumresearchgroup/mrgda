@@ -26,7 +26,6 @@
 #' @return An instance of `DT::datatable` class with the processed dataframe.
 #'
 #' @importFrom dplyr across n
-#' @importFrom tidyselect where
 #' @importFrom utils object.size
 #'
 #' @export
