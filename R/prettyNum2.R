@@ -1,7 +1,7 @@
 #' Round numeric value with significant digits
 #'
 #' @param .x numeric value
-#' @inheritParams v
+#' @param .digits number of digits to round numeric value to
 #'
 #' @return numeric value
 #'

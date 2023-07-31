@@ -9,7 +9,7 @@ prettyNum2(.x, .digits = 3)
 \arguments{
 \item{.x}{numeric value}
 
-\item{.digits}{number of digits to round numeric columns to.}
+\item{.digits}{number of digits to round numeric value to}
 }
 \value{
 numeric value

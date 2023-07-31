@@ -9,7 +9,7 @@
 #' present in the dataframe, it will be used to group rows in the datatable.
 #' @param .freeze_cols A character vector specifying columns to freeze when scrolling horizontally.
 #' `.subject_col` will automatically be appended to this list (i.e. `.subject_col` is always frozen).
-#' @param .digits number of digits to round numeric columns to.
+#' @param .digits number of digits to round numeric columns to. Set to `NULL` to prevent rounding.
 #'
 #' @details
 #' If `.subject_col` is `NULL`, the column names `"USUBJID"` and `"ID"` will be searched and set if present.
@@ -125,7 +125,9 @@ v <- function(
   names_with_labels <- format_v_headers(.df)
 
   # Round numeric columns to 3 decimal places
-  .df <- .df %>% dplyr::mutate(across(where(is.numeric),\(x) prettyNum2(x, .digits)))
+  if(!is.null(.digits)){
+    .df <- .df %>% dplyr::mutate(across(where(is.numeric),\(x) prettyNum2(x, .digits)))
+  }
 
   # Convert columns with less than 20 unique values to factors
   .df <- purrr::map_dfr(.df, ~ {

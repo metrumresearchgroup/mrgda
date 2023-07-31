@@ -15,7 +15,7 @@ present in the dataframe, it will be used to group rows in the datatable.}
 \item{.freeze_cols}{A character vector specifying columns to freeze when scrolling horizontally.
 \code{.subject_col} will automatically be appended to this list (i.e. \code{.subject_col} is always frozen).}
 
-\item{.digits}{number of digits to round numeric columns to.}
+\item{.digits}{number of digits to round numeric columns to. Set to \code{NULL} to prevent rounding.}
 }
 \value{
 An instance of \code{DT::datatable} class with the processed dataframe.
