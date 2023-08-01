@@ -1,3 +1,14 @@
+# mrgda development
+
+## Bug fixes
+
+- `src_viz()` app bug fixes and improvements with handling subject columns. (#141)
+
+## New features and changes
+
+- renamed function `view_src()` to `v()`, and function received a styling overhaul. (#141)
+
+
 # mrgda 0.8.1
 
 ## Bug fixes
