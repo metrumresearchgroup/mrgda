@@ -4,12 +4,13 @@
 \alias{src_viz}
 \title{Source Visualizer Shiny App}
 \usage{
-src_viz(.src_list, .subject_col = "USUBJID")
+src_viz(.src_list, .subject_col = NULL)
 }
 \arguments{
-\item{.src_list}{A list of data frames. Each data frame represents a domain that should be visualized. The list names should be the domain names.}
+\item{.src_list}{A named list of data frames. Each data frame represents a domain that should be visualized. The list names should be the domain names.}
 
-\item{.subject_col}{A string specifying the name of the subject column for filtering. Defaults to "USUBJID".}
+\item{.subject_col}{A string specifying the name of the subject column for global filtering, allowing users to filter all datasets at once.
+Defaults to NULL.}
 }
 \value{
 A Shiny App for visualizing source data from various domains.
@@ -18,6 +19,10 @@ A Shiny App for visualizing source data from various domains.
 This function creates a Shiny App for visualizing source data. It receives a list of data frames, each representing a different domain, and
 produces a tabbed visualizer where each tab corresponds to a domain. A global filter is provided to filter the data by a subject column.
 }
+\details{
+If \code{.subject_col} is set to \code{NULL}, will search for \code{"ID"} and \code{"USUBJID"}, and set the most commonly found column
+to this argument.
+}
 \note{
 The Shiny App will be launched in the system's default web browser.
 
@@ -25,7 +30,8 @@ This function assumes the use of the shinydashboard, shiny and purrr packages, a
 }
 \examples{
 \dontrun{
-src_viz(read_src_dir(system.file("example-sdtm", package = "mrgda")), .subject_col = "USUBJID")
+df_list <- read_src_dir(system.file("example-sdtm", package = "mrgda"))
+src_viz(df_list, .subject_col = "USUBJID")
 }
 
 }
