@@ -8,6 +8,8 @@
 
 - renamed function `view_src()` to `v()`, and function received a styling overhaul. (#141)
 
+- `execute_data_diffs` was made to run faster. (#142)
+
 
 # mrgda 0.8.1
 
