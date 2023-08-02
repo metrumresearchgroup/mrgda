@@ -48,7 +48,7 @@ v <- function(
 
   # Dont autofit width for few number of columns
   # otherwise DT will not align the headers properly (known open bug)
-  autoWidth <- if(ncol(.df) <= 6) FALSE else TRUE
+  autoWidth <- if(ncol(.df) <= 8) FALSE else TRUE
 
   # Set basic options
   col_width <- "1px"
