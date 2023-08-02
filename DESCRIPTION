@@ -20,7 +20,6 @@ Imports:
     magrittr (>= 2.0.3),
     purrr,
     rlang (>= 1.0.2),
-    htmlwidgets,
     htmltools,
     tidyr,
     tidyselect,
@@ -45,7 +44,8 @@ Imports:
     anytime
 Suggests: 
     testthat (>= 3.0.0),
-    withr (>= 2.5.0)
+    withr (>= 2.5.0),
+    pillar
 Config/testthat/edition: 3
 VignetteBuilder: 
     knitr

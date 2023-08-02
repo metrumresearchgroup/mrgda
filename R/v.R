@@ -48,7 +48,7 @@ v <- function(
 
   # Dont autofit width for few number of columns
   # otherwise DT will not align the headers properly (known open bug)
-  autoWidth <- if(ncol(.df) <= 6) FALSE else TRUE
+  autoWidth <- if(ncol(.df) <= 8) FALSE else TRUE
 
   # Set basic options
   col_width <- "1px"
@@ -81,10 +81,13 @@ v <- function(
     list(type = 'natural', targets = "_all")
   )
 
-  # If no .subject_col specified, look for USUBJID and ID
+  # If no .subject_col specified, look for USUBJID and ID (choose first in appearance)
   if(is.null(.subject_col)){
     id_cols <- grepl("^(?i)ID$|^(?i)USUBJID$", names(.df))
-    if(any(id_cols)) .subject_col <- names(.df)[id_cols[1]]
+    if(any(id_cols)) .subject_col <- names(.df)[id_cols]
+    if(length(.subject_col) > 1) .subject_col <- .subject_col[1]
+  }else{
+    assertthat::assert_that(length(.subject_col) == 1)
   }
 
   .freeze_cols <- c(.subject_col, .freeze_cols)
