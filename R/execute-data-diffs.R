@@ -162,10 +162,10 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
 
 
   # Clear out NUM -----------------------------------------------------------
-  .base_df$NUM <- NULL
-  .compare_df$NUM <- NULL
+  .base_df[["NUM"]] <- NULL
+  .compare_df[["NUM"]] <- NULL
   names_in_common <- names_in_common[names_in_common != "NUM"]
-  
+
   # Diffs by id -------------------------------------------------------------
   id_diffs <- list()
   ids <- unique(dplyr::intersect(.base_df[[.subject_col]], .compare_df[[.subject_col]]))
@@ -181,22 +181,36 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
       .compare_df[.compare_df[[.subject_col]] == id.i, ] %>%
       dplyr::select(dplyr::all_of(names_in_common))
 
-    diff.i <-
-      suppressMessages(
-        diffdf::diffdf(
-          base = base_df.i,
-          compare = compare_df.i,
-          suppress_warnings = TRUE,
-          strict_numeric = FALSE,
-          strict_factor = FALSE
-        )
-      )
+    # If they are identical (we do not care if attributes are different),
+    # skip the diffdf check to save time
+    all_equal.i <- all.equal(
+      target = base_df.i,
+      current = compare_df.i,
+      check.attributes = FALSE
+    )
 
-    if (length(diff.i) > 0) {
-      id_diffs[[as.character(id.i)]] <- diff.i
+    if (!isTRUE(all_equal.i)) {
+
+      diff.i <-
+        suppressMessages(
+          diffdf::diffdf(
+            base = base_df.i,
+            compare = compare_df.i,
+            suppress_warnings = TRUE,
+            strict_numeric = FALSE,
+            strict_factor = FALSE
+          )
+        )
+
+      if (length(diff.i) > 0) {
+        id_diffs[[as.character(id.i)]] <- diff.i
+      }
+
+      rm(diff.i)
+
     }
 
-    rm(diff.i)
+    rm(all_equal.i)
 
     pb$tick()
 

@@ -84,7 +84,7 @@ v <- function(
   # If no .subject_col specified, look for USUBJID and ID
   if(is.null(.subject_col)){
     id_cols <- grepl("^(?i)ID$|^(?i)USUBJID$", names(.df))
-    if(any(id_cols)) .subject_col <- names(.df)[id_cols]
+    if(any(id_cols)) .subject_col <- names(.df)[id_cols[1]]
   }
 
   .freeze_cols <- c(.subject_col, .freeze_cols)
