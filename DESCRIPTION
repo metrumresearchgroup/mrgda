@@ -44,7 +44,8 @@ Imports:
     anytime
 Suggests: 
     testthat (>= 3.0.0),
-    withr (>= 2.5.0)
+    withr (>= 2.5.0),
+    pillar
 Config/testthat/edition: 3
 VignetteBuilder: 
     knitr
