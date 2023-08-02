@@ -20,7 +20,6 @@ Imports:
     magrittr (>= 2.0.3),
     purrr,
     rlang (>= 1.0.2),
-    htmlwidgets,
     htmltools,
     tidyr,
     tidyselect,
