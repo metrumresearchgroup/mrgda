@@ -77,6 +77,8 @@ test_that("v works correctly for various .subject_col specifications", {
   expect_true(grepl(paste("N Subjects (ID):", num_ids), result$x$caption, fixed = TRUE))
   result <- v(df %>% dplyr::relocate(USUBJID))
   expect_true(grepl(paste("N Subjects (USUBJID):", num_ids), result$x$caption, fixed = TRUE))
+  result <- v(df, .subject_col = "USUBJID")
+  expect_true(grepl(paste("N Subjects (USUBJID):", num_ids), result$x$caption, fixed = TRUE))
 
   ## Errors if multiple specified
   error_msg <- testthat::capture_error(v(df, .subject_col = c("USUBJID", "ID")))
