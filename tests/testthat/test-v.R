@@ -27,6 +27,7 @@ df <- tibble::tibble(
 
 attr(df$USUBJID, "label") <- "Subject"
 
+
 test_that("v correctly modifies dataframe", {
 
   # Test the function on the test dataframe
@@ -43,7 +44,6 @@ test_that("v correctly modifies dataframe", {
 
   # Check that columns with less than 20 unique values are converted to factors
   expect_true(is.factor(result$x$data$sex))
-
 })
 
 
@@ -65,7 +65,6 @@ test_that("v works correctly for various .subject_col specifications", {
   ## Errors if multiple specified
   error_msg <- testthat::capture_error(v(df, .subject_col = c("USUBJID", "ID")))
   expect_equal(error_msg$message, "length(.subject_col) not equal to 1")
-
 })
 
 
@@ -114,6 +113,9 @@ test_that("v spawns a background process for large dataframes", {
 
   desired_rows <- 10000
   df_large <- purrr::map_dfr(seq_len(ceiling(desired_rows / nrow(df))), ~ df)
+
+  # Needed for dev environment only
+  Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())
 
   result <- v(df_large)
   on.exit(result$kill())
