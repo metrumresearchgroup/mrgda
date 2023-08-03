@@ -129,7 +129,7 @@ v <- function(
 
   # Round numeric columns to 3 decimal places
   if(!is.null(.digits)){
-    .df <- .df %>% dplyr::mutate(across(where(is.numeric),\(x) prettyNum2(x, .digits)))
+    .df <- .df %>% dplyr::mutate(across(where(is.numeric), ~prettyNum2(.x, .digits)))
   }
 
   # Convert columns with less than 20 unique values to factors
