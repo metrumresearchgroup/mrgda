@@ -76,7 +76,12 @@ src_viz <- function(.src_list, .subject_col = NULL) {
               shiny::tabPanel(
                 title = .x,
                 shiny::tags$br(),
-                DT::dataTableOutput(paste0("table", .x))
+                fluidRow(
+                  column(
+                    width = 12, align = "center",
+                    DT::dataTableOutput(paste0("table", .x))
+                  )
+                )
               )
             }
             )
@@ -105,9 +110,9 @@ src_viz <- function(.src_list, .subject_col = NULL) {
           if(nrow(.df_filter) == 0){
             .df_filter[1, .subject_col] <- "<b>No subjects found</b>"
           }
-          v(.df_filter, .subject_col)
+          create_v_datatable(.df_filter, .subject_col)
         }else{
-          v(.df, .subject_col = NULL)
+          create_v_datatable(.df, .subject_col = NULL)
         }
 
 

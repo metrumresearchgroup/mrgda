@@ -1,6 +1,6 @@
 #' Format headers to include column attributes (label and class)
 #'
-#' @inheritParams v
+#' @inheritParams create_v_datatable
 #'
 #' @keywords internal
 format_v_headers <- function(.df){

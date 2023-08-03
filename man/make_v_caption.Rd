@@ -2,7 +2,7 @@
 % Please edit documentation in R/make-v-caption.R
 \name{make_v_caption}
 \alias{make_v_caption}
-\title{Make the caption for \code{v()}, returning the number of subjects}
+\title{Make the caption for \code{create_v_datatable()}, returning the number of subjects}
 \usage{
 make_v_caption(.df, .subject_col, font_size)
 }
@@ -15,6 +15,6 @@ present in the dataframe, it will be used to group rows in the datatable.}
 \item{font_size}{font size of the caption}
 }
 \description{
-Make the caption for \code{v()}, returning the number of subjects
+Make the caption for \code{create_v_datatable()}, returning the number of subjects
 }
 \keyword{internal}

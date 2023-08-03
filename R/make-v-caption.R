@@ -1,6 +1,6 @@
-#' Make the caption for `v()`, returning the number of subjects
+#' Make the caption for `create_v_datatable()`, returning the number of subjects
 #'
-#' @inheritParams v
+#' @inheritParams create_v_datatable
 #' @param font_size font size of the caption
 #'
 #' @keywords internal

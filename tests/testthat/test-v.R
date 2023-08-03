@@ -46,24 +46,6 @@ test_that("v correctly modifies dataframe", {
 
 })
 
-test_that("v errors for large dataset when interactive", {
-  df <- haven::read_xpt(file.path(path, "lb.xpt"))
-
-  desired_rows <- 10000
-  df_large <- purrr::map_dfr(seq_len(ceiling(desired_rows / nrow(df))), ~ df)
-
-  rlang::with_interactive(value = TRUE, {
-    error_msg <- testthat::capture_error(v(df_large))
-  })
-
-  expect_true(grepl(".df object size", unname(error_msg$message)))
-
-  expect_equal(
-    unname(error_msg$body),
-    "Use `mrgda::src_viz(list(.df))` for large datasets, which renders the table using your R console"
-  )
-})
-
 
 test_that("v works correctly for various .subject_col specifications", {
 
@@ -126,3 +108,32 @@ test_that("v works correctly for various .freeze_cols specifications", {
   expect_equal(names(result$x$data)[1:result$x$options$fixedColumns$leftColumns], c("ID", freeze_cols))
 })
 
+
+test_that("v spawns a background process for large dataframes", {
+  df <- haven::read_xpt(file.path(path, "lb.xpt"))
+
+  desired_rows <- 10000
+  df_large <- purrr::map_dfr(seq_len(ceiling(desired_rows / nrow(df))), ~ df)
+
+  result <- v(df_large)
+  on.exit(result$kill())
+  expect_true(result$is_alive())
+})
+
+test_that("create_v_datatable errors for large dataset when interactive", {
+  df <- haven::read_xpt(file.path(path, "lb.xpt"))
+
+  desired_rows <- 10000
+  df_large <- purrr::map_dfr(seq_len(ceiling(desired_rows / nrow(df))), ~ df)
+
+  rlang::with_interactive(value = TRUE, {
+    error_msg <- testthat::capture_error(create_v_datatable(df_large))
+  })
+
+  expect_true(grepl(".df object size", unname(error_msg$message)))
+
+  expect_equal(
+    unname(error_msg$body),
+    "Use `mrgda::src_viz(list(.df))` for large datasets, which renders the table using your R console"
+  )
+})
