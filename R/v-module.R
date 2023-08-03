@@ -37,13 +37,9 @@ v_server <- function(
 
   moduleServer(id, function(input, output, session) {
 
-    ns <- session$ns
-    .rv <- reactiveValues()
-
     output$df_view <- DT::renderDT({
       create_v_datatable(.df, .subject_col, .freeze_cols, .digits)
     }, server = TRUE)
-
 
   })
 }
