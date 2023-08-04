@@ -4,7 +4,7 @@
 \alias{make_v_caption}
 \title{Make the caption for \code{create_v_datatable()}, returning the number of subjects}
 \usage{
-make_v_caption(.df, .subject_col, font_size)
+make_v_caption(.df, .subject_col, font_size = 12)
 }
 \arguments{
 \item{.df}{A dataframe that you want to process and view.}

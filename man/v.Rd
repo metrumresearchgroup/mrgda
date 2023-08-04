@@ -4,10 +4,10 @@
 \alias{v}
 \title{View a formatted dataframe in the viewer}
 \usage{
-v(.df, .subject_col = NULL, .freeze_cols = NULL, .digits = 3)
+v(.df_list, .subject_col = NULL, .freeze_cols = NULL, .digits = 3)
 }
 \arguments{
-\item{.df}{A dataframe that you want to process and view.}
+\item{.df_list}{A dataframe \emph{or} list of dataframes that you want to process and view.}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}

@@ -5,16 +5,16 @@
 \title{Basic shiny app for running \code{mrgda::create_v_datatable()} on the server}
 \usage{
 v_shiny_internal(
-  .df,
-  .subject_col,
-  .freeze_cols,
-  .digits,
+  .df_list,
+  .subject_col = NULL,
+  .freeze_cols = NULL,
+  .digits = 3,
   host = NULL,
   port = NULL
 )
 }
 \arguments{
-\item{.df}{A dataframe that you want to process and view.}
+\item{.df_list}{A dataframe \emph{or} list of dataframes that you want to process and view.}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}

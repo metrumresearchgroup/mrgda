@@ -4,12 +4,19 @@
 \alias{v_server}
 \title{shiny module server for \code{create_v_datatable}}
 \usage{
-v_server(id, .df, .subject_col = NULL, .freeze_cols = NULL, .digits = 3)
+v_server(
+  id,
+  .df_list,
+  .subject_col = NULL,
+  .freeze_cols = NULL,
+  .digits = 3,
+  subject_filter
+)
 }
 \arguments{
 \item{id}{shiny module id. Character string}
 
-\item{.df}{A dataframe that you want to process and view.}
+\item{.df_list}{A dataframe \emph{or} list of dataframes that you want to process and view.}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
@@ -18,6 +25,8 @@ present in the dataframe, it will be used to group rows in the datatable.}
 \code{.subject_col} will automatically be appended to this list (i.e. \code{.subject_col} is always frozen).}
 
 \item{.digits}{number of digits to round numeric columns to. Set to \code{NULL} to prevent rounding.}
+
+\item{subject_filter}{reactive expression pointing to global filter}
 }
 \description{
 shiny module server for \code{create_v_datatable}

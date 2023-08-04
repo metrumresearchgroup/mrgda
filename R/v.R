@@ -2,6 +2,7 @@
 #'
 #' Creates a DT::datatable object and runs it in a background shiny application in the Rstudio viewer pane.
 #'
+#' @param .df_list A dataframe *or* list of dataframes that you want to process and view.
 #' @inheritParams create_v_datatable
 #'
 #' @details
@@ -24,41 +25,38 @@
 #'
 #' @export
 v <- function(
-    .df,
+    .df_list,
     .subject_col = NULL,
     .freeze_cols = NULL,
     .digits = 3
 ){
 
   args <- list(
-    .df = .df,
+    .df_list = .df_list,
     .subject_col = .subject_col,
     .freeze_cols = .freeze_cols,
     .digits = .digits
   )
 
-  if(object.size(.df) > 2.1e6){
-    # Run in shiny app background process for large dataframes
-    run_app_bg(v_shiny_internal, args = args)
-  }else{
-    # Create DT::datatable object on client side otherwise
-    do.call(create_v_datatable, args = args)
-  }
+  run_app_bg(v_shiny_internal, args = args)
 }
 
 
 
 #' Basic shiny app for running `mrgda::create_v_datatable()` on the server
 #'
+#' @inheritParams v
 #' @inheritParams create_v_datatable
 #' @inheritParams run_app_bg
 #'
+#' @importFrom htmltools tags
+#'
 #' @keywords internal
 v_shiny_internal <- function(
-    .df,
-    .subject_col,
-    .freeze_cols,
-    .digits,
+    .df_list,
+    .subject_col = NULL,
+    .freeze_cols = NULL,
+    .digits = 3,
     host = NULL,
     port = NULL
 ){
@@ -70,12 +68,51 @@ v_shiny_internal <- function(
     devtools::load_all(load_path)
   }
 
-  ui <- shiny::fluidPage(
-    v_ui("df_view")
+  if(!inherits(.df_list, "list")){
+    .df_list <- list(.df_list)
+  }
+
+  # Ensure list elements are named
+  if(is.null(names(.df_list))){
+    names(.df_list) <- paste("Dataframe", seq(length(.df_list)))
+  }
+
+  # Filter out mrgda specific dataframe
+  .df_list <- .df_list[!grepl("mrgda", names(.df_list), fixed = TRUE)]
+
+  # Determine .subject_col if not specified
+  if(is.null(.subject_col)){
+    .subject_col <- check_subject_col(.df_list)
+  }else{
+    # Make sure .subject_col is valid
+    if(!any(purrr::map_lgl(.df_list, ~{.subject_col %in% names(.df_list)}))){
+      abort(glue(".subject_col ({.subject_col}) is not present in any dataframe"))
+    }
+  }
+
+  # Create global filter UI
+  global_filter_ui <- create_global_filter(.subject_col)
+
+  ui <- shinydashboard::dashboardPage(
+    shinydashboard::dashboardHeader(title = NULL, disable = TRUE),
+    shinydashboard::dashboardSidebar(disable = TRUE),
+    shinydashboard::dashboardBody(
+      shinydashboard::box(
+        width = 12,
+        title = tags$span(global_filter_ui),
+        status = "primary",
+        solidHeader = TRUE,
+        v_ui("df_view", .df_list, .subject_col)
+      )
+    )
   )
 
+
   server <- function(input, output, session) {
-    v_server("df_view", .df, .subject_col, .freeze_cols, .digits)
+
+    subject_filter <- reactive(input$subject_filter)
+    v_server("df_view", .df_list, .subject_col, .freeze_cols, .digits,
+             subject_filter = subject_filter)
 
     # End the process on window close. This is designed for the case where a
     # single user launches the app privately with run_app_bg(). If this app is

@@ -4,9 +4,9 @@
 #' @param font_size font size of the caption
 #'
 #' @keywords internal
-make_v_caption <- function(.df, .subject_col, font_size){
-  style <- glue('caption-side: top; text-align: left; color:#FFFFFF; background-color:#5A5A5A; font-size:{font_size}pt;
-                font-weight: bold; position: fixed;left: 12em; top: 1em; padding: 3px')
+make_v_caption <- function(.df, .subject_col, font_size = 12){
+  style <- glue('text-align: left; color:#FFFFFF; background-color:#5A5A5A; font-size:{font_size}pt;
+                font-weight: bold; padding: 3px')
 
   cap_txt <- if(!is.null(.subject_col)){
     num_subj <- .df %>% dplyr::count(!!!syms(.subject_col)) %>% nrow()
@@ -15,7 +15,7 @@ make_v_caption <- function(.df, .subject_col, font_size){
     'No subjects detected'
   }
 
-  htmltools::tags$caption(
+  htmltools::tags$span(
     style = style,
     cap_txt
   )

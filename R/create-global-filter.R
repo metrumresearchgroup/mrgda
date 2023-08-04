@@ -6,10 +6,14 @@
 create_global_filter <- function(.subject_col){
   if(!is.null(.subject_col)){
     global_filter_ui <-
-      shiny::textInput(
-        inputId = "subject_filter",
-        label = paste0("Global ", .subject_col, " Filter"),
-        width = "100%"
+      fluidRow(
+        column(5,
+               shiny::div(style = "font-size:18px;", paste0("Global ", .subject_col, " Filter"))
+               ),
+        column(6,
+               htmltools::tags$style("div.form-group {margin-bottom: 0px;}"),
+               shiny::textInput(inputId = "subject_filter", label = NULL)
+               )
       )
 
   }else{

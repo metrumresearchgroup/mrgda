@@ -54,7 +54,7 @@ src_viz <- function(.src_list, .subject_col = NULL) {
 
   ui <-
     shinydashboard::dashboardPage(
-      shinydashboard::dashboardHeader(title = "Source Visualizer"),
+      shinydashboard::dashboardHeader(title = NULL, disable = TRUE),
       shinydashboard::dashboardSidebar(disable = TRUE),
       shinydashboard::dashboardBody(
         shinydashboard::box(
@@ -124,8 +124,7 @@ src_viz <- function(.src_list, .subject_col = NULL) {
 
   shiny::shinyApp(
     ui = ui,
-    server = server,
-    options = list(launch.browser = TRUE)
+    server = server
   )
 }
 

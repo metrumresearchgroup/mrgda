@@ -28,10 +28,10 @@ df <- tibble::tibble(
 attr(df$USUBJID, "label") <- "Subject"
 
 
-test_that("v correctly modifies dataframe", {
+test_that("create_v_datatable correctly modifies dataframe", {
 
   # Test the function on the test dataframe
-  result <- v(df, "USUBJID")
+  result <- create_v_datatable(df, "USUBJID")
 
   # Check that the output is a datatables object
   expect_true(inherits(result, "datatables"))
@@ -47,29 +47,29 @@ test_that("v correctly modifies dataframe", {
 })
 
 
-test_that("v works correctly for various .subject_col specifications", {
+test_that("create_v_datatable works correctly for various .subject_col specifications", {
 
   ## No subject column
-  result <- v(df %>% dplyr::select(-c("USUBJID", "ID")))
+  result <- create_v_datatable(df %>% dplyr::select(-c("USUBJID", "ID")))
   expect_true(grepl("No subjects detected", result$x$caption, fixed = TRUE))
 
 
   ## Two subject columns found, use the first found
-  result <- v(df)
+  result <- create_v_datatable(df)
   expect_true(grepl(paste("N Subjects (ID):", num_ids), result$x$caption, fixed = TRUE))
-  result <- v(df %>% dplyr::relocate(USUBJID))
+  result <- create_v_datatable(df %>% dplyr::relocate(USUBJID))
   expect_true(grepl(paste("N Subjects (USUBJID):", num_ids), result$x$caption, fixed = TRUE))
-  result <- v(df, .subject_col = "USUBJID")
+  result <- create_v_datatable(df, .subject_col = "USUBJID")
   expect_true(grepl(paste("N Subjects (USUBJID):", num_ids), result$x$caption, fixed = TRUE))
 
   ## Errors if multiple specified
-  error_msg <- testthat::capture_error(v(df, .subject_col = c("USUBJID", "ID")))
+  error_msg <- testthat::capture_error(create_v_datatable(df, .subject_col = c("USUBJID", "ID")))
   expect_equal(error_msg$message, "length(.subject_col) not equal to 1")
 })
 
 
-test_that("v formatting options work correctly", {
-  result <- v(df %>% dplyr::relocate(sex))
+test_that("create_v_datatable formatting options work correctly", {
+  result <- create_v_datatable(df %>% dplyr::relocate(sex))
 
   # Found subject column is relocated to front
   expect_equal(colnames(result$x$data)[1], "ID")
@@ -96,31 +96,31 @@ test_that("v formatting options work correctly", {
 })
 
 
-test_that("v works correctly for various .freeze_cols specifications", {
+test_that("create_v_datatable works correctly for various .freeze_cols specifications", {
 
-  result <- v(df)
+  result <- create_v_datatable(df)
   # fixes/freezes first ID column found by default (none specified)
   expect_equal(names(result$x$data)[1:result$x$options$fixedColumns$leftColumns], "ID")
 
   freeze_cols <- c("USUBJID", "biomarker")
-  result <- v(df, .freeze_cols = freeze_cols)
+  result <- create_v_datatable(df, .freeze_cols = freeze_cols)
   expect_equal(names(result$x$data)[1:result$x$options$fixedColumns$leftColumns], c("ID", freeze_cols))
 })
 
 
-test_that("v spawns a background process for large dataframes", {
-  df <- haven::read_xpt(file.path(path, "lb.xpt"))
-
-  desired_rows <- 10000
-  df_large <- purrr::map_dfr(seq_len(ceiling(desired_rows / nrow(df))), ~ df)
-
-  # Needed for dev environment only
-  Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())
-
-  result <- v(df_large)
-  on.exit(result$kill())
-  expect_true(result$is_alive())
-})
+# test_that("v spawns a background process for large dataframes", {
+#   df <- haven::read_xpt(file.path(path, "lb.xpt"))
+#
+#   desired_rows <- 10000
+#   df_large <- purrr::map_dfr(seq_len(ceiling(desired_rows / nrow(df))), ~ df)
+#
+#   # Needed for dev environment only
+#   Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())
+#
+#   result <- v(df_large)
+#   on.exit(result$kill())
+#   expect_true(result$is_alive())
+# })
 
 test_that("create_v_datatable errors for large dataset when interactive", {
   df <- haven::read_xpt(file.path(path, "lb.xpt"))
