@@ -34,4 +34,8 @@ a \code{shinyApp} object
 Create and execute a basic shiny app for running \code{mrgda::create_v_datatable()} on the server.
 Renders a \code{DT::datatable} object for each dataframe in a \code{shiny::tabPanel} object.
 }
+\details{
+It's easier to use this function for testing during development, as messages
+will be printed to the console.
+}
 \keyword{internal}

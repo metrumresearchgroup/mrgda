@@ -89,6 +89,10 @@ v <- function(
 #'
 #' @importFrom htmltools tags
 #'
+#' @details
+#' It's easier to use this function for testing during development, as messages
+#' will be printed to the console.
+#'
 #' @return a `shinyApp` object
 #'
 #' @keywords internal
@@ -127,12 +131,14 @@ v_shiny_internal <- function(
     shinydashboard::dashboardHeader(title = NULL, disable = TRUE),
     shinydashboard::dashboardSidebar(disable = TRUE),
     shinydashboard::dashboardBody(
-      shinydashboard::box(
-        width = 12,
-        title = tags$span(global_filter_ui),
-        status = "primary",
-        solidHeader = TRUE,
-        v_ui("df_view", .df_list, .subject_col)
+      fluidRow(
+        shinydashboard::box(
+          width = 12,
+          title = tags$span(global_filter_ui),
+          status = "primary",
+          solidHeader = TRUE,
+          v_ui("df_view", .df_list, .subject_col)
+        )
       )
     )
   )
@@ -198,12 +204,8 @@ v_ui <- function(.id, .df_list, .subject_col){
       shinydashboard::tabBox,
       c(
         purrr::map2(names(.df_list), .df_list, function(.name, .df){
-          caption <- make_v_caption(.df, .subject_col)
           shiny::tabPanel(
-            title = .name,
-            shiny::tags$br(),
-            shiny::tags$div(caption),
-            shiny::tags$br(),
+            title = make_v_caption(.name, .df, .subject_col),
             fluidRow(
               column(
                 width = 12, align = "center",

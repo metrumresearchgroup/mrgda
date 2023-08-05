@@ -141,32 +141,46 @@ check_subject_col <- function(.df_list, .id_cols = c("USUBJID", "ID")){
 }
 
 
-#' Make a caption displaying number of subjects
+#' Make a caption displaying the dataset name and number of subjects
 #'
-#' Make a caption for for each rendering of `create_v_datatable()`, displaying the number of subjects
+#' Make a caption for for each rendering of `create_v_datatable()`, displaying the
+#' number of subjects under the dataset name (center aligned).
 #'
+#' @param .name name of the dataset
 #' @inheritParams create_v_datatable
 #' @param .font_size font size of the caption
 #'
 #' @returns a `shiny.tag` object
 #'
 #' @keywords internal
-make_v_caption <- function(.df, .subject_col, .font_size = 12){
-  style <- glue('text-align: left; color:#FFFFFF; background-color:#5A5A5A; font-size:{.font_size}pt;
-                font-weight: bold; padding: 3px')
+make_v_caption <- function(.name, .df, .subject_col, .font_size = 12){
 
-  cap_txt <- if(!is.null(.subject_col)){
+  # Format dataframe name
+  name_style <- glue('text-align: center; font-size:{.font_size}pt; font-weight: bold; display: block;')
+
+  name_txt <- htmltools::tags$span(
+    style = name_style,
+    .name
+  )
+
+  # Format subject count
+  n_subj_style <- glue('text-align: center; font-size:{.font_size-2}pt; display: block;')
+
+  n_subj_txt <- if(!is.null(.subject_col)){
     num_subj <- .df %>% dplyr::count(!!!syms(.subject_col)) %>% nrow()
-    glue('N Subjects ({.subject_col}): {num_subj}')
+    glue('(N Subjects: {num_subj})')
   }else{
     'No subjects detected'
   }
 
-  htmltools::tags$span(
-    style = style,
-    cap_txt
+  n_subj_txt <- htmltools::tags$span(
+    style = n_subj_style,
+    n_subj_txt
   )
 
+  # Combine and format as HTML
+  caption <- paste(name_txt, n_subj_txt, sep = " ")
+  shiny::tags$div(htmltools::HTML(caption))
 }
 
 
