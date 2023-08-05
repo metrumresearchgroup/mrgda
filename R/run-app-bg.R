@@ -47,10 +47,15 @@ run_app_bg <- function(func, args,
   spinner <- cli::make_spinner()
   while (!pingr::is_up(destination = host, port = port)) {
     if (!process$is_alive()) {
-      abort(paste(
-        "Background app process at", url, "failed:", readr::read_file(stderr_file),
-        paste("\n If you are in a dev environment, make sure you set the environment variable:",
-              "`Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())`\n")
+      msgs <- fmt_bg_msgs(stderr_file)
+
+      cli::cli_abort(c(
+        "x" = paste("Background app process at", url, "failed. Callback:\n"),
+        "",
+        msgs,
+        "",
+        "i" = "If you are in a dev environment, make sure you set the environment variable:",
+        " " = "{.code Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())}."
       ))
     }
     Sys.sleep(0.01)
@@ -70,4 +75,20 @@ random_dynamic_port <- function() {
   lower <- 49152L - 1L
   upper <- 65355L
   lower + sample(upper - lower, size = 1L)
+}
+
+
+#' Format lines of `stderr_file` into `cli::cli_bullets`
+#'
+#' @param stderr_file file path the standard error of the child R process is written to.
+#'
+#' @keywords internal
+fmt_bg_msgs <- function(stderr_file){
+  msgs <- strsplit(readr::read_file(stderr_file), '\n')[[1]]
+  msgs <- msgs %>% stats::setNames(rep(">", length(msgs)))
+  names(msgs)[grepl("(?i)Error", msgs)] <- "x"
+  names(msgs)[grepl("(?i)Loading", msgs)] <- "v"
+  names(msgs)[grepl("(?i)Warning", msgs)] <- "!"
+
+  return(msgs)
 }

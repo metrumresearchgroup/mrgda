@@ -36,7 +36,8 @@ Columns with label attributes will be appended to column headers as a new line.
 
 You can \emph{drag and drop} columns to move them around in the table. If a column is dragged to a frozen column's location,
 the new column will be frozen instead.
-
+}
+\note{
 \strong{Notes about the background process:}
 
 By running the app as a background process, users will retain access to their console.
@@ -48,11 +49,15 @@ The process will end when one of the following things happen:
 
 \if{html}{\out{<div class="sourceCode">}}\preformatted{result <- v(mtcars)
 result$kill()
+
+result
+PROCESS 'R', finished.
 }\if{html}{\out{</div>}}
 }
 }
 \examples{
 \dontrun{
+
  df_list <- mrgda::read_src_dir(system.file("example-sdtm", package = "mrgda"))
 
  # "USUBJID" automatically detected as `.subject_col`

@@ -20,6 +20,7 @@
 #' You can *drag and drop* columns to move them around in the table. If a column is dragged to a frozen column's location,
 #' the new column will be frozen instead.
 #'
+#' @note
 #' **Notes about the background process:**
 #'
 #' By running the app as a background process, users will retain access to their console.
@@ -30,10 +31,14 @@
 #'    ```
 #'    result <- v(mtcars)
 #'    result$kill()
+#'
+#'    result
+#'    PROCESS 'R', finished.
 #'    ```
 #'
 #' @examples
 #' \dontrun{
+#'
 #'  df_list <- mrgda::read_src_dir(system.file("example-sdtm", package = "mrgda"))
 #'
 #'  # "USUBJID" automatically detected as `.subject_col`
@@ -96,24 +101,14 @@ v_shiny_internal <- function(
     port = NULL
 ){
 
-  # For Development Environment
+  # For Development Environment, must load the package
   load_path <- Sys.getenv("MRGDA_SHINY_DEV_LOAD_PATH")
   if (nzchar(load_path)) {
     message("Loading ", load_path)
     devtools::load_all(load_path)
   }
 
-  if(!inherits(.df_list, "list")){
-    .df_list <- list(.df_list)
-  }
-
-  # Ensure list elements are named
-  if(is.null(names(.df_list))){
-    names(.df_list) <- paste("Dataframe", seq(length(.df_list)))
-  }
-
-  # Filter out mrgda specific dataframe
-  .df_list <- .df_list[!grepl("mrgda", names(.df_list), fixed = TRUE)]
+  .df_list <- setup_v_list(.df_list)
 
   # Determine .subject_col if not specified
   if(is.null(.subject_col)){
@@ -145,7 +140,14 @@ v_shiny_internal <- function(
 
   server <- function(input, output, session) {
 
+    onStop(function(){
+      cli::cli_inform(c("i"="Session Stopped\n"))
+    })
+
+    # Global subject filter
     subject_filter <- reactive(input$subject_filter)
+
+    # Create DT datatables
     v_server("df_view", .df_list, .subject_col, .freeze_cols, .digits,
              .subject_filter = subject_filter)
 
@@ -157,7 +159,17 @@ v_shiny_internal <- function(
     session$onSessionEnded(shiny::stopApp)
   }
 
-  app <- shinyApp(ui = ui, server = server, options = list(host = host, port = port))
+  # Messages wont be shown in the console when run in the background, but can be
+  # recovered before or after the process is finished.
+  onStart <- function() {
+    shiny::onStop(function() {
+      cli::cli_inform(c("i"="Recovering memory\n"))
+      gc()
+    })
+  }
+
+  app <- shinyApp(ui = ui, server = server, onStart = onStart,
+                  options = list(host = host, port = port))
   shiny::runApp(app)
 }
 

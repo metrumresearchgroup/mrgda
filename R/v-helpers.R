@@ -74,6 +74,34 @@ prettyNum2 <- function(.x, .digits = 3) {
 # Helpers for v_shiny_internal and v --------------------------------------
 
 
+#' Put `.df_list` in the right format
+#'
+#' @inheritParams v
+#'
+#' @return list of dataframes
+#'
+#' @keywords internal
+setup_v_list <- function(.df_list){
+  if(!inherits(.df_list, "list")){
+    if(!(inherits(.df_list, "data.frame") || inherits(.df_list, "tbl_df"))){
+      cli::cli_abort(".df_list must be a list, data.frame, or tibble")
+    }
+    .df_list <- list(.df_list)
+  }
+
+  # Ensure list elements are named
+  if(is.null(names(.df_list))){
+    names(.df_list) <- paste("Dataframe", seq(length(.df_list)))
+  }
+
+  # Filter out mrgda specific dataframe
+  .df_list <- .df_list[!grepl("mrgda", names(.df_list), fixed = TRUE)]
+
+  return(.df_list)
+}
+
+
+
 #' Search for ID columns across list of dataframes
 #'
 #' Search for the specified ID columns across list of dataframes, and return the column that appears the most.
