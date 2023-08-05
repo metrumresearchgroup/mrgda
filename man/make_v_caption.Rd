@@ -2,9 +2,9 @@
 % Please edit documentation in R/v-helpers.R
 \name{make_v_caption}
 \alias{make_v_caption}
-\title{Make the caption for \code{create_v_datatable()}, returning the number of subjects}
+\title{Make a caption displaying number of subjects}
 \usage{
-make_v_caption(.df, .subject_col, font_size = 12)
+make_v_caption(.df, .subject_col, .font_size = 12)
 }
 \arguments{
 \item{.df}{A dataframe that you want to process and view.}
@@ -12,9 +12,12 @@ make_v_caption(.df, .subject_col, font_size = 12)
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
 
-\item{font_size}{font size of the caption}
+\item{.font_size}{font size of the caption}
+}
+\value{
+a \code{shiny.tag} object
 }
 \description{
-Make the caption for \code{create_v_datatable()}, returning the number of subjects
+Make a caption for for each rendering of \code{create_v_datatable()}, displaying the number of subjects
 }
 \keyword{internal}

@@ -2,12 +2,12 @@
 % Please edit documentation in R/v.R
 \name{v}
 \alias{v}
-\title{View a formatted dataframe in the viewer}
+\title{Format and view a dataframe or list of dataframes in the viewer}
 \usage{
 v(.df_list, .subject_col = NULL, .freeze_cols = NULL, .digits = 3)
 }
 \arguments{
-\item{.df_list}{A dataframe \emph{or} list of dataframes that you want to process and view.}
+\item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
@@ -17,13 +17,14 @@ present in the dataframe, it will be used to group rows in the datatable.}
 
 \item{.digits}{number of digits to round numeric columns to. Set to \code{NULL} to prevent rounding.}
 }
+\value{
+The \code{callr} process (invisibly).
+}
 \description{
-Creates a DT::datatable object and runs it in a background shiny application in the Rstudio viewer pane.
+Creates a \code{DT::datatable} object for each dataframe and runs it in a background shiny application in the Rstudio viewer pane.
 }
 \details{
-This function modifies the input dataframe by converting columns with fewer than 20 unique values to factors.
-It adds labels to the column names and sets up a datatable with a range of options. If the specified
-subject column is present, it is used to group rows in the table.
+\strong{For each dataframe in \code{.df_list}:}
 
 If \code{.subject_col} is \code{NULL}, the column names \code{"USUBJID"} and \code{"ID"} will be searched and set if present.
 If \code{.subject_col} is present in the dataframe, it will be frozen and alternate in color.
@@ -35,4 +36,37 @@ Columns with label attributes will be appended to column headers as a new line.
 
 You can \emph{drag and drop} columns to move them around in the table. If a column is dragged to a frozen column's location,
 the new column will be frozen instead.
+
+\strong{Notes about the background process:}
+
+By running the app as a background process, users will retain access to their console.
+The process will end when one of the following things happen:
+\itemize{
+\item the Rstudio viewer pane process is stopped
+\item another \code{v()} call is executed (only one will run at a time)
+\item you manually kill it via the steps below:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{result <- v(mtcars)
+result$kill()
+}\if{html}{\out{</div>}}
+}
+}
+\examples{
+\dontrun{
+ df_list <- mrgda::read_src_dir(system.file("example-sdtm", package = "mrgda"))
+
+ # "USUBJID" automatically detected as `.subject_col`
+
+ v(df_list)
+
+ # manually specify `.subject_col`
+
+ v(df_list, .subject_col = "USUBJID")
+
+ # `.freeze_cols` found **per** dataset will be fixed while horizontally scrolling
+ # If a specified `.freeze_cols` is not found in one of the datasets, it will simply be ignored.
+
+ v(df_list, .freeze_cols = c("STUDYID", "RFSTDTC"))
+}
+
 }

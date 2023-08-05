@@ -76,20 +76,25 @@ prettyNum2 <- function(.x, .digits = 3) {
 
 #' Search for ID columns across list of dataframes
 #'
-#' @inheritParams src_viz
-#' @param id_cols vector of id columns to search for
+#' Search for the specified ID columns across list of dataframes, and return the column that appears the most.
+#' Returns `NULL` if none are found.
+#'
+#' @inheritParams v
+#' @param .id_cols vector of id columns to search for
 #'
 #' @importFrom tidyselect all_of
 #'
+#' @returns a character string
+#'
 #' @keywords internal
-check_subject_col <- function(.src_list, id_cols = c("ID", "USUBJID")){
+check_subject_col <- function(.df_list, .id_cols = c("USUBJID", "ID")){
   # Look for USUBJID and ID columns across datasets
-  id_col_df <- purrr::map_dfr(.src_list, function(df){
-    purrr::map_lgl(id_cols, function(id_col){
+  id_col_df <- purrr::map_dfr(.df_list, function(df){
+    purrr::map_lgl(.id_cols, function(id_col){
       any(grepl(glue("^(?i){id_col}$"), names(df)))
-    }) %>% stats::setNames(id_cols)
-  }) %>% dplyr::mutate(dataset = names(.src_list)) %>%
-    tidyr::pivot_longer(all_of(id_cols), names_to = "id_col", values_to = "present")
+    }) %>% stats::setNames(.id_cols)
+  }) %>% dplyr::mutate(dataset = names(.df_list)) %>%
+    tidyr::pivot_longer(all_of(.id_cols), names_to = "id_col", values_to = "present")
 
   if(!any(id_col_df$present)){
     # Set to NULL if none are found
@@ -100,7 +105,7 @@ check_subject_col <- function(.src_list, id_cols = c("ID", "USUBJID")){
     subject_col <- id_count$id_col[id_count$n == max(id_count$n)]
     # Use USUBJID if they are the same frequency
     if(length(subject_col) > 1){
-      subject_col <- "USUBJID"
+      subject_col <- .id_cols[1]
     }
   }
 
@@ -108,14 +113,18 @@ check_subject_col <- function(.src_list, id_cols = c("ID", "USUBJID")){
 }
 
 
-#' Make the caption for `create_v_datatable()`, returning the number of subjects
+#' Make a caption displaying number of subjects
+#'
+#' Make a caption for for each rendering of `create_v_datatable()`, displaying the number of subjects
 #'
 #' @inheritParams create_v_datatable
-#' @param font_size font size of the caption
+#' @param .font_size font size of the caption
+#'
+#' @returns a `shiny.tag` object
 #'
 #' @keywords internal
-make_v_caption <- function(.df, .subject_col, font_size = 12){
-  style <- glue('text-align: left; color:#FFFFFF; background-color:#5A5A5A; font-size:{font_size}pt;
+make_v_caption <- function(.df, .subject_col, .font_size = 12){
+  style <- glue('text-align: left; color:#FFFFFF; background-color:#5A5A5A; font-size:{.font_size}pt;
                 font-weight: bold; padding: 3px')
 
   cap_txt <- if(!is.null(.subject_col)){
@@ -135,7 +144,11 @@ make_v_caption <- function(.df, .subject_col, font_size = 12){
 
 #' Create global filter for the src_viz shiny app
 #'
+#' global filter is embedded in the title of a `shinydashboard::box`
+#'
 #' @inheritParams src_viz
+#'
+#' @returns a `shiny.tag` object
 #'
 #' @keywords internal
 create_global_filter <- function(.subject_col){

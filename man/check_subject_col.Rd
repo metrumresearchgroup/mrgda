@@ -4,14 +4,18 @@
 \alias{check_subject_col}
 \title{Search for ID columns across list of dataframes}
 \usage{
-check_subject_col(.src_list, id_cols = c("ID", "USUBJID"))
+check_subject_col(.df_list, .id_cols = c("USUBJID", "ID"))
 }
 \arguments{
-\item{.src_list}{A named list of data frames. Each data frame represents a domain that should be visualized. The list names should be the domain names.}
+\item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.}
 
-\item{id_cols}{vector of id columns to search for}
+\item{.id_cols}{vector of id columns to search for}
+}
+\value{
+a character string
 }
 \description{
-Search for ID columns across list of dataframes
+Search for the specified ID columns across list of dataframes, and return the column that appears the most.
+Returns \code{NULL} if none are found.
 }
 \keyword{internal}

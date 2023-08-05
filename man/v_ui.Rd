@@ -2,19 +2,22 @@
 % Please edit documentation in R/v.R
 \name{v_ui}
 \alias{v_ui}
-\title{shiny module ui for \code{create_v_datatable}}
+\title{shiny module UI for \code{v_shiny_internal}}
 \usage{
-v_ui(id, .df_list, .subject_col)
+v_ui(.id, .df_list, .subject_col)
 }
 \arguments{
-\item{id}{shiny module id. Character string}
+\item{.id}{shiny module id. Character string}
 
-\item{.df_list}{A dataframe \emph{or} list of dataframes that you want to process and view.}
+\item{.df_list}{a list of dataframes}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
 }
+\value{
+a shiny module UI object
+}
 \description{
-shiny module ui for \code{create_v_datatable}
+shiny module UI for \code{v_shiny_internal}
 }
 \keyword{internal}

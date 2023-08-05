@@ -10,7 +10,10 @@ create_global_filter(.subject_col)
 \item{.subject_col}{A string specifying the name of the subject column for global filtering, allowing users to filter all datasets at once.
 Defaults to NULL.}
 }
+\value{
+a \code{shiny.tag} object
+}
 \description{
-Create global filter for the src_viz shiny app
+global filter is embedded in the title of a \code{shinydashboard::box}
 }
 \keyword{internal}

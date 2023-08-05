@@ -2,21 +2,21 @@
 % Please edit documentation in R/v.R
 \name{v_server}
 \alias{v_server}
-\title{shiny module server for \code{create_v_datatable}}
+\title{shiny module server for \code{v_shiny_internal}}
 \usage{
 v_server(
-  id,
+  .id,
   .df_list,
   .subject_col = NULL,
   .freeze_cols = NULL,
   .digits = 3,
-  subject_filter
+  .subject_filter
 )
 }
 \arguments{
-\item{id}{shiny module id. Character string}
+\item{.id}{shiny module id. Character string}
 
-\item{.df_list}{A dataframe \emph{or} list of dataframes that you want to process and view.}
+\item{.df_list}{a list of dataframes}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
@@ -26,9 +26,12 @@ present in the dataframe, it will be used to group rows in the datatable.}
 
 \item{.digits}{number of digits to round numeric columns to. Set to \code{NULL} to prevent rounding.}
 
-\item{subject_filter}{reactive expression pointing to global filter}
+\item{.subject_filter}{reactive expression pointing to global filter}
+}
+\value{
+a shiny module server object
 }
 \description{
-shiny module server for \code{create_v_datatable}
+shiny module server for \code{v_shiny_internal}
 }
 \keyword{internal}

@@ -1,15 +1,13 @@
-#' View a formatted dataframe in the viewer
+#' Format and view a dataframe or list of dataframes in the viewer
 #'
-#' Creates a DT::datatable object and runs it in a background shiny application in the Rstudio viewer pane.
+#' Creates a `DT::datatable` object for each dataframe and runs it in a background shiny application in the Rstudio viewer pane.
 #'
-#' @param .df_list A dataframe *or* list of dataframes that you want to process and view.
+#' @param .df_list A dataframe ***or*** list of dataframes that you want to process and view.
 #' @inheritParams create_v_datatable
 #'
 #' @details
 #'
-#' This function modifies the input dataframe by converting columns with fewer than 20 unique values to factors.
-#' It adds labels to the column names and sets up a datatable with a range of options. If the specified
-#' subject column is present, it is used to group rows in the table.
+#' **For each dataframe in `.df_list`:**
 #'
 #' If `.subject_col` is `NULL`, the column names `"USUBJID"` and `"ID"` will be searched and set if present.
 #' If `.subject_col` is present in the dataframe, it will be frozen and alternate in color.
@@ -22,6 +20,37 @@
 #' You can *drag and drop* columns to move them around in the table. If a column is dragged to a frozen column's location,
 #' the new column will be frozen instead.
 #'
+#' **Notes about the background process:**
+#'
+#' By running the app as a background process, users will retain access to their console.
+#' The process will end when one of the following things happen:
+#'  - the Rstudio viewer pane process is stopped
+#'  - another `v()` call is executed (only one will run at a time)
+#'  - you manually kill it via the steps below:
+#'    ```
+#'    result <- v(mtcars)
+#'    result$kill()
+#'    ```
+#'
+#' @examples
+#' \dontrun{
+#'  df_list <- mrgda::read_src_dir(system.file("example-sdtm", package = "mrgda"))
+#'
+#'  # "USUBJID" automatically detected as `.subject_col`
+#'
+#'  v(df_list)
+#'
+#'  # manually specify `.subject_col`
+#'
+#'  v(df_list, .subject_col = "USUBJID")
+#'
+#'  # `.freeze_cols` found **per** dataset will be fixed while horizontally scrolling
+#'  # If a specified `.freeze_cols` is not found in one of the datasets, it will simply be ignored.
+#'
+#'  v(df_list, .freeze_cols = c("STUDYID", "RFSTDTC"))
+#' }
+#'
+#' @return The `callr` process (invisibly).
 #'
 #' @export
 v <- function(
@@ -43,13 +72,19 @@ v <- function(
 
 
 
-#' Basic shiny app for running `mrgda::create_v_datatable()` on the server
+#' Create shiny app for running `mrgda::create_v_datatable()` on the server
+#'
+#' Create and execute a basic shiny app for running `mrgda::create_v_datatable()` on the server.
+#' Renders a `DT::datatable` object for each dataframe in a `shiny::tabPanel` object.
+#'
 #'
 #' @inheritParams v
 #' @inheritParams create_v_datatable
 #' @inheritParams run_app_bg
 #'
 #' @importFrom htmltools tags
+#'
+#' @return a `shinyApp` object
 #'
 #' @keywords internal
 v_shiny_internal <- function(
@@ -112,7 +147,7 @@ v_shiny_internal <- function(
 
     subject_filter <- reactive(input$subject_filter)
     v_server("df_view", .df_list, .subject_col, .freeze_cols, .digits,
-             subject_filter = subject_filter)
+             .subject_filter = subject_filter)
 
     # End the process on window close. This is designed for the case where a
     # single user launches the app privately with run_app_bg(). If this app is
@@ -129,17 +164,20 @@ v_shiny_internal <- function(
 
 
 
-#' shiny module ui for `create_v_datatable`
+#' shiny module UI for `v_shiny_internal`
 #'
-#' @param id shiny module id. Character string
-#' @inheritParams v
+#' @inheritParams v_server
+#' @inheritParams create_v_datatable
+#'
 #' @importFrom htmltools tagList
 #' @importFrom shiny NS fluidRow column
 #'
+#' @returns a shiny module UI object
+#'
 #' @keywords internal
-v_ui <- function(id, .df_list, .subject_col){
+v_ui <- function(.id, .df_list, .subject_col){
 
-  ns <- NS(id)
+  ns <- NS(.id)
 
   tagList(
     # tags$style(".dataTables_scrollBody {max-height: 400px !important;}"),
@@ -168,33 +206,37 @@ v_ui <- function(id, .df_list, .subject_col){
   )
 }
 
-#' shiny module server for `create_v_datatable`
-#' @inheritParams v
+#' shiny module server for `v_shiny_internal`
+#'
 #' @inheritParams create_v_datatable
-#' @inheritParams v_ui
-#' @param subject_filter reactive expression pointing to global filter
+#' @param .id shiny module id. Character string
+#' @param .df_list a list of dataframes
+#' @param .subject_filter reactive expression pointing to global filter
+#'
 #' @importFrom shiny moduleServer shinyApp
+#'
+#' @returns a shiny module server object
 #'
 #' @keywords internal
 v_server <- function(
-    id,
+    .id,
     .df_list,
     .subject_col = NULL,
     .freeze_cols = NULL,
     .digits = 3,
-    subject_filter
+    .subject_filter
 ){
 
-  moduleServer(id, function(input, output, session) {
+  moduleServer(.id, function(input, output, session) {
 
     purrr::map2(names(.df_list), .df_list, function(.name, .df) {
       output[[paste0("table", .name)]] <- DT::renderDT({
 
         has_subject_col <- !is.null(.subject_col) && .subject_col %in% names(.df)
-        do_rows_filter <- has_subject_col && nchar(trimws(subject_filter())) > 0
+        do_rows_filter <- has_subject_col && nchar(trimws(.subject_filter())) > 0
 
         if(do_rows_filter){
-          .df_filter <- .df %>% dplyr::filter(grepl(trimws(subject_filter()), !!sym(.subject_col)))
+          .df_filter <- .df %>% dplyr::filter(grepl(trimws(.subject_filter()), !!sym(.subject_col)))
         }else{
           .df_filter <- .df
         }

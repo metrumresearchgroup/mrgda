@@ -2,7 +2,7 @@
 % Please edit documentation in R/v.R
 \name{v_shiny_internal}
 \alias{v_shiny_internal}
-\title{Basic shiny app for running \code{mrgda::create_v_datatable()} on the server}
+\title{Create shiny app for running \code{mrgda::create_v_datatable()} on the server}
 \usage{
 v_shiny_internal(
   .df_list,
@@ -14,7 +14,7 @@ v_shiny_internal(
 )
 }
 \arguments{
-\item{.df_list}{A dataframe \emph{or} list of dataframes that you want to process and view.}
+\item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
@@ -27,7 +27,11 @@ present in the dataframe, it will be used to group rows in the datatable.}
 \item{host, port}{Host and port to serve the Shiny app on. If \code{port} isn't
 specified, it is randomly selected from the valid range of dynamic ports.}
 }
+\value{
+a \code{shinyApp} object
+}
 \description{
-Basic shiny app for running \code{mrgda::create_v_datatable()} on the server
+Create and execute a basic shiny app for running \code{mrgda::create_v_datatable()} on the server.
+Renders a \code{DT::datatable} object for each dataframe in a \code{shiny::tabPanel} object.
 }
 \keyword{internal}
