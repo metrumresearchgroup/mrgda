@@ -198,7 +198,8 @@ v_ui <- function(.id, .df_list, .subject_col){
   ns <- NS(.id)
 
   tagList(
-    # tags$style(".dataTables_scrollBody {max-height: 400px !important;}"),
+    # more defined header
+    tags$style(" .nav-tabs {border-bottom-color: #3c8dbc !important; border-bottom-width: 2px ;}"),
     # Make a tab for every domain
     do.call(
       shinydashboard::tabBox,
