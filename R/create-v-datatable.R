@@ -33,7 +33,12 @@ create_v_datatable <- function(
     .df,
     .subject_col = NULL,
     .freeze_cols = NULL,
-    .digits = 3
+    .digits = 3,
+    dt_options = list(
+      show_filters = FALSE,
+      wrap_labels = TRUE,
+      show_labels = FALSE
+    )
 ){
 
 
@@ -56,11 +61,12 @@ create_v_datatable <- function(
   col_width <- "1px"
   base_font_size <- 10
 
+
   # Table options
   tableOpts = list(
-    dom = "B<lf<\"datatables-scroll\"t>ipr>",
-    pageLength = 100,
-    lengthMenu = c(25,100,500,1000),
+    dom = "B<\"datatables-scroll\"t>irf<\"row\">lp",
+    pageLength = 500,
+    lengthMenu = c(100,500,1000,5000),
     headerCallback = DT::JS(
       "function(thead) {",
       glue("$(thead).css('font-size', '{base_font_size-0.5}pt');"),
@@ -68,7 +74,7 @@ create_v_datatable <- function(
     ),
     scrolly = "15vh",
     scrollX = TRUE,
-    scrollY = 350,
+    scrollY = 400,
     scrollCollapse=TRUE,
     colReorder = TRUE,
     searchHighlight = TRUE,
@@ -142,13 +148,16 @@ create_v_datatable <- function(
     }
   })
 
+  # User controlled table options
+  filter <- ifelse(dt_options$show_filters, "top", "none")
+
   # Return the .df table
   .df_view <- DT::datatable(
     .df,
     colnames = names_with_labels,
     rownames = FALSE,
     escape = FALSE,
-    filter = list(position = 'top', clear = FALSE),
+    filter = filter,
     selection = "none",
     class = 'cell-border hover order-column nowrap',
     extensions = c("RowGroup", "ColReorder", "FixedColumns"),

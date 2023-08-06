@@ -40,6 +40,8 @@ Imports:
     stringr,
     shiny (>= 1.6.0),
     shinydashboard,
+    shinydashboardPlus (>= 2.0.0),
+    shinyWidgets,
     DT,
     knitr,
     readr,

@@ -4,7 +4,13 @@
 \alias{create_v_datatable}
 \title{create_datatable function}
 \usage{
-create_v_datatable(.df, .subject_col = NULL, .freeze_cols = NULL, .digits = 3)
+create_v_datatable(
+  .df,
+  .subject_col = NULL,
+  .freeze_cols = NULL,
+  .digits = 3,
+  dt_options = list(show_filter = FALSE, wrap_labels = TRUE, hide_labels = FALSE)
+)
 }
 \arguments{
 \item{.df}{A dataframe that you want to process and view.}

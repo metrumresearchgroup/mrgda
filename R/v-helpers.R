@@ -184,11 +184,27 @@ make_v_caption <- function(.name, .df, .subject_col, .font_size = 12){
 }
 
 
+fmt_v_table_opts <- function(.name, .df, .subject_col, .font_size = 12){
+
+  n_subj_txt <- if(!is.null(.subject_col)){
+    num_subj <- .df %>% dplyr::count(!!!syms(.subject_col)) %>% nrow()
+    glue('(N Subjects: {num_subj})')
+  }else{
+    'No subjects detected'
+  }
+
+
+  # Combine and format
+  tibble::tibble(name = .name, n_subs = n_subj_txt)
+}
+
 #' Create global filter for the src_viz shiny app
 #'
 #' global filter is embedded in the title of a `shinydashboard::box`
 #'
 #' @inheritParams src_viz
+#'
+#' @importFrom shiny HTML
 #'
 #' @returns a `shiny.tag` object
 #'
@@ -197,8 +213,8 @@ create_global_filter <- function(.subject_col){
   if(!is.null(.subject_col)){
     global_filter_ui <-
       fluidRow(
-        column(5,
-               shiny::div(style = "font-size:18px;", paste0("Global ", .subject_col, " Filter"))
+        column(6,
+               shiny::div(style = "font-size:16px;", HTML(paste("&nbsp","Global", .subject_col, "Filter")))
         ),
         column(6,
                htmltools::tags$style("div.form-group {margin-bottom: 0px;}"),

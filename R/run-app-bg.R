@@ -47,7 +47,7 @@ run_app_bg <- function(func, args,
   spinner <- cli::make_spinner()
   while (!pingr::is_up(destination = host, port = port)) {
     if (!process$is_alive()) {
-      msgs <- fmt_bg_msgs(stderr_file)
+      msgs <- fmt_bg_file(stderr_file)
 
       cli::cli_abort(c(
         "x" = paste("Background app process at", url, "failed. Callback:\n"),
@@ -80,15 +80,36 @@ random_dynamic_port <- function() {
 
 #' Format lines of `stderr_file` into `cli::cli_bullets`
 #'
-#' @param stderr_file file path the standard error of the child R process is written to.
 #'
+#' @details
+#' Purpose of this function is to format errors or warnings with use of `v()`.
+#' Failure of the background shiny app has somewhat verbose messages, and this
+#' helps to emphasize what actually went wrong.
+#'
+#' See `?cli::cli_bullets` for how to change formatting
+#'
+#' @param bg_file file path of background file, such as `stderr`
+#'
+#' @return character vector formatted to be used with `cli::cli_bullets`
 #' @keywords internal
-fmt_bg_msgs <- function(stderr_file){
-  msgs <- strsplit(readr::read_file(stderr_file), '\n')[[1]]
+fmt_bg_file <- function(bg_file){
+
+  bg_lines <- readr::read_file(bg_file)
+  msgs <- strsplit(bg_lines, '\n')[[1]]
+
+  # Set comments to bullets by default
   msgs <- msgs %>% stats::setNames(rep(">", length(msgs)))
-  names(msgs)[grepl("(?i)Error", msgs)] <- "x"
-  names(msgs)[grepl("(?i)Loading", msgs)] <- "v"
-  names(msgs)[grepl("(?i)Warning", msgs)] <- "!"
+  # Remove bullets for empty lines
+  names(msgs)[grepl("^\\s*$",msgs)] <- " "
+
+  # Format loading, warning, and error messages (case insensitive)
+  # (allow whitespace or ':' to surround words)
+  cli_patterns <- c("error" = "x","loading" = "v", "warning" = "!")
+  names(cli_patterns) <- glue("^(?i)\\s*{names(cli_patterns)}[:]?(\\s|$)")
+
+  for (i in seq_along(cli_patterns)) {
+    names(msgs)[grepl(names(cli_patterns)[i], msgs)] <- unname(cli_patterns[i])
+  }
 
   return(msgs)
 }
