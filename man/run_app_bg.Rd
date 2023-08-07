@@ -15,10 +15,10 @@ run_app_bg(
 \item{func}{Function passed as the \code{func} argument to \code{\link[callr:r_bg]{callr::r_bg()}}. This
 must meet the following requirements:
 \itemize{
-\item launch a Shiny app
+\item \strong{launch} a Shiny app
 \item accept \code{host} and \code{port} arguments and instruct Shiny to use those
 \item call \code{\link[devtools:load_all]{devtools::load_all()}} with the value of the
-MRGDA_SHINY_DEV_LOAD_PATH environment variable if it is a non-empty
+\code{MRGDA_SHINY_DEV_LOAD_PATH} environment variable if it is a non-empty
 string.
 }}
 
@@ -35,5 +35,49 @@ The callr process (invisibly).
 \description{
 Use \code{\link[callr:r_bg]{callr::r_bg()}} to launch the app in a separate process, returning once
 \code{port} on \code{host} is active.
+}
+\details{
+Make sure to set \code{Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())}
+if you are in a development setting. This will allow package functions to be
+accessible in the background process, which is not an issue when the package
+is installed.
+}
+\examples{
+
+\dontrun{
+
+shiny_func <- function(
+   df,
+   filter = TRUE,
+   host = NULL,
+   port = NULL
+){
+
+ # For Development Environment, must load the package
+ load_path <- Sys.getenv("MRGDA_SHINY_DEV_LOAD_PATH")
+ if (nzchar(load_path)) {
+   message("Loading ", load_path)
+   devtools::load_all(load_path)
+ }
+
+ # other setup...
+
+ ui <- fluidPage
+ server <- function(input, output, session) {}
+
+ # Passes the host and port to the shinyApp object
+ app <- shinyApp(ui = ui, server = server,
+                 options = list(host = host, port = port))
+
+ # Function launches the app
+ shiny::runApp(app)
+}
+
+# Launching app in background
+args <- list(df = mtcars, filter = TRUE)
+run_app_bg(shiny_func, args = args)
+
+}
+
 }
 \keyword{internal}

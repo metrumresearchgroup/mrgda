@@ -3,6 +3,7 @@
 #' Creates a `DT::datatable` object for each dataframe and runs it in a background shiny application in the Rstudio viewer pane.
 #'
 #' @param .df_list A dataframe ***or*** list of dataframes that you want to process and view.
+#' Named lists will inherit their names when shown in the app.
 #' @inheritParams create_v_datatable
 #'
 #' @details

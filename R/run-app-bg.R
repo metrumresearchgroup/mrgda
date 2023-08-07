@@ -5,22 +5,66 @@
 #'
 #' @param func Function passed as the `func` argument to [callr::r_bg()]. This
 #'   must meet the following requirements:
-#'   * launch a Shiny app
+#'   * **launch** a Shiny app
 #'   * accept `host` and `port` arguments and instruct Shiny to use those
 #'   * call [devtools::load_all()] with the value of the
-#'     MRGDA_SHINY_DEV_LOAD_PATH environment variable if it is a non-empty
+#'     `MRGDA_SHINY_DEV_LOAD_PATH` environment variable if it is a non-empty
 #'     string.
 #' @param args Argument passed as `args` argument to [callr::r_bg()]. This
 #'   should not include "host" or "port"; those will be added by this function.
 #'   Must be a named list.
 #' @param host,port Host and port to serve the Shiny app on. If `port` isn't
 #'   specified, it is randomly selected from the valid range of dynamic ports.
+#'
+#' @details
+#' Make sure to set `Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())`
+#' if you are in a development setting. This will allow package functions to be
+#' accessible in the background process, which is not an issue when the package
+#' is installed.
+#'
+#' @examples
+#'
+#' \dontrun{
+#'
+#' shiny_func <- function(
+#'    df,
+#'    filter = TRUE,
+#'    host = NULL,
+#'    port = NULL
+#' ){
+#'
+#'  # For Development Environment, must load the package
+#'  load_path <- Sys.getenv("MRGDA_SHINY_DEV_LOAD_PATH")
+#'  if (nzchar(load_path)) {
+#'    message("Loading ", load_path)
+#'    devtools::load_all(load_path)
+#'  }
+#'
+#'  # other setup...
+#'
+#'  ui <- fluidPage
+#'  server <- function(input, output, session) {}
+#'
+#'  # Passes the host and port to the shinyApp object
+#'  app <- shinyApp(ui = ui, server = server,
+#'                  options = list(host = host, port = port))
+#'
+#'  # Function launches the app
+#'  shiny::runApp(app)
+#' }
+#'
+#' # Launching app in background
+#' args <- list(df = mtcars, filter = TRUE)
+#' run_app_bg(shiny_func, args = args)
+#'
+#' }
+#'
 #' @return The callr process (invisibly).
 #' @keywords internal
 run_app_bg <- function(func, args,
                        host = getOption("shiny.host", "127.0.0.1"),
                        port = getOption("shiny.port")) {
-  port <- port %||% random_dynamic_port()
+  port <- port %||% random_dynamic_port(host = host)
   args <- c(args, list(host = host, port = port))
   env <- callr::rcmd_safe_env()
   load_path <- Sys.getenv("MRGDA_SHINY_DEV_LOAD_PATH")
@@ -69,13 +113,23 @@ run_app_bg <- function(func, args,
   return(invisible(process))
 }
 
-random_dynamic_port <- function() {
+
+#' Assign dynamic port
+#'
+#' @param host Host to serve the Shiny app on
+#' @param n Number of ports to try before giving up
+#'
+#' @return A port that is available to listen on
+#'
+#' @keywords internal
+random_dynamic_port <- function(host, n = 20) {
   # TODO: Respect /proc/sys/net/ipv4/ip_local_port_range
-  #
-  # TODO: Check if port is already bound.
   lower <- 49152L - 1L
-  upper <- 65355L
-  lower + sample(upper - lower, size = 1L)
+  upper <- 65535L
+
+  httpuv::randomPort(
+    min = lower, max = upper,
+    host = host, n = n)
 }
 
 

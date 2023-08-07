@@ -7,7 +7,8 @@
 check_subject_col(.df_list, .id_cols = c("USUBJID", "ID"))
 }
 \arguments{
-\item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.}
+\item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.
+Named lists will inherit their names when shown in the app.}
 
 \item{.id_cols}{vector of id columns to search for}
 }

@@ -7,7 +7,8 @@
 setup_v_list(.df_list)
 }
 \arguments{
-\item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.}
+\item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.
+Named lists will inherit their names when shown in the app.}
 }
 \value{
 list of dataframes
