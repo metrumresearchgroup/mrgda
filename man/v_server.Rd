@@ -6,17 +6,18 @@
 \usage{
 v_server(
   .id,
-  .df_list,
+  .df,
   .subject_col = NULL,
   .freeze_cols = NULL,
   .digits = 3,
-  .subject_filter
+  .subject_filter,
+  .dt_options
 )
 }
 \arguments{
 \item{.id}{shiny module id. Character string}
 
-\item{.df_list}{a list of dataframes}
+\item{.df}{A dataframe that you want to process and view.}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
@@ -27,6 +28,8 @@ present in the dataframe, it will be used to group rows in the datatable.}
 \item{.digits}{number of digits to round numeric columns to. Set to \code{NULL} to prevent rounding.}
 
 \item{.subject_filter}{reactive expression pointing to global filter}
+
+\item{.dt_options}{list of options for formatting the \code{DT::datatable}}
 }
 \value{
 a shiny module server object

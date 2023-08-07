@@ -129,7 +129,7 @@ v_shiny_internal <- function(
   global_filter_ui <- create_global_filter(.subject_col)
 
   table_opts <- purrr::map2_dfr(names(.df_list), .df_list, function(.name, .df){
-    fmt_v_table_opts(.name, .df, .subject_col)
+    make_v_caption(.name, .df, .subject_col)
   })
 
   ui <- shinydashboardPlus::dashboardPage(
@@ -137,15 +137,8 @@ v_shiny_internal <- function(
     shinydashboardPlus::dashboardSidebar(width = 0),
     shinydashboard::dashboardBody(
       tags$head(
-        # Remove extra white space throughout app
-        # tags$style(".box-body {padding: 10px 0px 10px 0px !important;
-        #             margin: -0.5em -0.75em -0.5em -0.85em !important;}"),
-        tags$style(".nav-tabs-custom {margin-bottom: 0px;}"),
-        tags$style(".content {padding: 0px;}"),
-        tags$style(".box {margin-bottom: 0px;}"),
-        # more defined separation between tables
-        tags$style(".nav-tabs {border-bottom-color: #3c8dbc !important;
-               border-bottom-width: 2px; }"),
+        tags$style(".content{padding-bottom: 0px !important;
+                   padding-top: 0px !important;}")
       ),
       fluidRow(
         style = "background-color: #007319; color: white;",
@@ -159,20 +152,21 @@ v_shiny_internal <- function(
             inputId = "data_view", label = "Viewing Dataset:",
             inline = TRUE, width = "fit",
             choices = table_opts$name,
-            choicesOpt = list(subtext = table_opts$n_subs),
+            choicesOpt = list(content = table_opts$html_label),
             options = list(style = "btn-success")
           )
         ),
         column(
           width = 2,  align = "right",
           dropdownButton(
-            circle = FALSE, status = "success", right = TRUE, size = "lg", width = "200px",
+            circle = FALSE, status = "success", right = TRUE, size = "lg",
             icon = shiny::icon("gear"), tooltip = tooltipOptions(title = "Table Options", placement = "left"),
             shinyWidgets::checkboxGroupButtons(
-              "dt_options", label = "Table Options", individual = TRUE, direction = "vertical",
-              choiceNames = c("Show Filter", "Wrap column labels", "Show column labels"),
+              "dt_options", label = htmltools::h4("Table Options", style = "color:black;"),
+              individual = TRUE, direction = "vertical",
+              choiceNames = c("Show column filters", "Wrap column labels", "Show column labels"),
               choiceValues = c("show_filters", "wrap_labels", "show_labels"),
-              selected = c("show_filters", "wrap_labels"),
+              selected = c("wrap_labels", "show_labels"),
               checkIcon = list(
                 yes = tags$i(class = "fa fa-check-square", style = "color: steelblue"),
                 no = tags$i(class = "fa fa-square-o", style = "color: steelblue"))
@@ -197,6 +191,11 @@ v_shiny_internal <- function(
     # Global subject filter
     subject_filter <- reactive(input$subject_filter)
 
+    # Selected Dataset
+    data_view <- reactive({
+      .df_list[[shiny::req(input$data_view)]]
+    })
+
     # DT options
     dt_options <- reactive({
       list(
@@ -207,7 +206,7 @@ v_shiny_internal <- function(
     })
 
     # Create DT datatables
-    v_server("df_view", .df_list, .subject_col, .freeze_cols, .digits,
+    v_server("df_view", .df = data_view, .subject_col, .freeze_cols, .digits,
              .subject_filter = subject_filter, .dt_options = dt_options)
 
     # End the process on window close. This is designed for the case where a
@@ -251,22 +250,13 @@ v_ui <- function(.id, .df_list, .subject_col){
   ns <- NS(.id)
 
   tagList(
-    # Make a tab for every domain
-    do.call(
-      shinydashboard::tabBox,
-      c(
-        purrr::map2(names(.df_list), .df_list, function(.name, .df){
-          shiny::tabPanel(
-            title = make_v_caption(.name, .df, .subject_col),
-            fluidRow(
-              column(
-                width = 12, align = "center",
-                DT::DTOutput(ns(paste0("table", .name)))
-              )
-            )
-          )
-        }),
-        list(width = 12)
+    shinydashboard::box(
+      width = NULL, title = NULL,
+      fluidRow(
+        column(
+          width = 12, align = "center",
+          DT::DTOutput(ns("df_view"))
+        )
       )
     )
   )
@@ -274,9 +264,8 @@ v_ui <- function(.id, .df_list, .subject_col){
 
 #' shiny module server for `v_shiny_internal`
 #'
-#' @inheritParams create_v_datatable
 #' @param .id shiny module id. Character string
-#' @param .df_list a list of dataframes
+#' @inheritParams create_v_datatable
 #' @param .subject_filter reactive expression pointing to global filter
 #'
 #' @importFrom shiny moduleServer shinyApp
@@ -286,7 +275,7 @@ v_ui <- function(.id, .df_list, .subject_col){
 #' @keywords internal
 v_server <- function(
     .id,
-    .df_list,
+    .df,
     .subject_col = NULL,
     .freeze_cols = NULL,
     .digits = 3,
@@ -296,39 +285,37 @@ v_server <- function(
 
   moduleServer(.id, function(input, output, session) {
 
-    purrr::map2(names(.df_list), .df_list, function(.name, .df) {
-      output[[paste0("table", .name)]] <- DT::renderDT({
+    output$df_view <- DT::renderDT({
 
-        has_subject_col <- !is.null(.subject_col) && .subject_col %in% names(.df)
-        do_rows_filter <- has_subject_col && nchar(trimws(.subject_filter())) > 0
+      has_subject_col <- !is.null(.subject_col) && .subject_col %in% names(.df())
+      do_rows_filter <- has_subject_col && nchar(trimws(.subject_filter())) > 0
 
-        if(do_rows_filter){
-          .df_filter <- .df %>% dplyr::filter(grepl(trimws(.subject_filter()), !!sym(.subject_col)))
-        }else{
-          .df_filter <- .df
+      if(do_rows_filter){
+        .df_filter <- .df() %>% dplyr::filter(grepl(trimws(.subject_filter()), !!sym(.subject_col)))
+      }else{
+        .df_filter <- .df()
+      }
+
+      # Fix .freeze_cols found per dataset, so that it still works with lists
+      if(!is.null(.freeze_cols)){
+        .freeze_cols_df <- .freeze_cols[.freeze_cols %in% names(.df())]
+        if(rlang::is_empty(.freeze_cols_df)) .freeze_cols_df <- NULL
+      }else{
+        .freeze_cols_df <- NULL
+      }
+
+      # Allows for some dataframes to not have .subject_col
+      if(has_subject_col){
+        if(nrow(.df_filter) == 0){
+          .df_filter[1, .subject_col] <- "<b>No subjects found</b>"
         }
-
-        # Fix .freeze_cols found per dataset, so that it still works with lists
-        if(!is.null(.freeze_cols)){
-          .freeze_cols_df <- .freeze_cols[.freeze_cols %in% names(.df)]
-          if(rlang::is_empty(.freeze_cols_df)) .freeze_cols_df <- NULL
-        }else{
-          .freeze_cols_df <- NULL
-        }
-
-        # Allows for some dataframes to not have .subject_col
-        if(has_subject_col){
-          if(nrow(.df_filter) == 0){
-            .df_filter[1, .subject_col] <- "<b>No subjects found</b>"
-          }
-          create_v_datatable(.df_filter, .subject_col, .freeze_cols_df, .digits,
-                             dt_options = .dt_options())
-        }else{
-          create_v_datatable(.df, .subject_col = NULL, .freeze_cols_df, .digits,
-                             dt_options = .dt_options())
-        }
-      }, server = TRUE)
-    })
+        create_v_datatable(.df_filter, .subject_col, .freeze_cols_df, .digits,
+                           dt_options = .dt_options())
+      }else{
+        create_v_datatable(.df(), .subject_col = NULL, .freeze_cols_df, .digits,
+                           dt_options = .dt_options())
+      }
+    }, server = TRUE)
 
   })
 }

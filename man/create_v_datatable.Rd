@@ -9,7 +9,7 @@ create_v_datatable(
   .subject_col = NULL,
   .freeze_cols = NULL,
   .digits = 3,
-  dt_options = list(show_filter = FALSE, wrap_labels = TRUE, hide_labels = FALSE)
+  dt_options = list(show_filters = FALSE, wrap_labels = TRUE, show_labels = FALSE)
 )
 }
 \arguments{
@@ -22,6 +22,8 @@ present in the dataframe, it will be used to group rows in the datatable.}
 \code{.subject_col} will automatically be appended to this list (i.e. \code{.subject_col} is always frozen).}
 
 \item{.digits}{number of digits to round numeric columns to. Set to \code{NULL} to prevent rounding.}
+
+\item{dt_options}{list of options for formatting the \code{DT::datatable}}
 }
 \value{
 An instance of \code{DT::datatable} class with the processed dataframe.

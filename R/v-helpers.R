@@ -5,9 +5,11 @@
 #' Format headers to include column attributes in create_v_datatable (label and class)
 #'
 #' @inheritParams create_v_datatable
+#' @param .wrap_labels Logical (T/F). IF `TRUE`, wrap labels to 20 characters, and indent new lines
+#' @param .show_labels Logical (T/F). IF `TRUE`, show label attributes under the column name
 #'
 #' @keywords internal
-format_v_headers <- function(.df){
+format_v_headers <- function(.df, .wrap_labels = TRUE, .show_labels = TRUE){
   col_attributes <- purrr::map(colnames(.df), ~ {
     list(col_lbl = attr(.df[[.x]], "label"), col_class = readr::guess_parser(as.character(.df[[.x]])))
   })
@@ -15,10 +17,14 @@ format_v_headers <- function(.df){
   names_with_labels <- purrr::map2_chr(colnames(.df), col_attributes, function(col_name, col_attr){
     # Label attributes
     lbl_sub_txt <- if(!is.null(col_attr$col_lbl)){
-      col_lbl <- paste0(col_attr$col_lbl) %>%
-        gsub(" ", "<br>", ., fixed = TRUE) %>%
-        gsub("_", "<br>", ., fixed = TRUE) %>%
-        gsub(".", "<br>", ., fixed = TRUE)
+      col_lbl <- if(isTRUE(.wrap_labels)){
+        paste0(col_attr$col_lbl) %>%
+          stringr::str_trunc(20) %>%
+          gsub(" ", "<br>", ., fixed = TRUE) %>%
+          gsub("_", "<br>", ., fixed = TRUE)
+      }else{
+        paste0(col_attr$col_lbl)
+      }
       paste0("<br>", glue("<span style='color: #8A8B8C;'>"), col_lbl, "</span>")
     }else{
       ""
@@ -46,7 +52,12 @@ format_v_headers <- function(.df){
                              class_name, "</span></i>")
 
     # Create overall header
-    paste0(col_name, lbl_sub_txt, class_sub_text)
+    final_label <- if(isTRUE(.show_labels)){
+      paste0(col_name, lbl_sub_txt, class_sub_text)
+    }else{
+      paste0(col_name, class_sub_text)
+    }
+
   })
 
   return(names_with_labels)
@@ -153,50 +164,40 @@ check_subject_col <- function(.df_list, .id_cols = c("USUBJID", "ID")){
 #' @returns a `shiny.tag` object
 #'
 #' @keywords internal
-make_v_caption <- function(.name, .df, .subject_col, .font_size = 12){
+make_v_caption <- function(.name, .df, .subject_col, .font_size = 10){
+
+  # Calculate N subjects
+  if(!is.null(.subject_col)){
+    num_subj <- .df %>% dplyr::count(!!!syms(.subject_col)) %>% nrow()
+    n_subj_txt <- glue('(N {.subject_col}: {num_subj})')
+  }else{
+    num_subj <- 0
+    n_subj_txt <- 'No subjects detected'
+  }
 
   # Format dataframe name
   name_style <- glue('text-align: center; font-size:{.font_size}pt; font-weight: bold; display: block;')
-
-  name_txt <- htmltools::tags$span(
+  name_html <- htmltools::tags$span(
     style = name_style,
     .name
   )
 
   # Format subject count
   n_subj_style <- glue('text-align: center; font-size:{.font_size-2}pt; display: block;')
-
-  n_subj_txt <- if(!is.null(.subject_col)){
-    num_subj <- .df %>% dplyr::count(!!!syms(.subject_col)) %>% nrow()
-    glue('(N Subjects: {num_subj})')
-  }else{
-    'No subjects detected'
-  }
-
-  n_subj_txt <- htmltools::tags$span(
+  n_subj_html <- htmltools::tags$span(
     style = n_subj_style,
     n_subj_txt
   )
 
   # Combine and format as HTML
-  caption <- paste(name_txt, n_subj_txt, sep = " ")
-  shiny::tags$div(htmltools::HTML(caption))
+  caption <- paste(.name, n_subj_txt)
+  html_caption <- paste0(name_html, n_subj_html)
+  html_caption <- as.character(shiny::tags$div(htmltools::HTML(html_caption)))
+
+  tibble::tibble(name = .name, n_subs = num_subj,
+                 label = caption, html_label = html_caption)
 }
 
-
-fmt_v_table_opts <- function(.name, .df, .subject_col, .font_size = 12){
-
-  n_subj_txt <- if(!is.null(.subject_col)){
-    num_subj <- .df %>% dplyr::count(!!!syms(.subject_col)) %>% nrow()
-    glue('(N Subjects: {num_subj})')
-  }else{
-    'No subjects detected'
-  }
-
-
-  # Combine and format
-  tibble::tibble(name = .name, n_subs = n_subj_txt)
-}
 
 #' Create global filter for the src_viz shiny app
 #'
@@ -213,12 +214,14 @@ create_global_filter <- function(.subject_col){
   if(!is.null(.subject_col)){
     global_filter_ui <-
       fluidRow(
-        column(6,
-               shiny::div(style = "font-size:16px;", HTML(paste("&nbsp","Global", .subject_col, "Filter")))
+        column(
+          width = 5, style = "padding-right: 2px;  margin-top: 15px;",
+          shiny::div(style = "font-size:14px; font-weight: bold;", HTML(paste("Global", .subject_col, "Filter:")))
         ),
-        column(6,
-               htmltools::tags$style("div.form-group {margin-bottom: 0px;}"),
-               shiny::textInput(inputId = "subject_filter", label = NULL)
+        column(
+          width = 6, style = "padding-left: 1px; margin-top: 7px;",
+          htmltools::tags$style("div.form-group {margin-bottom: 0px;}"),
+          shiny::textInput(inputId = "subject_filter", label = NULL)
         )
       )
 

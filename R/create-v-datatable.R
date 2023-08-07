@@ -10,6 +10,7 @@
 #' @param .freeze_cols A character vector specifying columns to freeze when scrolling horizontally.
 #' `.subject_col` will automatically be appended to this list (i.e. `.subject_col` is always frozen).
 #' @param .digits number of digits to round numeric columns to. Set to `NULL` to prevent rounding.
+#' @param dt_options list of options for formatting the `DT::datatable`
 #'
 #' @details
 #' If `.subject_col` is `NULL`, the column names `"USUBJID"` and `"ID"` will be searched and set if present.
@@ -74,7 +75,7 @@ create_v_datatable <- function(
     ),
     scrolly = "15vh",
     scrollX = TRUE,
-    scrollY = 400,
+    scrollY = 450,
     scrollCollapse=TRUE,
     colReorder = TRUE,
     searchHighlight = TRUE,
@@ -132,7 +133,7 @@ create_v_datatable <- function(
 
 
   # Format headers as bold, and include column attributes (label and class)
-  names_with_labels <- format_v_headers(.df)
+  names_with_labels <- format_v_headers(.df, dt_options$wrap_labels, dt_options$show_labels)
 
   # Round numeric columns to 3 decimal places
   if(!is.null(.digits)){

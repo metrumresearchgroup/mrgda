@@ -4,10 +4,14 @@
 \alias{format_v_headers}
 \title{Format headers to include column attributes in create_v_datatable (label and class)}
 \usage{
-format_v_headers(.df)
+format_v_headers(.df, .wrap_labels = TRUE, .show_labels = TRUE)
 }
 \arguments{
 \item{.df}{A dataframe that you want to process and view.}
+
+\item{.wrap_labels}{Logical (T/F). IF \code{TRUE}, wrap labels to 20 characters, and indent new lines}
+
+\item{.show_labels}{Logical (T/F). IF \code{TRUE}, show label attributes under the column name}
 }
 \description{
 Format headers to include column attributes in create_v_datatable (label and class)
