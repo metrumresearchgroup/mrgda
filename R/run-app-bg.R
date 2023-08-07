@@ -63,7 +63,8 @@ run_app_bg <- function(func, args,
   }
 
   # Browse in Rstudio viewer
-  utils::browseURL(url,  browser = .rs.invokeShinyPaneViewer)
+  # utils::browseURL(url,  browser = .rs.invokeShinyPaneViewer)
+  rstudioapi::viewer(url, height = "maximize")
 
   return(invisible(process))
 }

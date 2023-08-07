@@ -75,7 +75,7 @@ create_v_datatable <- function(
     ),
     scrolly = "15vh",
     scrollX = TRUE,
-    scrollY = 450,
+    scrollY = 425,
     scrollCollapse=TRUE,
     colReorder = TRUE,
     searchHighlight = TRUE,

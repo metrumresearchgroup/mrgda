@@ -215,13 +215,10 @@ create_global_filter <- function(.subject_col){
     global_filter_ui <-
       fluidRow(
         column(
-          width = 5, style = "padding-right: 2px;  margin-top: 15px;",
-          shiny::div(style = "font-size:14px; font-weight: bold;", HTML(paste("Global", .subject_col, "Filter:")))
-        ),
-        column(
-          width = 6, style = "padding-left: 1px; margin-top: 7px;",
+          width = 12, style = "margin-top: 7px;",
           htmltools::tags$style("div.form-group {margin-bottom: 0px;}"),
-          shiny::textInput(inputId = "subject_filter", label = NULL)
+          shiny::textInput(inputId = "subject_filter", label = NULL,
+                           placeholder = paste("Global", .subject_col, "Filter"))
         )
       )
 

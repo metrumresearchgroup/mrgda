@@ -143,13 +143,9 @@ v_shiny_internal <- function(
       fluidRow(
         style = "background-color: #007319; color: white;",
         column(
-          width = 6,
-          global_filter_ui
-        ),
-        column(
           width = 4,
           pickerInput(
-            inputId = "data_view", label = "Viewing Dataset:",
+            inputId = "data_view", label = "Selected:",
             inline = TRUE, width = "fit",
             choices = table_opts$name,
             choicesOpt = list(content = table_opts$html_label),
@@ -157,7 +153,12 @@ v_shiny_internal <- function(
           )
         ),
         column(
-          width = 2,  align = "right",
+          width = 4, offset = 3,
+          global_filter_ui
+        ),
+        column(
+          width = 1,  align = "right",
+          style = "padding: 0px;",
           dropdownButton(
             circle = FALSE, status = "success", right = TRUE, size = "lg",
             icon = shiny::icon("gear"), tooltip = tooltipOptions(title = "Table Options", placement = "left"),
