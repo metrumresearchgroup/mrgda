@@ -6,26 +6,7 @@ rows_per_id <- 3
 num_ids <- 21
 
 # Create a test dataframe
-df <- tibble::tibble(
-  age = sample(c(22,25,26,30,32,24), num_ids, replace = TRUE),
-  Weight = rnorm(num_ids, 75, 15),
-  sex = rep(c("M", "F"), num_ids)[1:num_ids],
-  BLFL = rep(c(TRUE, FALSE), num_ids)[1:num_ids],
-  DATETIME = rep(Sys.time(), num_ids),
-  DATE = rep(Sys.Date(), num_ids),
-  TIME = rep(format(as.POSIXct(Sys.time()), format = "%H:%M"), num_ids)
-) %>%
-  dplyr::mutate(
-    ID = 1:n(),
-    USUBJID = paste0("STUDY-1001-3053-", 1:n())
-  ) %>%
-  tidyr::uncount(rows_per_id) %>%
-  dplyr::mutate(
-    biomarker = rnorm(num_ids*rows_per_id, 5, 1),
-  ) %>%
-  dplyr::relocate(ID, USUBJID)
-
-attr(df$USUBJID, "label") <- "Subject"
+df <- create_test_v_df(rows_per_id, num_ids)
 
 
 test_that("create_v_datatable correctly modifies dataframe", {
@@ -49,23 +30,25 @@ test_that("create_v_datatable correctly modifies dataframe", {
 
 test_that("create_v_datatable works correctly for various .subject_col specifications", {
 
-  ## No subject column
+  ## No subject column, none specified - no relocation or color coding
   result <- create_v_datatable(df %>% dplyr::select(-c("USUBJID", "ID")))
-  expect_true(grepl("No subjects detected", result$x$caption, fixed = TRUE))
-
+  expect_equal(as.character(unique(result$x$data$color)), "white")
 
   ## Two subject columns found, use the first found
   result <- create_v_datatable(df)
-  expect_true(grepl(paste("N Subjects (ID):", num_ids), result$x$caption, fixed = TRUE))
+  expect_equal(names(result$x$data)[1], "ID")
   result <- create_v_datatable(df %>% dplyr::relocate(USUBJID))
-  expect_true(grepl(paste("N Subjects (USUBJID):", num_ids), result$x$caption, fixed = TRUE))
+  expect_equal(names(result$x$data)[1], "USUBJID")
+
+  # user specification takes precedence
   result <- create_v_datatable(df, .subject_col = "USUBJID")
-  expect_true(grepl(paste("N Subjects (USUBJID):", num_ids), result$x$caption, fixed = TRUE))
+  expect_equal(names(result$x$data)[1], "USUBJID")
 
   ## Errors if multiple specified
   error_msg <- testthat::capture_error(create_v_datatable(df, .subject_col = c("USUBJID", "ID")))
   expect_equal(error_msg$message, "length(.subject_col) not equal to 1")
 })
+
 
 
 test_that("create_v_datatable formatting options work correctly", {
@@ -108,19 +91,7 @@ test_that("create_v_datatable works correctly for various .freeze_cols specifica
 })
 
 
-# test_that("v spawns a background process for large dataframes", {
-#   df <- haven::read_xpt(file.path(path, "lb.xpt"))
-#
-#   desired_rows <- 10000
-#   df_large <- purrr::map_dfr(seq_len(ceiling(desired_rows / nrow(df))), ~ df)
-#
-#   # Needed for dev environment only
-#   Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())
-#
-#   result <- v(df_large)
-#   on.exit(result$kill())
-#   expect_true(result$is_alive())
-# })
+
 
 test_that("create_v_datatable errors for large dataset when interactive", {
   df <- haven::read_xpt(file.path(path, "lb.xpt"))

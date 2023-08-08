@@ -4,7 +4,7 @@
 \alias{make_v_caption}
 \title{Make a caption displaying the dataset name and number of subjects}
 \usage{
-make_v_caption(.name, .df, .subject_col, .font_size = 10)
+make_v_caption(.name, .df, .subject_col = NULL, .font_size = 10)
 }
 \arguments{
 \item{.name}{name of the dataset}

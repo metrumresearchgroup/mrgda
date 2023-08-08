@@ -10,7 +10,8 @@ v_shiny_internal(
   .freeze_cols = NULL,
   .digits = 3,
   host = NULL,
-  port = NULL
+  port = NULL,
+  dont_run = FALSE
 )
 }
 \arguments{
@@ -27,6 +28,9 @@ present in the dataframe, it will be used to group rows in the datatable.}
 
 \item{host, port}{Host and port to serve the Shiny app on. If \code{port} isn't
 specified, it is randomly selected from the valid range of dynamic ports.}
+
+\item{dont_run}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, return the shinyApp object
+instead of executing it via \code{runApp}. Used for testing}
 }
 \value{
 a \code{shinyApp} object

@@ -66,7 +66,7 @@ create_v_datatable <- function(
   # Table options
   tableOpts = list(
     dom = "B<\"datatables-scroll\"t>irf<\"row\">lp",
-    pageLength = 500,
+    pageLength = 100,
     lengthMenu = c(100,500,1000,5000),
     headerCallback = DT::JS(
       "function(thead) {",

@@ -7,7 +7,7 @@
 #' @param env Environment to use for scoping
 #'
 #' @keywords internal
-local_svn_repo <- function(clean = TRUE, env = parent.frame()){
+local_svn_repo <- function(clean = TRUE, env = parent.frame(), msg = "test"){
   repo <- withr::local_tempdir("svn-test-repo",
                                clean = clean,
                                .local_envir = env
@@ -32,6 +32,36 @@ svn_repo_with_code <- function(code, clean = TRUE, env = parent.frame()) {
 
   withr::with_dir(repo, code)
 }
+
+
+# Create a test dataframe with necessary variability for testing
+# v related functions
+create_test_v_df <- function(rows_per_id = 3, num_ids = 21){
+  df <- tibble::tibble(
+    age = sample(c(22,25,26,30,32,24), num_ids, replace = TRUE),
+    Weight = rnorm(num_ids, 75, 15),
+    sex = rep(c("M", "F"), num_ids)[1:num_ids],
+    BLFL = rep(c(TRUE, FALSE), num_ids)[1:num_ids],
+    DATETIME = rep(Sys.time(), num_ids),
+    DATE = rep(Sys.Date(), num_ids),
+    TIME = rep(format(as.POSIXct(Sys.time()), format = "%H:%M"), num_ids)
+  ) %>%
+    dplyr::mutate(
+      ID = 1:n(),
+      USUBJID = paste0("STUDY-1001-3053-", 1:n())
+    ) %>%
+    tidyr::uncount(rows_per_id) %>%
+    dplyr::mutate(
+      biomarker = rnorm(num_ids*rows_per_id, 5, 1),
+    ) %>%
+    dplyr::relocate(ID, USUBJID)
+
+  attr(df$USUBJID, "label") <- "Subject"
+
+  return(df)
+}
+
+
 
 #' Compare inferred data class from v(), to what shows in a tibble view
 #'
@@ -85,4 +115,18 @@ compare_classes <- function(column_info_df) {
   purrr::pmap_dfr(column_info_df, function(col_name, determined_class, starting_class) {
     tibble::tibble(col_name = col_name, correct = check_exceptions(determined_class, starting_class))
   })
+}
+
+
+
+with_bg_env <- function(code){
+  # Dont run if inside an R CMD Check environment (package is installed)
+  if(!testthat::is_checking()){
+    Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = here::here())
+    Sys.setenv("RSTUDIO" = 1)
+    on.exit(Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = ""))
+  }
+
+  result <- eval(code)
+  return(result)
 }

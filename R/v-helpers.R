@@ -140,7 +140,8 @@ check_subject_col <- function(.df_list, .id_cols = c("USUBJID", "ID")){
     subject_col <- NULL
   }else{
     # Use the id_col with the most occurrences across the datasets
-    id_count <- id_col_df %>% dplyr::count(.data$id_col, .data$present)
+    id_count <- id_col_df %>% dplyr::filter(.data$present) %>%
+      dplyr::count(.data$id_col, .data$present)
     subject_col <- id_count$id_col[id_count$n == max(id_count$n)]
     # Use USUBJID if they are the same frequency
     if(length(subject_col) > 1){
@@ -164,7 +165,7 @@ check_subject_col <- function(.df_list, .id_cols = c("USUBJID", "ID")){
 #' @returns a `shiny.tag` object
 #'
 #' @keywords internal
-make_v_caption <- function(.name, .df, .subject_col, .font_size = 10){
+make_v_caption <- function(.name, .df, .subject_col = NULL, .font_size = 10){
 
   # Calculate N subjects
   if(!is.null(.subject_col)){

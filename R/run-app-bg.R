@@ -27,7 +27,7 @@
 #' \dontrun{
 #'
 #' shiny_func <- function(
-#'    df,
+    #'    df,
 #'    filter = TRUE,
 #'    host = NULL,
 #'    port = NULL
@@ -73,7 +73,7 @@ run_app_bg <- function(func, args,
   }
 
   iodir <- tempfile(pattern = "mrgda--")
-  fs::dir_create(iodir)
+  dir.create(iodir)
   stderr_file <- file.path(iodir, "stderr")
 
   # The following approach (callr::r_bg() followed by a pingr::is_up()
@@ -106,9 +106,14 @@ run_app_bg <- function(func, args,
     spinner$spin()
   }
 
-  # Browse in Rstudio viewer
-  # utils::browseURL(url,  browser = .rs.invokeShinyPaneViewer)
-  rstudioapi::viewer(url, height = "maximize")
+  # Browse in Rstudio viewer if available (not in R CMD Check)
+  if(nzchar(Sys.getenv("RSTUDIO"))){
+    # utils::browseURL(url,  browser = .rs.invokeShinyPaneViewer)
+    rstudioapi::viewer(url, height = "maximize")
+  }else{
+    utils::browseURL(url)
+  }
+
 
   return(invisible(process))
 }
@@ -124,12 +129,13 @@ run_app_bg <- function(func, args,
 #' @keywords internal
 random_dynamic_port <- function(host, n = 20) {
   # TODO: Respect /proc/sys/net/ipv4/ip_local_port_range
-  lower <- 49152L - 1L
+  lower <- 49152L
   upper <- 65535L
 
   httpuv::randomPort(
     min = lower, max = upper,
-    host = host, n = n)
+    host = host, n = n
+  )
 }
 
 

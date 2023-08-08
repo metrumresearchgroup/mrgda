@@ -49,6 +49,8 @@ Imports:
 Suggests: 
     testthat (>= 3.0.0),
     withr (>= 2.5.0),
+    devtools,
+    httpuv,
     pillar
 Config/testthat/edition: 3
 VignetteBuilder: 

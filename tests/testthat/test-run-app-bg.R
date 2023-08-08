@@ -1,3 +1,4 @@
+
 testthat::test_that("fmt_bg_stderr formats messages correctly", {
 
   msgs <- c("Loading: package","loading package", "package is loading (bullet point)",
@@ -7,7 +8,7 @@ testthat::test_that("fmt_bg_stderr formats messages correctly", {
 
   # Write messages to file
   iodir <- tempfile(pattern = "mrgda--")
-  fs::dir_create(iodir); on.exit(fs::dir_delete(iodir))
+  dir.create(iodir); on.exit(unlink(iodir, recursive = TRUE))
   stderr_file <- file.path(iodir, "stderr")
   readr::write_file(msgs, stderr_file)
 
