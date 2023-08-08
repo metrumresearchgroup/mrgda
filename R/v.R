@@ -332,7 +332,7 @@ v_global_ui <- function(.df_list, .subject_col){
     ),
     column(
       width = 3, align = "left",
-      style = "margin-top: 14px; margin-left: -10px; padding: 0px;",
+      style = "margin-top: 14px; padding: 0px;",
       shinyWidgets::materialSwitch(
         "show_filters", label = "Column filters",
         right = TRUE, value = FALSE, status = "success"
@@ -345,7 +345,7 @@ v_global_ui <- function(.df_list, .subject_col){
     ),
     column(
       width = 1, align = "right",
-      style = "padding: 0px; margin-top: 5px; ",
+      style = "margin-top: 5px;",
       shinyWidgets::dropMenu(
         shiny::actionButton(
           "table_opts",label = NULL,

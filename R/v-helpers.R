@@ -200,11 +200,11 @@ make_v_caption <- function(.name, .df, .subject_col = NULL, .font_size = 10){
 }
 
 
-#' Create global filter for the src_viz shiny app
+#' Create global filter for the v shiny app
 #'
 #' global filter is embedded in the title of a `shinydashboard::box`
 #'
-#' @inheritParams src_viz
+#' @inheritParams v
 #'
 #' @importFrom shiny HTML
 #'
