@@ -217,18 +217,10 @@ create_v_datatable <- function(
     .df_view <- .df_view %>%
       DT::formatStyle(
         tableOpts$fixedColumns$leftColumns, target = "cell",
-        `border-right` = '3px solid #007319', padding= "1px"
+        `border-right` = '2px solid #007319', padding= "1px"
       )
   }
 
-  # Row Borders for .subject_col column
-  if(!is.null(.subject_col)){
-    .df_view <- .df_view %>%
-      DT::formatStyle(
-        0:ncol(.df), "subj_border",
-        `border-bottom` = DT::styleEqual(1,'2px solid black')
-      )
-  }
 
   return(.df_view)
 }
