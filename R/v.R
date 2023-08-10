@@ -368,9 +368,9 @@ v_global_ui <- function(.df_list, .subject_col){
           tags$hr(),
           shinyWidgets::awesomeCheckboxGroup(
             "dt_options", label = htmltools::h4("Column Labels"),
-            choices = c("Show column labels" = "show_labels",
-                        "Wrap column labels" = "wrap_labels",
-                        "Truncate column labels" = "trunc_labels"),
+            choices = c("Show labels" = "show_labels",
+                        "Wrap labels" = "wrap_labels",
+                        "Truncate labels" = "trunc_labels"),
             selected = c("show_labels")
           ),
           shiny::conditionalPanel(

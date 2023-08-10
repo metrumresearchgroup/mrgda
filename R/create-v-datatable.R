@@ -79,10 +79,15 @@ create_v_datatable <- function(
     select = list(style = 'os', items = 'row')
   )
 
-  # Modify the headerCallback to adjust font size
-  tableOpts$headerCallback <- DT::JS(
-    "function(thead) {",
-    glue("$(thead).css('font-size', '{base_font_size}pt');"),
+
+  # Adjust font size and formatting of header on init
+  tableOpts$initComplete <- DT::JS(
+    "function(settings, json) {",
+    "  var mainHeader = $(this.api().table().header());",
+    glue("mainHeader.css('font-size', '{base_font_size}pt');"),
+    "  var indivHeader = mainHeader.find('th');",
+    "  indivHeader.css('padding-top', '0px');",
+    "  indivHeader.css('padding-bottom', '1px');",
     "}"
   )
 
@@ -161,6 +166,7 @@ create_v_datatable <- function(
 
   # Format headers as bold, and include column attributes (label and class)
   names_with_labels <- format_v_headers(.df,
+                                        .font_size = base_font_size - 1,
                                         .show_labels = dt_options$show_labels,
                                         .wrap_labels = dt_options$wrap_labels,
                                         .trunc_labels = dt_options$trunc_labels,

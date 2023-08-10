@@ -6,6 +6,7 @@
 \usage{
 format_v_headers(
   .df,
+  .font_size = 8,
   .show_labels = TRUE,
   .wrap_labels = FALSE,
   .trunc_labels = TRUE,
@@ -14,6 +15,8 @@ format_v_headers(
 }
 \arguments{
 \item{.df}{A dataframe that you want to process and view.}
+
+\item{.font_size}{Numeric. Base font size (in pt) of the column labels.}
 
 \item{.show_labels}{Logical (T/F). IF \code{TRUE}, show label attributes under the column name.}
 

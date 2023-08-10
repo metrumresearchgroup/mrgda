@@ -15,6 +15,7 @@ Authors:
 \itemize{
   \item Grace O'Brien \email{graceo@metrumrg.com}
   \item Michael McDermott \email{michaelm@metrumrg.com}
+  \item Kyle Barrett \email{barrettk@metrumrg.com}
 }
 
 }

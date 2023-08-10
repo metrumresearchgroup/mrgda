@@ -5,6 +5,7 @@
 #' Format headers to include column attributes in create_v_datatable (label and class)
 #'
 #' @inheritParams create_v_datatable
+#' @param .font_size Numeric. Base font size (in pt) of the column labels.
 #' @param .show_labels Logical (T/F). IF `TRUE`, show label attributes under the column name.
 #' @param .wrap_labels Logical (T/F). IF `TRUE`, wrap labels to 20 characters, and indent new lines.
 #' @param .trunc_labels Logical (T/F). IF `TRUE`, truncate labels.
@@ -13,6 +14,7 @@
 #' @keywords internal
 format_v_headers <- function(
     .df,
+    .font_size = 8,
     .show_labels = TRUE,
     .wrap_labels = FALSE,
     .trunc_labels = TRUE,
@@ -35,7 +37,9 @@ format_v_headers <- function(
           gsub(" ", "<br>", ., fixed = TRUE) %>%
           gsub("_", "<br>", ., fixed = TRUE)
       }
-      paste0("<br>", glue("<span style='color: #8A8B8C;'>"), col_lbl, "</span>")
+      lbl_style <- glue("<span style='color: #8A8B8C; font-size: {.font_size}pt;
+                        display:block; margin-top:1px; line-height:95%;'>")
+      paste0(lbl_style, col_lbl, "</span>")
     }else{
       ""
     }
@@ -57,9 +61,10 @@ format_v_headers <- function(
       col_attr$col_class %in% c("datetime", "time", "date") ~ "#3366A4",
       TRUE ~ "black"
     )
-
-    class_sub_text <- paste0("<br>", glue("<i><span style='color: {class_color};'>"),
-                             class_name, "</span></i>")
+    class_name <- paste0("<i>", class_name, "</i>")
+    class_style <- glue("<span style='color: {class_color}; font-size: {.font_size+0.5}pt;
+                        display: block;'>")
+    class_sub_text <- paste0(class_style, class_name, "</span>")
 
     # Create overall header
     final_label <- if(isTRUE(.show_labels)){
