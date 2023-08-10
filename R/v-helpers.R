@@ -5,11 +5,19 @@
 #' Format headers to include column attributes in create_v_datatable (label and class)
 #'
 #' @inheritParams create_v_datatable
-#' @param .wrap_labels Logical (T/F). IF `TRUE`, wrap labels to 20 characters, and indent new lines
-#' @param .show_labels Logical (T/F). IF `TRUE`, show label attributes under the column name
+#' @param .show_labels Logical (T/F). IF `TRUE`, show label attributes under the column name.
+#' @param .wrap_labels Logical (T/F). IF `TRUE`, wrap labels to 20 characters, and indent new lines.
+#' @param .trunc_labels Logical (T/F). IF `TRUE`, truncate labels.
+#' @param .trunc_length Numeric. Number of characters to truncate labels to. Only relevant if `.trunc_labels` is `TRUE`.
 #'
 #' @keywords internal
-format_v_headers <- function(.df, .wrap_labels = TRUE, .show_labels = TRUE){
+format_v_headers <- function(
+    .df,
+    .show_labels = TRUE,
+    .wrap_labels = FALSE,
+    .trunc_labels = TRUE,
+    .trunc_length = 20
+){
   col_attributes <- purrr::map(colnames(.df), ~ {
     list(col_lbl = attr(.df[[.x]], "label"), col_class = readr::guess_parser(as.character(.df[[.x]])))
   })
@@ -17,13 +25,15 @@ format_v_headers <- function(.df, .wrap_labels = TRUE, .show_labels = TRUE){
   names_with_labels <- purrr::map2_chr(colnames(.df), col_attributes, function(col_name, col_attr){
     # Label attributes
     lbl_sub_txt <- if(!is.null(col_attr$col_lbl)){
-      col_lbl <- if(isTRUE(.wrap_labels)){
-        paste0(col_attr$col_lbl) %>%
-          stringr::str_trunc(20) %>%
+      col_lbl <- paste0(col_attr$col_lbl)
+      if(isTRUE(.trunc_labels)){
+        assertthat::is.number(.trunc_length)
+        col_lbl <- col_lbl %>% stringr::str_trunc(.trunc_length)
+      }
+      if(isTRUE(.wrap_labels)){
+        col_lbl <- col_lbl %>%
           gsub(" ", "<br>", ., fixed = TRUE) %>%
           gsub("_", "<br>", ., fixed = TRUE)
-      }else{
-        paste0(col_attr$col_lbl)
       }
       paste0("<br>", glue("<span style='color: #8A8B8C;'>"), col_lbl, "</span>")
     }else{
@@ -79,7 +89,6 @@ prettyNum2 <- function(.x, .digits = 3) {
     signif(.x, digits = .digits)
   )
 }
-
 
 
 # Helpers for v_shiny_internal and v --------------------------------------

@@ -37,8 +37,11 @@ create_v_datatable <- function(
     .digits = 3,
     dt_options = list(
       show_filters = FALSE,
-      wrap_labels = TRUE,
-      show_labels = FALSE
+      show_labels = TRUE,
+      wrap_labels = FALSE,
+      trunc_labels = 20,
+      ft_size = 9,
+      subj_contrast = FALSE
     )
 ){
 
@@ -60,8 +63,7 @@ create_v_datatable <- function(
 
   # Set basic options
   col_width <- "1px"
-  base_font_size <- 10
-
+  base_font_size <- dt_options$ft_size
 
   # Table options
   tableOpts = list(
@@ -87,7 +89,13 @@ create_v_datatable <- function(
     list(className = 'dt-center', targets = "_all"),
     list(width = col_width, targets = "_all"),
     # Controls column ordering
-    list(type = 'natural', targets = "_all")
+    list(type = 'natural', targets = "_all"),
+    # Show NAs (to differentiate between blank and NA)
+    list(targets = "_all", render = DT::JS(
+      "function(data, type, row, meta) {",
+      "return data === null ? 'NA' : data;",
+      "}")
+    )
   )
 
   # If no .subject_col specified, look for USUBJID and ID (choose first in appearance)
@@ -112,20 +120,29 @@ create_v_datatable <- function(
     if (!is.null(.subject_col)) {
       stopifnot(.subject_col %in% names(.df))
 
-      # Add color column
+      # Set subject alternation color
+      color_rot <- ifelse(isTRUE(dt_options$subj_contrast), "yellow", "#ececec")
+
+      # Add group columns (color, bg color, and borders)
       .df <- .df %>%
         dplyr::group_by(dplyr::across(all_of(.subject_col))) %>%
         dplyr::mutate(group_id = dplyr::cur_group_id()) %>%
-        dplyr::mutate(color = ifelse(.data$group_id %% 2 == 1, "white", "#ececec")) %>%
+        dplyr::mutate(
+          bg_color = ifelse(.data$group_id %% 2 == 1, "white", color_rot),
+          ft_color = ifelse(.data$group_id %% 2 == 1, "black", "black"),
+          subj_border = ifelse(dplyr::row_number() == dplyr::last(dplyr::row_number()), 1, 0)
+        ) %>% # was #ececec
         dplyr::ungroup() %>% dplyr::select(-"group_id")
     }
   }
 
-  if(!("color" %in% names(.df))) .df <- .df %>% dplyr::mutate(color = "white")
+  if(!("bg_color" %in% names(.df))){
+    .df <- .df %>% dplyr::mutate(bg_color = "white", ft_color = "black")
+  }
 
 
-  # Hides color column in output
-  color_id <- grep("color", names(.df)) - 1
+  # Hides grouping columns in output
+  color_id <- grep("bg_color|ft_color|subj_border", names(.df)) - 1
   columnDefs <- c(columnDefs, list(list(targets = color_id, visible = F)))
 
   # Assign columnDefs to table options
@@ -133,7 +150,11 @@ create_v_datatable <- function(
 
 
   # Format headers as bold, and include column attributes (label and class)
-  names_with_labels <- format_v_headers(.df, dt_options$wrap_labels, dt_options$show_labels)
+  names_with_labels <- format_v_headers(.df,
+                                        .show_labels = dt_options$show_labels,
+                                        .wrap_labels = dt_options$wrap_labels,
+                                        .trunc_labels = dt_options$trunc_labels,
+                                        .trunc_length = dt_options$trunc_length)
 
   # Round numeric columns to 3 decimal places
   if(!is.null(.digits)){
@@ -148,6 +169,13 @@ create_v_datatable <- function(
       .x
     }
   })
+
+
+  # Escape special characters that could be misunderstood as HTML
+  # TODO: see if we can apply the opposite approach to headers instead
+  # This is unlikely, as many HTML escaping mechanisms are designed to prevent
+  # the rendering of HTML tags and entities for security reasons
+  .df <- .df %>% dplyr::mutate(across(everything(), ~ htmltools::htmlEscape(.x)))
 
   # User controlled table options
   filter <- ifelse(dt_options$show_filters, "top", "none")
@@ -165,12 +193,42 @@ create_v_datatable <- function(
     plugins = 'natural',
     options = tableOpts
   ) %>%
-    DT::formatStyle(0:ncol(.df), target = "cell", border = '1px solid #bbbbbb', padding= "1px") %>%
+    #
+    # Column Borders
+    DT::formatStyle(0:ncol(.df), target = "cell", border = '1px solid #bbbbbb', padding= "2px") %>%
+    # Line Height
     DT::formatStyle(0, target= 'row',lineHeight='85%') %>%
+    # Font Size
     DT::formatStyle(0:ncol(.df), fontSize = paste0(base_font_size, "pt")) %>%
-    DT::formatStyle(0:ncol(.df), "color",
-                    backgroundColor = DT::styleEqual(sort(unique(.df$color)), sort(unique(.df$color)))
-    ) %>% suppressWarnings()
+    # Background color
+    DT::formatStyle(
+      0:ncol(.df), "bg_color",
+      backgroundColor = DT::styleEqual(sort(unique(.df$bg_color)), sort(unique(.df$bg_color)))
+    ) %>%
+    # Font color
+    DT::formatStyle(
+      0:ncol(.df), "ft_color",
+      color = DT::styleEqual(sort(unique(.df$ft_color)), sort(unique(.df$ft_color)))
+    ) %>%
+    suppressWarnings()
+
+  # Column Borders for fixed columns
+  if(!is.null(tableOpts$fixedColumns)){
+    .df_view <- .df_view %>%
+      DT::formatStyle(
+        tableOpts$fixedColumns$leftColumns, target = "cell",
+        `border-right` = '3px solid #007319', padding= "1px"
+      )
+  }
+
+  # Row Borders for .subject_col column
+  if(!is.null(.subject_col)){
+    .df_view <- .df_view %>%
+      DT::formatStyle(
+        0:ncol(.df), "subj_border",
+        `border-bottom` = DT::styleEqual(1,'2px solid black')
+      )
+  }
 
   return(.df_view)
 }

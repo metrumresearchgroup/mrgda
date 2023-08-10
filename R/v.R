@@ -142,7 +142,8 @@ v_shiny_internal <- function(
         # PickerInput styling (hard to see before - columns stand out more)
         tags$style(HTML(".dropdown-menu > li > a {font-size: smaller;}")),
         tags$style(HTML(".dropdown-header {font-size: larger; font-weight: bold;}")),
-        tags$style(HTML(".dropdown-menu > .divider {background-color: black; height: 2px;}"))
+        tags$style(HTML(".dropdown-menu > .divider {background-color: black; height: 2px;}")),
+        tags$style(HTML("hr {border-top: 2px solid #007319;}"))
       ),
       # Main Header UIs
       v_global_ui(.df_list, .subject_col),
@@ -364,13 +365,51 @@ v_global_ui <- function(.df_list, .subject_col){
             ),
             multiple = TRUE
           ),
+          tags$hr(),
           shinyWidgets::awesomeCheckboxGroup(
-            "dt_options", label = htmltools::h4("Table Options"),
-            choices = c("Wrap column labels" = "wrap_labels",
-                        "Show column labels" = "show_labels"),
-            selected = c("wrap_labels", "show_labels")
+            "dt_options", label = htmltools::h4("Column Labels"),
+            choices = c("Show column labels" = "show_labels",
+                        "Wrap column labels" = "wrap_labels",
+                        "Truncate column labels" = "trunc_labels"),
+            selected = c("show_labels")
+          ),
+          shiny::conditionalPanel(
+            condition = "input.dt_options.indexOf('trunc_labels') != -1",
+            tags$br(),
+            fluidRow(
+              column(
+                width = 10, offset = 1,
+                style = "background-color: #e2e2e2; border:3px solid #8ebf42",
+                shiny::sliderInput(
+                  "trunc_length", label = "Max characters to show",
+                  value = 20, min = 10, max = 30, step = 2
+                )
+              )
+            )
+          ),
+          tags$hr(),
+          htmltools::h4("Table Options"),
+          fluidRow(
+            column(
+              width = 7,
+              shiny::sliderInput(
+                "ft_size", label = "Font Size",
+                value = 9, min = 5, max = 12, step = 1
+              )
+            ),
+            column(
+              width = 5,
+              tags$label("Subject Contrast"),
+              shinyWidgets::switchInput(
+                inputId = "subj_contrast",
+                onLabel = "Heavy",
+                offLabel = "Light",
+                size = "small"
+              )
+            )
           )
-        )
+        ),
+        maxWidth = "300px"
       )
     )
   )
@@ -407,8 +446,12 @@ v_global_server <- function(
   dt_options <- reactive({
     list(
       show_filters = input$show_filters,
+      show_labels = "show_labels" %in% input$dt_options,
       wrap_labels = "wrap_labels" %in% input$dt_options,
-      show_labels = "show_labels" %in% input$dt_options
+      trunc_labels = "trunc_labels" %in% input$dt_options,
+      trunc_length = input$trunc_length,
+      ft_size = input$ft_size,
+      subj_contrast = input$subj_contrast
     )
   })
 

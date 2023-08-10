@@ -4,14 +4,24 @@
 \alias{format_v_headers}
 \title{Format headers to include column attributes in create_v_datatable (label and class)}
 \usage{
-format_v_headers(.df, .wrap_labels = TRUE, .show_labels = TRUE)
+format_v_headers(
+  .df,
+  .show_labels = TRUE,
+  .wrap_labels = FALSE,
+  .trunc_labels = TRUE,
+  .trunc_length = 20
+)
 }
 \arguments{
 \item{.df}{A dataframe that you want to process and view.}
 
-\item{.wrap_labels}{Logical (T/F). IF \code{TRUE}, wrap labels to 20 characters, and indent new lines}
+\item{.show_labels}{Logical (T/F). IF \code{TRUE}, show label attributes under the column name.}
 
-\item{.show_labels}{Logical (T/F). IF \code{TRUE}, show label attributes under the column name}
+\item{.wrap_labels}{Logical (T/F). IF \code{TRUE}, wrap labels to 20 characters, and indent new lines.}
+
+\item{.trunc_labels}{Logical (T/F). IF \code{TRUE}, truncate labels.}
+
+\item{.trunc_length}{Numeric. Number of characters to truncate labels to. Only relevant if \code{.trunc_labels} is \code{TRUE}.}
 }
 \description{
 Format headers to include column attributes in create_v_datatable (label and class)
