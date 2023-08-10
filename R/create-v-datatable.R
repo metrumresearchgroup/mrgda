@@ -180,6 +180,10 @@ create_v_datatable <- function(
   # User controlled table options
   filter <- ifelse(dt_options$show_filters, "top", "none")
 
+  # Determine lineheight based on font size
+  # EQ developed from 40% = 5pt & 100% = 12pt (lm(c(40, 100) ~ c(5, 12)))
+  line_height <- paste0(round(8.6*base_font_size - 2.9), "%")
+
   # Return the .df table
   .df_view <- DT::datatable(
     .df,
@@ -193,11 +197,10 @@ create_v_datatable <- function(
     plugins = 'natural',
     options = tableOpts
   ) %>%
-    #
     # Column Borders
-    DT::formatStyle(0:ncol(.df), target = "cell", border = '1px solid #bbbbbb', padding= "2px") %>%
+    DT::formatStyle(0:ncol(.df), target = "cell", border = '1px solid #bbbbbb', padding = "2px") %>%
     # Line Height
-    DT::formatStyle(0, target= 'row',lineHeight='85%') %>%
+    DT::formatStyle(0, target = 'row', lineHeight = line_height) %>%
     # Font Size
     DT::formatStyle(0:ncol(.df), fontSize = paste0(base_font_size, "pt")) %>%
     # Background color
@@ -217,10 +220,9 @@ create_v_datatable <- function(
     .df_view <- .df_view %>%
       DT::formatStyle(
         tableOpts$fixedColumns$leftColumns, target = "cell",
-        `border-right` = '2px solid #007319', padding= "1px"
+        `border-right` = '2px solid #007319', padding = "1px"
       )
   }
-
 
   return(.df_view)
 }
