@@ -65,24 +65,34 @@ create_v_datatable <- function(
   col_width <- "1px"
   base_font_size <- dt_options$ft_size
 
-  # Table options
+  # Core table options
   tableOpts = list(
-    dom = "B<\"datatables-scroll\"t>irf<\"row\">lp",
+    dom = "<'dt-wrapper'<'datatables-scroll'rt><'row-pad' lf>ip>",
     pageLength = 100,
     lengthMenu = c(100,500,1000,5000),
-    headerCallback = DT::JS(
-      "function(thead) {",
-      glue("$(thead).css('font-size', '{base_font_size-0.5}pt');"),
-      "}"
-    ),
-    scrolly = "15vh",
     scrollX = TRUE,
-    scrollY = 425,
+    scrollY = 450,
     scrollCollapse=TRUE,
     colReorder = TRUE,
     searchHighlight = TRUE,
     autoWidth = autoWidth,
     select = list(style = 'os', items = 'row')
+  )
+
+  # Modify the headerCallback to adjust font size
+  tableOpts$headerCallback <- DT::JS(
+    "function(thead) {",
+    glue("$(thead).css('font-size', '{base_font_size}pt');"),
+    "}"
+  )
+
+  # Add a callback to improve margins of DT info elements
+  tableOpts$drawCallback <- DT::JS(
+    "function(settings) {",
+    "  var mainBody = $('.dt-wrapper');",
+    "  var rowPad = mainBody.find('.row-pad');",
+    "  rowPad.css('padding-top', '1em');",
+    "}"
   )
 
   columnDefs <- list(
@@ -161,6 +171,15 @@ create_v_datatable <- function(
     .df <- .df %>% dplyr::mutate(across(where(is.numeric), ~prettyNum2(.x, .digits)))
   }
 
+
+  # Escape special characters that could be misunderstood as HTML
+  # (this must happen before factor conversion)
+  # TODO: see if we can apply the opposite approach to headers instead
+  # This is unlikely, as many HTML escaping mechanisms are designed to prevent
+  # the rendering of HTML tags and entities for security reasons
+  .df <- .df %>% dplyr::mutate(across(where(is.character), ~ htmltools::htmlEscape(.x)))
+
+
   # Convert columns with less than 20 unique values to factors
   .df <- purrr::map_dfr(.df, ~ {
     if(length(unique(.x)) < 20){
@@ -171,14 +190,8 @@ create_v_datatable <- function(
   })
 
 
-  # Escape special characters that could be misunderstood as HTML
-  # TODO: see if we can apply the opposite approach to headers instead
-  # This is unlikely, as many HTML escaping mechanisms are designed to prevent
-  # the rendering of HTML tags and entities for security reasons
-  .df <- .df %>% dplyr::mutate(across(everything(), ~ htmltools::htmlEscape(.x)))
-
   # User controlled table options
-  filter <- ifelse(dt_options$show_filters, "top", "none")
+  filter <- if(dt_options$show_filters) list(position = 'top', clear = FALSE) else "none"
 
   # Determine lineheight based on font size
   # EQ developed from 40% = 5pt & 100% = 12pt (lm(c(40, 100) ~ c(5, 12)))
