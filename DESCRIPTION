@@ -5,7 +5,8 @@ Authors@R:
     c(
     person(given = "Eric", family = "Anderson", email = "andersone@metrumrg.com", role = c("aut", "cre")),
     person(given = "Grace", family = "O'Brien", email = "graceo@metrumrg.com", role = c("aut")),
-    person(given = "Michael", family = "McDermott", email = "michaelm@metrumrg.com", role = c("aut"))
+    person(given = "Michael", family = "McDermott", email = "michaelm@metrumrg.com", role = c("aut")),
+    person(given = "Kyle", family = "Barrett", email = "barrettk@metrumrg.com", role = c("aut"))
     )
 Description: Run various tests on an NMTRAN dataset to validate it prior to modeling.
 License: GPL (>= 3)
