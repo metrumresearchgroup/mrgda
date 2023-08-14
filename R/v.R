@@ -455,7 +455,6 @@ v_global_server <- function(
     session = getDefaultReactiveDomain()
 ){
 
-
   .rv <- reactiveValues()
 
   observe({
@@ -469,16 +468,16 @@ v_global_server <- function(
     # Arguments passed to create_v_datatable directly
     dt_args <- list(
       # Show Filters
-      show_filters = input$show_filters,
+      .show_filters = input$show_filters,
       # Label presence and formatting
-      show_labels = "show_labels" %in% input$dt_options,
-      wrap_labels = "wrap_labels" %in% input$dt_options,
-      trunc_labels = "trunc_labels" %in% input$dt_options,
-      trunc_length = input$trunc_length,
+      .show_labels = "show_labels" %in% input$dt_options,
+      .wrap_labels = "wrap_labels" %in% input$dt_options,
+      .trunc_labels = "trunc_labels" %in% input$dt_options,
+      .trunc_length = input$trunc_length,
       # Misc DT options
-      digits = input$digits,
-      ft_size = input$ft_size,
-      subj_contrast = input$subj_contrast
+      .digits = input$digits,
+      .ft_size = input$ft_size,
+      .subj_contrast = input$subj_contrast
     )
     .rv$dt_args <- dt_args
 
