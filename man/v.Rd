@@ -4,7 +4,7 @@
 \alias{v}
 \title{Format and view a dataframe or list of dataframes in the viewer}
 \usage{
-v(.df_list, .subject_col = NULL, .freeze_cols = NULL, .digits = 3)
+v(.df_list, .subject_col = NULL)
 }
 \arguments{
 \item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.
@@ -12,11 +12,6 @@ Named lists will inherit their names when shown in the app.}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
-
-\item{.freeze_cols}{A character vector specifying columns to freeze when scrolling horizontally.
-\code{.subject_col} will automatically be appended to this list (i.e. \code{.subject_col} is always frozen).}
-
-\item{.digits}{number of digits to round numeric columns to. Set to \code{NULL} to prevent rounding.}
 }
 \value{
 The \code{callr} process (invisibly).

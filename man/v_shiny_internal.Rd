@@ -8,7 +8,6 @@ v_shiny_internal(
   .df_list,
   .subject_col = NULL,
   .freeze_cols = NULL,
-  .digits = 3,
   host = NULL,
   port = NULL,
   dont_run = FALSE
@@ -23,8 +22,6 @@ present in the dataframe, it will be used to group rows in the datatable.}
 
 \item{.freeze_cols}{A character vector specifying columns to freeze when scrolling horizontally.
 \code{.subject_col} will automatically be appended to this list (i.e. \code{.subject_col} is always frozen).}
-
-\item{.digits}{number of digits to round numeric columns to. Set to \code{NULL} to prevent rounding.}
 
 \item{host, port}{Host and port to serve the Shiny app on. If \code{port} isn't
 specified, it is randomly selected from the valid range of dynamic ports.}

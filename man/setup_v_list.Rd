@@ -4,11 +4,14 @@
 \alias{setup_v_list}
 \title{Put \code{.df_list} in the right format}
 \usage{
-setup_v_list(.df_list)
+setup_v_list(.df_list, .subject_col)
 }
 \arguments{
 \item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.
 Named lists will inherit their names when shown in the app.}
+
+\item{.subject_col}{A character string specifying the subject column. If this column is
+present in the dataframe, it will be used to group rows in the datatable.}
 }
 \value{
 list of dataframes

@@ -34,15 +34,14 @@ create_v_datatable <- function(
     .df,
     .subject_col = NULL,
     .freeze_cols = NULL,
-    .digits = 3,
-    dt_options = list(
-      show_filters = FALSE,
-      show_labels = TRUE,
-      wrap_labels = FALSE,
-      trunc_labels = 20,
-      ft_size = 9,
-      subj_contrast = FALSE
-    )
+    show_filters = FALSE,
+    show_labels = TRUE,
+    wrap_labels = FALSE,
+    trunc_labels = FALSE,
+    trunc_length = 20,
+    ft_size = 9,
+    subj_contrast = FALSE,
+    digits = 3
 ){
 
 
@@ -63,7 +62,7 @@ create_v_datatable <- function(
 
   # Set basic options
   col_width <- "1px"
-  base_font_size <- dt_options$ft_size
+  base_font_size <- ft_size
 
   # Core table options
   tableOpts = list(
@@ -136,7 +135,7 @@ create_v_datatable <- function(
       stopifnot(.subject_col %in% names(.df))
 
       # Set subject alternation color
-      color_rot <- ifelse(isTRUE(dt_options$subj_contrast), "yellow", "#ececec")
+      color_rot <- ifelse(isTRUE(subj_contrast), "yellow", "#ececec")
 
       # Add group columns (color, bg color, and borders)
       .df <- .df %>%
@@ -167,14 +166,14 @@ create_v_datatable <- function(
   # Format headers as bold, and include column attributes (label and class)
   names_with_labels <- format_v_headers(.df,
                                         .font_size = base_font_size - 1,
-                                        .show_labels = dt_options$show_labels,
-                                        .wrap_labels = dt_options$wrap_labels,
-                                        .trunc_labels = dt_options$trunc_labels,
-                                        .trunc_length = dt_options$trunc_length)
+                                        .show_labels = show_labels,
+                                        .wrap_labels = wrap_labels,
+                                        .trunc_labels = trunc_labels,
+                                        .trunc_length = trunc_length)
 
   # Round numeric columns to 3 decimal places
-  if(!is.null(.digits)){
-    .df <- .df %>% dplyr::mutate(across(where(is.numeric), ~prettyNum2(.x, .digits)))
+  if(!is.null(digits)){
+    .df <- .df %>% dplyr::mutate(across(where(is.numeric), ~prettyNum2(.x, digits)))
   }
 
 
@@ -197,7 +196,7 @@ create_v_datatable <- function(
 
 
   # User controlled table options
-  filter <- if(dt_options$show_filters) list(position = 'top', clear = FALSE) else "none"
+  filter <- if(show_filters) list(position = 'top', clear = FALSE) else "none"
 
   # Determine lineheight based on font size
   # EQ developed from 40% = 5pt & 100% = 12pt (lm(c(40, 100) ~ c(5, 12)))

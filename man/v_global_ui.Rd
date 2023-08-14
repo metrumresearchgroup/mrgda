@@ -4,7 +4,7 @@
 \alias{v_global_ui}
 \title{Construct global header UI for \code{v_shiny_internal}}
 \usage{
-v_global_ui(.df_list, .subject_col)
+v_global_ui(.df_list, .subject_col, .freeze_cols)
 }
 \arguments{
 \item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.
@@ -12,6 +12,9 @@ Named lists will inherit their names when shown in the app.}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
+
+\item{.freeze_cols}{A character vector specifying columns to freeze when scrolling horizontally.
+\code{.subject_col} will automatically be appended to this list (i.e. \code{.subject_col} is always frozen).}
 }
 \value{
 a shiny UI

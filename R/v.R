@@ -61,17 +61,10 @@
 #' @export
 v <- function(
     .df_list,
-    .subject_col = NULL,
-    .freeze_cols = NULL,
-    .digits = 3
+    .subject_col = NULL
 ){
 
-  args <- list(
-    .df_list = .df_list,
-    .subject_col = .subject_col,
-    .freeze_cols = .freeze_cols,
-    .digits = .digits
-  )
+  args <- setup_v_list(.df_list, .subject_col)
 
   run_app_bg(v_shiny_internal, args = args)
 }
@@ -105,7 +98,6 @@ v_shiny_internal <- function(
     .df_list,
     .subject_col = NULL,
     .freeze_cols = NULL,
-    .digits = 3,
     host = NULL,
     port = NULL,
     dont_run = FALSE
@@ -118,16 +110,12 @@ v_shiny_internal <- function(
     devtools::load_all(load_path)
   }
 
-  .df_list <- setup_v_list(.df_list)
-
-  # Determine .subject_col if not specified
-  if(is.null(.subject_col)){
-    .subject_col <- check_subject_col(.df_list)
-  }else{
-    # Make sure .subject_col is valid
-    if(!any(purrr::map_lgl(.df_list, ~{.subject_col %in% colnames(.x)}))){
-      abort(glue(".subject_col ({.subject_col}) is not present in any dataframe"))
-    }
+  # Only triggers if v_shiny_internal is called directly
+  if(rlang::is_interactive()){
+    args <- setup_v_list(.df_list, .subject_col)
+    .subject_col <- args$.subject_col
+    .freeze_cols <- args$.freeze_cols
+    .df_list <- args$.df_list
   }
 
 
@@ -146,7 +134,7 @@ v_shiny_internal <- function(
         tags$style(HTML("hr {border-top: 2px solid #007319;}"))
       ),
       # Main Header UIs
-      v_global_ui(.df_list, .subject_col),
+      v_global_ui(.df_list, .subject_col, .freeze_cols),
       # Individual Dataframe
       fluidRow(v_mod_ui("df_view"))
     )
@@ -160,23 +148,12 @@ v_shiny_internal <- function(
     })
 
     # Handle global UIs
-    global_vars <- v_global_server(.df_list,
-                                   .subject_col = .subject_col,
-                                   .freeze_cols = .freeze_cols,
-                                   input, output)
-
-    observe({
-      shiny::req(global_vars)
-    }, priority = 2)
+    global_vars <- v_global_server(.df_list, input, output)
 
     # Create DT datatables
     v_mod_server("df_view",
-                 .df = global_vars$data_select,
                  .subject_col = .subject_col,
-                 .freeze_cols = global_vars$freeze_cols,
-                 .digits = .digits,
-                 .subject_filter = global_vars$subject_filter,
-                 .dt_options = global_vars$dt_options
+                 global_vars = reactive(global_vars)
     )
 
     # End the process on window close. This is designed for the case where a
@@ -240,8 +217,7 @@ v_mod_ui <- function(.id){
 #' shiny module server for `v_shiny_internal`
 #'
 #' @param .id shiny module id. Character string
-#' @param .subject_filter reactive expression pointing to global filter
-#' @param .freeze_cols reactive expression containing columns to freeze for the particular dataset
+#' @param global_vars reactive list of arguments
 #' @inheritParams create_v_datatable
 #'
 #' @importFrom shiny moduleServer shinyApp
@@ -251,46 +227,71 @@ v_mod_ui <- function(.id){
 #' @keywords internal
 v_mod_server <- function(
     .id,
-    .df,
     .subject_col = NULL,
-    .freeze_cols = NULL,
-    .digits = 3,
-    .subject_filter,
-    .dt_options
+    global_vars
 ){
 
   moduleServer(.id, function(input, output, session) {
-    output$df_view <- DT::renderDT({
-      has_subject_col <- !is.null(.subject_col) && .subject_col %in% names(.df())
-      do_rows_filter <- has_subject_col && nchar(trimws(.subject_filter())) > 0
 
-      fix_cols <- .freeze_cols()
+
+    # Reactive display data
+    data <- reactive({
+      data_raw <- shiny::req(global_vars()$data_select)
+      subject_filter <- global_vars()$subject_filter
+
+      has_subject_col <- !is.null(.subject_col) && .subject_col %in% names(data_raw)
+      do_rows_filter <- has_subject_col && nchar(trimws(subject_filter)) > 0
 
       if(do_rows_filter){
-        .df_filter <- .df() %>% dplyr::filter(grepl(trimws(.subject_filter()), !!sym(.subject_col)))
+        data_filter <- data_raw %>% dplyr::filter(grepl(trimws(subject_filter), !!sym(.subject_col)))
       }else{
-        .df_filter <- .df()
-      }
-
-      # Fix .freeze_cols found per dataset, so that it still works with lists
-      if(!is.null(fix_cols)){
-        .freeze_cols_df <- fix_cols[fix_cols %in% names(.df())]
-        if(rlang::is_empty(.freeze_cols_df)) .freeze_cols_df <- NULL
-      }else{
-        .freeze_cols_df <- NULL
+        data_filter <- data_raw
       }
 
       # Allows for some dataframes to not have .subject_col
       if(has_subject_col){
-        if(nrow(.df_filter) == 0){
-          .df_filter[1, .subject_col] <- "<b>No subjects found</b>"
+        if(nrow(data_filter) == 0){
+          data_filter[1, .subject_col] <- "No subjects found"
         }
-        create_v_datatable(.df_filter, .subject_col, .freeze_cols_df, .digits,
-                           dt_options = .dt_options())
-      }else{
-        create_v_datatable(.df(), .subject_col = NULL, .freeze_cols_df, .digits,
-                           dt_options = .dt_options())
       }
+      data_filter
+    })
+
+
+    # Set subject column per dataset (to account for list elements where subject_col is missing)
+    subject_col_df <- reactive({
+      if(!is.null(.subject_col) && .subject_col %in% names(data())){
+        .subject_col
+      }else{
+        NULL
+      }
+    })
+
+    # Fix .freeze_cols found per dataset, so that it still works with lists
+    freeze_cols <- reactive({
+      fix_cols <- global_vars()$freeze_col_choices
+      if(!is.null(fix_cols)){
+        .freeze_cols_df <- fix_cols[fix_cols %in% names(data())]
+        if(rlang::is_empty(.freeze_cols_df)) .freeze_cols_df <- NULL
+      }else{
+        .freeze_cols_df <- NULL
+      }
+      .freeze_cols_df
+    })
+
+    output$df_view <- DT::renderDT({
+      args_df <- list(
+        .df = shiny::req(data()),
+        .subject_col = subject_col_df(),
+        .freeze_cols = freeze_cols()
+      )
+
+      args <- c(args_df, global_vars()$dt_args)
+
+      # Dont consider shiny session to be interactive (avoid object size check)
+      rlang::with_interactive({
+        do.call(create_v_datatable, args)
+      }, value = FALSE)
     }, server = TRUE)
 
   })
@@ -305,11 +306,12 @@ v_mod_server <- function(
 #' Note that this is not module
 #'
 #' @inheritParams v
+#' @inheritParams create_v_datatable
 #'
 #' @return a shiny UI
 #'
 #' @keywords internal
-v_global_ui <- function(.df_list, .subject_col){
+v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
 
   # Create global filter UI
   global_filter_ui <- create_global_filter(.subject_col)
@@ -333,7 +335,7 @@ v_global_ui <- function(.df_list, .subject_col){
     ),
     column(
       width = 3, align = "left",
-      style = "margin-top: 14px; padding: 0px;",
+      style = "margin-top: 14px;",
       shinyWidgets::materialSwitch(
         "show_filters", label = "Column filters",
         right = TRUE, value = FALSE, status = "success"
@@ -358,7 +360,7 @@ v_global_ui <- function(.df_list, .subject_col){
           shinyWidgets::pickerInput(
             inputId = "freeze_cols",
             label = htmltools::h4("Fix columns while scrolling"),
-            choices = list(),
+            choices = .freeze_cols,
             options = list(
               `live-search` = TRUE, `actions-box` = TRUE,
               style = "btn-success", size = 8
@@ -407,6 +409,16 @@ v_global_ui <- function(.df_list, .subject_col){
                 size = "small"
               )
             )
+          ),
+          fluidRow(
+            column(
+              width = 7,
+              shiny::sliderInput(
+                "digits", label = "Round Values",
+                value = 3, min = 1, max = 6, step = 1,
+                post = " digits"
+              )
+            )
           )
         ),
         maxWidth = "300px"
@@ -427,78 +439,39 @@ v_global_ui <- function(.df_list, .subject_col){
 #' @keywords internal
 v_global_server <- function(
     .df_list,
-    .subject_col = NULL,
-    .freeze_cols = NULL,
     input,
     output,
     session = getDefaultReactiveDomain()
 ){
 
-  # Global subject filter
-  subject_filter <- reactive(input$subject_filter)
 
-  # Selected Dataset
-  data_select <- reactive({
-    .df_list[[shiny::req(input$data_select)]]
-  })
+  .rv <- reactiveValues()
 
-  # DT options
-  dt_options <- reactive({
-    list(
+  observe({
+    # Selected Dataset
+    .rv$data_select = .df_list[[shiny::req(input$data_select)]]
+    # Global subject filter
+    .rv$subject_filter = input$subject_filter
+    # Frozen columns
+    .rv$freeze_col_choices = input$freeze_cols
+
+    # Arguments passed to create_v_datatable directly
+    dt_args <- list(
+      # Show Filters
       show_filters = input$show_filters,
+      # Label presence and formatting
       show_labels = "show_labels" %in% input$dt_options,
       wrap_labels = "wrap_labels" %in% input$dt_options,
       trunc_labels = "trunc_labels" %in% input$dt_options,
       trunc_length = input$trunc_length,
+      # Misc DT options
+      digits = input$digits,
       ft_size = input$ft_size,
       subj_contrast = input$subj_contrast
     )
+    .rv$dt_args <- dt_args
+
   })
 
-  # Set Freeze columns per dataset on load
-  init_freeze_cols <- as.list(rep("", length(.df_list))) %>% stats::setNames(names(.df_list))
-  freeze_cols_lst <- do.call("reactiveValues",init_freeze_cols)
-  observeEvent(.freeze_cols, {
-    freeze_cols_lst[[shiny::req(input$data_select)]] <- .freeze_cols
-  }, once = TRUE, priority = 3)
-
-  # Update freeze column options and current selections
-  observeEvent(list(freeze_cols_lst, data_select()),{
-    data_name <- shiny::req(input$data_select)
-    freeze_cols <- freeze_cols_lst[[data_name]]
-
-    # Named list of potential freeze columns (remove subject column if it exists)
-    freeze_col_opts <- colnames(data_select())
-    if(!is.null(.subject_col)){
-      freeze_col_opts <- freeze_col_opts[-grep(.subject_col, freeze_col_opts)]
-    }
-    freeze_col_opts <- list(freeze_col_opts) %>% stats::setNames(data_name)
-
-    if(any(freeze_cols %in% names(data_select()))){
-      freeze_cols <- freeze_cols[freeze_cols %in% names(data_select())]
-      shinyWidgets::updatePickerInput(session, "freeze_cols", choices = freeze_col_opts, selected = freeze_cols)
-    }else{
-      shinyWidgets::updatePickerInput(session, "freeze_cols", choices = freeze_col_opts)
-    }
-  }, ignoreNULL = FALSE)
-
-  # For updating selected data freeze columns
-  observeEvent(list(input$freeze_cols), {
-    freeze_cols_lst[[shiny::req(input$data_select)]] <- unique(input$freeze_cols)
-  }, ignoreNULL = FALSE, ignoreInit = TRUE, priority = 2)
-
-  # Apply freeze columns to all datasets
-  observeEvent(input$data_select, {
-    freeze_cols_lst[[shiny::req(input$data_select)]] <-
-      unique(c(input$freeze_cols, freeze_cols_lst[[shiny::req(input$data_select)]]))
-  }, ignoreNULL = FALSE, ignoreInit = TRUE, priority = 2)
-
-  return(
-    list(
-      subject_filter = subject_filter,
-      data_select = data_select,
-      dt_options = dt_options,
-      freeze_cols = reactive(freeze_cols_lst[[shiny::req(input$data_select)]])
-    )
-  )
+  return(.rv)
 }

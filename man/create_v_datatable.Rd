@@ -8,9 +8,14 @@ create_v_datatable(
   .df,
   .subject_col = NULL,
   .freeze_cols = NULL,
-  .digits = 3,
-  dt_options = list(show_filters = FALSE, show_labels = TRUE, wrap_labels = FALSE,
-    trunc_labels = 20, ft_size = 9, subj_contrast = FALSE)
+  show_filters = FALSE,
+  show_labels = TRUE,
+  wrap_labels = FALSE,
+  trunc_labels = FALSE,
+  trunc_length = 20,
+  ft_size = 9,
+  subj_contrast = FALSE,
+  digits = 3
 )
 }
 \arguments{

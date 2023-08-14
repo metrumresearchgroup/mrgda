@@ -106,7 +106,7 @@ prettyNum2 <- function(.x, .digits = 3) {
 #' @return list of dataframes
 #'
 #' @keywords internal
-setup_v_list <- function(.df_list){
+setup_v_list <- function(.df_list, .subject_col){
   if(!inherits(.df_list, "list")){
     if(!(inherits(.df_list, "data.frame") || inherits(.df_list, "tbl_df"))){
       cli::cli_abort(".df_list must be a list, data.frame, or tibble")
@@ -122,48 +122,81 @@ setup_v_list <- function(.df_list){
   # Filter out mrgda specific dataframe
   .df_list <- .df_list[!grepl("mrgda", names(.df_list), fixed = TRUE)]
 
-  return(.df_list)
+  # Determine subject column and freeze columns
+  v_cols <- gather_v_cols(.df_list, .subject_col)
+
+  # Put in format for run_app_bg
+  args <- c(list(.df_list = .df_list), v_cols)
+
+  return(args)
 }
 
 
 
-#' Search for ID columns across list of dataframes
+
+#' Determine subject column and which columns can be frozen
 #'
-#' Search for the specified ID columns across list of dataframes, and return the column that appears the most.
-#' Returns `NULL` if none are found.
+#' Search for the specified ID columns across list of dataframes, and return the
+#' column that appears the most as the subject column (if not specified).
+#' The freeze columns will be all columns outside of the determined subject column
 #'
 #' @inheritParams v
 #' @param .id_cols vector of id columns to search for
 #'
 #' @importFrom tidyselect all_of
 #'
-#' @returns a character string
+#' @returns a named list of subject column and available freeze columns
 #'
 #' @keywords internal
-check_subject_col <- function(.df_list, .id_cols = c("USUBJID", "ID")){
-  # Look for USUBJID and ID columns across datasets
-  id_col_df <- purrr::map_dfr(.df_list, function(df){
-    purrr::map_lgl(.id_cols, function(id_col){
-      any(grepl(glue("^(?i){id_col}$"), names(df)))
-    }) %>% stats::setNames(.id_cols)
-  }) %>% dplyr::mutate(dataset = names(.df_list)) %>%
-    tidyr::pivot_longer(all_of(.id_cols), names_to = "id_col", values_to = "present")
+gather_v_cols <- function(
+    .df_list,
+    .subject_col = NULL,
+    .id_cols = c("USUBJID", "ID")
+){
 
-  if(!any(id_col_df$present)){
-    # Set to NULL if none are found
-    subject_col <- NULL
+  if(!is.null(.subject_col)){
+    # Make sure .subject_col is valid if user specified
+    if(!any(purrr::map_lgl(.df_list, ~{.subject_col %in% colnames(.x)}))){
+      abort(glue(".subject_col ({.subject_col}) is not present in any dataframe"))
+    }
+    subject_col <- .subject_col
   }else{
-    # Use the id_col with the most occurrences across the datasets
-    id_count <- id_col_df %>% dplyr::filter(.data$present) %>%
-      dplyr::count(.data$id_col, .data$present)
-    subject_col <- id_count$id_col[id_count$n == max(id_count$n)]
-    # Use USUBJID if they are the same frequency
-    if(length(subject_col) > 1){
-      subject_col <- .id_cols[1]
+    # Look for USUBJID and ID columns across datasets
+    id_col_df <- purrr::map_dfr(.df_list, function(df){
+      purrr::map_lgl(.id_cols, function(id_col){
+        any(grepl(glue("^(?i){id_col}$"), names(df)))
+      }) %>% stats::setNames(.id_cols)
+    }) %>% dplyr::mutate(dataset = names(.df_list)) %>%
+      tidyr::pivot_longer(all_of(.id_cols), names_to = "id_col", values_to = "present")
+
+    if(!any(id_col_df$present)){
+      # Set to NULL if none are found
+      subject_col <- NULL
+    }else{
+      # Use the id_col with the most occurrences across the datasets
+      id_count <- id_col_df %>% dplyr::filter(.data$present) %>%
+        dplyr::count(.data$id_col, .data$present)
+      subject_col <- id_count$id_col[id_count$n == max(id_count$n)]
+      # Use USUBJID if they are the same frequency
+      if(length(subject_col) > 1){
+        subject_col <- .id_cols[1]
+      }
     }
   }
 
-  return(subject_col)
+  # Make sure subject_col is part of .id_cols (if user specified)
+  id_cols <- unique(c(.id_cols, subject_col))
+
+  # Freeze column choices
+  unique_cols <- names(table(unlist(purrr::map(.df_list, ~ names(.x)))))
+  freeze_cols <- unique_cols[!(unique_cols %in% id_cols)]
+
+  return(
+    list(
+      .subject_col = subject_col,
+      .freeze_cols = freeze_cols
+    )
+  )
 }
 
 
@@ -233,7 +266,7 @@ create_global_filter <- function(.subject_col){
           width = 12, style = "margin-top: 7px;",
           htmltools::tags$style("div.form-group {margin-bottom: 0px;}"),
           shiny::textInput(inputId = "subject_filter", label = NULL,
-                           placeholder = paste("Global", .subject_col, "Filter"))
+                           placeholder = paste(.subject_col, "Filter"))
         )
       )
 
