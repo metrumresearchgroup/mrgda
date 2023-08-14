@@ -2,20 +2,20 @@
 % Please edit documentation in R/create-v-datatable.R
 \name{create_v_datatable}
 \alias{create_v_datatable}
-\title{create_datatable function}
+\title{Creates a formatted \code{DT::datatable}}
 \usage{
 create_v_datatable(
   .df,
   .subject_col = NULL,
   .freeze_cols = NULL,
-  show_filters = FALSE,
-  show_labels = TRUE,
-  wrap_labels = FALSE,
-  trunc_labels = FALSE,
-  trunc_length = 20,
-  ft_size = 9,
-  subj_contrast = FALSE,
-  digits = 3
+  .digits = 3,
+  .show_filters = FALSE,
+  .show_labels = TRUE,
+  .wrap_labels = FALSE,
+  .trunc_labels = FALSE,
+  .trunc_length = 20,
+  .ft_size = 9,
+  .subj_contrast = FALSE
 )
 }
 \arguments{
@@ -29,15 +29,26 @@ present in the dataframe, it will be used to group rows in the datatable.}
 
 \item{.digits}{number of digits to round numeric columns to. Set to \code{NULL} to prevent rounding.}
 
-\item{dt_options}{list of options for formatting the \code{DT::datatable}}
+\item{.show_filters}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, show column filters.}
+
+\item{.show_labels}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, show label attributes associated with the columns.}
+
+\item{.wrap_labels}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, wrap column labels to have multuple lines.}
+
+\item{.trunc_labels}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, truncate the column label attributes.}
+
+\item{.trunc_length}{Numeric. Maximum width of column labels. Only relevant if \code{.trunc_labels = TRUE}.}
+
+\item{.ft_size}{Numeric. Base font size of the table. Other labels scale off this value.}
+
+\item{.subj_contrast}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, increase the color contrast between unique \code{.subject_col} groupings.}
 }
 \value{
 An instance of \code{DT::datatable} class with the processed dataframe.
 }
 \description{
-This function modifies the input dataframe by converting columns with fewer than 20 unique values to factors.
-It adds labels to the column names and sets up a datatable with a range of options. If the specified
-subject column is present, it is used to group rows in the table.
+Creates a formatted \code{DT::datatable} with many adjustable formatting options. Designed to be called within
+\code{v()} or \code{v_shiny_internal} for easier formatting adjustments and server-side processing.
 }
 \details{
 If \code{.subject_col} is \code{NULL}, the column names \code{"USUBJID"} and \code{"ID"} will be searched and set if present.

@@ -1,8 +1,7 @@
-#' create_datatable function
+#' Creates a formatted `DT::datatable`
 #'
-#' This function modifies the input dataframe by converting columns with fewer than 20 unique values to factors.
-#' It adds labels to the column names and sets up a datatable with a range of options. If the specified
-#' subject column is present, it is used to group rows in the table.
+#' Creates a formatted `DT::datatable` with many adjustable formatting options. Designed to be called within
+#'  `v()` or `v_shiny_internal` for easier formatting adjustments and server-side processing.
 #'
 #' @param .df A dataframe that you want to process and view.
 #' @param .subject_col A character string specifying the subject column. If this column is
@@ -10,7 +9,13 @@
 #' @param .freeze_cols A character vector specifying columns to freeze when scrolling horizontally.
 #' `.subject_col` will automatically be appended to this list (i.e. `.subject_col` is always frozen).
 #' @param .digits number of digits to round numeric columns to. Set to `NULL` to prevent rounding.
-#' @param dt_options list of options for formatting the `DT::datatable`
+#' @param .show_filters Logical (`TRUE`/`FALSE`). If `TRUE`, show column filters.
+#' @param .show_labels Logical (`TRUE`/`FALSE`). If `TRUE`, show label attributes associated with the columns.
+#' @param .wrap_labels Logical (`TRUE`/`FALSE`). If `TRUE`, wrap column labels to have multuple lines.
+#' @param .trunc_labels Logical (`TRUE`/`FALSE`). If `TRUE`, truncate the column label attributes.
+#' @param .trunc_length Numeric. Maximum width of column labels. Only relevant if `.trunc_labels = TRUE`.
+#' @param .ft_size Numeric. Base font size of the table. Other labels scale off this value.
+#' @param .subj_contrast Logical (`TRUE`/`FALSE`). If `TRUE`, increase the color contrast between unique `.subject_col` groupings.
 #'
 #' @details
 #' If `.subject_col` is `NULL`, the column names `"USUBJID"` and `"ID"` will be searched and set if present.
@@ -34,14 +39,14 @@ create_v_datatable <- function(
     .df,
     .subject_col = NULL,
     .freeze_cols = NULL,
-    show_filters = FALSE,
-    show_labels = TRUE,
-    wrap_labels = FALSE,
-    trunc_labels = FALSE,
-    trunc_length = 20,
-    ft_size = 9,
-    subj_contrast = FALSE,
-    digits = 3
+    .digits = 3,
+    .show_filters = FALSE,
+    .show_labels = TRUE,
+    .wrap_labels = FALSE,
+    .trunc_labels = FALSE,
+    .trunc_length = 20,
+    .ft_size = 9,
+    .subj_contrast = FALSE
 ){
 
 
@@ -51,7 +56,7 @@ create_v_datatable <- function(
     size <- format(as.numeric(object.size(.df)), scientific = TRUE, digits = 4)
     msg <- c(
       "x" = glue(".df object size is {size}, which must be less than 2.1e6 to render on the client side."),
-      "i"= "Use `mrgda::src_viz(list(.df))` for large datasets, which renders the table using your R console"
+      "i"= "Use `mrgda::v(.df)` for large datasets, which renders the table using your R console"
     )
     cli::cli_abort(msg)
   }
@@ -62,7 +67,7 @@ create_v_datatable <- function(
 
   # Set basic options
   col_width <- "1px"
-  base_font_size <- ft_size
+  base_font_size <- .ft_size
 
   # Core table options
   tableOpts = list(
@@ -135,7 +140,7 @@ create_v_datatable <- function(
       stopifnot(.subject_col %in% names(.df))
 
       # Set subject alternation color
-      color_rot <- ifelse(isTRUE(subj_contrast), "yellow", "#ececec")
+      color_rot <- ifelse(isTRUE(.subj_contrast), "yellow", "#ececec")
 
       # Add group columns (color, bg color, and borders)
       .df <- .df %>%
@@ -166,14 +171,14 @@ create_v_datatable <- function(
   # Format headers as bold, and include column attributes (label and class)
   names_with_labels <- format_v_headers(.df,
                                         .font_size = base_font_size - 1,
-                                        .show_labels = show_labels,
-                                        .wrap_labels = wrap_labels,
-                                        .trunc_labels = trunc_labels,
-                                        .trunc_length = trunc_length)
+                                        .show_labels = .show_labels,
+                                        .wrap_labels = .wrap_labels,
+                                        .trunc_labels = .trunc_labels,
+                                        .trunc_length = .trunc_length)
 
   # Round numeric columns to 3 decimal places
-  if(!is.null(digits)){
-    .df <- .df %>% dplyr::mutate(across(where(is.numeric), ~prettyNum2(.x, digits)))
+  if(!is.null(.digits)){
+    .df <- .df %>% dplyr::mutate(across(where(is.numeric), ~prettyNum2(.x, .digits)))
   }
 
 
@@ -196,7 +201,7 @@ create_v_datatable <- function(
 
 
   # User controlled table options
-  filter <- if(show_filters) list(position = 'top', clear = FALSE) else "none"
+  filter <- if(.show_filters) list(position = 'top', clear = FALSE) else "none"
 
   # Determine lineheight based on font size
   # EQ developed from 40% = 5pt & 100% = 12pt (lm(c(40, 100) ~ c(5, 12)))
