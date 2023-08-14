@@ -131,6 +131,9 @@ v_shiny_internal <- function(
         tags$style(HTML(".dropdown-menu > li > a {font-size: smaller;}")),
         tags$style(HTML(".dropdown-header {font-size: larger; font-weight: bold;}")),
         tags$style(HTML(".dropdown-menu > .divider {background-color: black; height: 2px;}")),
+        # Ensures minimum width of pickerInput
+        tags$style(HTML(".open > .dropdown-menu {width: 250px !important;}")),
+        # Other Styling
         tags$style(HTML("hr {border-top: 2px solid #007319;}"))
       ),
       # Main Header UIs
@@ -324,9 +327,9 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
   fluidRow(
     style = "background-color: #007319; color: white;",
     column(
-      width = 4, align = "left",
+      width = 3, align = "left",
       pickerInput(
-        inputId = "data_select", label = "Selected:",
+        inputId = "data_select", label = "Data:",
         inline = TRUE, width = "fit",
         choices = table_opts$name,
         choicesOpt = list(content = table_opts$html_label),
@@ -335,14 +338,29 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
     ),
     column(
       width = 3, align = "left",
+      style = "margin-top: 7px;",
+      shinyWidgets::pickerInput(
+        "freeze_cols", label = NULL,
+        choices = .freeze_cols$col_name,
+        options = list(
+          `live-search` = TRUE, `actions-box` = TRUE,
+          style = "btn-success", size = 8,
+          title = "Freeze columns"
+        ),
+        choicesOpt = list(subtext = .freeze_cols$subtitle),
+        multiple = TRUE
+      )
+    ),
+    column(
+      width = 2, align = "left",
       style = "margin-top: 14px;",
       shinyWidgets::materialSwitch(
-        "show_filters", label = "Column filters",
+        "show_filters", label = "Filters",
         right = TRUE, value = FALSE, status = "success"
       )
     ),
     column(
-      width = 4, align = "right",
+      width = 3, align = "right",
       style = "padding-left: 0px;",
       global_filter_ui
     ),
@@ -351,23 +369,12 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
       style = "margin-top: 5px;",
       shinyWidgets::dropMenu(
         shiny::actionButton(
-          "table_opts",label = NULL,
+          "table_opts", label = NULL,
           icon = shiny::icon("gear", style = "color: white"),
           style='font-size:120%',
           class = "btn-success"),
         tags$div(
           style = "text-align: left;",
-          shinyWidgets::pickerInput(
-            inputId = "freeze_cols",
-            label = htmltools::h4("Fix columns while scrolling"),
-            choices = .freeze_cols,
-            options = list(
-              `live-search` = TRUE, `actions-box` = TRUE,
-              style = "btn-success", size = 8
-            ),
-            multiple = TRUE
-          ),
-          tags$hr(),
           shinyWidgets::awesomeCheckboxGroup(
             "dt_options", label = htmltools::h4("Column Labels"),
             choices = c("Show labels" = "show_labels",

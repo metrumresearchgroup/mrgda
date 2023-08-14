@@ -68,7 +68,7 @@ create_v_datatable <- function(
   tableOpts = list(
     dom = "<'dt-wrapper'<'datatables-scroll'rt><'row-pad' lf>ip>",
     pageLength = 100,
-    lengthMenu = c(100,500,1000,5000),
+    lengthMenu = c(100,250,500,1000,5000),
     scrollX = TRUE,
     scrollY = 450,
     scrollCollapse=TRUE,

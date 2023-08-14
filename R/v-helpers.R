@@ -190,6 +190,13 @@ gather_v_cols <- function(
   # Freeze column choices
   unique_cols <- names(table(unlist(purrr::map(.df_list, ~ names(.x)))))
   freeze_cols <- unique_cols[!(unique_cols %in% id_cols)]
+  freeze_cols <- purrr::map_dfr(freeze_cols, find_df_with_col, .df_list) %>%
+    dplyr::arrange(dplyr::desc(n_domain))
+
+
+  if(!is.null(subject_col)){
+    cli::cli_alert_info(glue::glue("Detected Subject Column: " , subject_col))
+  }
 
   return(
     list(
@@ -199,6 +206,39 @@ gather_v_cols <- function(
   )
 }
 
+
+#' Search list of dataframes for column
+#'
+#' @param .col_name column name
+#' @inheritParams v
+#'
+#' @keywords internal
+#'
+#' @returns tibble
+find_df_with_col <- function(.col_name, .df_list) {
+  df_with_col <- character(0)
+  for(i in seq_along(.df_list)){
+    if(.col_name %in% colnames(.df_list[[i]])){
+      df_with_col <- c(df_with_col, names(.df_list)[i])
+    }
+  }
+
+  max_elements <- 2 # Max domains to display
+  n_domains <- length(df_with_col) # N domains found
+
+  if(n_domains > max_elements){
+    sub_txt <- paste0(df_with_col[1:max_elements], collapse = ", ")
+    sub_txt <- paste(sub_txt, "and", n_domains - max_elements, "more")
+  }else{
+    sub_txt <- paste0(df_with_col, collapse = ", ")
+  }
+
+  tibble::tibble(
+    col_name = .col_name,
+    n_domain = n_domains,
+    subtitle = paste0("(", sub_txt, ")")
+  )
+}
 
 #' Make a caption displaying the dataset name and number of subjects
 #'
