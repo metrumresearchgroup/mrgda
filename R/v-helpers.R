@@ -89,7 +89,7 @@ format_v_headers <- function(
 #' @keywords internal
 prettyNum2 <- function(.x, .digits = 3) {
   ifelse(
-    .x >= 1,
+    .x >= 1 | .x <= -1,
     round(.x, digits = .digits),
     signif(.x, digits = .digits)
   )
