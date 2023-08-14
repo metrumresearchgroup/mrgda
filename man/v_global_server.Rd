@@ -16,6 +16,9 @@ Named lists will inherit their names when shown in the app.}
 
 \item{session}{main shiny session}
 }
+\value{
+a list of \code{reactiveValues}
+}
 \description{
 Handle all global UIs
 }

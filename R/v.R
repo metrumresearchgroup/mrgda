@@ -78,7 +78,8 @@ v <- function(
 #'
 #'
 #' @inheritParams v
-#' @inheritParams create_v_datatable
+#' @param .freeze_cols A tibble of freeze columns. One column containing the column names,
+#' and the other with the domains they were found in.
 #' @inheritParams run_app_bg
 #' @param dont_run Logical (`TRUE`/`FALSE`). If `TRUE`, return the shinyApp object
 #'  instead of executing it via `runApp`. Used for testing
@@ -309,7 +310,7 @@ v_mod_server <- function(
 #' Note that this is not module
 #'
 #' @inheritParams v
-#' @inheritParams create_v_datatable
+#' @inheritParams v_shiny_internal
 #'
 #' @return a shiny UI
 #'
@@ -443,6 +444,9 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
 #' @param session main shiny session
 #'
 #' @importFrom shiny reactive req observe observeEvent reactiveValues getDefaultReactiveDomain
+#'
+#' @returns a list of `reactiveValues`
+#'
 #' @keywords internal
 v_global_server <- function(
     .df_list,

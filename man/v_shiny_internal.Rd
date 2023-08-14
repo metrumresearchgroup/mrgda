@@ -20,8 +20,8 @@ Named lists will inherit their names when shown in the app.}
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}
 
-\item{.freeze_cols}{A character vector specifying columns to freeze when scrolling horizontally.
-\code{.subject_col} will automatically be appended to this list (i.e. \code{.subject_col} is always frozen).}
+\item{.freeze_cols}{A tibble of freeze columns. One column containing the column names,
+and the other with the domains they were found in.}
 
 \item{host, port}{Host and port to serve the Shiny app on. If \code{port} isn't
 specified, it is randomly selected from the valid range of dynamic ports.}
