@@ -88,7 +88,7 @@ test_that("v_global_server sets all inputs in correct format", {
   # Test that global_vars() is identical to `global_var_lst`
   testServer(test_server, {
     # Set all inputs to input_lst
-    set_inputs(input_lst, session)
+    set_all_inputs(input_lst, session)
     session$flushReact()
     expect_true(rlang::is_empty(setdiff(global_vars(), global_var_lst)))
   })
