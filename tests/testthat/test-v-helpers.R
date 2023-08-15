@@ -1,6 +1,12 @@
 
 
-test_that("check_subject_col determines the correct column", {
+test_that("gather_v_cols determines the correct subject and frozen columns", {
+
+
+  get_freeze_cols <- function(df_list){
+    unique_cols <- names(table(unlist(purrr::map(df_list, ~ names(.x)))))
+    unique_cols[!(unique_cols %in% c("USUBJID", "ID"))]
+  }
 
   # `USUBJID` is most common ID column
   df_list1 <- list(
@@ -10,7 +16,8 @@ test_that("check_subject_col determines the correct column", {
     ),
     b = data.frame(y = 6:10) %>% dplyr::mutate(
       USUBJID = paste0("STUDY-1001-3053-", 1:dplyr::n())
-    )
+    ),
+    c = create_test_v_df(rows_per_id = 3, num_ids = 21)
   )
 
   # `ID` is most common ID column
@@ -21,7 +28,8 @@ test_that("check_subject_col determines the correct column", {
     ),
     b = data.frame(y = 6:10) %>% dplyr::mutate(
       ID = 1:n()
-    )
+    ),
+    c = create_test_v_df(rows_per_id = 3, num_ids = 21)
   )
 
   # USUBJID and ID are both present, use USUBJID
@@ -33,12 +41,30 @@ test_that("check_subject_col determines the correct column", {
     b = data.frame(y = 6:10) %>% dplyr::mutate(
       ID = 1:n(),
       USUBJID = paste0("STUDY-1001-3053-", 1:dplyr::n())
-    )
+    ),
+    c = create_test_v_df(rows_per_id = 3, num_ids = 21)
   )
 
-  expect_equal(check_subject_col(df_list1), "USUBJID")
-  expect_equal(check_subject_col(df_list2), "ID")
-  expect_equal(check_subject_col(df_list3), "USUBJID")
+  v_cols <- gather_v_cols(df_list1)
+  expect_equal(v_cols$.subject_col, "USUBJID")
+
+  v_cols <- gather_v_cols(df_list2)
+  expect_equal(v_cols$.subject_col, "ID")
+
+  v_cols <- gather_v_cols(df_list3)
+  expect_equal(v_cols$.subject_col, "USUBJID")
+
+
+  # Subtitle and freeze calls are the same for all example lists - test once
+  expect_equal(v_cols$.freeze_cols$subtitle, paste0("(", c(rep("c", 8), "a", "b"), ")"))
+  expect_equal(
+    v_cols$.freeze_cols$col_name,
+    get_freeze_cols(df_list3)
+  )
+
+  # Subject column not found
+  error_msg <- testthat::capture_error(gather_v_cols(df_list1, .subject_col = "hello"))
+  expect_equal(error_msg$message, ".subject_col (hello) is not present in any dataframe")
 })
 
 

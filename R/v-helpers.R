@@ -191,7 +191,7 @@ gather_v_cols <- function(
   unique_cols <- names(table(unlist(purrr::map(.df_list, ~ names(.x)))))
   freeze_cols <- unique_cols[!(unique_cols %in% id_cols)]
   freeze_cols <- purrr::map_dfr(freeze_cols, find_df_with_col, .df_list) %>%
-    dplyr::arrange(dplyr::desc(n_domain))
+    dplyr::arrange(dplyr::desc(.data$n_domain))
 
 
   if(!is.null(subject_col)){

@@ -70,17 +70,21 @@ create_test_v_df <- function(rows_per_id = 3, num_ids = 21){
 #'
 #' @keywords internal
 map_v_classes <- function(df, df_view){
-  # Regex to extract column names and classes from datatable container
-  pattern <- "<th>(.*?)<br>.*?&lt;(.*?)&gt;.*?</th>"
 
-  column_info_df <- purrr::map_df(
-    stringr::str_match_all(df_view$x$container, pattern), ~
-      data.frame(col_name = .x[, 2], determined_class = .x[, 3])
-  ) %>% dplyr::left_join(
-    purrr::map_dfr(df, ~ pillar::type_sum(.x)) %>%
-      tidyr::gather(key = "col_name", value = "starting_class"),
-    by = "col_name"
+  # Extract column names and class information
+  html <- rvest::read_html(df_view$x$container)
+  columns <- rvest::html_elements(html, "th")
+  col_names <- rvest::html_text(columns)
+
+  column_info_df <- data.frame(
+    col_name = stringr::str_replace(col_names, "<.*?>", ""),
+    determined_class = stringr::str_extract(col_names, "(?<=<).*?(?=>)")
   ) %>%
+    dplyr::left_join(
+      purrr::map_dfr(df, ~ pillar::type_sum(.x)) %>%
+        tidyr::gather(key = "col_name", value = "starting_class"),
+      by = "col_name"
+    ) %>%
     # remove color column
     dplyr::filter(col_name %in% names(df))
 

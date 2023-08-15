@@ -13,12 +13,10 @@ test_that("v_shiny_internal app structure", {
     )
   )
 
+  expect_false(nzchar(Sys.getenv("MRGDA_SHINY_DEV_LOAD_PATH")))
   app <- v_shiny_internal(df_list, dont_run = TRUE)
 
   expect_true(inherits(app, "shiny.appobj"))
-
-  error_msg <- testthat::capture_error(v_shiny_internal(df_list, .subject_col = "hello"))
-  expect_equal(error_msg$message, ".subject_col (hello) is not present in any dataframe")
 })
 
 test_that("v spawns a background process", {
