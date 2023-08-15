@@ -4,10 +4,10 @@
 \alias{v_mod_server}
 \title{shiny module server for \code{v_shiny_internal}}
 \usage{
-v_mod_server(.id, .subject_col = NULL, global_vars)
+v_mod_server(id, .subject_col = NULL, global_vars)
 }
 \arguments{
-\item{.id}{shiny module id. Character string}
+\item{id}{shiny module id. Character string}
 
 \item{.subject_col}{A character string specifying the subject column. If this column is
 present in the dataframe, it will be used to group rows in the datatable.}

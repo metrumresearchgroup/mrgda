@@ -4,10 +4,10 @@
 \alias{v_mod_ui}
 \title{shiny module UI for \code{v_shiny_internal}}
 \usage{
-v_mod_ui(.id)
+v_mod_ui(id)
 }
 \arguments{
-\item{.id}{shiny module id. Character string}
+\item{id}{shiny module id. Character string}
 }
 \value{
 a shiny module UI object

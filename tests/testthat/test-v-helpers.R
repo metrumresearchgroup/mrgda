@@ -95,3 +95,22 @@ test_that("make_v_caption works correctly for various .subject_col specification
   expect_equal(cap$label, "test (N ID: 21)")
 })
 
+
+
+test_that("filter_v_subject filters using global subject filter", {
+  df <- create_test_v_df(rows_per_id = 3, num_ids = 21)
+
+  # Test filtering
+  filter_df <- filter_v_subject(df, "USUBJID", "3053-4")
+  expect_equal(nrow(filter_df), 3)
+  expect_true(all(grepl("3053-4", filter_df$USUBJID)))
+
+  # Test if none found
+  filter_df <- filter_v_subject(df, "USUBJID", "3053-100")
+  expect_equal(nrow(filter_df), 1)
+  expect_true(grepl("No subjects found", filter_df$USUBJID))
+  expect_true(
+    filter_df %>% dplyr::select(-"USUBJID") %>% t() %>%
+      data.frame() %>% unlist() %>% unique() %>% is.na()
+  )
+})

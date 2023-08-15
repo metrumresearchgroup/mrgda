@@ -317,3 +317,38 @@ create_global_filter <- function(.subject_col){
   return(global_filter_ui)
 }
 
+
+#' Filter dataframe by subject column
+#'
+#' @inheritParams create_v_datatable
+#' @param .subject_filter a string to seach for within the defined `.subject_col`
+#'
+#' @keywords internal
+#'
+#' @examples
+#'
+#' \dontrun{
+#' filter_v_subject(df, "USUBJID", "3053-4")
+#' }
+#'
+#' @return a filtered dataframe
+filter_v_subject <- function(.df, .subject_col = NULL, .subject_filter){
+  has_subject_col <- !is.null(.subject_col) && .subject_col %in% names(.df)
+  do_rows_filter <- has_subject_col && nchar(trimws(.subject_filter)) > 0
+
+  if(do_rows_filter){
+    data_filter <- .df %>% dplyr::filter(grepl(trimws(.subject_filter), !!sym(.subject_col)))
+  }else{
+    data_filter <- .df
+  }
+
+  # Allows for some dataframes to not have .subject_col
+  if(has_subject_col){
+    if(nrow(data_filter) == 0){
+      data_filter[1, .subject_col] <- "No subjects found"
+    }
+  }
+
+  return(data_filter)
+}
+

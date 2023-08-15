@@ -200,9 +200,9 @@ v_shiny_internal <- function(
 #' @returns a shiny module UI object
 #'
 #' @keywords internal
-v_mod_ui <- function(.id){
+v_mod_ui <- function(id){
 
-  ns <- NS(.id)
+  ns <- NS(id)
 
   tagList(
     shinydashboard::box(
@@ -220,7 +220,7 @@ v_mod_ui <- function(.id){
 
 #' shiny module server for `v_shiny_internal`
 #'
-#' @param .id shiny module id. Character string
+#' @param id shiny module id. Character string
 #' @param global_vars reactive list of arguments
 #' @inheritParams create_v_datatable
 #'
@@ -230,35 +230,21 @@ v_mod_ui <- function(.id){
 #'
 #' @keywords internal
 v_mod_server <- function(
-    .id,
+    id,
     .subject_col = NULL,
     global_vars
 ){
 
-  moduleServer(.id, function(input, output, session) {
+  moduleServer(id, function(input, output, session) {
 
 
-    # Reactive display data
+    # Reactive display data - filtered by subject column
     data <- reactive({
-      data_raw <- shiny::req(global_vars()$data_select)
-      subject_filter <- global_vars()$subject_filter
-
-      has_subject_col <- !is.null(.subject_col) && .subject_col %in% names(data_raw)
-      do_rows_filter <- has_subject_col && nchar(trimws(subject_filter)) > 0
-
-      if(do_rows_filter){
-        data_filter <- data_raw %>% dplyr::filter(grepl(trimws(subject_filter), !!sym(.subject_col)))
-      }else{
-        data_filter <- data_raw
-      }
-
-      # Allows for some dataframes to not have .subject_col
-      if(has_subject_col){
-        if(nrow(data_filter) == 0){
-          data_filter[1, .subject_col] <- "No subjects found"
-        }
-      }
-      data_filter
+      filter_v_subject(
+        .df = shiny::req(global_vars()$data_select),
+        .subject_col = .subject_col,
+        .subject_filter = global_vars()$subject_filter
+      )
     })
 
 
