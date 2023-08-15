@@ -134,3 +134,6 @@ with_bg_env <- function(code){
   result <- eval(code)
   return(result)
 }
+
+# Make sure it's not set when tests are run
+Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = "")
