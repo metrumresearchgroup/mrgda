@@ -1,7 +1,156 @@
+path <- system.file("example-sdtm", package = "mrgda")
+src_list <- read_src_dir(.path = path) %>% suppressMessages()
 
+# used in tests
+rows_per_id <- 3
+num_ids <- 21
+
+# Create a test dataframe
+df <- create_test_v_df(rows_per_id, num_ids)
+
+
+test_that("create_v_datatable correctly modifies dataframe", {
+
+  # Test the function on the test dataframe
+  result <- create_v_datatable(df, "USUBJID")
+
+  # Check that the output is a datatables object
+  expect_true(inherits(result, "datatables"))
+
+  # Check that the output has the correct number of rows
+  expect_equal(nrow(result$x$data), nrow(df))
+
+  # Check that the output has the correct number of columns
+  cols_remove <- c("bg_color", "ft_color", "subj_border")
+  expect_equal(ncol(result$x$data %>% dplyr::select(-dplyr::all_of(cols_remove))), ncol(df))
+
+  # Check that columns with less than 20 unique values are converted to factors
+  expect_true(is.factor(result$x$data$sex))
+})
+
+
+test_that("create_v_datatable works correctly for various .subject_col specifications", {
+
+  ## No subject column, none specified - no relocation or color coding
+  result <- create_v_datatable(df %>% dplyr::select(-c("USUBJID", "ID")))
+  expect_equal(as.character(unique(result$x$data$bg_color)), "white")
+
+  ## Two subject columns found, use the first found
+  result <- create_v_datatable(df)
+  expect_equal(names(result$x$data)[1], "ID")
+  result <- create_v_datatable(df %>% dplyr::relocate(USUBJID))
+  expect_equal(names(result$x$data)[1], "USUBJID")
+
+  # user specification takes precedence
+  result <- create_v_datatable(df, .subject_col = "USUBJID")
+  expect_equal(names(result$x$data)[1], "USUBJID")
+
+  ## Errors if multiple specified
+  error_msg <- testthat::capture_error(create_v_datatable(df, .subject_col = c("USUBJID", "ID")))
+  expect_equal(error_msg$message, "length(.subject_col) not equal to 1")
+})
+
+
+
+test_that("create_v_datatable formatting options work correctly", {
+  result <- create_v_datatable(df %>% dplyr::relocate(sex))
+
+  # Found subject column is relocated to front
+  expect_equal(colnames(result$x$data)[1], "ID")
+
+  # fixes/freezes ID column
+  expect_equal(result$x$options$fixedColumns$leftColumns, 1)
+
+  # make sure colors alternate with ID
+  expect_equal(dplyr::n_distinct(result$x$data$bg_color), 2)
+  expect_equal(
+    result$x$data$bg_color,
+    stats::ave(result$x$data$bg_color, FUN = rep, each = rows_per_id)
+  )
+
+  # color column is hidden (column order starts at 0 for columnDefs)
+  col_defs <- result$x$options$columnDefs
+  hidden_cols_opt <- which(purrr::map_lgl(col_defs, ~"visible" %in% names(.x)))
+  expect_equal(
+    col_defs[[5]],
+    list(targets = seq(ncol(df), length.out = 3), visible = FALSE)
+  )
+
+})
+
+
+test_that("create_v_datatable works correctly for various .freeze_cols specifications", {
+
+  result <- create_v_datatable(df)
+  # fixes/freezes first ID column found by default (none specified)
+  expect_equal(names(result$x$data)[1:result$x$options$fixedColumns$leftColumns], "ID")
+
+  freeze_cols <- c("USUBJID", "biomarker")
+  result <- create_v_datatable(df, .freeze_cols = freeze_cols)
+  expect_equal(names(result$x$data)[1:result$x$options$fixedColumns$leftColumns], c("ID", freeze_cols))
+})
+
+
+
+
+test_that("create_v_datatable errors for large dataset when interactive", {
+  df_lb <- src_list$lb
+
+  desired_rows <- 10000
+  df_large <- purrr::map_dfr(seq_len(ceiling(desired_rows / nrow(df_lb))), ~ df_lb)
+
+  rlang::with_interactive(value = TRUE, {
+    error_msg <- testthat::capture_error(create_v_datatable(df_large))
+  })
+
+  expect_true(grepl(".df object size", unname(error_msg$message)))
+
+  expect_equal(
+    unname(error_msg$body),
+    "Use `mrgda::v(.df)` for large datasets, which renders the table using your R console"
+  )
+})
+
+test_that("format_v_headers creates a header column correctly", {
+
+  df_lb <- src_list$lb
+
+  # Extract column names and class information
+  header_tbl <- extract_v_headers(df_lb)
+
+  # Function for class mapping - these discrepancies are OK
+  compare_classes <- function(col_type, expected_col_type){
+    if (col_type == expected_col_type) {
+      return(TRUE)
+    } else if(col_type == "dbl" && expected_col_type == "int") {
+      return(TRUE)
+    } else if (col_type == "time" && expected_col_type == "chr") {
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  }
+
+  # Determine expected classes (how tibble sets it)
+  column_info_df <- header_tbl %>%
+    dplyr::left_join(
+      purrr::map_dfr(df_lb, ~ pillar::type_sum(.x)) %>%
+        tidyr::gather(key = "col_name", value = "expected_col_type"),
+      by = "col_name"
+    ) %>%
+    dplyr::mutate(
+      correct = purrr::map2_lgl(col_type, expected_col_type, ~ compare_classes(.x, .y))
+    )
+
+  # Check if determined column classes are suitable
+  expect_true(all(column_info_df$correct))
+
+  # Check labels
+  col_labels <- purrr::map_chr(colnames(df_lb), ~ {attr(df_lb[[.x]], "label")})
+  expect_true(all(column_info_df$col_label == col_labels))
+})
 
 test_that("gather_v_cols determines the correct subject and frozen columns", {
-
 
   get_freeze_cols <- function(df_list){
     unique_cols <- names(table(unlist(purrr::map(df_list, ~ names(.x)))))
@@ -45,13 +194,22 @@ test_that("gather_v_cols determines the correct subject and frozen columns", {
     c = create_test_v_df(rows_per_id = 3, num_ids = 21)
   )
 
-  v_cols <- gather_v_cols(df_list1)
+  expect_message(
+    v_cols <- gather_v_cols(df_list1),
+    "Detected Subject Column: USUBJID"
+  )
   expect_equal(v_cols$.subject_col, "USUBJID")
 
-  v_cols <- gather_v_cols(df_list2)
+  expect_message(
+    v_cols <- gather_v_cols(df_list2),
+    "Detected Subject Column: ID"
+  )
   expect_equal(v_cols$.subject_col, "ID")
 
-  v_cols <- gather_v_cols(df_list3)
+  expect_message(
+    v_cols <- gather_v_cols(df_list3),
+    "Detected Subject Column: USUBJID"
+  )
   expect_equal(v_cols$.subject_col, "USUBJID")
 
 

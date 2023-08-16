@@ -62,65 +62,32 @@ create_test_v_df <- function(rows_per_id = 3, num_ids = 21){
 }
 
 
-
-#' Compare inferred data class from v(), to what shows in a tibble view
+#' Extract column names, labels, and classes from header html
 #'
-#' @param df a starting dataframe
-#' @param df_view a DT::datatable object returned from v()
+#' @param df A starting dataframe
 #'
 #' @keywords internal
-map_v_classes <- function(df, df_view){
+extract_v_headers <- function(df){
+  headers <- format_v_headers(df)
 
-  # Extract column names and class information
-  html <- rvest::read_html(df_view$x$container)
-  columns <- rvest::html_elements(html, "th")
+  html <- rvest::read_html(paste0(headers, collapse = ""))
+  columns <- rvest::html_elements(html, "h4")
   col_names <- rvest::html_text(columns)
 
-  column_info_df <- data.frame(
-    col_name = stringr::str_replace(col_names, "<.*?>", ""),
-    determined_class = stringr::str_extract(col_names, "(?<=<).*?(?=>)")
-  ) %>%
-    dplyr::left_join(
-      purrr::map_dfr(df, ~ pillar::type_sum(.x)) %>%
-        tidyr::gather(key = "col_name", value = "starting_class"),
-      by = "col_name"
-    ) %>%
-    # remove color column
-    dplyr::filter(col_name %in% names(df))
+  col_styles <- rvest::html_elements(html, "span")
+  col_styles <- rvest::html_text(col_styles)
 
-  # Check if determined column classes are suitable
-  correct <- compare_classes(column_info_df)
-  column_info_df <- column_info_df %>% dplyr::left_join(correct, by = "col_name")
+  col_labels <- col_styles[seq(1, length(col_styles), by = 2)]
+  col_types <- col_styles[seq(2, length(col_styles), by = 2)] %>%
+    stringr::str_extract("(?<=<).*?(?=>)")
 
-  return(column_info_df)
+
+  tibble::tibble(
+    col_name = col_names,
+    col_label = col_labels,
+    col_type = col_types
+  )
 }
-
-
-#' Check if determined column classes are suitable
-#'
-#' @param column_info_df dataframe of column names, determined_class, and starting_class
-#'
-#' @keywords internal
-compare_classes <- function(column_info_df) {
-
-  # Function to check for exceptions in class matching
-  check_exceptions <- function(determined_class, starting_class){
-    if (determined_class == starting_class) {
-      return(TRUE)
-    } else if(determined_class == "dbl" && starting_class == "int") {
-      return(TRUE)
-    } else if (determined_class == "time" && starting_class == "chr") {
-      return(TRUE)
-    } else {
-      return(FALSE)
-    }
-  }
-
-  purrr::pmap_dfr(column_info_df, function(col_name, determined_class, starting_class) {
-    tibble::tibble(col_name = col_name, correct = check_exceptions(determined_class, starting_class))
-  })
-}
-
 
 
 with_bg_env <- function(code){
