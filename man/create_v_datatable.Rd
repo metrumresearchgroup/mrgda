@@ -15,6 +15,7 @@ create_v_datatable(
   .trunc_labels = FALSE,
   .trunc_length = 20,
   .ft_size = 9,
+  .scroll_y = 400,
   .subj_contrast = FALSE
 )
 }
@@ -40,6 +41,8 @@ present in the dataframe, it will be used to group rows in the datatable.}
 \item{.trunc_length}{Numeric. Maximum width of column labels. Only relevant if \code{.trunc_labels = TRUE}.}
 
 \item{.ft_size}{Numeric. Base font size of the table. Other labels scale off this value.}
+
+\item{.scroll_y}{Numeric. Height of the table in pixels. Passed to \code{scrollY} option of \code{DT::datatable}.}
 
 \item{.subj_contrast}{Logical (\code{TRUE}/\code{FALSE}). If \code{TRUE}, increase the color contrast between unique \code{.subject_col} groupings.}
 }
