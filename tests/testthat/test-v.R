@@ -11,6 +11,7 @@ input_lst <- list(
   trunc_length = 20,
   digits = 3,
   ft_size = 9,
+  scroll_y = "400",
   subj_contrast = FALSE
 )
 
@@ -27,6 +28,7 @@ global_var_lst <- list(
     .trunc_length = input_lst$trunc_length,
     .digits = input_lst$digits,
     .ft_size = input_lst$ft_size,
+    .scroll_y = as.numeric(input_lst$scroll_y),
     .subj_contrast = input_lst$subj_contrast
   )
 )
@@ -86,7 +88,7 @@ test_that("v_global_server sets all inputs in correct format", {
 
 
   # Test that global_vars() is identical to `global_var_lst`
-  testServer(test_server, {
+  shiny::testServer(test_server, {
     # Set all inputs to input_lst
     set_all_inputs(input_lst, session)
     session$flushReact()
@@ -143,14 +145,3 @@ test_that("v_mod_server works as expected", {
     })
 })
 
-
-
-# This test is necessary, and caught a few bugs
-# test_that("v_shiny_internal works when no subject columns are found", {
-#   non_list_input <- data.frame(a = 1:5, b = 6:10)
-#   app <- v_shiny_internal(non_list_input, dont_run = TRUE)
-#
-#   # This test passes either way (not an actual test)
-#   # TODO: write shiny test for no subjects
-#   expect_error(app, NA)
-# })

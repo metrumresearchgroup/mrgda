@@ -19,6 +19,7 @@
 #' @param .trunc_labels Logical (`TRUE`/`FALSE`). If `TRUE`, truncate the column label attributes.
 #' @param .trunc_length Numeric. Maximum width of column labels. Only relevant if `.trunc_labels = TRUE`.
 #' @param .ft_size Numeric. Base font size of the table. Other labels scale off this value.
+#' @param .scroll_y Numeric. Height of the table in pixels. Passed to `scrollY` option of `DT::datatable`.
 #' @param .subj_contrast Logical (`TRUE`/`FALSE`). If `TRUE`, increase the color contrast between unique `.subject_col` groupings.
 #'
 #' @details
@@ -50,6 +51,7 @@ create_v_datatable <- function(
     .trunc_labels = FALSE,
     .trunc_length = 20,
     .ft_size = 9,
+    .scroll_y = 400,
     .subj_contrast = FALSE
 ){
 
@@ -77,9 +79,9 @@ create_v_datatable <- function(
   tableOpts = list(
     dom = "<'dt-wrapper'<'datatables-scroll'rt><'row-pad' lf>ip>",
     pageLength = 100,
-    lengthMenu = c(100,250,500,1000,5000),
+    lengthMenu = c(25,100,500,1000,5000),
     scrollX = TRUE,
-    scrollY = 450,
+    scrollY = .scroll_y,
     scrollCollapse=TRUE,
     colReorder = TRUE,
     searchHighlight = TRUE,

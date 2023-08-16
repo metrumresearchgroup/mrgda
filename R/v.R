@@ -132,8 +132,8 @@ v_shiny_internal <- function(
         tags$style(HTML(".dropdown-menu > li > a {font-size: smaller;}")),
         tags$style(HTML(".dropdown-header {font-size: larger; font-weight: bold;}")),
         tags$style(HTML(".dropdown-menu > .divider {background-color: black; height: 2px;}")),
-        # Ensures minimum width of pickerInput
-        tags$style(HTML(".open > .dropdown-menu {width: 250px !important;}")),
+        # Ensures minimum width of `freeze_cols` pickerInput
+        tags$style(HTML("#freeze_cols .open > .dropdown-menu {width: 250px !important;}")),
         # Other Styling
         tags$style(HTML("hr {border-top: 2px solid #007319;}"))
       ),
@@ -384,7 +384,7 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
             )
           ),
           tags$hr(),
-          htmltools::h4("Table Options"),
+          htmltools::h4("Table Sizing"),
           fluidRow(
             column(
               width = 7,
@@ -395,15 +395,15 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
             ),
             column(
               width = 5,
-              tags$label("Subject Contrast"),
-              shinyWidgets::switchInput(
-                inputId = "subj_contrast",
-                onLabel = "Heavy",
-                offLabel = "Light",
-                size = "small"
+              shinyWidgets::pickerInput(
+                "scroll_y", label = "Scroll Height (pixels)",
+                choices = seq(200, 1000, 200), selected = 400,
+                options = list(style = "btn-success")
               )
             )
           ),
+          tags$hr(),
+          htmltools::h4("Formatting Options"),
           fluidRow(
             column(
               width = 7,
@@ -411,6 +411,16 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
                 "digits", label = "Round Values",
                 value = 3, min = 1, max = 6, step = 1,
                 post = " digits"
+              )
+            ),
+            column(
+              width = 5,
+              tags$label("Subject Contrast"),
+              shinyWidgets::switchInput(
+                inputId = "subj_contrast",
+                onLabel = "Heavy",
+                offLabel = "Light",
+                size = "small"
               )
             )
           )
@@ -463,6 +473,7 @@ v_global_server <- function(
       # Misc DT options
       .digits = input$digits,
       .ft_size = input$ft_size,
+      .scroll_y = as.numeric(input$scroll_y),
       .subj_contrast = input$subj_contrast
     )
     .rv$dt_args <- dt_args

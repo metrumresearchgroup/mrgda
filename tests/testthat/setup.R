@@ -91,6 +91,7 @@ extract_v_headers <- function(df){
 
 
 with_bg_env <- function(code){
+  Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = "")
   # Dont run if inside an R CMD Check environment (package is installed)
   if(!testthat::is_checking()){
     Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = here::here())
