@@ -7,7 +7,7 @@
 #' @param env Environment to use for scoping
 #'
 #' @keywords internal
-local_svn_repo <- function(clean = TRUE, env = parent.frame(), msg = "test"){
+local_svn_repo <- function(clean = TRUE, env = parent.frame()){
   repo <- withr::local_tempdir("svn-test-repo",
                                clean = clean,
                                .local_envir = env
