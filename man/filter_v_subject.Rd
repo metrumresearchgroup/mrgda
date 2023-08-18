@@ -21,7 +21,6 @@ a filtered dataframe
 Filter dataframe by subject column
 }
 \examples{
-
 \dontrun{
 filter_v_subject(df, "USUBJID", "3053-4")
 }
