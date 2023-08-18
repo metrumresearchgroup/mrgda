@@ -50,10 +50,6 @@
 #'
 #'  v(df_list, .subject_col = "USUBJID")
 #'
-#'  # `.freeze_cols` found **per** dataset will be fixed while horizontally scrolling
-#'  # If a specified `.freeze_cols` is not found in one of the datasets, it will simply be ignored.
-#'
-#'  v(df_list, .freeze_cols = c("STUDYID", "RFSTDTC"))
 #' }
 #'
 #' @return The `callr` process (invisibly).
