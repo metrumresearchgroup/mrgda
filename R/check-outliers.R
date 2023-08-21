@@ -15,7 +15,7 @@
 #' get_outliers(.df = src_list$lb, .group = "LBTESTCD", .time = "LBDTC", .cov = "LBSTRESN")
 #' @export
 
-get_outliers <- function(.df, .group, .id= "USUBJID", .time= NULL, .cov="ALL", .show_mean_med = TRUE){
+get_outliers <- function(.df, .group = FALSE, .id= "USUBJID", .time= NULL, .cov="ALL", .show_mean_med = TRUE){
 
   if (.cov == "ALL"){
     .cov <- names(dplyr::select_if(.df, is.numeric))
