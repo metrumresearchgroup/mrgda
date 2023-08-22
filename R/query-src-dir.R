@@ -1,4 +1,5 @@
 library(Rcpp)
+library(RcppParallel)
 
 # source the Rcpp function
 Rcpp::sourceCpp('~/mrgda/R/search_matches.cpp')
@@ -20,8 +21,6 @@ Rcpp::sourceCpp('~/mrgda/R/search_matches.cpp')
 #' @export
 query_src_dir <- function(.src_directory, .string, .file_types = "detect") {
 
-  #browser()
-
   src_list <- read_src_dir(.path = .src_directory, .file_types = .file_types)
   src_list$mrgda_src_meta <- NULL
 
@@ -36,7 +35,7 @@ query_src_dir <- function(.src_directory, .string, .file_types = "detect") {
   }
 
   # Use the Rcpp function here instead of the nested for-loops
-  hits <- findMatchesCpp(matches, .string)
+  hits <- findMatchesCppParallel(matches, .string)
 
   hits %>%
     dplyr::group_by(DOMAIN, COLUMN, VALUE) %>%
