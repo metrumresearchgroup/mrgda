@@ -43,6 +43,8 @@ set_all_inputs <- function(input_lst, session){
 }
 
 test_that("v_shiny_internal app structure", {
+  skip_if_v_missing_deps()
+
   # Prepare a proper input list
   df_list <- list(
     a = data.frame(x = 1:5) %>% dplyr::mutate(
@@ -62,6 +64,8 @@ test_that("v_shiny_internal app structure", {
 
 
 test_that("v spawns a background process", {
+  skip_if_v_missing_deps()
+
   expect_false(nzchar(Sys.getenv("MRGDA_SHINY_DEV_LOAD_PATH")))
   # Needed for dev environment only
   expect_message(
@@ -79,6 +83,7 @@ test_that("v spawns a background process", {
 
 
 test_that("v_global_server sets all inputs in correct format", {
+  skip_if_v_missing_deps()
 
   # Wrap v_global_server in template server since it behaves like a normal function
   test_server <- function(input, output, session) {
@@ -104,6 +109,8 @@ test_that("v_global_server sets all inputs in correct format", {
 })
 
 test_that("v_mod_server works as expected", {
+  skip_if_v_missing_deps()
+
   global_vars <- reactive(global_var_lst)
 
   # Base case with filter and no freeze columns found

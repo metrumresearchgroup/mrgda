@@ -4,7 +4,12 @@
 \alias{v_global_server}
 \title{Handle all global UIs}
 \usage{
-v_global_server(.df_list, input, output, session = getDefaultReactiveDomain())
+v_global_server(
+  .df_list,
+  input,
+  output,
+  session = shiny::getDefaultReactiveDomain()
+)
 }
 \arguments{
 \item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.
@@ -17,7 +22,7 @@ Named lists will inherit their names when shown in the app.}
 \item{session}{main shiny session}
 }
 \value{
-a list of \code{reactiveValues}
+a list of \code{shiny::reactiveValues}
 }
 \description{
 Handle all global UIs

@@ -21,7 +21,6 @@ Imports:
     magrittr (>= 2.0.3),
     purrr,
     rlang (>= 1.0.2),
-    htmltools,
     tidyr,
     tidyselect,
     yspec,
@@ -32,28 +31,29 @@ Imports:
     yaml,
     here,
     crayon,
-    callr,
     progress,
-    pingr,
     forcats,
     assertthat,
-    rstudioapi,
     stringr,
-    shiny (>= 1.6.0),
-    shinydashboard,
-    shinydashboardPlus (>= 2.0.0),
-    shinyWidgets,
-    DT,
     knitr,
     readr,
     anytime
 Suggests: 
     testthat (>= 3.1.10),
     withr (>= 2.5.0),
+    callr,
     devtools,
+    DT,
     httpuv,
+    htmltools,
     pillar,
-    rvest
+    pingr,
+    rstudioapi,
+    rvest,
+    shiny (>= 1.6.0),
+    shinydashboard,
+    shinydashboardPlus (>= 2.0.0),
+    shinyWidgets
 Config/testthat/edition: 3
 VignetteBuilder: 
     knitr
