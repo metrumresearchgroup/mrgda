@@ -10,6 +10,7 @@ df <- create_test_v_df(rows_per_id, num_ids)
 
 
 test_that("create_v_datatable correctly modifies dataframe", {
+  skip_if_v_missing_deps()
 
   # Test the function on the test dataframe
   result <- create_v_datatable(df, "USUBJID")
@@ -30,6 +31,7 @@ test_that("create_v_datatable correctly modifies dataframe", {
 
 
 test_that("create_v_datatable works correctly for various .subject_col specifications", {
+  skip_if_v_missing_deps()
 
   ## No subject column, none specified - no relocation or color coding
   result <- create_v_datatable(df %>% dplyr::select(-c("USUBJID", "ID")))
@@ -53,6 +55,8 @@ test_that("create_v_datatable works correctly for various .subject_col specifica
 
 
 test_that("create_v_datatable formatting options work correctly", {
+  skip_if_v_missing_deps()
+
   result <- create_v_datatable(df %>% dplyr::relocate(sex))
 
   # Found subject column is relocated to front
@@ -80,6 +84,7 @@ test_that("create_v_datatable formatting options work correctly", {
 
 
 test_that("create_v_datatable works correctly for various .freeze_cols specifications", {
+  skip_if_v_missing_deps()
 
   result <- create_v_datatable(df)
   # fixes/freezes first ID column found by default (none specified)
@@ -94,6 +99,8 @@ test_that("create_v_datatable works correctly for various .freeze_cols specifica
 
 
 test_that("create_v_datatable errors for large dataset when interactive", {
+  skip_if_v_missing_deps()
+
   df_lb <- src_list$lb
 
   desired_rows <- 10000
@@ -112,6 +119,7 @@ test_that("create_v_datatable errors for large dataset when interactive", {
 })
 
 test_that("format_v_headers creates a header column correctly", {
+  skip_if_v_missing_deps()
 
   df_lb <- src_list$lb
 
@@ -151,6 +159,7 @@ test_that("format_v_headers creates a header column correctly", {
 })
 
 test_that("gather_v_cols determines the correct subject and frozen columns", {
+  skip_if_v_missing_deps()
 
   get_freeze_cols <- function(df_list){
     unique_cols <- names(table(unlist(purrr::map(df_list, ~ names(.x)))))
@@ -227,6 +236,7 @@ test_that("gather_v_cols determines the correct subject and frozen columns", {
 
 
 test_that("create_global_filter creates the correct UI", {
+  skip_if_v_missing_deps()
 
   filter_ui <- create_global_filter(.subject_col = NULL)
   expect_equal(filter_ui, shiny::div())
@@ -238,6 +248,8 @@ test_that("create_global_filter creates the correct UI", {
 
 
 test_that("make_v_caption works correctly for various .subject_col specifications", {
+  skip_if_v_missing_deps()
+
   df <- create_test_v_df(rows_per_id = 3, num_ids = 21)
   cap <- make_v_caption("test", df)
   expect_equal(cap$name, "test")
@@ -256,6 +268,8 @@ test_that("make_v_caption works correctly for various .subject_col specification
 
 
 test_that("filter_v_subject filters using global subject filter", {
+  skip_if_v_missing_deps()
+
   df <- create_test_v_df(rows_per_id = 3, num_ids = 21)
 
   # Test filtering

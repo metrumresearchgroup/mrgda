@@ -59,6 +59,7 @@ v <- function(
     .df_list,
     .subject_col = NULL
 ){
+  stop_if_v_missing_deps()
 
   args <- setup_v_list(.df_list, .subject_col)
 

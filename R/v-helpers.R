@@ -617,3 +617,45 @@ filter_v_subject <- function(.df, .subject_col = NULL, .subject_filter) {
 
   return(data_filter)
 }
+
+#' Checks if all packages needed for v() are present
+#'
+#' Returns a vector with the missing packages, or returns NULL if all are
+#' present.
+#' @keywords internal
+check_for_v_pkgs <- function() {
+  pkgs_present <- purrr::map_lgl(REQUIRED_V_PKGS, function(.pkg) {
+    requireNamespace(.pkg, quietly = TRUE)
+  })
+
+  if (any(!pkgs_present)) {
+    return(REQUIRED_V_PKGS[!pkgs_present])
+  } else {
+    return(NULL)
+  }
+}
+
+#' Skip tests if missing v() dependencies
+#' @keywords internal
+skip_if_v_missing_deps <- function() {
+  missing_pkgs <- check_for_v_pkgs()
+  testthat::skip_if(
+    !is.null(missing_pkgs),
+    glue::glue("Skipped because the following packages are needed for this test: {paste(missing_pkgs, collapse = ', ')}")
+  )
+}
+
+#' Error if missing v() dependencies
+#' @keywords internal
+stop_if_v_missing_deps <- function() {
+  missing_pkgs <- check_for_v_pkgs()
+  if (!is.null(missing_pkgs)) {
+    rlang::abort(paste( # need to use rlang::abort instead of stop to get the pkgr formatting to print correctly
+      glue::glue("The following packages needed to run `v()` are not installed: {paste(missing_pkgs, collapse = ', ')}"),
+      "Consider running `install.packages('mrgda', dependencies = TRUE)`",
+      "\nIf using pkgr, add the following to your pkgr.yml and re-run `pkgr install`",
+      "\nCustomizations:\n  Packages:\n    - mrgda:\n        Suggests: true",
+      sep = "\n"
+    ), call. = FALSE)
+  }
+}
