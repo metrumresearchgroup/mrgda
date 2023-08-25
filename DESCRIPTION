@@ -5,7 +5,8 @@ Authors@R:
     c(
     person(given = "Eric", family = "Anderson", email = "andersone@metrumrg.com", role = c("aut", "cre")),
     person(given = "Grace", family = "O'Brien", email = "graceo@metrumrg.com", role = c("aut")),
-    person(given = "Michael", family = "McDermott", email = "michaelm@metrumrg.com", role = c("aut"))
+    person(given = "Michael", family = "McDermott", email = "michaelm@metrumrg.com", role = c("aut")),
+    person(given = "Kyle", family = "Barrett", email = "barrettk@metrumrg.com", role = c("aut"))
     )
 Description: Run various tests on an NMTRAN dataset to validate it prior to modeling.
 License: GPL (>= 3)
@@ -31,21 +32,28 @@ Imports:
     yaml,
     here,
     crayon,
+    callr,
     progress,
+    pingr,
     forcats,
     assertthat,
     rstudioapi,
     stringr,
-    shiny,
+    shiny (>= 1.6.0),
     shinydashboard,
+    shinydashboardPlus (>= 2.0.0),
+    shinyWidgets,
     DT,
     knitr,
     readr,
     anytime
 Suggests: 
-    testthat (>= 3.0.0),
+    testthat (>= 3.1.10),
     withr (>= 2.5.0),
-    pillar
+    devtools,
+    httpuv,
+    pillar,
+    rvest
 Config/testthat/edition: 3
 VignetteBuilder: 
     knitr

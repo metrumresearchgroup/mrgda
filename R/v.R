@@ -1,17 +1,15 @@
-#' create_datatable function
+#' Format and view a dataframe or list of dataframes in the viewer
 #'
-#' This function modifies the input dataframe by converting columns with fewer than 20 unique values to factors.
-#' It adds labels to the column names and sets up a datatable with a range of options. If the specified
-#' subject column is present, it is used to group rows in the table.
+#' Creates a `DT::datatable` object for each dataframe and runs it in a background shiny application in the Rstudio viewer pane.
 #'
-#' @param .df A dataframe that you want to process and view.
-#' @param .subject_col A character string specifying the subject column. If this column is
-#' present in the dataframe, it will be used to group rows in the datatable.
-#' @param .freeze_cols A character vector specifying columns to freeze when scrolling horizontally.
-#' `.subject_col` will automatically be appended to this list (i.e. `.subject_col` is always frozen).
-#' @param .digits number of digits to round numeric columns to. Set to `NULL` to prevent rounding.
+#' @param .df_list A dataframe ***or*** list of dataframes that you want to process and view.
+#' Named lists will inherit their names when shown in the app.
+#' @inheritParams create_v_datatable
 #'
 #' @details
+#'
+#' **For each dataframe in `.df_list`:**
+#'
 #' If `.subject_col` is `NULL`, the column names `"USUBJID"` and `"ID"` will be searched and set if present.
 #' If `.subject_col` is present in the dataframe, it will be frozen and alternate in color.
 #'
@@ -23,146 +21,460 @@
 #' You can *drag and drop* columns to move them around in the table. If a column is dragged to a frozen column's location,
 #' the new column will be frozen instead.
 #'
-#' @return An instance of `DT::datatable` class with the processed dataframe.
+#' @note
+#' **Notes about the background process:**
 #'
-#' @importFrom dplyr across n
-#' @importFrom utils object.size
+#' By running the app as a background process, users will retain access to their console.
+#' The process will end when one of the following things happen:
+#'  - the Rstudio viewer pane process is stopped
+#'  - another `v()` call is executed (only one will run at a time)
+#'  - you manually kill it via the steps below:
+#'    ```
+#'    result <- v(mtcars)
+#'    result$kill()
+#'
+#'    result
+#'    PROCESS 'R', finished.
+#'    ```
+#'
+#' @examples
+#' \dontrun{
+#'
+#'  df_list <- mrgda::read_src_dir(system.file("example-sdtm", package = "mrgda"))
+#'
+#'  # "USUBJID" automatically detected as `.subject_col`
+#'
+#'  v(df_list)
+#'
+#'  # manually specify `.subject_col`
+#'
+#'  v(df_list, .subject_col = "USUBJID")
+#'
+#' }
+#'
+#' @return The `callr` process (invisibly).
 #'
 #' @export
 v <- function(
-    .df,
-    .subject_col = NULL,
-    .freeze_cols = NULL,
-    .digits = 3
+    .df_list,
+    .subject_col = NULL
 ){
 
+  args <- setup_v_list(.df_list, .subject_col)
 
-  if(rlang::is_interactive() && object.size(.df) > 2.1e6){
-    size <- format(as.numeric(object.size(.df)), scientific = TRUE, digits = 4)
-    msg <- c(
-      "x" = glue(".df object size is {size}, which must be less than 2.1e6 to render on the client side."),
-      "i"= "Use `mrgda::src_viz(list(.df))` for large datasets, which renders the table using your R console"
-    )
-    cli::cli_abort(msg)
-  }
-
-  # Dont autofit width for few number of columns
-  # otherwise DT will not align the headers properly (known open bug)
-  autoWidth <- if(ncol(.df) <= 8) FALSE else TRUE
-
-  # Set basic options
-  col_width <- "1px"
-  base_font_size <- 10
-
-  # Table options
-  tableOpts = list(
-    dom = "B<lf<\"datatables-scroll\"t>ipr>",
-    pageLength = 100,
-    lengthMenu = c(25,100,500,1000),
-    headerCallback = DT::JS(
-      "function(thead) {",
-      glue("$(thead).css('font-size', '{base_font_size-0.5}pt');"),
-      "}"
-    ),
-    scrolly = "15vh",
-    scrollX = TRUE,
-    scrollY = 800,
-    scrollCollapse=TRUE,
-    colReorder = TRUE,
-    searchHighlight = TRUE,
-    autoWidth = autoWidth,
-    select = list(style = 'os', items = 'row')
-  )
-
-  columnDefs <- list(
-    list(className = 'dt-center', targets = "_all"),
-    list(width = col_width, targets = "_all"),
-    # Controls column ordering
-    list(type = 'natural', targets = "_all")
-  )
-
-  # If no .subject_col specified, look for USUBJID and ID (choose first in appearance)
-  if(is.null(.subject_col)){
-    id_cols <- grepl("^(?i)ID$|^(?i)USUBJID$", names(.df))
-    if(any(id_cols)) .subject_col <- names(.df)[id_cols]
-    if(length(.subject_col) > 1) .subject_col <- .subject_col[1]
-  }else{
-    assertthat::assert_that(length(.subject_col) == 1)
-  }
-
-  .freeze_cols <- c(.subject_col, .freeze_cols)
-
-  # Fix .freeze_cols and color coat .subject_col
-  if (!is.null(.freeze_cols)) {
-    stopifnot(.freeze_cols %in% names(.df))
-
-    .df <- .df %>% dplyr::relocate(!!!syms(.freeze_cols))
-    fix_col_index <- purrr::map_dbl(.freeze_cols, ~ grep(paste0("^",.x, "$"), names(.df)))
-    tableOpts$fixedColumns <- list(leftColumns = max(fix_col_index))
-
-    if (!is.null(.subject_col)) {
-      stopifnot(.subject_col %in% names(.df))
-
-      # Add color column
-      .df <- .df %>%
-        dplyr::group_by(dplyr::across(all_of(.subject_col))) %>%
-        dplyr::mutate(group_id = dplyr::cur_group_id()) %>%
-        dplyr::mutate(color = ifelse(.data$group_id %% 2 == 1, "white", "#ececec")) %>%
-        dplyr::ungroup() %>% dplyr::select(-"group_id")
-    }
-  }
-
-  if(!("color" %in% names(.df))) .df <- .df %>% dplyr::mutate(color = "white")
-
-  caption <- make_v_caption(.df, .subject_col, base_font_size + 2)
-
-  # Hides color column in output
-  color_id <- grep("color", names(.df)) - 1
-  columnDefs <- c(columnDefs, list(list(targets = color_id, visible = F)))
-
-  # Assign columnDefs to table options
-  tableOpts$columnDefs <- columnDefs
-
-
-  # Format headers as bold, and include column attributes (label and class)
-  names_with_labels <- format_v_headers(.df)
-
-  # Round numeric columns to 3 decimal places
-  if(!is.null(.digits)){
-    .df <- .df %>% dplyr::mutate(across(where(is.numeric), ~prettyNum2(.x, .digits)))
-  }
-
-  # Convert columns with less than 20 unique values to factors
-  .df <- purrr::map_dfr(.df, ~ {
-    if(length(unique(.x)) < 20){
-      as.factor(.x)
-    } else {
-      .x
-    }
-  })
-
-  # Return the .df table
-  .df_view <- DT::datatable(
-    .df,
-    caption = caption,
-    colnames = names_with_labels,
-    rownames = FALSE,
-    escape = FALSE,
-    filter = list(position = 'top', clear = FALSE),
-    selection = "none",
-    class = 'cell-border hover order-column nowrap',
-    extensions = c("RowGroup", "ColReorder", "FixedColumns"),
-    plugins = 'natural',
-    options = tableOpts
-  ) %>%
-    DT::formatStyle(0:ncol(.df), target = "cell", border = '1px solid #bbbbbb', padding= "1px") %>%
-    DT::formatStyle(0, target= 'row',lineHeight='85%') %>%
-    DT::formatStyle(0:ncol(.df), fontSize = paste0(base_font_size, "pt")) %>%
-    DT::formatStyle(0:ncol(.df), "color",
-                    backgroundColor = DT::styleEqual(sort(unique(.df$color)), sort(unique(.df$color)))
-    ) %>% suppressWarnings()
-
-  return(.df_view)
+  run_app_bg(v_shiny_internal, args = args)
 }
 
 
+
+#' Create shiny app for running `mrgda::create_v_datatable()` on the server
+#'
+#' Create and execute a basic shiny app for running `mrgda::create_v_datatable()` on the server.
+#' Renders a `DT::datatable` object for each dataframe in a `shiny::tabPanel` object.
+#'
+#'
+#' @inheritParams v
+#' @param .freeze_cols A tibble of freeze columns. One column containing the column names,
+#' and the other with the domains they were found in.
+#' @inheritParams run_app_bg
+#' @param dont_run Logical (`TRUE`/`FALSE`). If `TRUE`, return the shinyApp object
+#'  instead of executing it via `runApp`. Used for testing
+#'
+#' @importFrom htmltools tags
+#' @importFrom shiny onStop
+#' @importFrom shinyWidgets tooltipOptions dropdownButton pickerInput
+#'
+#' @details
+#' It's easier to use this function for testing during development, as messages
+#' will be printed to the console.
+#'
+#' @return a `shinyApp` object
+#'
+#' @keywords internal
+v_shiny_internal <- function(
+    .df_list,
+    .subject_col = NULL,
+    .freeze_cols = NULL,
+    host = NULL,
+    port = NULL,
+    dont_run = FALSE
+){
+
+  # For Development Environment, must load the package
+  load_path <- Sys.getenv("MRGDA_SHINY_DEV_LOAD_PATH")
+  if (nzchar(load_path)) {
+    message("Loading ", load_path)
+    devtools::load_all(load_path)
+  }
+
+  # Only triggers if v_shiny_internal is called directly
+  if(rlang::is_interactive()){
+    args <- setup_v_list(.df_list, .subject_col)
+    .subject_col <- args$.subject_col
+    .freeze_cols <- args$.freeze_cols
+    .df_list <- args$.df_list
+  }
+
+
+  ui <- shinydashboardPlus::dashboardPage(
+    shinydashboardPlus::dashboardHeader(title = NULL, disable = TRUE),
+    shinydashboardPlus::dashboardSidebar(width = 0),
+    shinydashboard::dashboardBody(
+      tags$head(
+        # Remove whitespace
+        tags$style(".content{padding-bottom: 0px !important;
+                   padding-top: 0px !important;}"),
+        # PickerInput styling (hard to see before - columns stand out more)
+        tags$style(HTML(".dropdown-menu > li > a {font-size: smaller;}")),
+        tags$style(HTML(".dropdown-header {font-size: larger; font-weight: bold;}")),
+        tags$style(HTML(".dropdown-menu > .divider {background-color: black; height: 2px;}")),
+        # Ensures minimum width of `freeze_cols` pickerInput
+        tags$style(HTML("#freeze_cols .open > .dropdown-menu {width: 250px !important;}")),
+        # Other Styling
+        tags$style(HTML("hr {border-top: 2px solid #007319;}"))
+      ),
+      # Main Header UIs
+      v_global_ui(.df_list, .subject_col, .freeze_cols),
+      # Individual Dataframe
+      fluidRow(v_mod_ui("df_view"))
+    )
+  )
+
+
+  server <- function(input, output, session) {
+
+    onStop(function(){
+      cli::cli_inform(c("i"="Session Stopped\n"))
+    })
+
+    # Handle global UIs
+    global_vars <- v_global_server(.df_list, input, output)
+
+    # Create DT datatables
+    v_mod_server("df_view",
+                 .subject_col = .subject_col,
+                 global_vars = reactive(global_vars)
+    )
+
+    # End the process on window close. This is designed for the case where a
+    # single user launches the app privately with run_app_bg(). If this app is
+    # ever reworked into a multi-user setting, this should be removed.
+    #
+    # Note that a refresh will also trigger this.
+    session$onSessionEnded(shiny::stopApp)
+  }
+
+  # Messages wont be shown in the console when run in the background, but can be
+  # recovered before or after the process is finished.
+  onStart <- function() {
+    shiny::onStop(function() {
+      cli::cli_inform(c("i"="Recovering memory\n"))
+      gc()
+    })
+  }
+
+  app <- shinyApp(ui = ui, server = server, onStart = onStart,
+                  options = list(host = host, port = port))
+
+  if(isTRUE(dont_run)){
+    return(app)
+  }
+
+  shiny::runApp(app)
+}
+
+
+
+
+#' shiny module UI for `v_shiny_internal`
+#'
+#' @inheritParams v_mod_server
+#'
+#' @importFrom htmltools tagList br
+#' @importFrom shiny NS fluidRow column
+#'
+#' @returns a shiny module UI object
+#'
+#' @keywords internal
+v_mod_ui <- function(id){
+
+  ns <- NS(id)
+
+  tagList(
+    shinydashboard::box(
+      width = NULL, title = NULL,
+      fluidRow(
+        column(
+          width = 12, align = "center",
+          DT::DTOutput(ns("df_view"))
+        )
+      )
+    )
+  )
+}
+
+
+#' shiny module server for `v_shiny_internal`
+#'
+#' @param id shiny module id. Character string
+#' @param global_vars reactive list of arguments
+#' @inheritParams create_v_datatable
+#'
+#' @importFrom shiny moduleServer shinyApp
+#'
+#' @returns a shiny module server object
+#'
+#' @keywords internal
+v_mod_server <- function(
+    id,
+    .subject_col = NULL,
+    global_vars
+){
+
+  moduleServer(id, function(input, output, session) {
+
+
+    # Reactive display data - filtered by subject column
+    data <- reactive({
+      filter_v_subject(
+        .df = shiny::req(global_vars()$data_select),
+        .subject_col = .subject_col,
+        .subject_filter = global_vars()$subject_filter
+      )
+    })
+
+
+    # Set subject column per dataset (to account for list elements where subject_col is missing)
+    subject_col_df <- reactive({
+      if(!is.null(.subject_col) && .subject_col %in% names(data())){
+        .subject_col
+      }else{
+        NULL
+      }
+    })
+
+    # Fix .freeze_cols found per dataset, so that it still works with lists
+    freeze_cols <- reactive({
+      fix_cols <- global_vars()$freeze_col_choices
+      if(!is.null(fix_cols)){
+        .freeze_cols_df <- fix_cols[fix_cols %in% names(data())]
+        if(rlang::is_empty(.freeze_cols_df)) .freeze_cols_df <- NULL
+      }else{
+        .freeze_cols_df <- NULL
+      }
+      .freeze_cols_df
+    })
+
+    output$df_view <- DT::renderDT({
+      args_df <- list(
+        .df = shiny::req(data()),
+        .subject_col = subject_col_df(),
+        .freeze_cols = freeze_cols()
+      )
+
+      args <- c(args_df, global_vars()$dt_args)
+
+      # Dont consider shiny session to be interactive (avoid object size check)
+      rlang::with_interactive({
+        do.call(create_v_datatable, args)
+      }, value = FALSE)
+    }, server = TRUE)
+
+  })
+}
+
+
+#' Construct global header UI for `v_shiny_internal`
+#'
+#' Serves as a wrapper for all global UIs
+#'
+#' @details
+#' Note that this is not module
+#'
+#' @inheritParams v
+#' @inheritParams v_shiny_internal
+#'
+#' @return a shiny UI
+#'
+#' @keywords internal
+v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
+
+  # Create global filter UI
+  global_filter_ui <- create_global_filter(.subject_col)
+
+  # For dataframe selection (formats names and N subjects)
+  table_opts <- purrr::map2_dfr(names(.df_list), .df_list, function(.name, .df){
+    make_v_caption(.name, .df, .subject_col)
+  })
+
+  fluidRow(
+    style = "background-color: #007319; color: white;",
+    column(
+      width = 3, align = "left",
+      pickerInput(
+        inputId = "data_select", label = "Data:",
+        inline = TRUE, width = "fit",
+        choices = table_opts$name,
+        choicesOpt = list(content = table_opts$html_label),
+        options = list(style = "btn-success")
+      )
+    ),
+    column(
+      width = 3, align = "left",
+      style = "margin-top: 7px;",
+      shinyWidgets::pickerInput(
+        "freeze_cols", label = NULL,
+        choices = .freeze_cols$col_name,
+        options = list(
+          `live-search` = TRUE, `actions-box` = TRUE,
+          style = "btn-success", size = 8,
+          title = "Freeze columns"
+        ),
+        choicesOpt = list(subtext = .freeze_cols$subtitle),
+        multiple = TRUE
+      )
+    ),
+    column(
+      width = 2, align = "left",
+      style = "margin-top: 14px;",
+      shinyWidgets::materialSwitch(
+        "show_filters", label = "Filters",
+        right = TRUE, value = FALSE, status = "success"
+      )
+    ),
+    column(
+      width = 3, align = "right",
+      style = "padding-left: 0px;",
+      global_filter_ui
+    ),
+    column(
+      width = 1, align = "right",
+      style = "margin-top: 5px;",
+      shinyWidgets::dropMenu(
+        shiny::actionButton(
+          "table_opts", label = NULL,
+          icon = shiny::icon("gear", style = "color: white"),
+          style='font-size:120%',
+          class = "btn-success"),
+        tags$div(
+          style = "text-align: left;",
+          shinyWidgets::awesomeCheckboxGroup(
+            "dt_options", label = htmltools::h4("Column Labels"),
+            choices = c("Show labels" = "show_labels",
+                        "Wrap labels" = "wrap_labels",
+                        "Truncate labels" = "trunc_labels"),
+            selected = c("show_labels")
+          ),
+          shiny::conditionalPanel(
+            condition = "input.dt_options.indexOf('trunc_labels') != -1",
+            tags$br(),
+            fluidRow(
+              column(
+                width = 10, offset = 1,
+                style = "background-color: #e2e2e2; border:3px solid #8ebf42",
+                shiny::sliderInput(
+                  "trunc_length", label = "Max characters to show",
+                  value = 20, min = 10, max = 30, step = 2
+                )
+              )
+            )
+          ),
+          tags$hr(),
+          htmltools::h4("Table Sizing"),
+          fluidRow(
+            column(
+              width = 7,
+              shiny::sliderInput(
+                "ft_size", label = "Font Size",
+                value = 9, min = 5, max = 12, step = 1
+              )
+            ),
+            column(
+              width = 5,
+              shinyWidgets::pickerInput(
+                "scroll_y", label = "Scroll Height (pixels)",
+                choices = seq(200, 1000, 200), selected = 400,
+                options = list(style = "btn-success")
+              )
+            )
+          ),
+          tags$hr(),
+          htmltools::h4("Formatting Options"),
+          fluidRow(
+            column(
+              width = 7,
+              shiny::sliderInput(
+                "digits", label = "Round Values",
+                value = 3, min = 1, max = 6, step = 1,
+                post = " digits"
+              )
+            ),
+            column(
+              width = 5,
+              tags$label("Subject Contrast"),
+              shinyWidgets::switchInput(
+                inputId = "subj_contrast",
+                onLabel = "Heavy",
+                offLabel = "Light",
+                size = "small"
+              )
+            )
+          )
+        ),
+        maxWidth = "300px"
+      )
+    )
+  )
+}
+
+
+#' Handle all global UIs
+#'
+#' @inheritParams v
+#' @param input named list of shiny inputs
+#' @param output named list of shiny outputs
+#' @param session main shiny session
+#'
+#' @importFrom shiny reactive req observe observeEvent reactiveValues getDefaultReactiveDomain
+#'
+#' @returns a list of `reactiveValues`
+#'
+#' @keywords internal
+v_global_server <- function(
+    .df_list,
+    input,
+    output,
+    session = getDefaultReactiveDomain()
+){
+
+  .rv <- reactiveValues()
+
+  observe({
+    # Selected Dataset
+    .rv$data_select = .df_list[[shiny::req(input$data_select)]]
+    # Global subject filter
+    .rv$subject_filter = input$subject_filter
+    # Frozen columns
+    .rv$freeze_col_choices = input$freeze_cols
+
+    # Arguments passed to create_v_datatable directly
+    dt_args <- list(
+      # Show Filters
+      .show_filters = input$show_filters,
+      # Label presence and formatting
+      .show_labels = "show_labels" %in% input$dt_options,
+      .wrap_labels = "wrap_labels" %in% input$dt_options,
+      .trunc_labels = "trunc_labels" %in% input$dt_options,
+      .trunc_length = input$trunc_length,
+      # Misc DT options
+      .digits = input$digits,
+      .ft_size = input$ft_size,
+      .scroll_y = as.numeric(input$scroll_y),
+      .subj_contrast = input$subj_contrast
+    )
+    .rv$dt_args <- dt_args
+
+  })
+
+  return(.rv)
+}

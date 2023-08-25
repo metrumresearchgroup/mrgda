@@ -33,56 +33,75 @@ svn_repo_with_code <- function(code, clean = TRUE, env = parent.frame()) {
   withr::with_dir(repo, code)
 }
 
-#' Compare inferred data class from v(), to what shows in a tibble view
-#'
-#' @param df a starting dataframe
-#' @param df_view a DT::datatable object returned from v()
-#'
-#' @keywords internal
-map_v_classes <- function(df, df_view){
-  # Regex to extract column names and classes from datatable container
-  pattern <- "<th>(.*?)<br>.*?&lt;(.*?)&gt;.*?</th>"
 
-  column_info_df <- purrr::map_df(
-    stringr::str_match_all(df_view$x$container, pattern), ~
-      data.frame(col_name = .x[, 2], determined_class = .x[, 3])
-  ) %>% dplyr::left_join(
-    purrr::map_dfr(df, ~ pillar::type_sum(.x)) %>%
-      tidyr::gather(key = "col_name", value = "starting_class"),
-    by = "col_name"
+# Create a test dataframe with necessary variability for testing
+# v related functions
+create_test_v_df <- function(rows_per_id = 3, num_ids = 21){
+  df <- tibble::tibble(
+    age = sample(c(22,25,26,30,32,24), num_ids, replace = TRUE),
+    Weight = rnorm(num_ids, 75, 15),
+    sex = rep(c("M", "F"), num_ids)[1:num_ids],
+    BLFL = rep(c(TRUE, FALSE), num_ids)[1:num_ids],
+    DATETIME = rep(Sys.time(), num_ids),
+    DATE = rep(Sys.Date(), num_ids),
+    TIME = rep(format(as.POSIXct(Sys.time()), format = "%H:%M"), num_ids)
   ) %>%
-    # remove color column
-    dplyr::filter(col_name %in% names(df))
+    dplyr::mutate(
+      ID = 1:n(),
+      USUBJID = paste0("STUDY-1001-3053-", 1:n())
+    ) %>%
+    tidyr::uncount(rows_per_id) %>%
+    dplyr::mutate(
+      biomarker = rnorm(num_ids*rows_per_id, 5, 1),
+    ) %>%
+    dplyr::relocate(ID, USUBJID)
 
-  # Check if determined column classes are suitable
-  correct <- compare_classes(column_info_df)
-  column_info_df <- column_info_df %>% dplyr::left_join(correct, by = "col_name")
+  attr(df$USUBJID, "label") <- "Subject"
 
-  return(column_info_df)
+  return(df)
 }
 
 
-#' Check if determined column classes are suitable
+#' Extract column names, labels, and classes from header html
 #'
-#' @param column_info_df dataframe of column names, determined_class, and starting_class
+#' @param df A starting dataframe
 #'
 #' @keywords internal
-compare_classes <- function(column_info_df) {
+extract_v_headers <- function(df){
+  headers <- format_v_headers(df)
 
-  # Function to check for exceptions in class matching
-  check_exceptions <- function(determined_class, starting_class){
-    if (determined_class == starting_class) {
-      return(TRUE)
-    } else if(determined_class == "dbl" && starting_class == "int") {
-      return(TRUE)
-    } else if (determined_class == "time" && starting_class == "chr") {
-      return(TRUE)
-    } else {
-      return(FALSE)
-    }
+  html <- rvest::read_html(paste0(headers, collapse = ""))
+  columns <- rvest::html_elements(html, "h4")
+  col_names <- rvest::html_text(columns)
+
+  col_styles <- rvest::html_elements(html, "span")
+  col_styles <- rvest::html_text(col_styles)
+
+  col_labels <- col_styles[seq(1, length(col_styles), by = 2)]
+  col_types <- col_styles[seq(2, length(col_styles), by = 2)] %>%
+    stringr::str_extract("(?<=<).*?(?=>)")
+
+
+  tibble::tibble(
+    col_name = col_names,
+    col_label = col_labels,
+    col_type = col_types
+  )
+}
+
+
+with_bg_env <- function(code){
+  Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = "")
+  # Dont run if inside an R CMD Check environment (package is installed)
+  if(!testthat::is_checking()){
+    Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = here::here())
+    Sys.setenv("RSTUDIO" = 1)
+    on.exit(Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = ""))
   }
 
-  purrr::pmap_dfr(column_info_df, function(col_name, determined_class, starting_class) {
-    tibble::tibble(col_name = col_name, correct = check_exceptions(determined_class, starting_class))
-  })
+  result <- eval(code)
+  return(result)
 }
+
+# Make sure it's not set when tests are run
+Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = "")
