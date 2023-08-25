@@ -46,7 +46,7 @@
 #'  server <- function(input, output, session) {}
 #'
 #'  # Passes the host and port to the shinyApp object
-#'  app <- shinyApp(ui = ui, server = server,
+#'  app <- shiny::shinyApp(ui = ui, server = server,
 #'                  options = list(host = host, port = port))
 #'
 #'  # Function launches the app

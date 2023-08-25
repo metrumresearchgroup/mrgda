@@ -80,10 +80,6 @@ v <- function(
 #' @param dont_run Logical (`TRUE`/`FALSE`). If `TRUE`, return the shinyApp object
 #'  instead of executing it via `runApp`. Used for testing
 #'
-#' @importFrom htmltools tags
-#' @importFrom shiny onStop
-#' @importFrom shinyWidgets tooltipOptions dropdownButton pickerInput
-#'
 #' @details
 #' It's easier to use this function for testing during development, as messages
 #' will be printed to the console.
@@ -120,30 +116,30 @@ v_shiny_internal <- function(
     shinydashboardPlus::dashboardHeader(title = NULL, disable = TRUE),
     shinydashboardPlus::dashboardSidebar(width = 0),
     shinydashboard::dashboardBody(
-      tags$head(
+      htmltools::tags$head(
         # Remove whitespace
-        tags$style(".content{padding-bottom: 0px !important;
+        htmltools::tags$style(".content{padding-bottom: 0px !important;
                    padding-top: 0px !important;}"),
         # PickerInput styling (hard to see before - columns stand out more)
-        tags$style(HTML(".dropdown-menu > li > a {font-size: smaller;}")),
-        tags$style(HTML(".dropdown-header {font-size: larger; font-weight: bold;}")),
-        tags$style(HTML(".dropdown-menu > .divider {background-color: black; height: 2px;}")),
+        htmltools::tags$style(shiny::HTML(".dropdown-menu > li > a {font-size: smaller;}")),
+        htmltools::tags$style(shiny::HTML(".dropdown-header {font-size: larger; font-weight: bold;}")),
+        htmltools::tags$style(shiny::HTML(".dropdown-menu > .divider {background-color: black; height: 2px;}")),
         # Ensures minimum width of `freeze_cols` pickerInput
-        tags$style(HTML("#freeze_cols .open > .dropdown-menu {width: 250px !important;}")),
+        htmltools::tags$style(shiny::HTML("#freeze_cols .open > .dropdown-menu {width: 250px !important;}")),
         # Other Styling
-        tags$style(HTML("hr {border-top: 2px solid #007319;}"))
+        htmltools::tags$style(shiny::HTML("hr {border-top: 2px solid #007319;}"))
       ),
       # Main Header UIs
       v_global_ui(.df_list, .subject_col, .freeze_cols),
       # Individual Dataframe
-      fluidRow(v_mod_ui("df_view"))
+      shiny::fluidRow(v_mod_ui("df_view"))
     )
   )
 
 
   server <- function(input, output, session) {
 
-    onStop(function(){
+    shiny::onStop(function(){
       cli::cli_inform(c("i"="Session Stopped\n"))
     })
 
@@ -153,7 +149,7 @@ v_shiny_internal <- function(
     # Create DT datatables
     v_mod_server("df_view",
                  .subject_col = .subject_col,
-                 global_vars = reactive(global_vars)
+                 global_vars = shiny::reactive(global_vars)
     )
 
     # End the process on window close. This is designed for the case where a
@@ -173,7 +169,7 @@ v_shiny_internal <- function(
     })
   }
 
-  app <- shinyApp(ui = ui, server = server, onStart = onStart,
+  app <- shiny::shinyApp(ui = ui, server = server, onStart = onStart,
                   options = list(host = host, port = port))
 
   if(isTRUE(dont_run)){
@@ -190,21 +186,18 @@ v_shiny_internal <- function(
 #'
 #' @inheritParams v_mod_server
 #'
-#' @importFrom htmltools tagList br
-#' @importFrom shiny NS fluidRow column
-#'
 #' @returns a shiny module UI object
 #'
 #' @keywords internal
 v_mod_ui <- function(id){
 
-  ns <- NS(id)
+  ns <- shiny::NS(id)
 
-  tagList(
+  htmltools::tagList(
     shinydashboard::box(
       width = NULL, title = NULL,
-      fluidRow(
-        column(
+      shiny::fluidRow(
+        shiny::column(
           width = 12, align = "center",
           DT::DTOutput(ns("df_view"))
         )
@@ -220,8 +213,6 @@ v_mod_ui <- function(id){
 #' @param global_vars reactive list of arguments
 #' @inheritParams create_v_datatable
 #'
-#' @importFrom shiny moduleServer shinyApp
-#'
 #' @returns a shiny module server object
 #'
 #' @keywords internal
@@ -231,11 +222,11 @@ v_mod_server <- function(
     global_vars
 ){
 
-  moduleServer(id, function(input, output, session) {
+  shiny::moduleServer(id, function(input, output, session) {
 
 
     # Reactive display data - filtered by subject column
-    data <- reactive({
+    data <- shiny::reactive({
       filter_v_subject(
         .df = shiny::req(global_vars()$data_select),
         .subject_col = .subject_col,
@@ -245,7 +236,7 @@ v_mod_server <- function(
 
 
     # Set subject column per dataset (to account for list elements where subject_col is missing)
-    subject_col_df <- reactive({
+    subject_col_df <- shiny::reactive({
       if(!is.null(.subject_col) && .subject_col %in% names(data())){
         .subject_col
       }else{
@@ -254,7 +245,7 @@ v_mod_server <- function(
     })
 
     # Fix .freeze_cols found per dataset, so that it still works with lists
-    freeze_cols <- reactive({
+    freeze_cols <- shiny::reactive({
       fix_cols <- global_vars()$freeze_col_choices
       if(!is.null(fix_cols)){
         .freeze_cols_df <- fix_cols[fix_cols %in% names(data())]
@@ -307,11 +298,11 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
     make_v_caption(.name, .df, .subject_col)
   })
 
-  fluidRow(
+  shiny::fluidRow(
     style = "background-color: #007319; color: white;",
-    column(
+    shiny::column(
       width = 3, align = "left",
-      pickerInput(
+      shinyWidgets::pickerInput(
         inputId = "data_select", label = "Data:",
         inline = TRUE, width = "fit",
         choices = table_opts$name,
@@ -319,7 +310,7 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
         options = list(style = "btn-success")
       )
     ),
-    column(
+    shiny::column(
       width = 3, align = "left",
       style = "margin-top: 7px;",
       shinyWidgets::pickerInput(
@@ -334,7 +325,7 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
         multiple = TRUE
       )
     ),
-    column(
+    shiny::column(
       width = 2, align = "left",
       style = "margin-top: 14px;",
       shinyWidgets::materialSwitch(
@@ -342,12 +333,12 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
         right = TRUE, value = FALSE, status = "success"
       )
     ),
-    column(
+    shiny::column(
       width = 3, align = "right",
       style = "padding-left: 0px;",
       global_filter_ui
     ),
-    column(
+    shiny::column(
       width = 1, align = "right",
       style = "margin-top: 5px;",
       shinyWidgets::dropMenu(
@@ -356,7 +347,7 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
           icon = shiny::icon("gear", style = "color: white"),
           style='font-size:120%',
           class = "btn-success"),
-        tags$div(
+        htmltools::tags$div(
           style = "text-align: left;",
           shinyWidgets::awesomeCheckboxGroup(
             "dt_options", label = htmltools::h4("Column Labels"),
@@ -367,9 +358,9 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
           ),
           shiny::conditionalPanel(
             condition = "input.dt_options.indexOf('trunc_labels') != -1",
-            tags$br(),
-            fluidRow(
-              column(
+            htmltools::tags$br(),
+            shiny::fluidRow(
+              shiny::column(
                 width = 10, offset = 1,
                 style = "background-color: #e2e2e2; border:3px solid #8ebf42",
                 shiny::sliderInput(
@@ -379,17 +370,17 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
               )
             )
           ),
-          tags$hr(),
+          htmltools::tags$hr(),
           htmltools::h4("Table Sizing"),
-          fluidRow(
-            column(
+          shiny::fluidRow(
+            shiny::column(
               width = 7,
               shiny::sliderInput(
                 "ft_size", label = "Font Size",
                 value = 9, min = 5, max = 12, step = 1
               )
             ),
-            column(
+            shiny::column(
               width = 5,
               shinyWidgets::pickerInput(
                 "scroll_y", label = "Scroll Height (pixels)",
@@ -398,10 +389,10 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
               )
             )
           ),
-          tags$hr(),
+          htmltools::tags$hr(),
           htmltools::h4("Formatting Options"),
-          fluidRow(
-            column(
+          shiny::fluidRow(
+            shiny::column(
               width = 7,
               shiny::sliderInput(
                 "digits", label = "Round Values",
@@ -409,9 +400,9 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
                 post = " digits"
               )
             ),
-            column(
+            shiny::column(
               width = 5,
-              tags$label("Subject Contrast"),
+              htmltools::tags$label("Subject Contrast"),
               shinyWidgets::switchInput(
                 inputId = "subj_contrast",
                 onLabel = "Heavy",
@@ -435,21 +426,19 @@ v_global_ui <- function(.df_list, .subject_col, .freeze_cols){
 #' @param output named list of shiny outputs
 #' @param session main shiny session
 #'
-#' @importFrom shiny reactive req observe observeEvent reactiveValues getDefaultReactiveDomain
-#'
-#' @returns a list of `reactiveValues`
+#' @returns a list of `shiny::reactiveValues`
 #'
 #' @keywords internal
 v_global_server <- function(
     .df_list,
     input,
     output,
-    session = getDefaultReactiveDomain()
+    session = shiny::getDefaultReactiveDomain()
 ){
 
-  .rv <- reactiveValues()
+  .rv <- shiny::reactiveValues()
 
-  observe({
+  shiny::observe({
     # Selected Dataset
     .rv$data_select = .df_list[[shiny::req(input$data_select)]]
     # Global subject filter

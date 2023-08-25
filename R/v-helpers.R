@@ -560,7 +560,6 @@ make_v_caption <- function(.name, .df, .subject_col = NULL, .font_size = 10) {
 #'
 #' @inheritParams v
 #'
-#' @importFrom shiny HTML
 #'
 #' @returns a `shiny.tag` object
 #'
@@ -568,8 +567,8 @@ make_v_caption <- function(.name, .df, .subject_col = NULL, .font_size = 10) {
 create_global_filter <- function(.subject_col) {
   if (!is.null(.subject_col)) {
     global_filter_ui <-
-      fluidRow(
-        column(
+      shiny::fluidRow(
+        shiny::column(
           width = 12, style = "margin-top: 7px;",
           htmltools::tags$style("div.form-group {margin-bottom: 0px;}"),
           shiny::textInput(
