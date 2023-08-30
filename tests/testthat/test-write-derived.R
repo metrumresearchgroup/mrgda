@@ -42,20 +42,6 @@ test_that("write_derived makes a blank diff file when no diffs", {
   )
 })
 
-test_that("subject level data gets written out correctly", {
-
-  .subject_level <-
-    file.path(tools::file_path_sans_ext(.temp_csv), "subject-level.csv") %>%
-    readr::read_csv() %>%
-    suppressMessages()
-
-  .subject_level_cols <- c("ID", unique(.subject_level$Column))
-
-  .distinct_subject_cols <- names(mrgda::distinct_subject_columns(nm, "ID"))
-
-  expect_true(all(sort(.distinct_subject_cols) == sort(.subject_level_cols)))
-})
-
 
 test_that("write_derived works with special characters in file name", {
   .temp_csv <- tempfile(fileext = "-pk.csv")

@@ -9,6 +9,8 @@ Authors@R:
     person(given = "Kyle", family = "Barrett", email = "barrettk@metrumrg.com", role = c("aut"))
     )
 Description: Run various tests on an NMTRAN dataset to validate it prior to modeling.
+URL: https://github.com/metrumresearchgroup/mrgda
+BugReports: https://github.com/metrumresearchgroup/mrgda/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
