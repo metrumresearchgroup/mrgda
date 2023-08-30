@@ -21,7 +21,6 @@ reference:
     desc: Write NONMEM data set
     contents:
     - write_derived
-    - nm_write
     - distinct_subject_columns
     - execute_data_diffs
   - title: Data Validation
