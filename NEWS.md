@@ -6,6 +6,10 @@
 
 - `execute_data_diffs` was made to run faster. (#142)
 
+- `nm_validate()` and `nm_write()` was removed from the package. 
+
+- `write_derived()` no longer writes out the subject level csv in the meta data folder.
+
 ## Bug fixes
 
 - `src_viz()` app bug fixes and improvements with handling subject columns. (#141)
