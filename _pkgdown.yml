@@ -27,7 +27,6 @@ reference:
   - title: Data Validation
     desc: Check for errors in a NONMEM data set
     contents:
-    - nm_validate
     - check_src
     - check_src_duplicates
     - check_src_missing_datetime
