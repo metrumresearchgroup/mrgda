@@ -1,14 +1,14 @@
 path <- system.file("example-sdtm", package = "mrgda")
 src_list <- read_src_dir(.path = path) %>% suppressMessages()
 
-test_that("read_src_dir ae domain: check data is read in correctly [NMV-RSD-001]", {
+test_that("read_src_dir ae domain: check data is read in correctly", {
   expect_equal(src_list$ae, haven::read_xpt(file.path(path, "ae.xpt")) %>% suppressMessages())
   expect_equal(src_list$dm, haven::read_xpt(file.path(path, "dm.xpt")) %>% suppressMessages())
   expect_equal(src_list$lb, haven::read_xpt(file.path(path, "lb.xpt")) %>% suppressMessages())
   expect_equal(src_list$vs, haven::read_xpt(file.path(path, "vs.xpt")) %>% suppressMessages())
 })
 
-test_that("read_src_dir allows user to only load in specific domains [NMV-RSD-004]", {
+test_that("read_src_dir allows user to only load in specific domains", {
   src_list <- read_src_dir(.path = path, .read_domains = c("dm", "lb")) %>% suppressMessages()
   expect_equal(length(src_list), 4)
 })

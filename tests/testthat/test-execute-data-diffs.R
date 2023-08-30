@@ -19,7 +19,7 @@ temp_dir <- tempdir()
 .compare_df2 <- .compare_df %>% dplyr::rename(USUBJID=ID)
 
 # 1. Test: The function properly identifies and outputs differences in the data frames.
-test_that("The function identifies and outputs differences [NMV-EDD-001]", {
+test_that("The function identifies and outputs differences", {
   diffs_list <- execute_data_diffs(.base_df, .compare_df, "ID")
   diffs <- diffs_list$diffs
   expect_equal(diffs$name[1], "N Rows Diff")
@@ -31,7 +31,7 @@ test_that("The function identifies and outputs differences [NMV-EDD-001]", {
 
 
 # 4. Test: The function properly identifies and outputs differences based on IDs.
-test_that("The function identifies and outputs differences based on IDs [NMV-EDD-004]", {
+test_that("The function identifies and outputs differences based on IDs", {
   diffs <- execute_data_diffs(.base_df, .compare_df, "ID")
   id_diffs <- diffs$subject_diffs
   expect_equal(nrow(id_diffs), 1)

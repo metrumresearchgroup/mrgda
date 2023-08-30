@@ -21,13 +21,11 @@ reference:
     desc: Write NONMEM data set
     contents:
     - write_derived
-    - nm_write
     - distinct_subject_columns
     - execute_data_diffs
   - title: Data Validation
     desc: Check for errors in a NONMEM data set
     contents:
-    - nm_validate
     - check_src
     - check_src_duplicates
     - check_src_missing_datetime
