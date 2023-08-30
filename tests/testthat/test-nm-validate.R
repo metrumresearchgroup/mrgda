@@ -8,7 +8,7 @@ nm_spec_parflags <- yspec::ys_load(system.file("derived", "pk-partial_flags.yml"
 
 
 # returns appropriate debug code when issue detected ----------------------
-test_that("nm_validate debug code: Returns usable debug code [NMV-VAL-001]", {
+test_that("nm_validate debug code: Returns usable debug code", {
 
   x = nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
   # Test 1
@@ -21,7 +21,7 @@ test_that("nm_validate debug code: Returns usable debug code [NMV-VAL-001]", {
 
 
 # duplicates across id, time, primary_keys fails --------------------------
-test_that("nm_validate catches duplicates across id, time, primary_keys [NMV-VAL-002]", {
+test_that("nm_validate catches duplicates across id, time, primary_keys", {
   nm_dups <- nm_errors
   nm_dups$EVID[1:10] = 0
   nm_dups$DVID[1:10] = 1
@@ -35,7 +35,7 @@ test_that("nm_validate catches duplicates across id, time, primary_keys [NMV-VAL
 
 
 # non-unique baseline covariates -------------------------------------------
-test_that("nm_validate catches non-unique baseline covariates [NMV-VAL-003]", {
+test_that("nm_validate catches non-unique baseline covariates", {
   nm_nonuni <- nm_errors
   nm_nonuni$WTBL[4] = 79.5
   nm_nonuni$WTBL[5] = 80.4
@@ -48,7 +48,7 @@ test_that("nm_validate catches non-unique baseline covariates [NMV-VAL-003]", {
 
 
 # missing covariates -------------------------------------------------------
-test_that("nm_validate catches missing covariates [NMV-VAL-004]", {
+test_that("nm_validate catches missing covariates", {
   nm_missc <- nm_errors
   nm_missc$WTBL[4] = NA_real_
   nm_missc$WT[5] = NA_real_
@@ -67,7 +67,7 @@ test_that("nm_validate catches missing covariates [NMV-VAL-004]", {
 
 
 # output all failures ---------------------------------------------------
-test_that("nm_validate prints multiple failures [NMV-VAL-005]", {
+test_that("nm_validate prints multiple failures", {
   x = nm_validate(.data = nm_errors, .spec = nm_spec, .error_on_fail = FALSE)
 
   expect_false(x$`No duplicate records`$success)
@@ -83,7 +83,7 @@ test_that("nm_validate prints multiple failures [NMV-VAL-005]", {
 
 
 # output all failures ---------------------------------------------------
-test_that("nm_validate works when arguments are provided out of order [NMV-VAL-006]", {
+test_that("nm_validate works when arguments are provided out of order", {
   x = nm_validate(.spec = nm_spec, .data = nm_errors, .error_on_fail = FALSE)
 
   expect_true(grepl("nm_errors", x$`No duplicate records`$debug))
@@ -93,7 +93,7 @@ test_that("nm_validate works when arguments are provided out of order [NMV-VAL-0
 
 
 # output prints appropriate test names ------------------------------------
-test_that("nm_validate prints correct test names when only 1 failure  [NMV-VAL-007]", {
+test_that("nm_validate prints correct test names when only 1 failure", {
   nm_1e <- nm
   nm_1e$WTBL[1] = NA_real_
   x = nm_validate(.spec = nm_spec, .data = nm_1e, .error_on_fail = FALSE)
@@ -102,7 +102,7 @@ test_that("nm_validate prints correct test names when only 1 failure  [NMV-VAL-0
 })
 
 # output catches NA, Inf and -Inf for non-finite TIME --------------------
-test_that("nm_validate catches all cases of non-finite TIME [NMV-VAL-008]", {
+test_that("nm_validate catches all cases of non-finite TIME", {
   nm_1e <- nm_errors
   nm_1e$TIME[1] = NA
   nm_1e$TIME[2] = Inf
@@ -114,7 +114,7 @@ test_that("nm_validate catches all cases of non-finite TIME [NMV-VAL-008]", {
 })
 
 # output catches when MDV incorrectly set for NA DV --------------------
-test_that("nm_validate checks MDV is set to 1 for all rows with NA DV [NMV-VAL-009]", {
+test_that("nm_validate checks MDV is set to 1 for all rows with NA DV", {
   nm_1e <- nm
   nm_1e$DV[1] = NA_real_
   nm_1e$MDV[1] = 0
@@ -130,7 +130,7 @@ test_that("nm_validate checks MDV is set to 1 for all rows with NA DV [NMV-VAL-0
   expect_true(is.na(x$`MDV not set to 1 when DV is NA or 0`$success))
 })
 
-test_that("nm_validate checks MDV  is set to 1 for all rows with 0 DV [NMV-VAL-009]", {
+test_that("nm_validate checks MDV  is set to 1 for all rows with 0 DV", {
   nm_2e <- nm
   nm_2e$DV[1] = 0
   nm_2e$MDV[1] = 0
@@ -141,7 +141,7 @@ test_that("nm_validate checks MDV  is set to 1 for all rows with 0 DV [NMV-VAL-0
 })
 
 # output ensures only unique NUM values in dataset --------------------
-test_that("nm_validate checks if all NUM are unique [NMV-VAL-010]", {
+test_that("nm_validate checks if all NUM are unique", {
   nm_num <- nm
 
   x = nm_validate(.spec = nm_spec, .data = nm_num, .error_on_fail = FALSE)
@@ -154,7 +154,7 @@ test_that("nm_validate checks if all NUM are unique [NMV-VAL-010]", {
 })
 
 # output ensures all dosing rows have AMT = RATE*DUR --------------------
-test_that("nm_validate checks if AMT always equals RATE times DUR [NMV-VAL-011]", {
+test_that("nm_validate checks if AMT always equals RATE times DUR", {
   x = nm_validate(.spec = nm_spec, .data = nm, .error_on_fail = FALSE)
   expect_true(x$`All dosing AMT values are equivalent to RATE * DUR`$success)
 

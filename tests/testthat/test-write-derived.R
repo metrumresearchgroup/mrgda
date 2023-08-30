@@ -23,11 +23,11 @@ withr::with_tempdir({
   .xpt_in_labels <- purrr::map(.xpt_in, ~ attr(.x, "label"))
 })
 
-test_that("write_derived write csv: csv is written correctly and matches data [NMV-NMW-001]", {
+test_that("write_derived write csv: csv is written correctly and matches data", {
   expect_equal(nm, .csv_in)
 })
 
-test_that("write_derived write xpt: xpt data includes correct labels [NMV-NMW-002]", {
+test_that("write_derived write xpt: xpt data includes correct labels", {
   expect_equal(
     yspec::ys_get_short(nm_spec)[order(names(yspec::ys_get_short(nm_spec)))],
     .xpt_in_labels[order(names(.xpt_in_labels))]
@@ -57,7 +57,7 @@ test_that("subject level data gets written out correctly", {
 })
 
 
-test_that("write_derived works with special characters in file name [NMV-NMW-003]", {
+test_that("write_derived works with special characters in file name", {
   .temp_csv <- tempfile(fileext = "-pk.csv")
   write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv, .compare_from_svn = FALSE) %>% suppressMessages()
   expect_equal(nm, readr::read_csv(.temp_csv, na = ".") %>% suppressMessages())
