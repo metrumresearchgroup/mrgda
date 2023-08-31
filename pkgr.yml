@@ -7,10 +7,12 @@ Packages:
   - devtools
   - pkgdown
   - styler
+  - mpn.scorecard
 
 Repos:
   - CRAN: https://cran.rstudio.com
   - MPN: https://mpn.metworx.com/snapshots/stable/2023-05-14 # used for mrg packages
+  - scorecard: https://s3.amazonaws.com/mpn.metworx.dev/releases/mpn.scorecard/0.1.0
 
 Lockfile:
     Type: renv
