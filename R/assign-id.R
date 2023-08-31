@@ -77,7 +77,8 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
     .data %>%
     dplyr::left_join(prev_id_lookup) %>%
     dplyr::mutate(
-      mrgda_MAX_ID = ifelse(all(is.na(ID)), 0, max(ID, na.rm = TRUE)),
+      mrgda_MAX_ID = max(prev_id_lookup$ID, na.rm = TRUE),
+      mrgda_MAX_ID = ifelse(mrgda_MAX_ID == -Inf, 0, mrgda_MAX_ID),
       mrgda_SUBJ_NEED_ID = ifelse(is.na(ID), !!sym(.subject_col), NA),
       ID = ifelse(
         is.na(ID),
