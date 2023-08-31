@@ -1,0 +1,35 @@
+---
+title: "assigning-id"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{assigning-id}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This is a vignette to help you become familiar with using `assign_id()`. 
+Check out https://metrumresearchgroup.github.io/mrgda/reference/assign_id.html
+for additional documentation and examples.
+
+`assign_id()` helps you assign a unique numeric identifier to each
+subject in your data set. Its purpose is to ensure the same numeric
+identifier is assigned to each subject across multiple data sets. 
+
+Below, we will go through the two main use cases of `assign_id()`:
+- first ID assignment
+- assigning ID according to an existing file
+
+# Load packages
+
+```{r setup}
+library(mrgda)
+```
+
+# Setup
+
+
+
+```{r}
+data <- readr::read_csv(system.file("derived/pk.csv", package = "mrgda"))
+```
+

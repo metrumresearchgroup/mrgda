@@ -55,7 +55,8 @@ Suggests:
     shiny (>= 1.6.0),
     shinydashboard,
     shinydashboardPlus (>= 2.0.0),
-    shinyWidgets
+    shinyWidgets,
+    rmarkdown
 Config/testthat/edition: 3
 VignetteBuilder: 
     knitr
