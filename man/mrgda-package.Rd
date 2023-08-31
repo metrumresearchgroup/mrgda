@@ -8,6 +8,14 @@
 \description{
 Run various tests on an NMTRAN dataset to validate it prior to modeling.
 }
+\seealso{
+Useful links:
+\itemize{
+  \item \url{https://github.com/metrumresearchgroup/mrgda}
+  \item Report bugs at \url{https://github.com/metrumresearchgroup/mrgda/issues}
+}
+
+}
 \author{
 \strong{Maintainer}: Eric Anderson \email{andersone@metrumrg.com}
 

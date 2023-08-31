@@ -92,4 +92,23 @@ test_that("assign_id function works correctly", {
 
 })
 
+test_that("assign_id sets new ID's larger than the previous data even if no subjects are in common", {
 
+  old_data <- dplyr::tibble(USUBJID = c("A", "B", "C", "D"), ID = c(1, 2, 4, 19))
+  lookup_path <- paste0(tempfile(), ".csv")
+  data.table::fwrite(
+    x = old_data,
+    file = lookup_path,
+    sep = ",",
+    quote = FALSE,
+    row.names = FALSE,
+    na = "."
+  )
+
+  data <- dplyr::tibble(USUBJID = c("E", "F", "G"))
+  ids_assigned <- assign_id(.data = data, .subject_col = "USUBJID", .previously_derived_path = lookup_path)
+
+  expect_equal(nrow(ids_assigned), 3)
+  expect_equal(ncol(ids_assigned), 2)
+  expect_true(all(c(20, 21, 22) %in% unique(ids_assigned$ID)))
+})
