@@ -4,7 +4,7 @@
 \name{mrgda-package}
 \alias{mrgda}
 \alias{mrgda-package}
-\title{mrgda: Validate NMTRAN datasets}
+\title{mrgda: Tools for Data Assembly}
 \description{
 Run various tests on an NMTRAN dataset to validate it prior to modeling.
 }

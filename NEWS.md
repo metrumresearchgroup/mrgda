@@ -1,4 +1,4 @@
-# mrgda 0.8.1.9001
+# mrgda 0.9.0
 
 ## New features and changes
 
@@ -9,6 +9,8 @@
 - `nm_validate()` and `nm_write()` was removed from the package. (#156)
 
 - `write_derived()` no longer writes out the subject level csv in the meta data folder. (#158)
+
+- added `assigning-id` vignette. (#160)
 
 ## Bug fixes
 
