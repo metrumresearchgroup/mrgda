@@ -51,8 +51,7 @@ When creating a new data set where IDs have not been assigned previously,
 
 data_w_id <-
   pk_data %>% 
-  assign_id(.subject_col = "USUBJID") %>% 
-  suppressMessages()
+  assign_id(.subject_col = "USUBJID")
 
 ```
 
@@ -103,8 +102,7 @@ match that of `data_w_id`, then the mapping is consistent.
 ```{r, message=FALSE}
 data_w_id_reordered <-
   pk_data_reordered %>% 
-  assign_id(.previously_derived_path = lookup_path, .subject_col = "USUBJID") %>% 
-  suppressMessages()
+  assign_id(.previously_derived_path = lookup_path, .subject_col = "USUBJID")
 ```
 
 Notice that despite the sorting differences, both `data_w_id` and `data_w_id_reordered`
@@ -138,8 +136,7 @@ data.table::fwrite(
 )
 
 data <- dplyr::tibble(USUBJID = c("E", "F", "G"))
-assign_id(.data = data, .subject_col = "USUBJID", .previously_derived_path = lookup_path) %>% 
-  suppressMessages()
+assign_id(.data = data, .subject_col = "USUBJID", .previously_derived_path = lookup_path)
 ```
 
 Notice how the largest ID in the previous data set was 19. Since subjects `E`, `F` and `G` 

@@ -87,7 +87,8 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
     ) %>%
     dplyr::select(-tidyr::starts_with("mrgda_")) %>%
     dplyr::select(dplyr::all_of(c("ID", .subject_col))) %>%
-    dplyr::distinct()
+    dplyr::distinct() %>%
+    suppressMessages()
 
   # Join on new ID lookup to the original data
   .data_w_id <-
