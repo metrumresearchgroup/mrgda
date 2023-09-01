@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.8.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.0</span>
       </span>
     </div>
 
@@ -25,6 +25,16 @@
       <ul class="nav navbar-nav"><li>
   <a href="../reference/index.html">Reference</a>
 </li>
+<li class="dropdown">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+    Articles
+     
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu" role="menu"><li>
+      <a href="../articles/assigning-id.html">assigning-id</a>
+    </li>
+  </ul></li>
 <li>
   <a href="../news/index.html">Changelog</a>
 </li>
@@ -44,35 +54,51 @@
   <div class="col-md-9 contents">
     <div class="page-header">
       <h1 data-toc-skip>Changelog <small></small></h1>
-      
+      <small>Source: <a href="https://github.com/metrumresearchgroup/mrgda/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.9.0" id="mrgda-090">mrgda 0.9.0<a class="anchor" aria-label="anchor" href="#mrgda-090"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-0-9-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-9-0"></a></h3>
+<ul><li><p>renamed function <code>view_src()</code> to <code><a href="../reference/v.html">v()</a></code>, and function received a styling overhaul. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/141" class="external-link">#141</a>)</p></li>
+<li><p><code>execute_data_diffs</code> was made to run faster. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/142" class="external-link">#142</a>)</p></li>
+<li><p><code>nm_validate()</code> and <code>nm_write()</code> was removed from the package. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/156" class="external-link">#156</a>)</p></li>
+<li><p><code><a href="../reference/write_derived.html">write_derived()</a></code> no longer writes out the subject level csv in the meta data folder. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/158" class="external-link">#158</a>)</p></li>
+<li><p>added <code>assigning-id</code> vignette. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/160" class="external-link">#160</a>)</p></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-9-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-9-0"></a></h3>
+<ul><li><p><code>src_viz()</code> app bug fixes and improvements with handling subject columns. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/141" class="external-link">#141</a>)</p></li>
+<li><p><code><a href="../reference/assign_id.html">assign_id()</a></code> now assigns ID’s based on maximum ID in previous data set, even if no subjects overlap. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/158" class="external-link">#158</a>)</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.8.1" id="mrgda-081">mrgda 0.8.1<a class="anchor" aria-label="anchor" href="#mrgda-081"></a></h2>
 <div class="section level3">
 <h3 id="bug-fixes-0-8-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-1"></a></h3>
 <ul><li>
-<code><a href="../reference/execute_data_diffs.html">execute_data_diffs()</a></code> Since the NUM column is excluded from subject level diffs, it needed to be removed from the list of columns used for the subject level diffs. (#138)</li>
+<code><a href="../reference/execute_data_diffs.html">execute_data_diffs()</a></code> Since the NUM column is excluded from subject level diffs, it needed to be removed from the list of columns used for the subject level diffs. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/138" class="external-link">#138</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.8.0" id="mrgda-080">mrgda 0.8.0<a class="anchor" aria-label="anchor" href="#mrgda-080"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-8-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-8-0"></a></h3>
-<ul><li><p>add <code>check-src-duplicates.R</code> function to the package to perform source data duplicate checks. (#113)</p></li>
-<li><p>add <code>check-src-missing-datetime.R</code> function to the package to check for missing values. (#113)</p></li>
-<li><p>add <code>check-src.R</code> to run all source data checks. (#113)</p></li>
-<li><p>add <code>src-viz.R</code> function to the package to view all source domains in a shiny app. (#120)</p></li>
-<li><p><code>write-derived.R</code> now always explicitly exports the HEAD version from svn for data diffs. (#126)</p></li>
-<li><p><code>write-derived.R</code> now arranges subject-level data by numerical ID. (#126)</p></li>
-<li><p><code>write-derived.R</code> now always writes out subject level diffs even if they are empty. (#135)</p></li>
-<li><p><code>execute-data-diffs.R</code> now returns a list of diffs and does not write out. (#135)</p></li>
-<li><p><code>assign-id.R</code> prints a simplified message. (#136)</p></li>
+<ul><li><p>add <code>check-src-duplicates.R</code> function to the package to perform source data duplicate checks. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/113" class="external-link">#113</a>)</p></li>
+<li><p>add <code>check-src-missing-datetime.R</code> function to the package to check for missing values. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/113" class="external-link">#113</a>)</p></li>
+<li><p>add <code>check-src.R</code> to run all source data checks. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/113" class="external-link">#113</a>)</p></li>
+<li><p>add <code>src-viz.R</code> function to the package to view all source domains in a shiny app. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/120" class="external-link">#120</a>)</p></li>
+<li><p><code>write-derived.R</code> now always explicitly exports the HEAD version from svn for data diffs. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/126" class="external-link">#126</a>)</p></li>
+<li><p><code>write-derived.R</code> now arranges subject-level data by numerical ID. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/126" class="external-link">#126</a>)</p></li>
+<li><p><code>write-derived.R</code> now always writes out subject level diffs even if they are empty. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/135" class="external-link">#135</a>)</p></li>
+<li><p><code>execute-data-diffs.R</code> now returns a list of diffs and does not write out. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/135" class="external-link">#135</a>)</p></li>
+<li><p><code>assign-id.R</code> prints a simplified message. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/136" class="external-link">#136</a>)</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-8-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-8-0"></a></h3>
 <ul><li>
-<code>write-derived.R</code> The printed message for columns “added” or “removed” is now correct. (#126)</li>
+<code>write-derived.R</code> The printed message for columns “added” or “removed” is now correct. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/126" class="external-link">#126</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -80,7 +106,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-7-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-2"></a></h3>
 <ul><li>
-<code><a href="../reference/assign_id.html">assign_id()</a></code> now does not create duplicate records. (#110)</li>
+<code><a href="../reference/assign_id.html">assign_id()</a></code> now does not create duplicate records. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/110" class="external-link">#110</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -88,16 +114,16 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-7-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-7-1"></a></h3>
 <ul><li>
-<code><a href="../reference/nm_write.html">nm_write()</a></code> N IDs diff now shows number of IDs that changed. (#108)</li>
+<code>nm_write()</code> N IDs diff now shows number of IDs that changed. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/108" class="external-link">#108</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.7.0" id="mrgda-070">mrgda 0.7.0<a class="anchor" aria-label="anchor" href="#mrgda-070"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-7-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-7-0"></a></h3>
-<ul><li><p><code><a href="../reference/assign_id.html">assign_id()</a></code> now only outputs console message when new ID’s present. (#104)</p></li>
-<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> no longer outputs subject column domain. (#106)</p></li>
-<li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> returns a data.frame now instead of a view of the output. (#106)</p></li>
+<ul><li><p><code><a href="../reference/assign_id.html">assign_id()</a></code> now only outputs console message when new ID’s present. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/104" class="external-link">#104</a>)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> no longer outputs subject column domain. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/106" class="external-link">#106</a>)</p></li>
+<li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> returns a data.frame now instead of a view of the output. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/106" class="external-link">#106</a>)</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -105,7 +131,7 @@
 <div class="section level3">
 <h3 id="new-features-and-changes-0-6-2">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-6-2"></a></h3>
 <ul><li>
-<code><a href="../reference/write_derived.html">write_derived()</a></code> now shows number of IDs change now displayed in diff. (#102)</li>
+<code><a href="../reference/write_derived.html">write_derived()</a></code> now shows number of IDs change now displayed in diff. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/102" class="external-link">#102</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -113,31 +139,31 @@
 <div class="section level3">
 <h3 id="new-features-and-changes-0-6-1">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-6-1"></a></h3>
 <ul><li>
-<code><a href="../reference/write_derived.html">write_derived()</a></code> now allows users to turn off executing diffs. (#100)</li>
+<code><a href="../reference/write_derived.html">write_derived()</a></code> now allows users to turn off executing diffs. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/100" class="external-link">#100</a>)</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-6-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-1"></a></h3>
 <ul><li>
-<code><a href="../reference/write_derived.html">write_derived()</a></code> fixed error created by different classes in ID diff. (#100)</li>
+<code><a href="../reference/write_derived.html">write_derived()</a></code> fixed error created by different classes in ID diff. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/100" class="external-link">#100</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.6.0" id="mrgda-060">mrgda 0.6.0<a class="anchor" aria-label="anchor" href="#mrgda-060"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-6-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-6-0"></a></h3>
-<ul><li><p>Removed <code>nm_summary()</code>. (#81)</p></li>
-<li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> now pulls the base data to compare to from svn. (#83)</p></li>
-<li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> now runs additional diff checks at the ID level. (#83)</p></li>
-<li><p>Add <code><a href="../reference/get_data_version.html">get_data_version()</a></code> to assist with data versioning. (#87)</p></li>
-<li><p>Add <code><a href="../reference/write_derived.html">write_derived()</a></code> to write out csv files along with meta information about the data. (#87)</p></li>
-<li><p><code>view_mrgda_flags()</code> was removed from the package. (#87)</p></li>
-<li><p><code><a href="../reference/write_derived.html">write_derived()</a></code> print messages were cleaned up. (#92, #97)</p></li>
-<li><p><code><a href="../reference/assign_id.html">assign_id()</a></code> function added to package. (#93)</p></li>
+<ul><li><p>Removed <code>nm_summary()</code>. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/81" class="external-link">#81</a>)</p></li>
+<li><p><code>nm_write()</code> now pulls the base data to compare to from svn. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/83" class="external-link">#83</a>)</p></li>
+<li><p><code>nm_write()</code> now runs additional diff checks at the ID level. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/83" class="external-link">#83</a>)</p></li>
+<li><p>Add <code><a href="../reference/get_data_version.html">get_data_version()</a></code> to assist with data versioning. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/87" class="external-link">#87</a>)</p></li>
+<li><p>Add <code><a href="../reference/write_derived.html">write_derived()</a></code> to write out csv files along with meta information about the data. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/87" class="external-link">#87</a>)</p></li>
+<li><p><code>view_mrgda_flags()</code> was removed from the package. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/87" class="external-link">#87</a>)</p></li>
+<li><p><code><a href="../reference/write_derived.html">write_derived()</a></code> print messages were cleaned up. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/92" class="external-link">#92</a>, <a href="https://github.com/metrumresearchgroup/mrgda/issues/97" class="external-link">#97</a>)</p></li>
+<li><p><code><a href="../reference/assign_id.html">assign_id()</a></code> function added to package. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/93" class="external-link">#93</a>)</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-6-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-6-0"></a></h3>
 <ul><li>
-<code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> fixed error message when source domains fail to read in. (#81)</li>
+<code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> fixed error message when source domains fail to read in. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/81" class="external-link">#81</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -145,44 +171,44 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-5-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-2"></a></h3>
 <ul><li>
-<code><a href="../reference/nm_write.html">nm_write()</a></code> no longer renders a define document for the data specification. (#75)</li>
+<code>nm_write()</code> no longer renders a define document for the data specification. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/75" class="external-link">#75</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.1" id="mrgda-051">mrgda 0.5.1<a class="anchor" aria-label="anchor" href="#mrgda-051"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-5-1">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-5-1"></a></h3>
-<ul><li><p>Added <code>view_mrgda_flags()</code> to allow the user to view a summary of how mrgda flags in the specification file are assigned to the data set. (#67)</p></li>
-<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now outputs the name and size of the current file its reading in. (#67)</p></li>
-<li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> now allows the user to specify file types. (#67)</p></li>
+<ul><li><p>Added <code>view_mrgda_flags()</code> to allow the user to view a summary of how mrgda flags in the specification file are assigned to the data set. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/67" class="external-link">#67</a>)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now outputs the name and size of the current file its reading in. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/67" class="external-link">#67</a>)</p></li>
+<li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> now allows the user to specify file types. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/67" class="external-link">#67</a>)</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-5-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-1"></a></h3>
-<ul><li><p><code>nm_summary()</code> now will only run if all required flags are available. (#67)</p></li>
-<li><p><code><a href="../reference/nm_validate.html">nm_validate()</a></code> has stricter requirements for the data it needs defined to run each check. (#67)</p></li>
-<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> Allows non-detect method for file type discovery. (#67)</p></li>
+<ul><li><p><code>nm_summary()</code> now will only run if all required flags are available. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/67" class="external-link">#67</a>)</p></li>
+<li><p><code>nm_validate()</code> has stricter requirements for the data it needs defined to run each check. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/67" class="external-link">#67</a>)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> Allows non-detect method for file type discovery. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/67" class="external-link">#67</a>)</p></li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.5.0" id="mrgda-050">mrgda 0.5.0<a class="anchor" aria-label="anchor" href="#mrgda-050"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-5-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-5-0"></a></h3>
-<ul><li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> is a new function that searches through the data in a source directory for a string or pattern. (#64)</p></li>
-<li><p><code><a href="../reference/distinct_subject_columns.html">distinct_subject_columns()</a></code> is a new function that takes a data frame and subject column identifier and returns the columns in which the values are unique for every subject. (#64)</p></li>
-<li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> the experimental feature of including the data assembly source script in the meta data folder has been removed. (#64)</p></li>
-<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now returns an additional data object - a data frame containing the column name and labels from every domain. (#64)</p></li>
+<ul><li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> is a new function that searches through the data in a source directory for a string or pattern. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/64" class="external-link">#64</a>)</p></li>
+<li><p><code>distinct_subject_columns()</code> is a new function that takes a data frame and subject column identifier and returns the columns in which the values are unique for every subject. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/64" class="external-link">#64</a>)</p></li>
+<li><p><code>nm_write()</code> the experimental feature of including the data assembly source script in the meta data folder has been removed. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/64" class="external-link">#64</a>)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now returns an additional data object - a data frame containing the column name and labels from every domain. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/64" class="external-link">#64</a>)</p></li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.4.0" id="mrgda-040">mrgda 0.4.0<a class="anchor" aria-label="anchor" href="#mrgda-040"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-4-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-4-0"></a></h3>
-<ul><li><p><code><a href="../reference/nm_validate.html">nm_validate()</a></code> now checks if MDV is set to 1 when DV is either NA or 0. (#55)</p></li>
-<li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> now determines and saves out the names of other analysis that depend on the derived data. (#55)</p></li>
-<li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> now outputs the source script in the meta data folder. (#55)</p></li>
-<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> added a <code>.read_domains</code> argument to allow users to only read in specific domains. If not specified, default is to read all in. (#55)</p></li>
-<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> added a <code>.subject_col</code> argument to allow users to specify the name of the unique subject identifier column in the source data. (#55)</p></li>
-<li><p>Added <code>view_src_dir_summary()</code> to allow the user to view all the domains and file sizes from their source data directory. (#55)</p></li>
+<ul><li><p><code>nm_validate()</code> now checks if MDV is set to 1 when DV is either NA or 0. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/55" class="external-link">#55</a>)</p></li>
+<li><p><code>nm_write()</code> now determines and saves out the names of other analysis that depend on the derived data. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/55" class="external-link">#55</a>)</p></li>
+<li><p><code>nm_write()</code> now outputs the source script in the meta data folder. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/55" class="external-link">#55</a>)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> added a <code>.read_domains</code> argument to allow users to only read in specific domains. If not specified, default is to read all in. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/55" class="external-link">#55</a>)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> added a <code>.subject_col</code> argument to allow users to specify the name of the unique subject identifier column in the source data. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/55" class="external-link">#55</a>)</p></li>
+<li><p>Added <code>view_src_dir_summary()</code> to allow the user to view all the domains and file sizes from their source data directory. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/55" class="external-link">#55</a>)</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -190,7 +216,7 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-3-2">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-2"></a></h3>
 <ul><li>
-<code><a href="../reference/nm_write.html">nm_write()</a></code> now allows for special characters in the file name. (#46)</li>
+<code>nm_write()</code> now allows for special characters in the file name. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/46" class="external-link">#46</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -198,29 +224,29 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-3-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-1"></a></h3>
 <ul><li>
-<code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now allows for source directories in which all files have no USUBJID. (#42)</li>
+<code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now allows for source directories in which all files have no USUBJID. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/42" class="external-link">#42</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.3.0" id="mrgda-030">mrgda 0.3.0<a class="anchor" aria-label="anchor" href="#mrgda-030"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-3-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-3-0"></a></h3>
-<ul><li><p>User can now omit tests from being run in <code><a href="../reference/nm_validate.html">nm_validate()</a></code>. Optional argument provided to do this. (#38)</p></li>
-<li><p><code><a href="../reference/nm_validate.html">nm_validate()</a></code> and <code>nm_summary()</code> now utilize a dictionary of column names found here <code>system.file("package-data", "recognized-flags.csv", package = "mrgda")</code>. The functions can extract information from the data set without the user explicitly needing to define these columns. (#38)</p></li>
-<li><p><code>view_sdtm_domains()</code> allows the user to view a dictionary of common SDTM domains and a description of the data found within them. (#38)</p></li>
-<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> reads in all .csv, .xpt or .sas7bdat files from a source data directory into a nested list containing the data from each domain.(#38)</p></li>
-<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> creates an additional data set informing the user if a subject has data in each domain. The resulting data.frame has one row per subject with a TRUE/FALSE column indicating if they are in a specific domain. (#38)</p></li>
-<li><p><code><a href="../reference/nm_write.html">nm_write()</a></code> writes out derived data to a .csv file and creates a folder matching the name of the derived data, containing meta data from the assembly. (#31, #36, #38)</p></li>
-<li><p><code><a href="../reference/nm_validate.html">nm_validate()</a></code> added 4 new pass/fail checks. These include checking for: non-finite times, MDV not set to 1 when DV is NA, all NUM values being unique and AMT being equal to RATE times DUR. (#38)</p></li>
-<li><p><code>nm_summary()</code> now opens an html document in a new tab containing both tables and figures. The figures are now interactive, allowing the user to hover over data points and view subject level information. (#30)</p></li>
-<li><p><code>nm_summary()</code> added a table showing the distribution of BLQ values in the data. Additionally, new spaghetti plots were added to view time-varying covariates. (#30)</p></li>
-<li><p><code>nm_summary()</code> now allows the user to decide if the tables and boxplots are to be stratified by study or not. (#30)</p></li>
-<li><p><code>mutate_egfr()</code> was removed from the package. (#38)</p></li>
+<ul><li><p>User can now omit tests from being run in <code>nm_validate()</code>. Optional argument provided to do this. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/38" class="external-link">#38</a>)</p></li>
+<li><p><code>nm_validate()</code> and <code>nm_summary()</code> now utilize a dictionary of column names found here <code>system.file("package-data", "recognized-flags.csv", package = "mrgda")</code>. The functions can extract information from the data set without the user explicitly needing to define these columns. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/38" class="external-link">#38</a>)</p></li>
+<li><p><code>view_sdtm_domains()</code> allows the user to view a dictionary of common SDTM domains and a description of the data found within them. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/38" class="external-link">#38</a>)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> reads in all .csv, .xpt or .sas7bdat files from a source data directory into a nested list containing the data from each domain.(<a href="https://github.com/metrumresearchgroup/mrgda/issues/38" class="external-link">#38</a>)</p></li>
+<li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> creates an additional data set informing the user if a subject has data in each domain. The resulting data.frame has one row per subject with a TRUE/FALSE column indicating if they are in a specific domain. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/38" class="external-link">#38</a>)</p></li>
+<li><p><code>nm_write()</code> writes out derived data to a .csv file and creates a folder matching the name of the derived data, containing meta data from the assembly. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/31" class="external-link">#31</a>, <a href="https://github.com/metrumresearchgroup/mrgda/issues/36" class="external-link">#36</a>, <a href="https://github.com/metrumresearchgroup/mrgda/issues/38" class="external-link">#38</a>)</p></li>
+<li><p><code>nm_validate()</code> added 4 new pass/fail checks. These include checking for: non-finite times, MDV not set to 1 when DV is NA, all NUM values being unique and AMT being equal to RATE times DUR. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/38" class="external-link">#38</a>)</p></li>
+<li><p><code>nm_summary()</code> now opens an html document in a new tab containing both tables and figures. The figures are now interactive, allowing the user to hover over data points and view subject level information. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/30" class="external-link">#30</a>)</p></li>
+<li><p><code>nm_summary()</code> added a table showing the distribution of BLQ values in the data. Additionally, new spaghetti plots were added to view time-varying covariates. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/30" class="external-link">#30</a>)</p></li>
+<li><p><code>nm_summary()</code> now allows the user to decide if the tables and boxplots are to be stratified by study or not. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/30" class="external-link">#30</a>)</p></li>
+<li><p><code>mutate_egfr()</code> was removed from the package. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/38" class="external-link">#38</a>)</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-3-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-3-0"></a></h3>
 <ul><li>
-<code><a href="../reference/nm_validate.html">nm_validate()</a></code> could not run when a data set did not have the needed data columns to run a specific check. Protections were added that allow tests to be skipped if the required data columns are not present. (#38)</li>
+<code>nm_validate()</code> could not run when a data set did not have the needed data columns to run a specific check. Protections were added that allow tests to be skipped if the required data columns are not present. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/38" class="external-link">#38</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -228,23 +254,23 @@
 <div class="section level3">
 <h3 id="bug-fixes-0-2-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-1"></a></h3>
 <ul><li>
-<code>nm_validate</code> did not always print the corresponding test name alongside the debug code. (#16)</li>
+<code>nm_validate</code> did not always print the corresponding test name alongside the debug code. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/16" class="external-link">#16</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.2.0" id="mrgda-020">mrgda 0.2.0<a class="anchor" aria-label="anchor" href="#mrgda-020"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-2-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-2-0"></a></h3>
-<ul><li><p>Output of <code><a href="../reference/nm_validate.html">nm_validate()</a></code> now returns code using the users given arguments when errors are found in the data. The code helps the user to debug the issue. (#12)</p></li>
-<li><p>Two checks in <code><a href="../reference/nm_validate.html">nm_validate()</a></code> were combined. The missing time varying covariate and baseline covariate checks are now combined as a missing covariate check. (#12)</p></li>
-<li><p>Baseline and time-varying covariate flag names were updated to make them more easily readable. The updated flag names are available in the README. (#9)</p></li>
-<li><p><code>mutate_egfr()</code> was added as a new function to assist users calculating estimated glomerular filtration rate during data assemblies (#8)</p></li>
-<li><p><code>readr</code> and <code>withr</code> were moved to suggests from imports. <code>assertr</code> was removed as a dependency. (#4, #12)</p></li>
+<ul><li><p>Output of <code>nm_validate()</code> now returns code using the users given arguments when errors are found in the data. The code helps the user to debug the issue. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/12" class="external-link">#12</a>)</p></li>
+<li><p>Two checks in <code>nm_validate()</code> were combined. The missing time varying covariate and baseline covariate checks are now combined as a missing covariate check. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/12" class="external-link">#12</a>)</p></li>
+<li><p>Baseline and time-varying covariate flag names were updated to make them more easily readable. The updated flag names are available in the README. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/9" class="external-link">#9</a>)</p></li>
+<li><p><code>mutate_egfr()</code> was added as a new function to assist users calculating estimated glomerular filtration rate during data assemblies (<a href="https://github.com/metrumresearchgroup/mrgda/issues/8" class="external-link">#8</a>)</p></li>
+<li><p><code>readr</code> and <code>withr</code> were moved to suggests from imports. <code>assertr</code> was removed as a dependency. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/4" class="external-link">#4</a>, <a href="https://github.com/metrumresearchgroup/mrgda/issues/12" class="external-link">#12</a>)</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-2-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-2-0"></a></h3>
 <ul><li>
-<code>nm_summary()</code> did not create readable continuous and categorical covariate figures when a large number of covariates were present. (#2)</li>
+<code>nm_summary()</code> did not create readable continuous and categorical covariate figures when a large number of covariates were present. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/2" class="external-link">#2</a>)</li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -252,7 +278,7 @@
 <div class="section level3">
 <h3 id="new-features-and-changes-0-1-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-1-0"></a></h3>
 <ul><li><p><code>mrgda</code> initial aim is to assist users in verifying the accuracy of data sets intended for NONMEM, following their derivation.</p></li>
-<li><p>The main feature, <code><a href="../reference/nm_validate.html">nm_validate()</a></code> asks the user to provide the derived data set and spec file as inputs. The function identifies columns in the data set using the spec file and runs a series of validation tests. It outputs a pass/fail for each test.</p></li>
+<li><p>The main feature, <code>nm_validate()</code> asks the user to provide the derived data set and spec file as inputs. The function identifies columns in the data set using the spec file and runs a series of validation tests. It outputs a pass/fail for each test.</p></li>
 <li><p>A supporting feature is <code>nm_summary()</code>. Its purpose is to provide the user with quick visual summaries of their data. It outputs these summaries in either tables or figures, depending on the users preference.</p></li>
 </ul></div>
 </div>
@@ -266,11 +292,11 @@
 
 
       <footer><div class="copyright">
-  <p></p><p>Developed by Eric Anderson, Grace O’Brien, Michael McDermott.</p>
+  <p></p><p>Developed by Eric Anderson, Grace O’Brien, Michael McDermott, Kyle Barrett.</p>
 </div>
 
 <div class="pkgdown">
-  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+  <p></p><p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer></div>
