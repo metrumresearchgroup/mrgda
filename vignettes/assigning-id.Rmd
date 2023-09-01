@@ -33,9 +33,9 @@ For the purposes of this vignette, a subject identifier column
 `USUBJID` is created and the `ID` column is removed. 
 
 ```{r, message=FALSE}
-pk_data <- 
-  readr::read_csv(system.file("derived/pk.csv", package = "mrgda")) %>% 
-  mutate(USUBJID = paste0(STUDYID, "-", ID)) %>% 
+pk_data <-
+  readr::read_csv(system.file("derived/pk.csv", package = "mrgda")) %>%
+  mutate(USUBJID = paste0(STUDYID, "-", ID)) %>%
   select(-ID)
 ```
 
@@ -48,11 +48,9 @@ When creating a new data set where IDs have not been assigned previously,
 - the subject identifier column name (.subject_col)
 
 ```{r}
-
 data_w_id <-
-  pk_data %>% 
+  pk_data %>%
   assign_id(.subject_col = "USUBJID")
-
 ```
 
 A summary is shown in the R console, detailing how many unique subjects
@@ -75,7 +73,7 @@ same contents as `pk_data` but is arranged in a different order.
 
 ```{r}
 pk_data_reordered <-
-  pk_data %>% 
+  pk_data %>%
   arrange(USUBJID)
 
 head(pk_data_reordered %>% distinct(USUBJID))
@@ -83,17 +81,16 @@ head(pk_data %>% distinct(USUBJID))
 ```
 
 ```{r, include=FALSE}
-
 # Writing out data to a temporary location in order to use .previously_derived_path below
 lookup_path <- paste0(tempfile(), ".csv")
-    data.table::fwrite(
-      x = data_w_id,
-      file = lookup_path,
-      sep = ",",
-      quote = FALSE,
-      row.names = FALSE,
-      na = "."
-    )
+data.table::fwrite(
+  x = data_w_id,
+  file = lookup_path,
+  sep = ",",
+  quote = FALSE,
+  row.names = FALSE,
+  na = "."
+)
 ```
 
 However, when we inform `assign_id()` we want the ID assignment to 
@@ -101,7 +98,7 @@ match that of `data_w_id`, then the mapping is consistent.
 
 ```{r, message=FALSE}
 data_w_id_reordered <-
-  pk_data_reordered %>% 
+  pk_data_reordered %>%
   assign_id(.previously_derived_path = lookup_path, .subject_col = "USUBJID")
 ```
 
