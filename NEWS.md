@@ -10,6 +10,8 @@
 
 - `write_derived()` no longer writes out the subject level csv in the meta data folder. (#158)
 
+- added `assigning-id` vignette. (#160)
+
 ## Bug fixes
 
 - `src_viz()` app bug fixes and improvements with handling subject columns. (#141)
