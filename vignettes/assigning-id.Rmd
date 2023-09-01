@@ -1,0 +1,140 @@
+---
+title: "assigning-id"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{assigning-id}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This is a vignette to help you become familiar with using `assign_id()`. 
+Check out https://metrumresearchgroup.github.io/mrgda/reference/assign_id.html
+for additional documentation and examples.
+
+`assign_id()` helps you assign a unique numeric identifier to each
+subject in your data set. Its purpose is to ensure the same numeric identifier
+is consistently assigned to each subject throughout a project. 
+
+Below, we will go through the two main use cases of `assign_id()`. These are 
+when you are assigning ID either for the first time or according to an existing file.
+
+# Load packages
+
+```{r setup, message=FALSE}
+library(mrgda)
+library(dplyr)
+```
+
+# Setup
+
+We will use the example derived PK data set from `mrgda`. 
+
+For the purposes of this vignette, a subject identifier column
+`USUBJID` is created and the `ID` column is removed. 
+
+```{r, message=FALSE}
+pk_data <-
+  readr::read_csv(system.file("derived/pk.csv", package = "mrgda")) %>%
+  mutate(USUBJID = paste0(STUDYID, "-", ID)) %>%
+  select(-ID)
+```
+
+# Initial ID assignment
+
+When creating a new data set where IDs have not been assigned previously,
+`assign_id()` only requires two arguments:
+
+- the data to append the `ID` column to (.data)
+- the subject identifier column name (.subject_col)
+
+```{r}
+data_w_id <-
+  pk_data %>%
+  assign_id(.subject_col = "USUBJID")
+```
+
+A summary is shown in the R console, detailing how many unique subjects
+were assigned an ID. Notice as well that the only change to `pk_data` 
+is one additional column.
+
+```{r, echo=FALSE}
+print(paste0("Size of pk_data ", dim(pk_data)[1], " x ", dim(pk_data)[2]))
+print(paste0("Size of data_w_id ", dim(data_w_id)[1], " x ", dim(data_w_id)[2]))
+```
+
+# Existing ID assignment
+
+When data sets are updated or new subsets are created, `assign_id()`
+ensures the ID mapping is consistent throughout. To do this, we can
+leverage the `.previously_derived_path` argument.
+
+First we will create a new data set `pk_data_reordered` which has the
+same contents as `pk_data` but is arranged in a different order.
+
+```{r}
+pk_data_reordered <-
+  pk_data %>%
+  arrange(USUBJID)
+
+head(pk_data_reordered %>% distinct(USUBJID))
+head(pk_data %>% distinct(USUBJID))
+```
+
+```{r, include=FALSE}
+# Writing out data to a temporary location in order to use .previously_derived_path below
+lookup_path <- paste0(tempfile(), ".csv")
+data.table::fwrite(
+  x = data_w_id,
+  file = lookup_path,
+  sep = ",",
+  quote = FALSE,
+  row.names = FALSE,
+  na = "."
+)
+```
+
+However, when we inform `assign_id()` we want the ID assignment to 
+match that of `data_w_id`, then the mapping is consistent.
+
+```{r, message=FALSE}
+data_w_id_reordered <-
+  pk_data_reordered %>%
+  assign_id(.previously_derived_path = lookup_path, .subject_col = "USUBJID")
+```
+
+Notice that despite the sorting differences, both `data_w_id` and `data_w_id_reordered`
+have the same ID assignment.
+
+```{r}
+head(data_w_id %>% distinct(USUBJID, ID) %>% arrange(ID))
+head(data_w_id_reordered %>% distinct(USUBJID, ID) %>% arrange(ID))
+```
+
+# New subjects
+
+In the event that there are new subjects in your data that were
+not present in the previously derived data set, then a new unique
+ID will be assigned to them.
+
+`assign_id()` does this by finding the maximum ID present in the
+previous data and setting all new ID's higher than it. An example
+of this is shown below.
+
+```{r}
+old_data <- dplyr::tibble(USUBJID = c("A", "B", "C", "D"), ID = c(1, 2, 4, 19))
+lookup_path <- paste0(tempfile(), ".csv")
+data.table::fwrite(
+  x = old_data,
+  file = lookup_path,
+  sep = ",",
+  quote = FALSE,
+  row.names = FALSE,
+  na = "."
+)
+
+data <- dplyr::tibble(USUBJID = c("E", "F", "G"))
+assign_id(.data = data, .subject_col = "USUBJID", .previously_derived_path = lookup_path)
+```
+
+Notice how the largest ID in the previous data set was 19. Since subjects `E`, `F` and `G` 
+were not present in `old_data` their ID's were all set to be larger than 19.

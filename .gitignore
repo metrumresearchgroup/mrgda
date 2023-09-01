@@ -4,3 +4,4 @@ docs/
 renv/
 .Rprofile
 .Rhistory
+inst/doc
