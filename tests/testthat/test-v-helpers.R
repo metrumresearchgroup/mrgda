@@ -286,3 +286,66 @@ test_that("filter_v_subject filters using global subject filter", {
       data.frame() %>% unlist() %>% unique() %>% is.na()
   )
 })
+
+
+test_that("find_df_with_col finds the correct dataframes", {
+
+  expect_error(
+    find_df_with_col("ID", list(df)),
+    ".df_list must be a named list"
+  )
+
+  args <- setup_v_list(src_list)
+  df_list <- args$.df_list
+
+  # None found
+  cols_df <- find_df_with_col("ID", df_list)
+  expect_equal(cols_df$n_domain, 0)
+  expect_equal(cols_df$subtitle, "()")
+
+  # Dataframes found
+  cols_df <- find_df_with_col("STUDYID", df_list)
+  expect_equal(cols_df$n_domain, 7)
+  expect_equal(cols_df$subtitle, "(ae, dm and 5 more)")
+
+  # Multiple columns (how the function is called in gather_v_cols)
+  cols <- c("STUDYID", "VISIT", "AEDECOD")
+  cols_df <- purrr::map_dfr(cols, find_df_with_col, df_list)
+  expect_equal(cols_df$col_name, cols)
+  expect_equal(cols_df$n_domain, c(7,4,1))
+  expect_equal(cols_df$subtitle, c("(ae, dm and 5 more)", "(eg, lb and 2 more)", "(ae)"))
+})
+
+
+test_that("setup_v_list works correctly (integration test)", {
+
+  expected_subj_col <- "USUBJID"
+
+  expect_message(
+    args <- setup_v_list(src_list),
+    glue::glue("Detected Subject Column: {expected_subj_col}")
+  )
+
+  # Attributes
+  expect_equal(names(args), c(".df_list", ".subject_col", ".freeze_cols"))
+
+  # Expected column
+  expect_equal(args$.subject_col, expected_subj_col)
+
+  # Filtering of mrgda specific dataframes
+  expect_equal(
+    setdiff(names(src_list), names(args$.df_list)),
+    c("mrgda_labels", "mrgda_src_meta")
+  )
+
+  # found subject column should not be in subject columns
+  freeze_cols <- args$.freeze_cols
+  expect_false(expected_subj_col %in% freeze_cols$col_name)
+
+  # All other unique column names should be present
+  all_col_names <- purrr::map(args$.df_list, names) %>% purrr::list_c() %>% unique()
+  all_col_names <- all_col_names[-grep(expected_subj_col, all_col_names)]
+  expect_true(rlang::is_empty(setdiff(freeze_cols$col_name, all_col_names)))
+  expect_true(rlang::is_empty(setdiff(all_col_names, freeze_cols$col_name)))
+
+})
