@@ -62,6 +62,16 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
     name = paste0("a", substr(gsub("[^[:alnum:]]", "", .data_name), 1, 7)) # Max of 8 chars
   )
 
+  # Try to render spec
+  try(
+    yspec::render_fda_define(
+      x = .spec,
+      stem = paste0(.data_name, "-define-fda"),
+      output_dir = .meta_data_folder
+    ),
+    silent = TRUE
+  )
+
   # cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
 
 

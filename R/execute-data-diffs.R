@@ -169,9 +169,11 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
   # Diffs by id -------------------------------------------------------------
   id_diffs <- list()
   ids <- unique(dplyr::intersect(.base_df[[.subject_col]], .compare_df[[.subject_col]]))
-  pb <- progress::progress_bar$new(total = length(ids))
+  cli::cli_progress_bar("Checking data differences", total = length(ids))
 
   for (id.i in ids) {
+
+    cli::cli_progress_update()
 
     base_df.i <-
       .base_df[.base_df[[.subject_col]] == id.i, ] %>%
@@ -212,9 +214,9 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
 
     rm(all_equal.i)
 
-    pb$tick()
-
   }
+
+  cli::cli_progress_done()
 
   if (length(id_diffs) > 0) {
 

@@ -1,3 +1,9 @@
+# mrgda development
+
+## New features and changes
+
+- Created the `explain()` function that communicates code intentionality. (#164)
+
 # mrgda 0.9.0
 
 ## New features and changes

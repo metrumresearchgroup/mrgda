@@ -8,6 +8,7 @@ Packages:
   - pkgdown
   - styler
   - mpn.scorecard
+  - roxygen2
 
 Repos:
   - CRAN: https://cran.rstudio.com
