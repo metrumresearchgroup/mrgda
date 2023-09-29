@@ -368,7 +368,7 @@ prettyNum2 <- function(.x, .digits = 3) {
 #' @return list of dataframes
 #'
 #' @keywords internal
-setup_v_list <- function(.df_list, .subject_col) {
+setup_v_list <- function(.df_list, .subject_col = NULL) {
   if (!inherits(.df_list, "list")) {
     if (!(inherits(.df_list, "data.frame") || inherits(.df_list, "tbl_df"))) {
       cli::cli_abort(".df_list must be a list, data.frame, or tibble")
@@ -480,6 +480,12 @@ gather_v_cols <- function(
 #'
 #' @returns tibble
 find_df_with_col <- function(.col_name, .df_list) {
+  if(is.null(names(.df_list))){
+    # lists are named in setup_v_list before this function is called
+    # This if statement is only precautionary for future uses
+    stop(".df_list must be a named list")
+  }
+
   df_with_col <- character(0)
   for (i in seq_along(.df_list)) {
     if (.col_name %in% colnames(.df_list[[i]])) {

@@ -4,7 +4,7 @@
 \alias{setup_v_list}
 \title{Put \code{.df_list} in the right format}
 \usage{
-setup_v_list(.df_list, .subject_col)
+setup_v_list(.df_list, .subject_col = NULL)
 }
 \arguments{
 \item{.df_list}{A dataframe \emph{\strong{or}} list of dataframes that you want to process and view.
