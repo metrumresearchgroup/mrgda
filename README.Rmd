@@ -4,6 +4,10 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+<br>
+
+# mrgda <a href='https:/metrumresearchgroup.github.io/mrgda'><img src='man/figures/logo.png' align="right" width="135px"/></a>
+
 ## Overview 
 
 mrgda is a data assembly helper, providing a set of functions that help 
