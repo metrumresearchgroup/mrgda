@@ -20,6 +20,14 @@ when you are assigning ID either for the first time or according to an existing 
 
 # Load packages
 
+```{r setup_interactive, include=FALSE}
+# NOTE: if running chunks interactively we need to load the package first
+#   because renv isolation prevents us from finding an bbr installation
+if (interactive()) {
+  devtools::load_all()
+}
+```
+
 ```{r setup, message=FALSE}
 library(mrgda)
 library(dplyr)
