@@ -1,26 +1,48 @@
 ---
-  output: github_document
+output: github_document
 ---
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-<br>
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
 
 # mrgda <a href='https:/metrumresearchgroup.github.io/mrgda'><img src='man/figures/logo.png' align="right" width="135px"/></a>
 
+<!-- badges: start -->
+[![Build Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/mrgda/status.svg)](https://github-drone.metrumrg.com/metrumresearchgroup/mrgda)
+[![codecov](https://codecov.io/gh/metrumresearchgroup/mrgda/branch/main/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/mrgda)
+<!-- badges: end -->
+
 ## Overview 
 
-mrgda is a data assembly helper, providing a set of functions that help 
+`mrgda` is a data assembly helper, providing a set of functions that help 
 you assemble, explore and validate your data set.
 
-An example data assembly script highlighting many `mrgda` functions can be found
-[here](https://ghe.metrumrg.com/templates/msproject/blob/master/script/data-assembly.Rmd).
 
+### Featured Vignettes
+
+* [Getting Started](https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html) -- Basic examples and introduction to a typical data assembly workflow.
+* [Assigning IDs](https://metrumresearchgroup.github.io/mrgda/articles/assigning-id.html) -- Background on `assign_id()`. `assign_id()` helps you assign a unique numeric identifier to each subject in your data set. Its purpose is to ensure the same numeric identifier is consistently assigned to each subject throughout a project
+    
 ## Documentation
 Public documentation of all functions is hosted at [https://metrumresearchgroup.github.io/mrgda/](https://metrumresearchgroup.github.io/mrgda/)
 
 
-## Development
+## Getting help
+
+If you encounter a clear bug, please file an issue with a minimal reproducible example on [mrgda](https://github.com/mrgda/issues). 
+
+#### Developer Notes
+
+<details closed>
+<summary>Developer Notes</summary>
 
 `mrgda` uses [pkgr](https://github.com/metrumresearchgroup/pkgr) to manage
 development dependencies and [renv](https://rstudio.github.io/renv/) to
@@ -28,39 +50,19 @@ provide isolation. To replicate this environment,
 
 1.  clone the repo
 
-2.  install pkgr
+2.  install [pkgr](https://github.com/metrumresearchgroup/pkgr)
 
 3.  open package in an R session and run `renv::init(bare = TRUE)`
 
-    -   install `renv` \> 0.8.3-4 into default `.libPaths()` if not
-        already installed
+    -   install `renv` \> 0.8.3-4 into default `.libPaths()` prior to this step
+        if not already installed
 
 4.  run `pkgr install` in terminal within package directory
 
 5.  restart session
 
 Then, launch R with the repo as the working directory (open the project
-in RStudio). renv will activate and find the project library.
+in RStudio). `renv` will activate and find the project library.
 
-## Getting help
+</details>
 
-If you encounter a clear bug, please file an issue with a minimal reproducible example on [mrgda](https://github.com/mrgda/issues). 
-
-```{r setup, include = FALSE}
-## Package coverage
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-if (basename(getwd()) == "docs") {
-  knitr::opts_knit$set(root.dir = file.path(getwd(), ".."))
-}
-```
-
-```{r, include=FALSE}
-# covr::package_coverage(type = "all", 
-#                        line_exclusions = c("R/print-aesthetics.R", "R/list-files-of-type.R", 
-#                                            "R/find-in-files.R", "R/gather-flags.R"))
-```

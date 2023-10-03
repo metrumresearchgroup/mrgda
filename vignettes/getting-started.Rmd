@@ -1,0 +1,258 @@
+---
+title: "Getting Started with mrgda"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{getting-started}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# Introduction
+
+This vignette takes the user through some basic scenarios for exploring, 
+assembling, and validating data sets using `mrgda`, introducing you to its 
+standard workflow and functionality. For more information how to effectively 
+integrate `mrgda` into your workflow, visit the 
+<a href="https://merge.metrumrg.com/expo/expo1-nonmem-foce/" target="_blank">
+MeRGE Expo</a>.
+
+```{r setup_interactive, include=FALSE}
+if (interactive() || isTRUE(getOption('knitr.in.progress'))) {
+  devtools::load_all()
+  Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())
+}
+```
+
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
+library(mrgda)
+library(dplyr)
+```
+
+
+# Specifcation and Version
+
+```{r}
+# Read in spec file
+nm_spec <- yspec::ys_load(
+  system.file("derived", "pk.yml", package = "mrgda")
+)
+# Read in meta flags from spec file (covariates, etc)
+nm_flags <- yspec::pull_meta(nm_spec, "flags")
+```
+
+
+# Source data
+
+We begin by pointing to a source directory containing the source data (typically
+STDM or ADaM datasets). `read_src_dir` will read in every data file and return a
+named list of the data objects, as well as some additional metadata.
+```{r, message = FALSE, results = 'hide'}
+src_path <- system.file("example-sdtm", package = "mrgda")
+
+# Read in all XPT files in source directory
+src_list <- mrgda::read_src_dir(src_path, .file_types = "xpt")
+```
+
+## Exploring the source data
+
+While it is common practice to use `View()` for inspecting dataframes or 
+matrix-like `R` objects, `mrgda` provides a convenient tool for exploring your 
+entire source directory. 
+
+```{r, eval=FALSE}
+mrgda::v(src_list)
+```
+
+`v()` facilitates manual inspections, such as confirming data integrity for a 
+specific subject or over specified date range. Note that `v()` runs a `shiny` app
+in the Rstudio viewer pane as background process, allowing you to retain control 
+over your `R` console:
+
+<img src="assets/v-example.png" width="700">
+
+**Some features include:**
+
+ - Allows you to seamlessly transition between any of the datasets in your list 
+ (you can also pass in a single dataframe)
+ - Apply global subject filters, filtering each of the datasets in `src_list` to
+ only contain the specified subject ID
+ - Apply column filters per dataset
+ - Groups the data by the specified *or detected* `.subject_col`, helping to 
+ differentiate between subject records.
+ - Column Organization
+    - "Freeze" or lock columns in place while scrolling horizontally
+    - Relocate columns to another position
+ - Other formatting options related to readability and presentation of column 
+ label attributes
+
+
+# Assembly
+
+**Note** the example source data *does not* have PK or dosing domains. Those 
+sections below are meant to illustrate how one may set up those assemblies, but 
+they cannot be reproduced using the example data provided in the package.
+
+## Inititialize Outputs
+Our typical data assembly workflow begins with initializing a nested list of 
+subject level and time varying datasets. These will be binded at the end of the 
+script.
+```{r}
+# Prepare to save individual domain assembly
+derived <- list()
+# Subject level
+derived$sl <- list()
+# Time varying
+derived$tv <- list()
+```
+
+## Assemble Demographics
+
+```{r}
+dm_1_out <- src_list$dm %>%
+  transmute(
+    STUDY = case_when(
+      STUDYID == "S-CDSK-01" ~ 1,
+      TRUE ~ -99
+    ),
+    USUBJID,
+    BLAGE = AGE,
+    SEX = case_when(
+      SEX == "F" ~ 1,
+      SEX == "M" ~ 2,
+      TRUE ~ -99
+    )
+  )
+
+# Grab baseline weights
+dm_2 <- src_list$vs %>% filter(USUBJID %in% dm_1_out$USUBJID, VSTEST == "Weight")
+dm_2_out <- dm_2 %>%
+  filter(VSBLFL == "Y") %>%
+  transmute(
+    USUBJID,
+    BLWT = VSSTRESN
+  )
+
+# Combine (note: CDISC01.200005 is missing weight)
+dm_out <- dm_1_out %>% dplyr::left_join(dm_2_out)
+
+# Add to subject level list
+derived$sl$dm <- dm_out
+```
+
+
+## Assemble PK
+
+```{r, eval = FALSE}
+pk_1 <- src_list$pc
+
+derived$tv$pk <-
+  pk_1 %>%
+  transmute(
+    USUBJID,
+    DV = PCSTRESN,
+    EVID = 0,
+    DATETIME = lubridate::ymd_hms(PCDTC)
+  )
+# Have a data frame with:
+# USUBJID | DV | EVID | DATETIME
+```
+
+## Assemble Dosing
+
+```{r, eval = FALSE}
+derived$tv$dosing <- 
+  src_list$ex %>%
+  dplyr::filter(EXTRT == "XANOMELINE") %>%
+  transmute(
+    USUBJID,
+    AMT = EXDOSE,
+    EVID = 1,
+    # assume doses were at 9:00 am
+    DATETIME = lubridate::ymd_hm(paste0(EXSTDTC, "T9:00"))
+  )
+# Have a data frame with:
+# USUBJID | AMT | EVID | DATETIME
+```
+
+## Combine domains
+```{r, eval = FALSE}
+nm_0 <-
+  # Bind all time varying data
+  bind_rows(derived$tv, .id = "TIMEVARYING") %>% 
+  # Left join on subject level data
+  left_join(
+    bind_rows(derived$sl, .id = "SUBJECTLEVEL")
+  ) %>% 
+  arrange(USUBJID, DATETIME)
+
+# Calculate time since first dose (by subject)
+nm_1 <- nm_0 %>%
+  mutate(
+    C = ".",
+    ID = as.numeric(forcats::fct_inorder(USUBJID))
+  )
+
+# Calculate TIME & DOSENUM (for TAD)
+nm_2 <- nm_1 %>% group_by(USUBJID) %>%
+  mutate(
+    DOSENUM = cumsum(EVID == 1),
+    TIME = as.numeric(difftime(DATETIME, first(DATETIME[EVID == 1]), units = "hours"))
+  ) %>% 
+  filter(TIME >= 0) %>% 
+  ungroup()
+
+# Calculate TAD
+nm_3 <- nm_2 %>%
+  group_by(USUBJID, DOSENUM) %>% 
+  mutate(
+    TALD = as.numeric(difftime(DATETIME, first(DATETIME[EVID == 1]), units = "hours"))
+  ) %>% ungroup()
+
+nm_3 <- nm_3 %>% mutate(NUM = 1:n())
+derived$nm <- nm_3 %>% dplyr::select(names(nm_spec))
+```
+
+
+# Check data
+
+### Check against the specification file
+
+If you use a specification file, the check below will confirm the following things:
+```{r, eval = FALSE}
+yspec::check_data(derived$nm, nm_spec)
+```
+
+
+`NMdata`'s `NMcheckData` performs extensive data checks for NONMEM compatibility
+and other common issues. Rather than recreate the wheel, we have opted to utilize
+this function in our workflow. It's good practice to run this (or similar check) 
+prior to saving out the assembled data.
+```{r, eval = FALSE}
+NMdata::NMcheckData(
+  data = derived$nm,
+  col.row = "NUM",
+  covs = c(nm_flags$catcov, nm_flags$contcov)
+)
+```
+
+## Save assembled data
+
+We can now export the compiled data using `write_derived`, ensuring both convenience
+and reproducibility. This function produces a CSV, an `xpt` file, and a dedicated 
+folder housing valuable metadata. This dual export capability enhances data 
+portability, accommodating various use cases.
+```{r, eval = FALSE}
+mrgda::write_derived(
+  .data = derived$nm,
+  .spec = nm_spec,
+  .file = here::here("data", "derived", "pk.csv")
+)
+```
+
