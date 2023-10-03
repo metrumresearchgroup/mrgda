@@ -89,7 +89,6 @@ trigger:
     - promote
 
 depends_on:
-- mpn:latest
 - cran-latest
 
 
