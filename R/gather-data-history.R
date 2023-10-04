@@ -79,6 +79,16 @@ gather_data_history <- function(.cur_history, .comment = NULL, .meta_data_folder
 
   .combined_history <- dplyr::bind_rows(.history, .cur_history)
 
+  if (nrow(.combined_history) > 0){
+
+    .combined_history <-
+      .combined_history %>%
+      dplyr::group_by(`Previous Revision`) %>%
+      dplyr::slice(1) %>%
+      dplyr::ungroup()
+
+  }
+
   .combined_history
 
 }
