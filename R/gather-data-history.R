@@ -43,7 +43,7 @@ gather_data_history <- function(.cur_history, .comment = NULL, .meta_data_folder
 
   if (inherits(.cur_diffs, "error")) {
 
-    .cur_diffs <- NULL
+    .cur_diffs <- dplyr::tibble()
 
   } else {
 
@@ -65,7 +65,7 @@ gather_data_history <- function(.cur_history, .comment = NULL, .meta_data_folder
       Datetime = as.character(as.POSIXct(format(Sys.time()), tz = "EDT"))
     )
 
-  if (!is.null(.cur_diffs)) {
+  if (nrow(.cur_diffs) > 0) {
 
     .history <-
       .history %>%
