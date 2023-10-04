@@ -7,6 +7,7 @@
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .file csv file name to write out to (including path)
+#' @param .comment explanation of data
 #' @param .prev_file csv file name of previous version (defaults to .file)
 #' @param .compare_from_svn logical. Should the data comparison be done on the latest svn version? (If not, local version is used)
 #' @param .return_base_compare logical. Should the two current and previous versions of the datasets be returned?
@@ -19,7 +20,7 @@
 #'}
 #' @md
 #' @export
-write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
+write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
 
   if (tools::file_ext(.file) != "csv") {
     stop("'.file' must reference a 'csv' file")
@@ -44,6 +45,18 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
   .data_location <- dirname(.file)
   .data_name <- tools::file_path_sans_ext(basename(.file))
   .meta_data_folder <- file.path(.data_location, .data_name)
+
+  .cur_history <- tryCatch(
+    suppressMessages(readr::read_csv(file.path(.meta_data_folder, "history.csv"))),
+    error = identity
+  )
+
+  if (inherits(.cur_history, "error")) {
+    .cur_history <- dplyr::tibble()
+  } else {
+    .cur_history <- .cur_history %>% dplyr::mutate_all(as.character)
+    .cur_history[is.na(.cur_history)] <- ""
+  }
 
   # Create directory anew if it exists
   if (dir.exists(.meta_data_folder)) {
@@ -131,6 +144,25 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
 
   cli::cli_alert_success(glue::glue("File written: {.file}"))
   cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
+
+
+  # Update history ----------------------------------------------------------
+  .history <-
+    gather_data_history(
+      .cur_history = .cur_history,
+      .comment = .comment,
+      .meta_data_folder = .meta_data_folder,
+      .prev_rev = base_df_list$prev_rev
+    )
+
+  data.table::fwrite(
+    x = .history,
+    file = file.path(.meta_data_folder, 'history.csv'),
+    sep = ",",
+    quote = FALSE,
+    row.names = FALSE
+  )
+
 
   # Return ------------------------------------------------------------------
   if (.return_base_compare) {
