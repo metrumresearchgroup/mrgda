@@ -81,10 +81,11 @@ gather_data_history <- function(.cur_history, .comment = NULL, .meta_data_folder
 
   if (nrow(.combined_history) > 0){
 
+    # Grab the first row for each revision
     .combined_history <-
       .combined_history %>%
       dplyr::group_by(`Previous Revision`) %>%
-      dplyr::slice(1) %>%
+      dplyr::filter(1:dplyr::n() == 1) %>%
       dplyr::ungroup()
 
   }
