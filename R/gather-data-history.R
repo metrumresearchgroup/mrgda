@@ -26,7 +26,7 @@
 #' history_prev <- tibble::tibble(
 #'   Author = "John",
 #'   Comment = "Initial commit",
-#'   Previous_Revision = "",
+#'   `Previous Revision` = "",
 #'   Datetime = "2022-01-01")
 #' gather_data_history(
 #'   history_prev,
