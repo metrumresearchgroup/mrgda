@@ -41,12 +41,17 @@ This function operates in several steps:
 }
 \examples{
 \dontrun{
-history_prev <- tibble::tibble(Author = "John", Comment = "Initial commit", Previous_Revision = "", Datetime = "2022-01-01")
-gather_data_history(history_prev, .comment = "Updated data", .meta_data_folder = "path/to/metadata", .prev_rev = "54")
+history_prev <- tibble::tibble(
+  Author = "John",
+  Comment = "Initial commit",
+  Previous_Revision = "",
+  Datetime = "2022-01-01")
+gather_data_history(
+  history_prev,
+  .comment = "Updated data",
+  .meta_data_folder = "path/to/metadata",
+  .prev_rev = "54")
 }
 
-}
-\seealso{
-\code{\link[dplyr]{bind_rows}}, \code{\link[dplyr]{mutate_all}}, \code{\link[readr]{read_csv}}, \code{\link[tidyr]{pivot_wider}}
 }
 \keyword{internal}

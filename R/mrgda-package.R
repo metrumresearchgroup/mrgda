@@ -59,7 +59,8 @@ globalVariables(
     "MRGDA_ISSUE_ID",
     "MRGDA_PARSE_DATETIME",
     "ID_SORT",
-    ".output_dir"
+    ".output_dir",
+    "Previous Revision"
   )
 )
 
