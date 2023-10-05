@@ -36,3 +36,29 @@ test_that("gather_data_history adds a new row to history", {
   expect_true(cur_history$`Previous Revision`[2] == "")
 
 })
+
+
+test_that("gather_data_history works for initial use case", {
+
+  cur_history <-
+    gather_data_history(
+      dplyr::tibble(),
+      .comment = "Updated data",
+      .meta_data_folder = history_dir,
+      .prev_rev = "54"
+    )
+
+  # Check size of history didn't add columns and only added 1 row
+  expect_true(ncol(cur_history)==4)
+  expect_true(nrow(cur_history)==1)
+
+  # Check author captured correctly
+  expect_true(cur_history$Author[1] == Sys.info()[["user"]])
+
+  # Check comments passed through correctly
+  expect_true(cur_history$Comment[1] == "Updated data")
+
+  # Check previous revision
+  expect_true(cur_history$`Previous Revision`[1] == "54")
+
+})
