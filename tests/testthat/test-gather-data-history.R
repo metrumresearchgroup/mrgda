@@ -2,10 +2,10 @@
 history_dir <- tempdir()
 
 history_prev <- dplyr::tibble(
-    Author = "John",
+    Author = "John Smith",
     Comment = "Initial commit",
     `Previous Revision` = "",
-    Datetime = "2022-01-01")
+    Datetime = "2023-10-06 09:58:58")
 
 # Save history to temp directory
 readr::write_csv(history_prev, file = file.path(history_dir, "history.csv"))

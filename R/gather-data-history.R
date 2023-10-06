@@ -24,10 +24,10 @@
 #' @examples
 #' \dontrun{
 #' history_prev <- tibble::tibble(
-#'   Author = "John",
+#'   Author = "John Smith",
 #'   Comment = "Initial commit",
 #'   `Previous Revision` = "",
-#'   Datetime = "2022-01-01")
+#'   Datetime = "2023-10-06 09:58:58")
 #' gather_data_history(
 #'   history_prev,
 #'   .comment = "Updated data",
