@@ -16,6 +16,7 @@ get_base_df <- function(.prev_file, .compare_from_svn){
 
   base <- .prev_file
   from_svn <- FALSE
+  prev_rev <- NA
 
   if (.compare_from_svn) {
 
@@ -36,6 +37,7 @@ get_base_df <- function(.prev_file, .compare_from_svn){
       if (export_try == 0) {
         from_svn <- TRUE
         base <- base_temp
+        svn_rev <- prev_rev
       }
     }
 
@@ -51,7 +53,8 @@ get_base_df <- function(.prev_file, .compare_from_svn){
   return(
     list(
       base_df = base_df,
-      from_svn = from_svn
+      from_svn = from_svn,
+      prev_rev = prev_rev
     )
   )
 

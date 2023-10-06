@@ -21,6 +21,7 @@ withr::with_tempdir({
                          gsub(".csv", ".xpt", basename(.temp_csv), fixed = TRUE))
   .xpt_in <- haven::read_xpt(.xpt_in_name) %>% suppressMessages()
   .xpt_in_labels <- purrr::map(.xpt_in, ~ attr(.x, "label"))
+  .history <- paste0(gsub(".csv", "", .temp_csv, fixed = TRUE),"/history.csv")
 })
 
 test_that("write_derived write csv: csv is written correctly and matches data", {
@@ -47,5 +48,9 @@ test_that("write_derived works with special characters in file name", {
   .temp_csv <- tempfile(fileext = "-pk.csv")
   write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv, .compare_from_svn = FALSE) %>% suppressMessages()
   expect_equal(nm, readr::read_csv(.temp_csv, na = ".") %>% suppressMessages())
+})
+
+test_that("write_derived outputs history csv in meta data folder", {
+  expect_true(file.exists(.history))
 })
 

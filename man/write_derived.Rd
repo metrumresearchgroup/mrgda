@@ -8,6 +8,7 @@ write_derived(
   .data,
   .spec,
   .file,
+  .comment = NULL,
   .prev_file = NULL,
   .compare_from_svn = TRUE,
   .return_base_compare = FALSE,
@@ -20,6 +21,8 @@ write_derived(
 \item{.spec}{a yspec object}
 
 \item{.file}{csv file name to write out to (including path)}
+
+\item{.comment}{explanation of data}
 
 \item{.prev_file}{csv file name of previous version (defaults to .file)}
 

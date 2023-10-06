@@ -7,6 +7,7 @@
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .file csv file name to write out to (including path)
+#' @param .comment explanation of data
 #' @param .prev_file csv file name of previous version (defaults to .file)
 #' @param .compare_from_svn logical. Should the data comparison be done on the latest svn version? (If not, local version is used)
 #' @param .return_base_compare logical. Should the two current and previous versions of the datasets be returned?
@@ -19,7 +20,7 @@
 #'}
 #' @md
 #' @export
-write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
+write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
 
   if (tools::file_ext(.file) != "csv") {
     stop("'.file' must reference a 'csv' file")
@@ -45,14 +46,24 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
   .data_name <- tools::file_path_sans_ext(basename(.file))
   .meta_data_folder <- file.path(.data_location, .data_name)
 
+  .cur_history <- tryCatch(
+    suppressMessages(readr::read_csv(file.path(.meta_data_folder, "history.csv"))),
+    error = identity
+  )
+
+  if (inherits(.cur_history, "error")) {
+    .cur_history <- dplyr::tibble()
+  } else {
+    .cur_history <- .cur_history %>% dplyr::mutate_all(as.character)
+    .cur_history[is.na(.cur_history)] <- ""
+  }
+
   # Create directory anew if it exists
   if (dir.exists(.meta_data_folder)) {
     unlink(.meta_data_folder, recursive = TRUE)
-    # cli::cli_alert_info(glue::glue("Directory removed: {.meta_data_folder}"))
   }
 
   dir.create(.meta_data_folder)
-  # cli::cli_alert_success(glue::glue("Directory created: {.meta_data_folder}"))
 
   # Write Out Meta Data -----------------------------------------------------
   haven::write_xpt(
@@ -63,16 +74,18 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
   )
 
   # Try to render spec
-  try(
-    yspec::render_fda_define(
-      x = .spec,
-      stem = paste0(.data_name, "-define-fda"),
-      output_dir = .meta_data_folder
-    ),
-    silent = TRUE
+  suppressWarnings(
+    suppressMessages(
+      try(
+        yspec::render_fda_define(
+          x = .spec,
+          stem = paste0(.data_name, "-define-fda"),
+          output_dir = .meta_data_folder
+        ),
+        silent = TRUE
+      )
+    )
   )
-
-  # cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
 
 
   # Execute data diffs ------------------------------------------------------
@@ -122,15 +135,32 @@ write_derived <- function(.data, .spec, .file, .prev_file = NULL, .compare_from_
 
   yaml::write_yaml(.sys_print, file = file.path(.meta_data_folder, "sys-info.yml"))
 
-  # cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'sys-info.yml')}"))
-
 
   # Determine and save dependencies -----------------------------------------
   dependencies <- find_in_files(.paths = c(here::here("script"), here::here("model")), .string = basename(.file))
   yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
 
-  cli::cli_alert_success(glue::glue("File written: {.file}"))
-  cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
+
+  # Update history ----------------------------------------------------------
+  .history <-
+    gather_data_history(
+      .cur_history = .cur_history,
+      .comment = .comment,
+      .meta_data_folder = .meta_data_folder,
+      .prev_rev = base_df_list$prev_rev
+    )
+
+  data.table::fwrite(
+    x = .history,
+    file = file.path(.meta_data_folder, 'history.csv'),
+    sep = ",",
+    quote = FALSE,
+    row.names = FALSE
+  )
+
+  cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))
+  cli::cli_alert(paste0("Meta data folder: ", cli::col_blue(tools::file_path_as_absolute(.meta_data_folder))))
+
 
   # Return ------------------------------------------------------------------
   if (.return_base_compare) {

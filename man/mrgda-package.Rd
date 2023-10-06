@@ -6,6 +6,8 @@
 \alias{mrgda-package}
 \title{mrgda: Tools for Data Assembly}
 \description{
+\if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
+
 Run various tests on an NMTRAN dataset to validate it prior to modeling.
 }
 \seealso{
