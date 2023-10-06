@@ -61,11 +61,9 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
   # Create directory anew if it exists
   if (dir.exists(.meta_data_folder)) {
     unlink(.meta_data_folder, recursive = TRUE)
-    # cli::cli_alert_info(glue::glue("Directory removed: {.meta_data_folder}"))
   }
 
   dir.create(.meta_data_folder)
-  # cli::cli_alert_success(glue::glue("Directory created: {.meta_data_folder}"))
 
   # Write Out Meta Data -----------------------------------------------------
   haven::write_xpt(
@@ -76,16 +74,18 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
   )
 
   # Try to render spec
-  try(
-    yspec::render_fda_define(
-      x = .spec,
-      stem = paste0(.data_name, "-define-fda"),
-      output_dir = .meta_data_folder
-    ),
-    silent = TRUE
+  suppressWarnings(
+    suppressMessages(
+      try(
+        yspec::render_fda_define(
+          x = .spec,
+          stem = paste0(.data_name, "-define-fda"),
+          output_dir = .meta_data_folder
+        ),
+        silent = TRUE
+      )
+    )
   )
-
-  # cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
 
 
   # Execute data diffs ------------------------------------------------------
@@ -135,15 +135,10 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
 
   yaml::write_yaml(.sys_print, file = file.path(.meta_data_folder, "sys-info.yml"))
 
-  # cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, 'sys-info.yml')}"))
-
 
   # Determine and save dependencies -----------------------------------------
   dependencies <- find_in_files(.paths = c(here::here("script"), here::here("model")), .string = basename(.file))
   yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
-
-  cli::cli_alert_success(glue::glue("File written: {.file}"))
-  cli::cli_alert_success(glue::glue("File written: {file.path(.meta_data_folder, paste0(.data_name, '.xpt'))}"))
 
 
   # Update history ----------------------------------------------------------
@@ -162,6 +157,9 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
     quote = FALSE,
     row.names = FALSE
   )
+
+  cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))
+  cli::cli_alert(paste0("Meta data folder: ", cli::col_blue(tools::file_path_as_absolute(.meta_data_folder))))
 
 
   # Return ------------------------------------------------------------------
