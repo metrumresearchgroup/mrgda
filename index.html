@@ -59,6 +59,9 @@
 <li>
       <a href="articles/assigning-id.html">assigning-id</a>
     </li>
+    <li>
+      <a href="articles/getting-started.html">Getting Started with mrgda</a>
+    </li>
   </ul>
 </li>
 <li>
@@ -84,17 +87,26 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-
-<p><br></p>
 <div class="section level1">
 <div class="page-header"><h1 id="mrgda-">mrgda <a href="https:/metrumresearchgroup.github.io/mrgda"><img src="reference/figures/logo.png" align="right" width="135px"></a>
 <a class="anchor" aria-label="anchor" href="#mrgda-"></a>
 </h1></div>
+<!-- badges: start -->
+
 <div class="section level2">
 <h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
 </h2>
-<p>mrgda is a data assembly helper, providing a set of functions that help you assemble, explore and validate your data set.</p>
-<p>An example data assembly script highlighting many <code>mrgda</code> functions can be found <a href="https://ghe.metrumrg.com/templates/msproject/blob/master/script/data-assembly.Rmd" class="external-link">here</a>.</p>
+<p><code>mrgda</code> is a data assembly helper, providing a set of functions that help you assemble, explore and validate your data set.</p>
+<div class="section level3">
+<h3 id="featured-vignettes">Featured Vignettes<a class="anchor" aria-label="anchor" href="#featured-vignettes"></a>
+</h3>
+<ul>
+<li>
+<a href="https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html">Getting Started</a> – Introduction to commonly used data assembly <code>mrgda</code> functions.</li>
+<li>
+<a href="https://metrumresearchgroup.github.io/mrgda/articles/assigning-id.html">Assigning IDs</a> – Background on <code><a href="reference/assign_id.html">assign_id()</a></code>. <code><a href="reference/assign_id.html">assign_id()</a></code> helps you assign a unique numeric identifier to each subject in your data set. Its purpose is to ensure the same numeric identifier is consistently assigned to each subject throughout a project</li>
+</ul>
+</div>
 </div>
 <div class="section level2">
 <h2 id="documentation">Documentation<a class="anchor" aria-label="anchor" href="#documentation"></a>
@@ -102,30 +114,32 @@
 <p>Public documentation of all functions is hosted at <a href="https://metrumresearchgroup.github.io/mrgda/" class="uri">https://metrumresearchgroup.github.io/mrgda/</a></p>
 </div>
 <div class="section level2">
-<h2 id="development">Development<a class="anchor" aria-label="anchor" href="#development"></a>
+<h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
 </h2>
-<p><code>mrgda</code> uses <a href="https://github.com/metrumresearchgroup/pkgr" class="external-link">pkgr</a> to manage development dependencies and <a href="https://rstudio.github.io/renv/" class="external-link">renv</a> to provide isolation. To replicate this environment,</p>
+<p>If you encounter a clear bug, please file an issue with a minimal reproducible example on <a href="https://github.com/mrgda/issues" class="external-link">mrgda</a>.</p>
+<div class="section level4">
+<h4 id="developer-notes">Developer Notes<a class="anchor" aria-label="anchor" href="#developer-notes"></a>
+</h4>
+<details closed><summary>
+Developer Notes
+</summary><p><code>mrgda</code> uses <a href="https://github.com/metrumresearchgroup/pkgr" class="external-link">pkgr</a> to manage development dependencies and <a href="https://rstudio.github.io/renv/" class="external-link">renv</a> to provide isolation. To replicate this environment,</p>
 <ol style="list-style-type: decimal">
 <li><p>clone the repo</p></li>
-<li><p>install pkgr</p></li>
+<li><p>install <a href="https://github.com/metrumresearchgroup/pkgr" class="external-link">pkgr</a></p></li>
 <li>
 <p>open package in an R session and run <code>renv::init(bare = TRUE)</code></p>
 <ul>
-<li>install <code>renv</code> &gt; 0.8.3-4 into default <code><a href="https://rdrr.io/r/base/libPaths.html" class="external-link">.libPaths()</a></code> if not already installed</li>
+<li>install <code>renv</code> &gt; 0.8.3-4 into default <code><a href="https://rdrr.io/r/base/libPaths.html" class="external-link">.libPaths()</a></code> prior to this step if not already installed</li>
 </ul>
 </li>
 <li><p>run <code>pkgr install</code> in terminal within package directory</p></li>
 <li><p>restart session</p></li>
 </ol>
-<p>Then, launch R with the repo as the working directory (open the project in RStudio). renv will activate and find the project library.</p>
-</div>
-<div class="section level2">
-<h2 id="getting-help">Getting help<a class="anchor" aria-label="anchor" href="#getting-help"></a>
-</h2>
-<p>If you encounter a clear bug, please file an issue with a minimal reproducible example on <a href="https://github.com/mrgda/issues" class="external-link">mrgda</a>.</p>
+<p>Then, launch R with the repo as the working directory (open the project in RStudio). <code>renv</code> will activate and find the project library.</p>
+</details>
 </div>
 </div>
-
+</div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
@@ -163,7 +177,13 @@
 </ul>
 </div>
 
-
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
+<ul class="list-unstyled">
+<li><a href="https://github-drone.metrumrg.com/metrumresearchgroup/mrgda" class="external-link"><img src="https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/mrgda/status.svg" alt="Build Status"></a></li>
+<li><a href="https://codecov.io/gh/metrumresearchgroup/mrgda" class="external-link"><img src="https://codecov.io/gh/metrumresearchgroup/mrgda/branch/main/graph/badge.svg" alt="codecov"></a></li>
+</ul>
+</div>
 
   </div>
 </div>
@@ -176,7 +196,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.7.</p>
 </div>
 
       </footer>
