@@ -19,8 +19,7 @@ help you assemble, explore and validate your data set.
 
 -   [Getting
     Started](https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html)
-    – Basic examples and introduction to a typical data assembly
-    workflow.
+    – Introduction to commonly used data assembly `mrgda` functions.
 -   [Assigning
     IDs](https://metrumresearchgroup.github.io/mrgda/articles/assigning-id.html)
     – Background on `assign_id()`. `assign_id()` helps you assign a

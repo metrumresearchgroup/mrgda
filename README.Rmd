@@ -28,7 +28,7 @@ you assemble, explore and validate your data set.
 
 ### Featured Vignettes
 
-* [Getting Started](https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html) -- Basic examples and introduction to a typical data assembly workflow.
+* [Getting Started](https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html) -- Introduction to commonly used data assembly `mrgda` functions.
 * [Assigning IDs](https://metrumresearchgroup.github.io/mrgda/articles/assigning-id.html) -- Background on `assign_id()`. `assign_id()` helps you assign a unique numeric identifier to each subject in your data set. Its purpose is to ensure the same numeric identifier is consistently assigned to each subject throughout a project
     
 ## Documentation
