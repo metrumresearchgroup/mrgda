@@ -1,6 +1,3 @@
-# Create temp directory to put history in
-#history_dir <- tempdir()
-
 history_prev <- dplyr::tibble(
     Author = "John Smith",
     `N Row` = "340",
