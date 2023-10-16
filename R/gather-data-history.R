@@ -20,8 +20,8 @@ gather_data_history <- function(.cur_data, .cur_history, .comment = NULL, .prev_
   .history <-
     tibble::tibble(
       Author = Sys.info()[["user"]],
-      `N row(s)` = nrow(.cur_data),
-      `N ID(s)` = length(unique(.cur_data[["ID"]])),
+      `N Row` = nrow(.cur_data),
+      `N ID` = length(unique(.cur_data[["ID"]])),
       `Previous Revision` = .prev_rev,
       `Datetime (EDT)` = as.character(as.POSIXct(format(Sys.time()), tz = "EDT")),
       Comment = .comment
