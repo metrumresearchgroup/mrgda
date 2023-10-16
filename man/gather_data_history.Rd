@@ -4,54 +4,22 @@
 \alias{gather_data_history}
 \title{Gather Data History}
 \usage{
-gather_data_history(
-  .cur_history,
-  .comment = NULL,
-  .meta_data_folder,
-  .prev_rev
-)
+gather_data_history(.cur_data, .cur_history, .comment = NULL, .prev_rev)
 }
 \arguments{
-\item{.cur_history}{A data frame or tibble containing the current data history.}
+\item{.cur_data}{A data frame containing the current version of the data.}
 
-\item{.comment}{A comment describing the current revision. If not provided, defaults to "No comment".}
+\item{.cur_history}{A data frame containing the current history/revision log of the data.}
 
-\item{.meta_data_folder}{Path to the folder containing the metadata, specifically "diffs.csv".}
+\item{.comment}{A character string representing a comment or note about the current revision.
+Defaults to "No comment" if not provided.}
 
-\item{.prev_rev}{A character string specifying the previous revision code or number.}
-}
-\value{
-A combined data frame/tibble of the current revision details with the previous data history.
+\item{.prev_rev}{A value representing the previous revision or version number. If not provided,
+it won't be logged.}
 }
 \description{
-This function consolidates the current data history with previous revisions. It reads the differences in the metadata
-from "diffs.csv", filters the required changes and combines this with the current revision details.
-}
-\details{
-This function operates in several steps:
-\enumerate{
-\item If \code{.comment} is not provided, it defaults to "No comment".
-\item Attempts to read "diffs.csv" from the \code{.meta_data_folder}.
-\item Filters the differences read from "diffs.csv" that are new, removed, or added.
-\item Creates a new tibble \code{.history} for the current revision details.
-\item If differences were found, they're combined with the current revision details in \code{.history}.
-\item All columns in \code{.history} are coerced to character type and NAs are replaced with empty strings.
-\item Combines \code{.history} with \code{.cur_history} to form the final data history.
-}
-}
-\examples{
-\dontrun{
-history_prev <- tibble::tibble(
-  Author = "John Smith",
-  Comment = "Initial commit",
-  `Previous Revision` = "",
-  Datetime = "2023-10-06 09:58:58")
-gather_data_history(
-  history_prev,
-  .comment = "Updated data",
-  .meta_data_folder = "path/to/metadata",
-  .prev_rev = "54")
-}
-
+This function takes the current data, its associated history, and additional
+metadata to record a new entry in the data's revision history. It provides
+a systematic way to keep track of changes, the author of the change, and more.
 }
 \keyword{internal}
