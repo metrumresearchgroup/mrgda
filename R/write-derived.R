@@ -79,7 +79,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
       try(
         yspec::render_fda_define(
           x = .spec,
-          stem = paste0(.data_name, "-define-fda"),
+          stem = "define",
           output_dir = .meta_data_folder
         ),
         silent = TRUE
@@ -144,9 +144,9 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
   # Update history ----------------------------------------------------------
   .history <-
     gather_data_history(
+      .cur_data = .data,
       .cur_history = .cur_history,
       .comment = .comment,
-      .meta_data_folder = .meta_data_folder,
       .prev_rev = base_df_list$prev_rev
     )
 
