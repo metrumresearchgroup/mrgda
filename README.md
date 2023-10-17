@@ -35,7 +35,8 @@ Public documentation of all functions is hosted at
 ## Getting help
 
 If you encounter a clear bug, please file an issue with a minimal
-reproducible example on [mrgda](https://github.com/mrgda/issues).
+reproducible example on
+[mrgda](https://github.com/metrumresearchgroup/mrgda/issues).
 
 #### Developer Notes
 
