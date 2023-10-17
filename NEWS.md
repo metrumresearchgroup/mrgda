@@ -1,8 +1,8 @@
-# mrgda development
+# mrgda 0.10.0
 
 ## New features and changes
 
-- Modified the `write_derived` function to save data history in the meta data folder (`history.csv`). (#171)
+- Modified the `write_derived` function to save data history in the meta data folder (`history.csv`). (#171, #176)
 
 - Created the `explain()` function that communicates code intentionality. (#164)
 
