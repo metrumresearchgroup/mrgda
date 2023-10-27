@@ -1,6 +1,7 @@
 history_prev <- dplyr::tibble(
     Author = "John Smith",
     `N Row` = "340",
+    `N Col` = "98",
     `N ID` = "50",
     `Previous Revision` = "",
     Comment = "Initial commit",
@@ -21,7 +22,7 @@ test_that("gather_data_history adds a new row to history", {
 
   # Check size of history didn't add columns and only added 1 row
   expect_equal(nrow(history_prev)+1, nrow(cur_history))
-  expect_true(ncol(cur_history)==6)
+  expect_true(ncol(cur_history)==7)
 
   # Check author captured correctly
   expect_true(cur_history$Author[1] == Sys.info()[["user"]])
@@ -37,6 +38,7 @@ test_that("gather_data_history adds a new row to history", {
   # Check ID counts
   expect_true(cur_history$`N ID`[1] == "12")
   expect_true(cur_history$`N Row`[1] == "132")
+  expect_true(cur_history$`N Col`[1] == "5")
 
 })
 
@@ -50,7 +52,7 @@ mtcars_history <-
 test_that("gather_data_history works for third update", {
 
   # Check size of history didn't add columns and only added 1 row
-  expect_true(ncol(mtcars_history)==6)
+  expect_true(ncol(mtcars_history)==7)
   expect_true(nrow(mtcars_history)==3)
 
   # Check author captured correctly
