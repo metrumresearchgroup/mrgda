@@ -21,6 +21,7 @@ gather_data_history <- function(.cur_data, .cur_history, .comment = NULL, .prev_
     tibble::tibble(
       Author = Sys.info()[["user"]],
       `N Row` = nrow(.cur_data),
+      `N Col` = ncol(.cur_data),
       `N ID` = length(unique(.cur_data[["ID"]])),
       `Previous Revision` = .prev_rev,
       `Datetime (EDT)` = as.character(as.POSIXct(format(Sys.time()), tz = "EDT")),

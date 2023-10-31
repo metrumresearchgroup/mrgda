@@ -13,6 +13,7 @@ Run various tests on an NMTRAN dataset to validate it prior to modeling.
 \seealso{
 Useful links:
 \itemize{
+  \item \url{https://metrumresearchgroup.github.io/mrgda/}
   \item \url{https://github.com/metrumresearchgroup/mrgda}
   \item Report bugs at \url{https://github.com/metrumresearchgroup/mrgda/issues}
 }
