@@ -17,7 +17,8 @@
 #' @export
 query_src_dir <- function(.src_directory, .string, .file_types = "detect") {
 
-  src_list <- read_src_dir(.path = .src_directory, .file_types = .file_types)
+  src_list <- read_src_dir(.path = .src_directory, .file_types = .file_types) %>%
+    suppressMessages()
   src_list$mrgda_src_meta <- NULL
 
   src_list_char <- purrr::map(
@@ -34,38 +35,30 @@ query_src_dir <- function(.src_directory, .string, .file_types = "detect") {
 
   for (df.i in names(matches)) {
 
-    for (i in 1:nrow(matches[[df.i]])) {
+    matches.i <- grepl(.string, matches[[df.i]], ignore.case = TRUE)
+    colmatches.i <- names(matches[[df.i]])[matches.i]
 
-      matches.i <- grepl(.string, matches[[df.i]][i, ], ignore.case = TRUE)
+    if (length(colmatches.i) > 0) {
 
-      if (any(matches.i)) {
+      cols_collapsed <- paste(colmatches.i, collapse = ",")
 
-        hits <-
-          dplyr::bind_rows(
-            hits,
-            dplyr::tibble(
-              DOMAIN = ifelse(
-                df.i != "mrgda_labels",
-                df.i,
-                paste0("mrgda_labels", " (", matches[[df.i]]$DOMAIN[i], ")")
-              ),
-              COLUMN = names(matches[[df.i]])[matches.i],
-              VALUE = as.character(matches[[df.i]][i, ][matches.i]),
-              I = i
-            )
+      hits <-
+        dplyr::bind_rows(
+          hits,
+          dplyr::tibble(
+            DOMAIN = ifelse(
+              df.i != "mrgda_labels",
+              df.i,
+              paste0("mrgda_labels", " (", matches[[df.i]]$DOMAIN[1], ")")
+            ),
+            COLUMNS = cols_collapsed
           )
-      }
+        )
 
     }
-
   }
 
   hits %>%
-    dplyr::group_by(DOMAIN, COLUMN, VALUE) %>%
-    dplyr::summarise(
-      MATCHING_ROWS = paste(I, collapse = ", ")
-    ) %>%
-    dplyr::ungroup() %>%
-    dplyr::rename(MATCH = VALUE)
+    dplyr::mutate(MATCHING = tolower(.string))
 
 }
