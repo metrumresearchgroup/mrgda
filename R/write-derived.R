@@ -1,8 +1,8 @@
-#' Write a derived data set and corresponding meta data
+#' Write a derived data set and corresponding metadata
 #'
 #' @description
 #' This function will take a data frame in R and write it out to csv.
-#' It also creates a meta data folder, storing the xpt file along with other useful information.
+#' It also creates a metadata folder, storing the xpt file along with other useful information.
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
@@ -41,7 +41,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
     na = "."
   )
 
-  # Prepare Meta Data Folder ------------------------------------------------
+  # Prepare Metadata Folder -------------------------------------------------
   .data_location <- dirname(.file)
   .data_name <- tools::file_path_sans_ext(basename(.file))
   .meta_data_folder <- file.path(.data_location, .data_name)
@@ -65,7 +65,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
 
   dir.create(.meta_data_folder)
 
-  # Write Out Meta Data -----------------------------------------------------
+  # Write Out Metadata ------------------------------------------------------
   haven::write_xpt(
     data = yspec::ys_add_labels(.data, .spec),
     path = file.path(.meta_data_folder, paste0(.data_name, ".xpt")),
@@ -159,7 +159,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
   )
 
   cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))
-  cli::cli_alert(paste0("Meta data folder: ", cli::col_blue(tools::file_path_as_absolute(.meta_data_folder))))
+  cli::cli_alert(paste0("Metadata folder: ", cli::col_blue(tools::file_path_as_absolute(.meta_data_folder))))
 
 
   # Return ------------------------------------------------------------------

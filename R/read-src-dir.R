@@ -89,7 +89,7 @@ read_src_dir <- function(.path,
   .out$mrgda_labels <-
     gather_data_labels(.out)
 
-  # meta data
+  # metadata
   .out$mrgda_src_meta$type <- .files_of_interest$type
   .out$mrgda_src_meta$path <- .path
 

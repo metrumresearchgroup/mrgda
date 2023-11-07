@@ -50,6 +50,9 @@ get_base_df <- function(.prev_file, .compare_from_svn){
       NULL
     }
 
+
+  prev_rev <- ifelse(length(prev_rev) == 0, NA, prev_rev)
+
   return(
     list(
       base_df = base_df,
