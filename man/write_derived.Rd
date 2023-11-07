@@ -2,7 +2,7 @@
 % Please edit documentation in R/write-derived.R
 \name{write_derived}
 \alias{write_derived}
-\title{Write a derived data set and corresponding meta data}
+\title{Write a derived data set and corresponding metadata}
 \usage{
 write_derived(
   .data,
@@ -34,7 +34,7 @@ write_derived(
 }
 \description{
 This function will take a data frame in R and write it out to csv.
-It also creates a meta data folder, storing the xpt file along with other useful information.
+It also creates a metadata folder, storing the xpt file along with other useful information.
 }
 \examples{
 \dontrun{
