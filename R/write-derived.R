@@ -47,7 +47,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
   .meta_data_folder <- file.path(.data_location, .data_name)
 
   .cur_history <- tryCatch(
-    suppressMessages(readr::read_csv(file.path(.meta_data_folder, "history.csv"))),
+    suppressMessages(data.table::fread(file.path(.meta_data_folder, "history.csv"))),
     error = identity
   )
 
@@ -89,7 +89,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
 
 
   # Execute data diffs ------------------------------------------------------
-  compare_df <- readr::read_csv(.file) %>% suppressMessages()
+  compare_df <- data.table::fread(.file) %>% suppressMessages()
 
   if (!is.null(base_df_list$base_df) & .execute_diffs) {
     diffs <-
