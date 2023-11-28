@@ -80,7 +80,7 @@ over your `R` console:
  - Other formatting options related to readability and presentation of column 
  label attributes
 
-### Query Source Directory
+### Query source list
 
 In addition to the convenient viewing and filtering methods provided by `v()`, 
 you can also query the entire source directory for a specific character string via
@@ -111,7 +111,7 @@ mrgda::write_derived(
 ```
 
 
-## Other Functions
+## Other functions
 
 `mrgda` exports other helpful functions for data creation, management, and validation. See the 
 <a href="https://metrumresearchgroup.github.io/mrgda/reference/index.html" 
