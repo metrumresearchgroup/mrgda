@@ -1,3 +1,9 @@
+# mrgda development
+
+## New features and changes
+
+- Renamed `query_src_dir` to `query_src_list`, and it now takes a list as an argument. (#182)
+
 # mrgda 0.10.0
 
 ## New features and changes
