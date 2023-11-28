@@ -1,7 +1,7 @@
 #' Query a source list.
 #'
 #' @description
-#' Use this to search for a character string across every source data list including
+#' Use this to search for a character string across every element in a source data list including
 #' the name, label and contents.
 #'
 #' @param .src_list A source list created using read_src_dir.

@@ -12,7 +12,7 @@ query_src_list(.src_list, .string)
 \item{.string}{string to search for (not case sensitive)}
 }
 \description{
-Use this to search for a character string across every source data list including
+Use this to search for a character string across every element in a source data list including
 the name, label and contents.
 }
 \examples{
