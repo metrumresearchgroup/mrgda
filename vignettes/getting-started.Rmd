@@ -84,10 +84,10 @@ over your `R` console:
 
 In addition to the convenient viewing and filtering methods provided by `v()`, 
 you can also query the entire source directory for a specific character string via
-`query_src_dir()`:
+`query_src_list()`:
 ```{r, message = FALSE}
 # Summarize source directory
-query_src_dir(.src_directory = src_path, .string = "RACE")
+query_src_list(src_list, .string = "RACE")
 ```
 
 
