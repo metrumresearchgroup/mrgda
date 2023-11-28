@@ -112,3 +112,14 @@ test_that("assign_id sets new ID's larger than the previous data even if no subj
   expect_equal(ncol(ids_assigned), 2)
   expect_true(all(c(20, 21, 22) %in% unique(ids_assigned$ID)))
 })
+
+test_that("assign_id stops if data is grouped", {
+  # Generate a sample dataframe for the tests
+  .data <- data.frame(USUBJID = c("A", "B", "C"), GROUP = 1)
+
+  expect_error(
+    .data %>%
+      dplyr::group_by(GROUP) %>%
+      assign_id()
+  )
+})

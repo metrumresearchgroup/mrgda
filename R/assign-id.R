@@ -28,6 +28,11 @@
 #' @export
 assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "USUBJID") {
 
+  # Check if data is grouped
+  if (dplyr::is_grouped_df(.data)) {
+    stop("Ungroup data before assign_id")
+  }
+
   # Check if the subject column does exist and ID doesn't exist in .data
   if (!is.null(.data[["ID"]])) {
     stop("Data already contains ID")
