@@ -1,8 +1,14 @@
-# mrgda development
+# mrgda 0.11.0
 
 ## New features and changes
 
 - Renamed `query_src_dir` to `query_src_list`, and it now takes a list as an argument. (#182)
+
+## Bug fixes
+
+- `assign_id()` is now protected against grouped data.frames. (#188)
+
+- Fixed `write_derived()` warning message when creating `history.csv`. (#186)
 
 # mrgda 0.10.0
 
