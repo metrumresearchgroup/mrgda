@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.11.0</span>
       </span>
     </div>
 
@@ -60,6 +60,18 @@
       <small>Source: <a href="https://github.com/metrumresearchgroup/mrgda/blob/HEAD/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="page-header" data-toc-text="0.11.0" id="mrgda-0110">mrgda 0.11.0<a class="anchor" aria-label="anchor" href="#mrgda-0110"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-0-11-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-11-0"></a></h3>
+<ul><li>Renamed <code>query_src_dir</code> to <code>query_src_list</code>, and it now takes a list as an argument. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/182" class="external-link">#182</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-11-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-11-0"></a></h3>
+<ul><li><p><code><a href="../reference/assign_id.html">assign_id()</a></code> is now protected against grouped data.frames. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/188" class="external-link">#188</a>)</p></li>
+<li><p>Fixed <code><a href="../reference/write_derived.html">write_derived()</a></code> warning message when creating <code>history.csv</code>. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/186" class="external-link">#186</a>)</p></li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.10.0" id="mrgda-0100">mrgda 0.10.0<a class="anchor" aria-label="anchor" href="#mrgda-0100"></a></h2>
 <div class="section level3">
@@ -134,7 +146,7 @@
 <h3 id="new-features-and-changes-0-7-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-7-0"></a></h3>
 <ul><li><p><code><a href="../reference/assign_id.html">assign_id()</a></code> now only outputs console message when new ID’s present. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/104" class="external-link">#104</a>)</p></li>
 <li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> no longer outputs subject column domain. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/106" class="external-link">#106</a>)</p></li>
-<li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> returns a data.frame now instead of a view of the output. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/106" class="external-link">#106</a>)</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/mrgda/man/query_src_dir.html" class="external-link">query_src_dir()</a></code> returns a data.frame now instead of a view of the output. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/106" class="external-link">#106</a>)</p></li>
 </ul></div>
 </div>
     <div class="section level2">
@@ -191,7 +203,7 @@
 <h3 id="new-features-and-changes-0-5-1">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-5-1"></a></h3>
 <ul><li><p>Added <code>view_mrgda_flags()</code> to allow the user to view a summary of how mrgda flags in the specification file are assigned to the data set. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/67" class="external-link">#67</a>)</p></li>
 <li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now outputs the name and size of the current file its reading in. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/67" class="external-link">#67</a>)</p></li>
-<li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> now allows the user to specify file types. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/67" class="external-link">#67</a>)</p></li>
+<li><p><code><a href="https://rdrr.io/pkg/mrgda/man/query_src_dir.html" class="external-link">query_src_dir()</a></code> now allows the user to specify file types. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/67" class="external-link">#67</a>)</p></li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-0-5-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-5-1"></a></h3>
@@ -204,7 +216,7 @@
 <h2 class="page-header" data-toc-text="0.5.0" id="mrgda-050">mrgda 0.5.0<a class="anchor" aria-label="anchor" href="#mrgda-050"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-5-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-5-0"></a></h3>
-<ul><li><p><code><a href="../reference/query_src_dir.html">query_src_dir()</a></code> is a new function that searches through the data in a source directory for a string or pattern. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/64" class="external-link">#64</a>)</p></li>
+<ul><li><p><code><a href="https://rdrr.io/pkg/mrgda/man/query_src_dir.html" class="external-link">query_src_dir()</a></code> is a new function that searches through the data in a source directory for a string or pattern. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/64" class="external-link">#64</a>)</p></li>
 <li><p><code>distinct_subject_columns()</code> is a new function that takes a data frame and subject column identifier and returns the columns in which the values are unique for every subject. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/64" class="external-link">#64</a>)</p></li>
 <li><p><code>nm_write()</code> the experimental feature of including the data assembly source script in the meta data folder has been removed. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/64" class="external-link">#64</a>)</p></li>
 <li><p><code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now returns an additional data object - a data frame containing the column name and labels from every domain. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/64" class="external-link">#64</a>)</p></li>

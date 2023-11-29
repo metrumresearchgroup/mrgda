@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.10.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.11.0</span>
       </span>
     </div>
 
@@ -159,28 +159,19 @@ records.</li>
 column label attributes</li>
 </ul>
 <div class="section level4">
-<h4 id="query-source-directory">Query Source Directory<a class="anchor" aria-label="anchor" href="#query-source-directory"></a>
+<h4 id="query-source-list">Query source list<a class="anchor" aria-label="anchor" href="#query-source-list"></a>
 </h4>
 <p>In addition to the convenient viewing and filtering methods provided
 by <code><a href="../reference/v.html">v()</a></code>, you can also query the entire source directory for
-a specific character string via <code><a href="../reference/query_src_dir.html">query_src_dir()</a></code>:</p>
+a specific character string via <code><a href="../reference/query_src_list.html">query_src_list()</a></code>:</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Summarize source directory</span></span>
-<span><span class="fu"><a href="../reference/query_src_dir.html">query_src_dir</a></span><span class="op">(</span>.src_directory <span class="op">=</span> <span class="va">src_path</span>, .string <span class="op">=</span> <span class="st">"RACE"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; ┌ read_src_dir Summary ────────────────────────┐</span></span>
-<span><span class="co">#&gt; │                                              │</span></span>
-<span><span class="co">#&gt; │   Number of domains successfully loaded: 7   │</span></span>
-<span><span class="co">#&gt; │   Number of domains that failed to load: 0   │</span></span>
-<span><span class="co">#&gt; │                                              │</span></span>
-<span><span class="co">#&gt; └──────────────────────────────────────────────┘</span></span>
-<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 5 × 4</span></span></span>
-<span><span class="co">#&gt;   DOMAIN            COLUMN       MATCH             MATCHING_ROWS             </span></span>
-<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                     </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> lb                LBORRES      TRACE             20, 80                    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> lb                LBSTNRC      NEGATIVE TO TRACE 19, 20, 38, 58, 59, 80, 81</span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">3</span> lb                LBSTRESC     TRACE             20, 80                    </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">4</span> mrgda_labels (dm) COLUMN_LABEL RACE_LABEL        30                        </span></span>
-<span><span class="co">#&gt; <span style="color: #BCBCBC;">5</span> mrgda_labels (dm) COLUMN_NAME  RACE              30</span></span></code></pre></div>
+<span><span class="fu"><a href="../reference/query_src_list.html">query_src_list</a></span><span class="op">(</span><span class="va">src_list</span>, .string <span class="op">=</span> <span class="st">"RACE"</span><span class="op">)</span></span>
+<span><span class="co">#&gt; <span style="color: #949494;"># A tibble: 2 × 3</span></span></span>
+<span><span class="co">#&gt;   DOMAIN       COLUMNS                  MATCHING</span></span>
+<span><span class="co">#&gt;   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">1</span> lb           LBORRES,LBSTRESC,LBSTNRC RACE    </span></span>
+<span><span class="co">#&gt; <span style="color: #BCBCBC;">2</span> mrgda_labels COLUMN_NAME,COLUMN_LABEL RACE</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level3">
@@ -205,7 +196,7 @@ MeRGE Expo</a> for more information on this).</p>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="other-functions">Other Functions<a class="anchor" aria-label="anchor" href="#other-functions"></a>
+<h3 id="other-functions">Other functions<a class="anchor" aria-label="anchor" href="#other-functions"></a>
 </h3>
 <p><code>mrgda</code> exports other helpful functions for data creation,
 management, and validation. See the
