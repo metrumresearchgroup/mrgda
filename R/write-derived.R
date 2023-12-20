@@ -34,7 +34,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
   # Check for commas in data
   check_for_commas <- purrr::map(.data, ~ any(stringr::str_detect(string = .x, pattern = ","), na.rm = TRUE))
 
-  check_for_commas = check_for_commas[unlist(check_for_commas)]
+  check_for_commas <- check_for_commas[unlist(check_for_commas)]
   if (length(check_for_commas) > 0) {
     cli::cli_abort(paste0("Comma found in following column(s):", paste(names(check_for_commas), collapse = ", ")))
   }
