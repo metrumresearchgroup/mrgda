@@ -54,3 +54,13 @@ test_that("write_derived outputs history csv in meta data folder", {
   expect_true(file.exists(.history))
 })
 
+test_that("write_derived gives error if data has comma in any value", {
+  df_comma <-
+    dplyr::tibble(
+      name = c("smith, john", "james", "mark"),
+      values = c(1, 2, 3)
+      )
+
+  expect_error(write_derived(.data = df_comma, .spec = nm_spec, .file = .temp_csv))
+})
+
