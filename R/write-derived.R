@@ -95,13 +95,6 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
     )
   )
 
-  # Search for ID column
-  has_id <- !is.null(.data$ID)
-  if (has_id) {
-    .subj_column = "ID"
-  } else {
-    .subj_column = NULL
-  }
 
   # Execute data diffs ------------------------------------------------------
   compare_df <- data.table::fread(.file) %>% suppressMessages()
@@ -111,7 +104,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
       execute_data_diffs(
         .base_df = base_df_list$base_df,
         .compare_df = compare_df,
-        .subject_col = .subj_column,
+        .subject_col = "ID",
         .base_from_svn = base_df_list$from_svn
       )
 
