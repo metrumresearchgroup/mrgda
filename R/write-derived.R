@@ -21,7 +21,7 @@
 #'}
 #' @md
 #' @export
-write_derived <- function(.data, .spec, .file, .subject_col = "ID", .comment = NULL, .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
+write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "ID", .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
 
   if (tools::file_ext(.file) != "csv") {
     stop("'.file' must reference a 'csv' file")
