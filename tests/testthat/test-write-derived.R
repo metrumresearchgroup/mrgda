@@ -69,7 +69,5 @@ test_that("write_derived works with now ID column in data", {
   nm_spec$ID <- NULL
   .temp_csv2 <- paste0(tempfile(), ".csv")
 
-  write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv2)
-  .csv_in2 <- readr::read_csv(.temp_csv2, na = ".") %>% suppressMessages()
-  expect_equal(nm, .csv_in2)
+  expect_error(write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv2))
 })
