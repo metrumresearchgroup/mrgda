@@ -9,6 +9,7 @@ write_derived(
   .spec,
   .file,
   .comment = NULL,
+  .subject_col = "ID",
   .prev_file = NULL,
   .compare_from_svn = TRUE,
   .return_base_compare = FALSE,
@@ -23,6 +24,8 @@ write_derived(
 \item{.file}{csv file name to write out to (including path)}
 
 \item{.comment}{explanation of data}
+
+\item{.subject_col}{subject column name (defaults to ID)}
 
 \item{.prev_file}{csv file name of previous version (defaults to .file)}
 

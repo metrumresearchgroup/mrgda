@@ -98,7 +98,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
 
   # Search for ID column
   if (!.subject_col %in% colnames(.data)) {
-    stop("Defined .subject_col ", .subject_col, " not found in data")
+    stop("Defined .subject_col '", .subject_col, "' not found in data")
   }
 
   # Execute data diffs ------------------------------------------------------
