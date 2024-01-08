@@ -7,6 +7,7 @@
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .file csv file name to write out to (including path)
+#' @param .subject_col subject column name (defaults to ID)
 #' @param .comment explanation of data
 #' @param .prev_file csv file name of previous version (defaults to .file)
 #' @param .compare_from_svn logical. Should the data comparison be done on the latest svn version? (If not, local version is used)
@@ -20,7 +21,7 @@
 #'}
 #' @md
 #' @export
-write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
+write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "ID", .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
 
   if (tools::file_ext(.file) != "csv") {
     stop("'.file' must reference a 'csv' file")
@@ -95,6 +96,10 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
     )
   )
 
+  # Search for ID column
+  if (!.subject_col %in% colnames(.data)) {
+    stop("Defined .subject_col '", .subject_col, "' not found in data")
+  }
 
   # Execute data diffs ------------------------------------------------------
   compare_df <- data.table::fread(.file) %>% suppressMessages()
@@ -104,7 +109,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .prev_file = NUL
       execute_data_diffs(
         .base_df = base_df_list$base_df,
         .compare_df = compare_df,
-        .subject_col = "ID",
+        .subject_col = .subject_col,
         .base_from_svn = base_df_list$from_svn
       )
 
