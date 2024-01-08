@@ -1,3 +1,9 @@
+# mrgda development
+
+## Bug fixes
+
+- `write_derived()` now checks that the given subject column exists in the data (#194)
+
 # mrgda 0.11.0
 
 ## New features and changes
