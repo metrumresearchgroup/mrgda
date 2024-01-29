@@ -2,7 +2,9 @@
 
 ## Bug fixes
 
-- `write_derived()` now checks that the given subject column exists in the data (#194)
+- `write_derived()` now checks that the given subject column exists in the data. (#194)
+
+- `write_derived()` now performs a spec check before writing out data. (#196)
 
 # mrgda 0.11.0
 
