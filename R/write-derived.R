@@ -27,6 +27,12 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
     stop("'.file' must reference a 'csv' file")
   }
 
+  spec_check <- yspec::ys_check(.data, .spec, error_on_fail = FALSE) %>% suppressMessages()
+
+  if (!spec_check) {
+    stop("Spec check failed. Please run 'yspec::ys_check()' and ensure it passes.", call. = FALSE)
+  }
+
   .prev_file <- ifelse(is.null(.prev_file), .file, .prev_file)
 
   # Base Version for Diff ----------------------------------------

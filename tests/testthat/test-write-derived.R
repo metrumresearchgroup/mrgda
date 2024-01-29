@@ -64,10 +64,17 @@ test_that("write_derived gives error if data has comma in any value", {
   expect_error(write_derived(.data = df_comma, .spec = nm_spec, .file = .temp_csv))
 })
 
-test_that("write_derived works with now ID column in data", {
+test_that("write_derived works with no ID column in data", {
   nm$ID <- NULL
   nm_spec$ID <- NULL
   .temp_csv2 <- paste0(tempfile(), ".csv")
 
   expect_error(write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv2))
 })
+
+test_that("if yspec check fails  write derived does not continue", {
+  nm_spec$ADAC <- NULL
+  expect_error(write_derived(.data = nm, .spec = nm_spec, .file =  paste0(tempfile(), ".csv")))
+})
+
+
