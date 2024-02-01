@@ -26,7 +26,7 @@ MeRGE Expo</a>.
 ```{r setup_interactive, include=FALSE}
 if (interactive() || isTRUE(getOption('knitr.in.progress'))) {
   devtools::load_all()
-  Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())
+  Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = rprojroot::find_rstudio_root_file())
 }
 ```
 
@@ -106,7 +106,7 @@ nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 mrgda::write_derived(
   .data = derived$nm,
   .spec = nm_spec,
-  .file = here::here("data", "derived", "pk.csv")
+  .file = rprojroot::find_rstudio_root_file("data", "derived", "pk.csv")
 )
 ```
 

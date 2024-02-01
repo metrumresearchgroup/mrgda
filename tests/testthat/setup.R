@@ -12,6 +12,7 @@ local_svn_repo <- function(clean = TRUE, env = parent.frame()){
                                clean = clean,
                                .local_envir = env
   )
+  writeLines("Version: 1.0", con = file.path(repo, "temp.Rproj"))
   return(repo)
 }
 
@@ -94,7 +95,7 @@ with_bg_env <- function(code){
   Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = "")
   # Dont run if inside an R CMD Check environment (package is installed)
   if(!testthat::is_checking()){
-    Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = here::here())
+    Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = rprojroot::find_rstudio_root_file())
     Sys.setenv("RSTUDIO" = 1)
     on.exit(Sys.setenv("MRGDA_SHINY_DEV_LOAD_PATH" = ""))
   }

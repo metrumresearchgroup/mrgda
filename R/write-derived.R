@@ -156,7 +156,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
 
 
   # Determine and save dependencies -----------------------------------------
-  dependencies <- find_in_files(.paths = c(here::here("script"), here::here("model")), .string = basename(.file))
+  dependencies <- find_in_files(.paths = c(rprojroot::find_rstudio_root_file("script"), rprojroot::find_rstudio_root_file("model")), .string = basename(.file))
   yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
 
 

@@ -2,6 +2,7 @@ nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
 
 withr::with_tempdir({
+  writeLines("Version: 1.0", con = "temp.Rproj")
   svn_dir <- local_svn_repo()
   withr::defer(unlink(svn_dir, recursive = TRUE))
 
