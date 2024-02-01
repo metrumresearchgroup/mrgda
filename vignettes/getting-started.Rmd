@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+writeLines("Version: 1.0", con = "temp.Rproj")
 ```
 
 # Introduction
