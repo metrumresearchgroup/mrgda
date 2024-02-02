@@ -22,7 +22,7 @@ get_base_df <- function(.prev_file, .compare_from_svn){
 
     cur_dir <- getwd()
     on.exit(setwd(cur_dir))
-    setwd(here::here())
+    setwd(rprojroot::find_rstudio_root_file())
 
     base_temp <- tempfile(fileext = ".csv")
 

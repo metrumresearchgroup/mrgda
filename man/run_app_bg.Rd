@@ -37,7 +37,7 @@ Use \code{\link[callr:r_bg]{callr::r_bg()}} to launch the app in a separate proc
 \code{port} on \code{host} is active.
 }
 \details{
-Make sure to set \code{Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())}
+Make sure to set \code{Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = rprojroot::find_rstudio_root_file())}
 if you are in a development setting. This will allow package functions to be
 accessible in the background process, which is not an issue when the package
 is installed.

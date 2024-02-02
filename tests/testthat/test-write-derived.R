@@ -2,6 +2,7 @@ nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
 nm <- readr::read_csv(system.file("derived", "pk.csv", package = "mrgda"), na = ".", show_col_types = FALSE)
 
 withr::with_tempdir({
+  writeLines("Version: 1.0", con = "temp.Rproj")
   svn_dir <- local_svn_repo()
   withr::defer(unlink(svn_dir, recursive = TRUE))
 
@@ -61,7 +62,7 @@ test_that("write_derived gives error if data has comma in any value", {
       values = c(1, 2, 3)
       )
 
-  expect_error(write_derived(.data = df_comma, .spec = nm_spec, .file = .temp_csv))
+  expect_error(write_derived(.data = df_comma, .spec = nm_spec, .file = .temp_csv, .compare_from_svn = FALSE))
 })
 
 test_that("write_derived works with no ID column in data", {
@@ -69,12 +70,12 @@ test_that("write_derived works with no ID column in data", {
   nm_spec$ID <- NULL
   .temp_csv2 <- paste0(tempfile(), ".csv")
 
-  expect_error(write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv2))
+  expect_error(write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv2, .compare_from_svn = FALSE))
 })
 
 test_that("if yspec check fails  write derived does not continue", {
   nm_spec$ADAC <- NULL
-  expect_error(write_derived(.data = nm, .spec = nm_spec, .file =  paste0(tempfile(), ".csv")))
+  expect_error(write_derived(.data = nm, .spec = nm_spec, .file =  paste0(tempfile(), ".csv"), .compare_from_svn = FALSE))
 })
 
 

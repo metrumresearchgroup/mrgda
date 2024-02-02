@@ -17,7 +17,7 @@
 #'   specified, it is randomly selected from the valid range of dynamic ports.
 #'
 #' @details
-#' Make sure to set `Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())`
+#' Make sure to set `Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = rprojroot::find_rstudio_root_file())`
 #' if you are in a development setting. This will allow package functions to be
 #' accessible in the background process, which is not an issue when the package
 #' is installed.
@@ -99,7 +99,7 @@ run_app_bg <- function(func, args,
         msgs,
         "",
         "i" = "If you are in a dev environment, make sure you set the environment variable:",
-        " " = "{.code Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())}."
+        " " = "{.code Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = rprojroot::find_rstudio_root_file())}."
       ))
     }
     Sys.sleep(0.01)

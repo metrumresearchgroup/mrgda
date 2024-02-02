@@ -156,8 +156,21 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
 
 
   # Determine and save dependencies -----------------------------------------
-  dependencies <- find_in_files(.paths = c(here::here("script"), here::here("model")), .string = basename(.file))
-  yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
+  rstudio_proj <- tryCatch(
+    rprojroot::find_rstudio_root_file(),
+    error = identity
+  )
+
+  if (!inherits(rstudio_proj, "error")) {
+    dependencies <-
+      find_in_files(.paths = c(
+        file.path(rstudio_proj, "script"),
+        file.path(rstudio_proj, "model")
+      ),
+      .string = basename(.file))
+
+    yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
+  }
 
 
   # Update history ----------------------------------------------------------

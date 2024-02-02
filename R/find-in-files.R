@@ -20,7 +20,7 @@ find_in_files <- function(.paths, .string, .file_types = c("R", "Rmd", "ctl")){
 
     }
 
-    .out[[gsub(here::here(), "", path.i, fixed = TRUE)]] <- found_in.i
+    .out[[gsub(rprojroot::find_rstudio_root_file(), "", path.i, fixed = TRUE)]] <- found_in.i
 
   }
 
