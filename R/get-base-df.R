@@ -45,7 +45,12 @@ get_base_df <- function(.prev_file, .compare_from_svn){
 
   base_df <-
     if (file.exists(base)) {
-      readr::read_csv(base) %>% suppressMessages()
+      data.table::fread(
+        file = base,
+        sep = ",",
+        quote = FALSE,
+        na = "."
+      ) %>% as.data.frame %>% suppressMessages()
     } else {
       NULL
     }
