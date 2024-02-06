@@ -18,7 +18,7 @@ port on host is active."><meta property="og:image" content="https://metrumresear
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.11.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.11.1</span>
       </span>
     </div>
 
@@ -107,7 +107,7 @@ specified, it is randomly selected from the valid range of dynamic ports.</p></d
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Make sure to set <code>Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = here::here())</code>
+    <p>Make sure to set <code>Sys.setenv('MRGDA_SHINY_DEV_LOAD_PATH' = rprojroot::find_rstudio_root_file())</code>
 if you are in a development setting. This will allow package functions to be
 accessible in the background process, which is not an issue when the package
 is installed.</p>
