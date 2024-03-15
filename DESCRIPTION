@@ -1,6 +1,6 @@
 Package: mrgda
 Title: Tools for Data Assembly
-Version: 0.11.0.8005
+Version: 0.11.1.9000
 Authors@R: 
     c(
     person(given = "Eric", family = "Anderson", email = "andersone@metrumrg.com", role = c("aut", "cre")),
