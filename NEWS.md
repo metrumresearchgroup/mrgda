@@ -1,3 +1,9 @@
+# mrgda development
+
+## New features
+
+- `read_src_dir()` now saves the md5 sum of each source file. (#204)
+
 # mrgda 0.11.1
 
 ## Bug fixes

@@ -334,7 +334,7 @@ test_that("setup_v_list works correctly (integration test)", {
 
   # Filtering of mrgda specific dataframes
   expect_equal(
-    setdiff(names(src_list), names(args$.df_list)),
+    sort(setdiff(names(src_list), names(args$.df_list))),
     c("mrgda_labels", "mrgda_src_meta")
   )
 

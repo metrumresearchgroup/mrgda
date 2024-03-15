@@ -77,6 +77,7 @@ read_src_dir <- function(.path,
     } else {
       cli::cli_alert_success(file.i)
       .out[[tools::file_path_sans_ext(basename(file.i))]] <- data.i
+      .out$mrgda_src_meta$md5[[tools::file_path_sans_ext(basename(file.i))]] <- unname(tools::md5sum(file.i))
       n_pass <- n_pass + 1
     }
 

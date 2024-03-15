@@ -1,11 +1,15 @@
 path <- system.file("example-sdtm", package = "mrgda")
 src_list <- read_src_dir(.path = path) %>% suppressMessages()
 
-test_that("read_src_dir ae domain: check data is read in correctly", {
+test_that("read_src_dir check data is read in correctly", {
   expect_equal(src_list$ae, haven::read_xpt(file.path(path, "ae.xpt")) %>% suppressMessages())
   expect_equal(src_list$dm, haven::read_xpt(file.path(path, "dm.xpt")) %>% suppressMessages())
   expect_equal(src_list$lb, haven::read_xpt(file.path(path, "lb.xpt")) %>% suppressMessages())
   expect_equal(src_list$vs, haven::read_xpt(file.path(path, "vs.xpt")) %>% suppressMessages())
+})
+
+test_that("read_src_dir dm domain: md5 is correct", {
+  expect_equal(src_list$mrgda_src_meta$md5$dm, unname(tools::md5sum(file.path(path, "dm.xpt"))))
 })
 
 test_that("read_src_dir allows user to only load in specific domains", {
