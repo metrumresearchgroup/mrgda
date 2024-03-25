@@ -2,6 +2,8 @@
 
 ## New features
 
+- `write_derived()` no longer returns unnecessary information to the R console. (#205)
+
 - `read_src_dir()` now saves the md5 sum of each source file. (#204)
 
 # mrgda 0.11.1
