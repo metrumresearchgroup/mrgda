@@ -11,7 +11,6 @@ silence_console_output(.expr)
 }
 \value{
 The result of the expression \code{.expr} if it completes successfully.
-If an error occurs, it returns \code{NULL}. No console output will be produced either way.
 }
 \description{
 Executes an expression while silencing all messages, warnings, errors, and console outputs.

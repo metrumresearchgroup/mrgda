@@ -7,7 +7,6 @@
 #' @param .expr An expression to be evaluated.
 #'
 #' @return The result of the expression `.expr` if it completes successfully.
-#'         If an error occurs, it returns `NULL`. No console output will be produced either way.
 #'
 #' @keywords internal
 silence_console_output <- function(.expr) {
