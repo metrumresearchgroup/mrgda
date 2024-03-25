@@ -89,16 +89,11 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   )
 
   # Try to render spec
-  suppressWarnings(
-    suppressMessages(
-      try(
-        yspec::render_fda_define(
-          x = .spec,
-          stem = "define",
-          output_dir = .meta_data_folder
-        ),
-        silent = TRUE
-      )
+  silence_console_output(
+    yspec::render_fda_define(
+      x = .spec,
+      stem = "define",
+      output_dir = .meta_data_folder
     )
   )
 
