@@ -8,7 +8,7 @@
 #'
 #' @return The result of the expression `.expr` if it completes successfully.
 #'
-#' @keywords internal
+#' @noRd
 silence_console_output <- function(.expr) {
   # Start diverting all output to a temporary file
   temp_file <- tempfile()
