@@ -1,8 +1,8 @@
 #' @keywords internal
-mrgda_read_csv <- function(.data) {
+mrgda_read_csv <- function(.file) {
 
   data.table::fread(
-    file = .data,
+    file = .file,
     sep = ",",
     quote = FALSE,
     na = "."

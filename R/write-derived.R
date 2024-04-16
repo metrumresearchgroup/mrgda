@@ -47,7 +47,8 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   }
 
   # Write Out New Version ---------------------------------------------------
-  mrgda_write_csv(.data = .data, .file = .file)
+  mrgda_write_csv(.data = .data,
+                  .file = .file)
 
   # Prepare Metadata Folder -------------------------------------------------
   .data_location <- dirname(.file)
@@ -107,7 +108,8 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
         .base_from_svn = base_df_list$from_svn
       )
 
-    mrgda_write_csv(.data = diffs$diffs, .file = file.path(.meta_data_folder, 'diffs.csv'))
+    mrgda_write_csv(.data = diffs$diffs,
+                    .file = file.path(.meta_data_folder, 'diffs.csv'))
 
     mrgda_write_csv(.data = diffs$subject_diffs,
                     .file = file.path(.meta_data_folder, 'subject-diffs.csv'))

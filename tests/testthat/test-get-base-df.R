@@ -43,7 +43,8 @@ test_that("get_base_df output check returns TRUE for from_svn if .compare_from_s
 
     system(paste0("svn co file:///", svn_dir1, " ", svn_dir2, " -q -q"))
 
-    mrgda:::mrgda_write_csv(.data = mtcars, .file = "df.csv")
+    mrgda:::mrgda_write_csv(.data = mtcars,
+                            .file = "df.csv")
 
     system("svn add df.csv -q -q")
     system("svn commit -m 'test' df.csv -q -q")
