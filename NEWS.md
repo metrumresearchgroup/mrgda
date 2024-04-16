@@ -1,4 +1,4 @@
-# mrgda development
+# mrgda 0.11.2
 
 ## New features
 
