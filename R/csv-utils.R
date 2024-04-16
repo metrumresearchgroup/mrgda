@@ -5,7 +5,7 @@ mrgda_read_csv <- function(.file) {
     file = .file,
     sep = ",",
     quote = FALSE,
-    na = "."
+    na.strings = "."
   ) %>%
     as.data.frame() %>%
     suppressMessages()
