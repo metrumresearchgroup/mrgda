@@ -45,12 +45,7 @@ get_base_df <- function(.prev_file, .compare_from_svn){
 
   base_df <-
     if (file.exists(base)) {
-      data.table::fread(
-        file = base,
-        sep = ",",
-        quote = FALSE,
-        na = "."
-      ) %>% as.data.frame %>% suppressMessages()
+      mrgda_read_csv(base)
     } else {
       NULL
     }

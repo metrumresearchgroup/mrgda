@@ -18,14 +18,8 @@ test_that("get_base_df output check: returns FALSE for from_svn if .compare_from
 # Test 4: The function should return a data frame for base_df if the file exists
 test_that("get_base_df output check: returns a data frame for base_df if the file exists", {
   # Create a test file
-  data.table::fwrite(
-    x = data.frame(a = 1:5, b = 6:10),
-    file = "test.csv",
-    sep = ",",
-    quote = FALSE,
-    row.names = FALSE,
-    na = "."
-  )
+  mrgda:::mrgda_write_csv(.data = data.frame(a = 1:5, b = 6:10),
+                          .file = "test.csv")
   on.exit(unlink("test.csv"))
 
   result <- get_base_df("test.csv", FALSE)
@@ -49,14 +43,7 @@ test_that("get_base_df output check returns TRUE for from_svn if .compare_from_s
 
     system(paste0("svn co file:///", svn_dir1, " ", svn_dir2, " -q -q"))
 
-    data.table::fwrite(
-      x = mtcars,
-      file = "df.csv",
-      sep = ",",
-      quote = FALSE,
-      row.names = FALSE,
-      na = "."
-    )
+    mrgda:::mrgda_write_csv(.data = mtcars, .file = "df.csv")
 
     system("svn add df.csv -q -q")
     system("svn commit -m 'test' df.csv -q -q")

@@ -4,14 +4,7 @@ test_that("assign_id function works correctly", {
   .data <- data.frame(USUBJID = c("A", "B", "C"))
   .new_data_file <- paste0(tempfile(), ".csv")
 
-  data.table::fwrite(
-    x = assign_id(.data),
-    file = .new_data_file,
-    sep = ",",
-    quote = FALSE,
-    row.names = FALSE,
-    na = "."
-  )
+  mrgda_write_csv(.data = assign_id(.data), .file = .new_data_file)
 
   expect_true(nrow(assign_id(.data, .previously_derived_path = .new_data_file)) == 3) %>% suppressMessages()
   expect_true(ncol(assign_id(.data, .previously_derived_path = .new_data_file)) == 2) %>% suppressMessages()
@@ -77,14 +70,8 @@ test_that("assign_id function works correctly", {
 
     data <- data.frame(USUBJID = c("A", "B", "C", "D"))
     lookup_path <- paste0(tempfile(), ".csv")
-    data.table::fwrite(
-      x = data,
-      file = lookup_path,
-      sep = ",",
-      quote = FALSE,
-      row.names = FALSE,
-      na = "."
-    )
+
+    mrgda_write_csv(.data = data, .file = lookup_path)
 
     expect_error(assign_id(.data = data, .previously_derived_path = lookup_path), "ID column not found in previous data")
     expect_error(assign_id(.data = data, .subject_col = "USUBJID2"), "USUBJID2 not found in data")
@@ -96,14 +83,7 @@ test_that("assign_id sets new ID's larger than the previous data even if no subj
 
   old_data <- dplyr::tibble(USUBJID = c("A", "B", "C", "D"), ID = c(1, 2, 4, 19))
   lookup_path <- paste0(tempfile(), ".csv")
-  data.table::fwrite(
-    x = old_data,
-    file = lookup_path,
-    sep = ",",
-    quote = FALSE,
-    row.names = FALSE,
-    na = "."
-  )
+  mrgda_write_csv(.data = old_data, .file = lookup_path)
 
   data <- dplyr::tibble(USUBJID = c("E", "F", "G"))
   ids_assigned <- assign_id(.data = data, .subject_col = "USUBJID", .previously_derived_path = lookup_path)
