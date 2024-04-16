@@ -47,8 +47,10 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   }
 
   # Write Out New Version ---------------------------------------------------
-  mrgda_write_csv(.data = .data,
-                  .file = .file)
+  mrgda_write_csv(
+    .data = .data,
+    .file = .file
+  )
 
   # Prepare Metadata Folder -------------------------------------------------
   .data_location <- dirname(.file)
@@ -108,11 +110,15 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
         .base_from_svn = base_df_list$from_svn
       )
 
-    mrgda_write_csv(.data = diffs$diffs,
-                    .file = file.path(.meta_data_folder, 'diffs.csv'))
+    mrgda_write_csv(
+      .data = diffs$diffs,
+      .file = file.path(.meta_data_folder, 'diffs.csv')
+    )
 
-    mrgda_write_csv(.data = diffs$subject_diffs,
-                    .file = file.path(.meta_data_folder, 'subject-diffs.csv'))
+    mrgda_write_csv(
+      .data = diffs$subject_diffs,
+      .file = file.path(.meta_data_folder, 'subject-diffs.csv')
+    )
   }
 
 
@@ -159,8 +165,10 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
       .prev_rev = base_df_list$prev_rev
     )
 
-  mrgda_write_csv(.data = .history,
-                  .file = file.path(.meta_data_folder, 'history.csv'))
+  mrgda_write_csv(
+    .data = .history,
+    .file = file.path(.meta_data_folder, 'history.csv')
+  )
 
   cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))
   cli::cli_alert(paste0("Metadata folder: ", cli::col_blue(tools::file_path_as_absolute(.meta_data_folder))))
