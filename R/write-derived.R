@@ -103,7 +103,12 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   }
 
   # Execute data diffs ------------------------------------------------------
-  compare_df <- data.table::fread(.file) %>% suppressMessages()
+  compare_df <- data.table::fread(
+    file = .file,
+    sep = ",",
+    quote = FALSE,
+    na = "."
+  ) %>% suppressMessages()
 
   if (!is.null(base_df_list$base_df) & .execute_diffs) {
     diffs <-
