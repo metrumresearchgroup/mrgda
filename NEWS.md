@@ -1,4 +1,4 @@
-# mrgda development
+# mrgda 0.11.2
 
 ## New features
 
@@ -8,7 +8,7 @@
 
 ## Bug fixes
 
-- `write_derived()` was reporting differences in columns where there were none.
+- `write_derived()` was reporting differences in columns where there were none.(#208)
 
 # mrgda 0.11.1
 
