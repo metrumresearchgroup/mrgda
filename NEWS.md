@@ -6,6 +6,10 @@
 
 - `read_src_dir()` now saves the md5 sum of each source file. (#204)
 
+## Bug fixes
+
+- `write_derived()` was reporting differences in columns where there were none.
+
 # mrgda 0.11.1
 
 ## Bug fixes

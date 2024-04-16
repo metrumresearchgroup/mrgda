@@ -89,13 +89,9 @@ head(pk_data %>% distinct(USUBJID))
 ```{r, include=FALSE}
 # Writing out data to a temporary location in order to use .previously_derived_path below
 lookup_path <- paste0(tempfile(), ".csv")
-data.table::fwrite(
-  x = data_w_id,
-  file = lookup_path,
-  sep = ",",
-  quote = FALSE,
-  row.names = FALSE,
-  na = "."
+mrgda:::mrgda_write_csv(
+  .data = data_w_id,
+  .file = lookup_path
 )
 ```
 
@@ -129,13 +125,9 @@ of this is shown below.
 ```{r}
 old_data <- dplyr::tibble(USUBJID = c("A", "B", "C", "D"), ID = c(1, 2, 4, 19))
 lookup_path <- paste0(tempfile(), ".csv")
-data.table::fwrite(
-  x = old_data,
-  file = lookup_path,
-  sep = ",",
-  quote = FALSE,
-  row.names = FALSE,
-  na = "."
+mrgda:::mrgda_write_csv(
+  .data = old_data,
+  .file = lookup_path
 )
 
 data <- dplyr::tibble(USUBJID = c("E", "F", "G"))

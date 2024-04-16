@@ -47,13 +47,9 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   }
 
   # Write Out New Version ---------------------------------------------------
-  data.table::fwrite(
-    x = .data,
-    file = .file,
-    sep = ",",
-    quote = FALSE,
-    row.names = FALSE,
-    na = "."
+  mrgda_write_csv(
+    .data = .data,
+    .file = .file
   )
 
   # Prepare Metadata Folder -------------------------------------------------
@@ -62,7 +58,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   .meta_data_folder <- file.path(.data_location, .data_name)
 
   .cur_history <- tryCatch(
-    suppressMessages(data.table::fread(file.path(.meta_data_folder, "history.csv"))),
+    mrgda_read_csv(file.path(.meta_data_folder, "history.csv")),
     error = identity
   )
 
@@ -103,7 +99,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   }
 
   # Execute data diffs ------------------------------------------------------
-  compare_df <- data.table::fread(.file) %>% suppressMessages()
+  compare_df <- mrgda_read_csv(.file)
 
   if (!is.null(base_df_list$base_df) & .execute_diffs) {
     diffs <-
@@ -114,22 +110,14 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
         .base_from_svn = base_df_list$from_svn
       )
 
-    data.table::fwrite(
-      x = diffs$diffs,
-      file = file.path(.meta_data_folder, 'diffs.csv'),
-      sep = ",",
-      quote = FALSE,
-      row.names = FALSE,
-      na = "."
+    mrgda_write_csv(
+      .data = diffs$diffs,
+      .file = file.path(.meta_data_folder, 'diffs.csv')
     )
 
-    data.table::fwrite(
-      x = diffs$subject_diffs,
-      file = file.path(.meta_data_folder, 'subject-diffs.csv'),
-      sep = ",",
-      quote = FALSE,
-      row.names = FALSE,
-      na = "."
+    mrgda_write_csv(
+      .data = diffs$subject_diffs,
+      .file = file.path(.meta_data_folder, 'subject-diffs.csv')
     )
   }
 
@@ -177,12 +165,9 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
       .prev_rev = base_df_list$prev_rev
     )
 
-  data.table::fwrite(
-    x = .history,
-    file = file.path(.meta_data_folder, 'history.csv'),
-    sep = ",",
-    quote = FALSE,
-    row.names = FALSE
+  mrgda_write_csv(
+    .data = .history,
+    .file = file.path(.meta_data_folder, 'history.csv')
   )
 
   cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))

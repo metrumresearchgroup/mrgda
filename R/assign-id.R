@@ -49,8 +49,7 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
 
   if (!is.null(.previously_derived_path)) {
     previously_derived <-
-      data.table::fread(.previously_derived_path) %>%
-      suppressMessages()
+      mrgda_read_csv(.previously_derived_path)
 
     if (is.null(previously_derived[["ID"]])) {
       stop("ID column not found in previous data")
