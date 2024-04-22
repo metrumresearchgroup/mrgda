@@ -2,9 +2,6 @@
 
 export("%>%")
 export(assign_id)
-export(check_src)
-export(check_src_duplicates)
-export(check_src_missing_datetime)
 export(execute_data_diffs)
 export(explain)
 export(query_src_list)

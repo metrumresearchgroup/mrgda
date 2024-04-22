@@ -1,6 +1,12 @@
+# mrgda development
+
+## New features and changes
+
+- `check-src` functions were removed from the package. 
+
 # mrgda 0.11.2
 
-## New features
+## New features and changes
 
 - `write_derived()` no longer returns unnecessary information to the R console. (#205)
 
