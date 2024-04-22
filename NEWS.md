@@ -2,7 +2,7 @@
 
 ## New features and changes
 
-- `check-src` functions were removed from the package. 
+- `check-src` functions were removed from the package. (#210)
 
 # mrgda 0.11.2
 
