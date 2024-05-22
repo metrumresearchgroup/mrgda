@@ -9,7 +9,7 @@ pkgr.yml
 ^.*\.Rproj$
 ^man-roxygen$
 ^README\.Rmd$
-^.drone.yml$
+^\.github$
 make-R.R
 inst/example-sdtm-large-ae
 inst/example-sdtm-large-lb
