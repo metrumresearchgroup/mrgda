@@ -6,8 +6,7 @@
 <!-- badges: start -->
 
 [![Build
-Status](https://github-drone.metrumrg.com/api/badges/metrumresearchgroup/mrgda/status.svg)](https://github-drone.metrumrg.com/metrumresearchgroup/mrgda)
-[![codecov](https://codecov.io/gh/metrumresearchgroup/mrgda/branch/main/graph/badge.svg)](https://codecov.io/gh/metrumresearchgroup/mrgda)
+Status](https://github.com/metrumresearchgroup/mrgda/actions/workflows/main.yaml/badge.svg)](https://github.com/metrumresearchgroup/mrgda/actions/workflows/main.yaml)
 <!-- badges: end -->
 
 ## Overview
