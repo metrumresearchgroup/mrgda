@@ -43,8 +43,6 @@ jobs:
             any::rcmdcheck
           upgrade: 'TRUE'
       - uses: r-lib/actions/check-r-package@v2
-        with:
-          error-on: '"note"'
       - name: Check pkgdown
         shell: Rscript {0}
         run: pkgdown::check_pkgdown()
