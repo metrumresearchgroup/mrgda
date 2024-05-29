@@ -39,7 +39,7 @@ read_nm_csv <- function(.file) {
 #' @param .data data.frame
 #' @param .file file path to write out csv file
 #'
-#' @export
+#' @noRd
 write_nm_csv <- function(.data, .file) {
 
   data.table::fwrite(
