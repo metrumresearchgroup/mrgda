@@ -4,7 +4,7 @@ test_that("assign_id function works correctly", {
   .data <- data.frame(USUBJID = c("A", "B", "C"))
   .new_data_file <- paste0(tempfile(), ".csv")
 
-  mrgda_write_csv(
+  write_nm_csv(
     .data = assign_id(.data),
     .file = .new_data_file
   )
@@ -74,7 +74,7 @@ test_that("assign_id function works correctly", {
     data <- data.frame(USUBJID = c("A", "B", "C", "D"))
     lookup_path <- paste0(tempfile(), ".csv")
 
-    mrgda_write_csv(
+    write_nm_csv(
       .data = data,
       .file = lookup_path
     )
@@ -89,7 +89,7 @@ test_that("assign_id sets new ID's larger than the previous data even if no subj
 
   old_data <- dplyr::tibble(USUBJID = c("A", "B", "C", "D"), ID = c(1, 2, 4, 19))
   lookup_path <- paste0(tempfile(), ".csv")
-  mrgda_write_csv(
+  write_nm_csv(
     .data = old_data,
     .file = lookup_path
   )

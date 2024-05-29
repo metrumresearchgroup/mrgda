@@ -27,3 +27,5 @@ reference:
     contents:
     - assign_id
     - explain
+    - read_nm_csv
+    - write_nm_csv
