@@ -11,8 +11,7 @@
 #' @export
 read_nm_csv <- function(.file) {
 
-  df <-
-    data.table::fread(
+  data.table::fread(
       file = .file,
       sep = ",",
       quote = FALSE,
@@ -20,11 +19,6 @@ read_nm_csv <- function(.file) {
     ) %>%
     as.data.frame() %>%
     suppressMessages()
-
-  cli::cli_alert_success(paste0("Successfully read: '", .file, "'"))
-  cli::cli_alert_info('"." replaced with NA')
-
-  df
 }
 
 
@@ -48,7 +42,4 @@ write_nm_csv <- function(.data, .file) {
     row.names = FALSE,
     na = "."
   )
-
-  cli::cli_alert_success(paste0("Successfully wrote: '", .file, "'"))
-  cli::cli_alert_info('NA replaced with "."')
 }
