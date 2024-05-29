@@ -22,12 +22,6 @@ reference:
     contents:
     - write_derived
     - execute_data_diffs
-  - title: Data Validation
-    desc: Check for errors in a NONMEM data set
-    contents:
-    - check_src
-    - check_src_duplicates
-    - check_src_missing_datetime
   - title: Data Management
     desc: Data versioning helpers
     contents:
