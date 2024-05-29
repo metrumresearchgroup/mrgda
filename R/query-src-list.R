@@ -26,10 +26,6 @@ query_src_list <- function(.src_list, .string) {
 
   matches <- src_list_char[grepl(.string, src_list_char, ignore.case = TRUE)]
 
-  if (length(matches) == 0) {
-    stop("No matches found for ", .string)
-  }
-
   hits <- dplyr::tibble()
 
   for (df.i in names(matches)) {
@@ -53,6 +49,10 @@ query_src_list <- function(.src_list, .string) {
     }
   }
 
-  hits %>% dplyr::mutate(MATCHING = .string)
+  if (length(matches) == 0) {
+    cli::cli_alert_danger(paste0("No matches found for ", .string))
+  } else {
+    hits %>% dplyr::mutate(MATCHING = .string)
+  }
 
 }
