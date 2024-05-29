@@ -9,10 +9,6 @@
 #' @export
 read_nm_csv <- function(.file) {
 
-  if (!file.exists(.file)) {
-    stop(.file, " not found")
-  }
-
   df <-
     data.table::fread(
       file = .file,
