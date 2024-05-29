@@ -1,10 +1,12 @@
-#' Read csv file
+#' Read CSV File
 #'
-#' @description
-#' Reads csv files and formats the data to replace any "." with
-#' NA values.
+#' This function reads a CSV file formatted for NONMEM (or similar) where missing values
+#' are represented by a period (".") and converts these to `NA`. It utilizes the
+#'  `data.table::fread` function for fast reading and converts the result to a data frame.
 #'
-#' @param .file file path to csv file
+#' @param .file A character string specifying the path to the CSV file to be read.
+#'
+#' @return A data frame with the contents of the CSV file, with "." values replaced by `NA`.
 #'
 #' @export
 read_nm_csv <- function(.file) {
