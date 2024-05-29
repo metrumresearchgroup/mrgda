@@ -1,6 +1,6 @@
 Package: mrgda
 Title: Tools for Data Assembly
-Version: 0.11.2
+Version: 0.11.2.8000
 Authors@R: 
     c(
     person(given = "Eric", family = "Anderson", email = "andersone@metrumrg.com", role = c("aut", "cre")),
@@ -37,8 +37,7 @@ Imports:
     assertthat,
     stringr,
     knitr,
-    readr,
-    anytime
+    readr
 Suggests: 
     testthat (>= 3.1.10),
     withr (>= 2.5.0),
