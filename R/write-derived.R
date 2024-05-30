@@ -58,7 +58,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   .meta_data_folder <- file.path(.data_location, .data_name)
 
   .cur_history <- tryCatch(
-    read_nm_csv(file.path(.meta_data_folder, "history.csv")),
+    read_csv_mrgda(file.path(.meta_data_folder, "history.csv")),
     error = identity
   )
 
@@ -99,7 +99,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   }
 
   # Execute data diffs ------------------------------------------------------
-  compare_df <- read_nm_csv(.file)
+  compare_df <- read_csv_mrgda(.file)
 
   if (!is.null(base_df_list$base_df) & .execute_diffs) {
     diffs <-

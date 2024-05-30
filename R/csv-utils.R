@@ -4,21 +4,34 @@
 #' are represented by a period (".") and converts these to `NA`. It utilizes the
 #'  `data.table::fread` function for fast reading and converts the result to a data frame.
 #'
-#' @param .file A character string specifying the path to the CSV file to be read.
+#' @param file A character string specifying the path to the CSV file to be read.
+#' @param sep Separator between columns, defaults to ","
+#' @param quote Set to handle fields starting with a double quote, defaults to FALSE
+#' @param na.strings A character vector of strings to be interpreted as NA values, defaults to "."
+#' @param integer64 Reads columns detected as containing integers larger than 2^31, default to "double"
+#' @param data.table Boolean, set to TRUE to return data.table, set to FALSE to return data.frame
+#' @param ... arguments passed to [data.table::fread()]
 #'
 #' @return A data frame with the contents of the CSV file, with "." values replaced by `NA`.
 #'
 #' @export
-read_nm_csv <- function(.file) {
+read_csv_mrgda <- function(file,
+                           sep = ",",
+                           quote = FALSE,
+                           na.strings = ".",
+                           integer64 = "double",
+                           data.table = FALSE,
+                           ...) {
 
   data.table::fread(
-      file = .file,
-      sep = ",",
-      quote = FALSE,
-      na.strings = "."
-    ) %>%
-    as.data.frame() %>%
-    suppressMessages()
+    file,
+    sep = ",",
+    quote = FALSE,
+    na.strings = ".",
+    integer64 = "double",
+    data.table = FALSE,
+    ...
+  )
 }
 
 

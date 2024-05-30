@@ -49,7 +49,7 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
 
   if (!is.null(.previously_derived_path)) {
     previously_derived <-
-      read_nm_csv(.previously_derived_path)
+      read_csv_mrgda(.previously_derived_path)
 
     if (is.null(previously_derived[["ID"]])) {
       stop("ID column not found in previous data")

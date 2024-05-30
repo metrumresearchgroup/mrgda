@@ -45,7 +45,7 @@ get_base_df <- function(.prev_file, .compare_from_svn){
 
   base_df <-
     if (file.exists(base)) {
-      read_nm_csv(base)
+      read_csv_mrgda(base)
     } else {
       NULL
     }
