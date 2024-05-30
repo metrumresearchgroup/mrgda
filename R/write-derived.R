@@ -47,9 +47,9 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   }
 
   # Write Out New Version ---------------------------------------------------
-  write_nm_csv(
-    .data = .data,
-    .file = .file
+  write_csv_mrgda(
+    x = .data,
+    file = .file
   )
 
   # Prepare Metadata Folder -------------------------------------------------
@@ -110,14 +110,14 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
         .base_from_svn = base_df_list$from_svn
       )
 
-    write_nm_csv(
-      .data = diffs$diffs,
-      .file = file.path(.meta_data_folder, 'diffs.csv')
+    write_csv_mrgda(
+      x = diffs$diffs,
+      file = file.path(.meta_data_folder, 'diffs.csv')
     )
 
-    write_nm_csv(
-      .data = diffs$subject_diffs,
-      .file = file.path(.meta_data_folder, 'subject-diffs.csv')
+    write_csv_mrgda(
+      x = diffs$subject_diffs,
+      file = file.path(.meta_data_folder, 'subject-diffs.csv')
     )
   }
 
@@ -165,9 +165,9 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
       .prev_rev = base_df_list$prev_rev
     )
 
-  write_nm_csv(
-    .data = .history,
-    .file = file.path(.meta_data_folder, 'history.csv')
+  write_csv_mrgda(
+    x = .history,
+    file = file.path(.meta_data_folder, 'history.csv')
   )
 
   cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))

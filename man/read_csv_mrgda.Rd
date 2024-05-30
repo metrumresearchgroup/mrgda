@@ -27,7 +27,7 @@ read_csv_mrgda(
 
 \item{data.table}{Boolean, set to TRUE to return data.table, set to FALSE to return data.frame}
 
-\item{...}{arguments passed to \link[data.table]{fread}}
+\item{...}{arguments passed to \code{\link[data.table:fread]{data.table::fread()}}}
 }
 \value{
 A data frame with the contents of the CSV file, with "." values replaced by \code{NA}.

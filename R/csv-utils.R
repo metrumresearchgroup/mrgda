@@ -24,35 +24,46 @@ read_csv_mrgda <- function(file,
                            ...) {
 
   data.table::fread(
-    file,
-    sep = ",",
-    quote = FALSE,
-    na.strings = ".",
-    integer64 = "double",
-    data.table = FALSE,
+    file = file,
+    sep = sep,
+    quote = quote,
+    na.strings = na.strings,
+    integer64 = integer64,
+    data.table = data.table,
     ...
   )
 }
 
 
-#' Write csv file
+#' Write CSV File
 #'
-#' @description
-#' Writes csv files and formats the data to replace any NA with
-#' "." values.
+#' This function writes a CSV file formatted for NONMEM (or similar) where missing values
+#' are converted to a period ("."). It utilizes the `data.table::fwrite` function.
 #'
-#' @param .data data.frame
-#' @param .file file path to write out csv file
+#' @param x Any list of same length vectors (eg. data.frame and data.table)
+#' @param file Output file name
+#' @param sep Separator between columns, default is ","
+#' @param quote Should character fields, factor filds and column names be surrounded by double quotes? Defaults to FALSE
+#' @param row.names Boolean. Should row names be written? Defaults to FALSE
+#' @param na The string to use for missing values in the data, defaults to "."
+#' @param ... arguments passed to [data.table::fwrite()]
 #'
-#' @noRd
-write_nm_csv <- function(.data, .file) {
+#' @export
+write_csv_mrgda <- function(x,
+                            file,
+                            sep = ",",
+                            quote = FALSE,
+                            row.names = FALSE,
+                            na = ".",
+                            ...) {
 
   data.table::fwrite(
-    x = .data,
-    file = .file,
-    sep = ",",
-    quote = FALSE,
-    row.names = FALSE,
-    na = "."
+    x = x,
+    file = file,
+    sep = sep,
+    quote = quote,
+    row.names = row.names,
+    na = na,
+    ...
   )
 }
