@@ -15,7 +15,7 @@
 #' @return A data frame with the contents of the CSV file, with "." values replaced by `NA`.
 #'
 #' @export
-read_csv_mrgda <- function(file,
+read_csv_dots <- function(file,
                            sep = ",",
                            quote = FALSE,
                            na.strings = ".",
@@ -49,7 +49,7 @@ read_csv_mrgda <- function(file,
 #' @param ... arguments passed to [data.table::fwrite()]
 #'
 #' @export
-write_csv_mrgda <- function(x,
+write_csv_dots <- function(x,
                             file,
                             sep = ",",
                             quote = FALSE,

@@ -27,5 +27,5 @@ reference:
     contents:
     - assign_id
     - explain
-    - read_csv_mrgda
-    - write_csv_mrgda
+    - read_csv_dots
+    - write_csv_dots

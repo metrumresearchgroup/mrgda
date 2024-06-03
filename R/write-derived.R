@@ -47,7 +47,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   }
 
   # Write Out New Version ---------------------------------------------------
-  write_csv_mrgda(
+  write_csv_dots(
     x = .data,
     file = .file
   )
@@ -58,7 +58,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   .meta_data_folder <- file.path(.data_location, .data_name)
 
   .cur_history <- tryCatch(
-    read_csv_mrgda(file.path(.meta_data_folder, "history.csv")),
+    read_csv_dots(file.path(.meta_data_folder, "history.csv")),
     error = identity
   )
 
@@ -99,7 +99,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   }
 
   # Execute data diffs ------------------------------------------------------
-  compare_df <- read_csv_mrgda(.file)
+  compare_df <- read_csv_dots(.file)
 
   if (!is.null(base_df_list$base_df) & .execute_diffs) {
     diffs <-
@@ -110,12 +110,12 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
         .base_from_svn = base_df_list$from_svn
       )
 
-    write_csv_mrgda(
+    write_csv_dots(
       x = diffs$diffs,
       file = file.path(.meta_data_folder, 'diffs.csv')
     )
 
-    write_csv_mrgda(
+    write_csv_dots(
       x = diffs$subject_diffs,
       file = file.path(.meta_data_folder, 'subject-diffs.csv')
     )
@@ -165,7 +165,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
       .prev_rev = base_df_list$prev_rev
     )
 
-  write_csv_mrgda(
+  write_csv_dots(
     x = .history,
     file = file.path(.meta_data_folder, 'history.csv')
   )
