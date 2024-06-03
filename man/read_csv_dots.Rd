@@ -7,7 +7,7 @@
 read_csv_dots(
   file,
   sep = ",",
-  quote = FALSE,
+  quote = "",
   na.strings = ".",
   integer64 = "double",
   data.table = FALSE,
@@ -19,7 +19,7 @@ read_csv_dots(
 
 \item{sep}{Separator between columns, defaults to ","}
 
-\item{quote}{Set to handle fields starting with a double quote, defaults to FALSE}
+\item{quote}{Set to handle fields starting with a double quote, defaults to ""}
 
 \item{na.strings}{A character vector of strings to be interpreted as NA values, defaults to "."}
 

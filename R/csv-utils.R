@@ -6,7 +6,7 @@
 #'
 #' @param file A character string specifying the path to the CSV file to be read.
 #' @param sep Separator between columns, defaults to ","
-#' @param quote Set to handle fields starting with a double quote, defaults to FALSE
+#' @param quote Set to handle fields starting with a double quote, defaults to ""
 #' @param na.strings A character vector of strings to be interpreted as NA values, defaults to "."
 #' @param integer64 Reads columns detected as containing integers larger than 2^31, default to "double"
 #' @param data.table Boolean, set to TRUE to return data.table, set to FALSE to return data.frame
