@@ -17,7 +17,7 @@
 #' @export
 read_csv_dots <- function(file,
                            sep = ",",
-                           quote = FALSE,
+                           quote = "",
                            na.strings = ".",
                            integer64 = "double",
                            data.table = FALSE,
