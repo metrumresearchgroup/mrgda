@@ -47,9 +47,9 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   }
 
   # Write Out New Version ---------------------------------------------------
-  mrgda_write_csv(
-    .data = .data,
-    .file = .file
+  write_csv_dots(
+    x = .data,
+    file = .file
   )
 
   # Prepare Metadata Folder -------------------------------------------------
@@ -58,7 +58,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   .meta_data_folder <- file.path(.data_location, .data_name)
 
   .cur_history <- tryCatch(
-    mrgda_read_csv(file.path(.meta_data_folder, "history.csv")),
+    read_csv_dots(file.path(.meta_data_folder, "history.csv")),
     error = identity
   )
 
@@ -99,7 +99,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   }
 
   # Execute data diffs ------------------------------------------------------
-  compare_df <- mrgda_read_csv(.file)
+  compare_df <- read_csv_dots(.file)
 
   if (!is.null(base_df_list$base_df) & .execute_diffs) {
     diffs <-
@@ -110,14 +110,14 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
         .base_from_svn = base_df_list$from_svn
       )
 
-    mrgda_write_csv(
-      .data = diffs$diffs,
-      .file = file.path(.meta_data_folder, 'diffs.csv')
+    write_csv_dots(
+      x = diffs$diffs,
+      file = file.path(.meta_data_folder, 'diffs.csv')
     )
 
-    mrgda_write_csv(
-      .data = diffs$subject_diffs,
-      .file = file.path(.meta_data_folder, 'subject-diffs.csv')
+    write_csv_dots(
+      x = diffs$subject_diffs,
+      file = file.path(.meta_data_folder, 'subject-diffs.csv')
     )
   }
 
@@ -165,9 +165,9 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
       .prev_rev = base_df_list$prev_rev
     )
 
-  mrgda_write_csv(
-    .data = .history,
-    .file = file.path(.meta_data_folder, 'history.csv')
+  write_csv_dots(
+    x = .history,
+    file = file.path(.meta_data_folder, 'history.csv')
   )
 
   cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))
