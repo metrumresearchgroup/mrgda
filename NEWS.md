@@ -1,6 +1,10 @@
-# mrgda development
+# mrgda 0.12.0
 
 ## New features and changes
+
+- `read_csv_dots` added to the package as the default csv reader. (#215)
+
+- `write_csv_dots` added to the package as an alternative csv writer. (#215)
 
 - `check-src` functions were removed from the package. (#210)
 
