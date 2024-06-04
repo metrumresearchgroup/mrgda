@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.11.2</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.12.0</span>
       </span>
     </div>
 
@@ -240,9 +240,9 @@ of this is shown below.</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">old_data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>USUBJID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"A"</span>, <span class="st">"B"</span>, <span class="st">"C"</span>, <span class="st">"D"</span><span class="op">)</span>, ID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">4</span>, <span class="fl">19</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">lookup_path</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/tempfile.html" class="external-link">tempfile</a></span><span class="op">(</span><span class="op">)</span>, <span class="st">".csv"</span><span class="op">)</span></span>
-<span><span class="fu">mrgda</span><span class="fu">:::</span><span class="fu">mrgda_write_csv</span><span class="op">(</span></span>
-<span>  .data <span class="op">=</span> <span class="va">old_data</span>,</span>
-<span>  .file <span class="op">=</span> <span class="va">lookup_path</span></span>
+<span><span class="fu">mrgda</span><span class="fu">:::</span><span class="fu"><a href="../reference/write_csv_dots.html">write_csv_dots</a></span><span class="op">(</span></span>
+<span>  x <span class="op">=</span> <span class="va">old_data</span>,</span>
+<span>  file <span class="op">=</span> <span class="va">lookup_path</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">data</span> <span class="op">&lt;-</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>USUBJID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"E"</span>, <span class="st">"F"</span>, <span class="st">"G"</span><span class="op">)</span><span class="op">)</span></span>
@@ -282,7 +282,7 @@ than 19.</p>
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.8.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.9.</p>
 </div>
 
       </footer>

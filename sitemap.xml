@@ -31,15 +31,6 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/check_for_v_pkgs.html</loc>
   </url>
   <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/check_src.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/check_src_duplicates.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/check_src_missing_datetime.html</loc>
-  </url>
-  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/create_global_filter.html</loc>
   </url>
   <url>
@@ -100,6 +91,9 @@
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/random_dynamic_port.html</loc>
   </url>
   <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/read_csv_dots.html</loc>
+  </url>
+  <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/read_src_dir.html</loc>
   </url>
   <url>
@@ -131,6 +125,9 @@
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/v_shiny_internal.html</loc>
+  </url>
+  <url>
+    <loc>https://metrumresearchgroup.github.io/mrgda/reference/write_csv_dots.html</loc>
   </url>
   <url>
     <loc>https://metrumresearchgroup.github.io/mrgda/reference/write_derived.html</loc>
