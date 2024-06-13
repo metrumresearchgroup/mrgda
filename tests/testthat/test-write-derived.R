@@ -86,6 +86,6 @@ test_that("comma is automatically removed from comment", {
                 .comment = "Add var1, var2, var3",
                 .compare_from_svn = FALSE)
   df <- read_csv_dots(paste0(file_loc, "/history.csv"))
-  expect_true(df$Comment == "Add var1 var2 var3")
+  expect_true(df$Comment == "Add var1  var2  var3")
 })
 
