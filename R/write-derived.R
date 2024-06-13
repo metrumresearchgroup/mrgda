@@ -160,7 +160,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
 
   # Protect against commas in comment
   if (!is.null(.comment)) {
-    .comment <- gsub(",", "", .comment)
+    .comment <- gsub(",", " ", .comment, fixed=TRUE)
   }
 
   .history <-
