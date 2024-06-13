@@ -78,4 +78,14 @@ test_that("if yspec check fails  write derived does not continue", {
   expect_error(write_derived(.data = nm, .spec = nm_spec, .file =  paste0(tempfile(), ".csv"), .compare_from_svn = FALSE))
 })
 
+test_that("comma is automatically removed from comment", {
+  file_loc <- tempfile()
+  write_derived(.data = nm,
+                .spec = nm_spec,
+                .file = paste0(file_loc, ".csv"),
+                .comment = "Add var1, var2, var3",
+                .compare_from_svn = FALSE)
+  df <- read_csv_dots(paste0(file_loc, "/history.csv"))
+  expect_true(df$Comment == "Add var1 var2 var3")
+})
 
