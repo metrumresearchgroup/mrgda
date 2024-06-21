@@ -12,7 +12,6 @@ Packages:
 
 Repos:
   - CRAN: https://cran.rstudio.com
-  - scorecard: https://s3.amazonaws.com/mpn.metworx.dev/releases/mpn.scorecard/0.4.0
   - MPN: https://mpn.metworx.com/snapshots/stable/2024-06-12 # used for mrg packages
 
 Lockfile:
