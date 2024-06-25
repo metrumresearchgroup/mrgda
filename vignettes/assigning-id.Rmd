@@ -1,5 +1,5 @@
 ---
-title: "assigning-id"
+title: "Assign ID Column"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{assigning-id}

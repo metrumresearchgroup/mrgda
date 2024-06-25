@@ -1,0 +1,107 @@
+---
+title: "Code Documentation with explain"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{explain-code}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+This is a vignette to help you become familiar with using `explain()`. 
+Check out the <a href="https://metrumresearchgroup.github.io/mrgda/reference/explain.html"
+target="_blank">function documentation</a> for additional background and examples.
+
+`explain()` prints a formatted message containing the result of a provided expression. 
+This function is intended to be run interactively in the R console to aid in code 
+understanding, transfer and debugging.
+
+Below, we will go through a few examples cases using `explain()`.
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = ""
+)
+```
+
+```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
+library(mrgda)
+library(dplyr)
+```
+
+# Setup
+
+We will use `explain()` to document data manipulations and checks on the derived PK 
+data set from `mrgda`.
+
+```{r, message=FALSE}
+pk_data <- readr::read_csv(system.file("derived/pk.csv", package = "mrgda"))
+```
+
+# Using explain()
+
+Before performing a data manipulation, we can use `explain()` to document why
+it is needed. This will help transfer knowledge of assumptions/decisions made
+to future authors or reviewers.
+
+```{r message=FALSE, warning=FALSE, include=FALSE}
+pk_data <-
+  pk_data %>% 
+  dplyr::mutate(
+    DV = dplyr::if_else(ID == 1 & TIME == 0.68, "15000", DV)
+  )
+```
+
+For instance, if we're planning to exclude a record we believe is an outlier, 
+we can first use `explain()` to show where in the data the issue exists.
+
+```{r}
+mrgda::explain("ID = 1 has outlier in PK data, will remove", {
+  pk_data %>% 
+    filter(ID == 1, DVID == 2, TIME < 24) %>% 
+    select(ID, TIME, TAD, DV, DVID, EVID)
+})
+```
+
+This not only explains the issue, but shows where in the data it occurs. 
+Additionally, the formatting of the message separates itself from the rest of
+the console outputs, helping it be more easily seen.
+
+## Expressions
+
+Users need to provide two arguments to `explain()`. The first is a message 
+to display in the header and the second is an expression to display the result of.
+
+As shown previously, this expression could be in the form of a data.frame.
+
+```{r}
+mrgda::explain("Show the first few records of ID = 2 from the pk_data data.frame", {
+  pk_data %>% 
+    filter(ID == 2) %>% 
+    select(ID, TIME, DV, EVID) %>% 
+    head()
+})
+```
+
+A vector can also be provided, such as one containing all the unique studies from the data set.
+
+```{r}
+mrgda::explain("Show a vector of all studies in the data set", {
+  pk_data %>% 
+    distinct(STUDYID) %>% 
+    pull(STUDYID)
+})
+```
+
+Calculations can even be performed.
+
+```{r}
+mrgda::explain("Total number of PK records that are not BLQ and doses", {
+  nrow(pk_data %>% filter(DVID == 2, BLQ == 1)) +
+    nrow(pk_data %>% filter(DVID ==1))
+})
+```
+
+Essentially, anything that can be evaluated in the console can be provided
+as the `.expr` argument. 
+
