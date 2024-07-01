@@ -12,3 +12,19 @@ test_that("list_files_of_type: check xpt works in test dir", {
 test_that("list_files_of_type: check sas7bdat does not work in test dir", {
   expect_equal(length(list_files_of_type(path, "sas7bdat")$files_of_type), 0)
 })
+
+test_that("list_files_of_type returns message if file type not csv, xpt or sas7bdat", {
+
+  if (!dir.exists(file.path(tempdir(), "listfiletype"))) {
+    dir.create(file.path(tempdir(), "listfiletype"))
+  }
+
+  write_csv_dots(data.frame(A = c(1,2), B = c(3,4)), file = file.path(tempdir(), "listfiletype/example.csv"))
+  write_csv_dots(data.frame(A = c(1,2), B = c(3,4)), file = file.path(tempdir(), "listfiletype/example2.csv"))
+  haven::write_xpt(data.frame(A = c(1,2), B = c(3,4)), file.path(tempdir(), "listfiletype/example.xpt"))
+
+  file_type_df <- list_files_of_type(file.path(tempdir(), "listfiletype"), .file_types = "detect") %>% suppressMessages()
+  expect_true(file_type_df$type == "csv")
+  expect_true(length(file_type_df$files_of_type) == 2)
+
+})
