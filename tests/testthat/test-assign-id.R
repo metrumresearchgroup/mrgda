@@ -100,6 +100,9 @@ test_that("assign_id sets new ID's larger than the previous data even if no subj
   expect_equal(nrow(ids_assigned), 3)
   expect_equal(ncol(ids_assigned), 2)
   expect_true(all(c(20, 21, 22) %in% unique(ids_assigned$ID)))
+
+  data2 <- dplyr::tibble(USUBJID2 = c("E", "F", "G"))
+  expect_error(assign_id(.data = data2, .subject_col = "USUBJID2", .previously_derived_path = lookup_path))
 })
 
 test_that("assign_id stops if data is grouped", {

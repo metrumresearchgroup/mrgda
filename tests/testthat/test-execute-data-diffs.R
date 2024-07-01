@@ -64,3 +64,36 @@ test_that("The function works if .suject_col is NULL", {
   )
 
 })
+
+test_that("Test if data.frames don't have shared names", {
+  base_df <- data.frame(A = c(1, 2), B = c(4, 7), C = c(5, 9))
+  compare_df <- data.frame(D = c(1, 2), E = c(4, 7), F = c(5, 9))
+
+  expect_error(
+    execute_data_diffs(base_df, compare_df,
+                       "The base and compare data frames do not have any columns to compare"))
+})
+
+# Create test data frames
+.compare_df3 <- data.frame(
+  ID = c(1, 2, 3),
+  A = c("a", "b", "c"),
+  B = c(1, 2, 2.5)
+)
+
+.base_df3 <- data.frame(
+  ID = c(1, 2, 3, 4),
+  A = c("a", "b", "c", "d"),
+  B = c(1, 2, 3, 4),
+  C = c(4, 5, 6, 7)
+)
+
+test_that("execute_data_diffs works with removing columns", {
+  diffs_list3 <- execute_data_diffs(.base_df3, .compare_df3, "ID")
+
+  diffs <- diffs_list3$diffs
+  expect_equal(diffs$value[1], "1 row(s) removed")
+  expect_equal(diffs$name[2], "Removed Columns")
+  expect_equal(diffs$value[2], "C")
+})
+
