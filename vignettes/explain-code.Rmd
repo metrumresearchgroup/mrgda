@@ -67,7 +67,7 @@ This not only explains the issue, but shows where in the data it occurs.
 Additionally, the formatting of the message separates itself from the rest of
 the console outputs, helping it be more easily seen.
 
-## Expressions
+## Arguments
 
 Users need to provide two arguments to `explain()`. The first is a message 
 to display in the header and the second is an expression to display the result of.
