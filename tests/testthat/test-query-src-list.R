@@ -7,6 +7,10 @@ test_that("query_src_list returns all domain and column combinations with a matc
   query_the <- query_src_list(.src_list = src_list, .string = "THE") %>% suppressMessages()
   query_subject <- query_src_list(.src_list = src_list, .string = "CDISC01.200002") %>% suppressMessages()
 
+  expect_message(
+    query_src_list(.src_list = src_list, .string = "No matches zzz"),
+    "No matches found for No matches zzz")
+
   expect_true(query_white$DOMAIN == "dm")
   expect_true(query_white$COLUMNS == "RACE")
 
