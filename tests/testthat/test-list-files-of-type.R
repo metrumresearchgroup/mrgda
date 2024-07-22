@@ -13,7 +13,7 @@ test_that("list_files_of_type: check sas7bdat does not work in test dir", {
   expect_equal(length(list_files_of_type(path, "sas7bdat")$files_of_type), 0)
 })
 
-test_that("list_files_of_type works with csv and xpt", {
+test_that("list_files_of_type returns message if file type not csv, xpt or sas7bdat", {
 
   if (!dir.exists(file.path(tempdir(), "listfiletype"))) {
     dir.create(file.path(tempdir(), "listfiletype"))
