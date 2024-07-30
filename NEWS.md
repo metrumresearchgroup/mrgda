@@ -1,3 +1,13 @@
+# mrgda 0.12.1
+
+## New features and changes
+
+- A vignette demonstrating the `explain` function was added to the package. (#220)
+
+## Bug fixes
+
+- Comment argument in `write_derived` is now protected against commas causing issues with history.csv. (#218)
+
 # mrgda 0.12.0
 
 ## New features and changes
