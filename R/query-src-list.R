@@ -17,42 +17,29 @@
 #'
 #' @export
 query_src_list <- function(.src_list, .string) {
-
+  # Remove unnecessary element
   .src_list$mrgda_src_meta <- NULL
 
-  src_list_char <- purrr::map(
-    .src_list, ~ .x %>% dplyr::mutate_all(as.character)
+  # Find columns containing the string in each data frame
+  hits_list <- purrr::map(.src_list, function(df) {
+    cols_with_string <- purrr::map_lgl(df, ~ any(grepl(.string, .x, ignore.case = TRUE)))
+    names(df)[cols_with_string]
+  })
+
+  # Remove entries with no matches
+  hits_list <- purrr::keep(hits_list, ~ length(.x) > 0)
+
+  if (length(hits_list) == 0) {
+    cli::cli_alert_danger(paste0("No matches found for ", .string))
+    return(invisible(NULL))
+  }
+
+  # Create the final tibble
+  hits <- tibble::tibble(
+    DOMAIN = names(hits_list),
+    COLUMNS = purrr::map_chr(hits_list, ~ paste(.x, collapse = ",")),
+    MATCHING = .string
   )
 
-  matches <- src_list_char[grepl(.string, src_list_char, ignore.case = TRUE)]
-
-  hits <- dplyr::tibble()
-
-  for (df.i in names(matches)) {
-
-    matches.i <- grepl(.string, matches[[df.i]], ignore.case = TRUE)
-    colmatches.i <- names(matches[[df.i]])[matches.i]
-
-    if (length(colmatches.i) > 0) {
-
-      cols_collapsed <- paste(colmatches.i, collapse = ",")
-
-      hits <-
-        dplyr::bind_rows(
-          hits,
-          dplyr::tibble(
-            DOMAIN = df.i,
-            COLUMNS = cols_collapsed
-          )
-        )
-
-    }
-  }
-
-  if (length(matches) == 0) {
-    cli::cli_alert_danger(paste0("No matches found for ", .string))
-  } else {
-    hits %>% dplyr::mutate(MATCHING = .string)
-  }
-
+  return(hits)
 }
