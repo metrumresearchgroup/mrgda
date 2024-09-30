@@ -23,3 +23,21 @@ test_that("query_src_list returns all domain and column combinations with a matc
   expect_true(nrow(query_subject) == 7)
 
 })
+
+test_that("query_src_list works with additional strings", {
+  query_qtcf <- query_src_list(.src_list = src_list, .string = "QTcF") %>% suppressMessages()
+  expect_true(query_qtcf$DOMAIN == "eg")
+  expect_true(query_qtcf$COLUMNS == "EGTESTCD,EGTEST")
+
+  query_alzheimers <-query_src_list(.src_list = src_list, .string = "ALZHEIMER'S") %>% suppressMessages()
+  expect_true(query_alzheimers$DOMAIN == "mh")
+  expect_true(query_alzheimers$COLUMNS == "MHTERM")
+
+  query_cardio <- query_src_list(.src_list = src_list, .string = "Cardio") %>% suppressMessages()
+  expect_true(query_cardio$DOMAIN == "pe")
+  expect_true(query_cardio$COLUMNS == "PETEST")
+
+  query_cardo <-query_src_list(.src_list = src_list, .string = "Cardo") %>% suppressMessages()
+  expect_null(query_cardo)
+
+})
