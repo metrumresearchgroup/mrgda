@@ -1,3 +1,9 @@
+# mrgda development
+
+## New features and changes
+
+- `write_derived' now writes out columns that have a unique value per subject. (#230)
+
 # mrgda 0.12.1
 
 ## New features and changes
