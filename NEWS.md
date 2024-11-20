@@ -1,8 +1,8 @@
-# mrgda 0.12.1
+# mrgda development
 
 ## New features and changes
 
-- A vignette demonstrating the `explain` function was added to the package. (#220)
+- The function `v` is deprecated (with no replacement). (#231)
 
 ## Bug fixes
 
