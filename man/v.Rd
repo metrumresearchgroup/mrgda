@@ -51,6 +51,11 @@ PROCESS 'R', finished.
 }\if{html}{\out{</div>}}
 }
 }
+\section{Deprecated}{
+
+This function is deprecated and will be removed in future versions.
+}
+
 \examples{
 \dontrun{
 
@@ -67,3 +72,4 @@ PROCESS 'R', finished.
 }
 
 }
+\keyword{deprecated}

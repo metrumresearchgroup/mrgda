@@ -2,6 +2,10 @@
 #'
 #' Creates a `DT::datatable` object for each dataframe and runs it in a background shiny application in the Rstudio viewer pane.
 #'
+#' @section Deprecated:
+#' This function is deprecated and will be removed in future versions.
+#' @keywords deprecated
+#'
 #' @param .df_list A dataframe ***or*** list of dataframes that you want to process and view.
 #' Named lists will inherit their names when shown in the app.
 #' @inheritParams create_v_datatable
