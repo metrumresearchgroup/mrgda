@@ -17,7 +17,7 @@
 #'
 #' @export
 query_src_list <- function(.src_list, .string) {
-  # Remove unnecessary element
+
   .src_list$mrgda_src_meta <- NULL
 
   # Find columns containing the string in each data frame
