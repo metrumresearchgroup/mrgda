@@ -38,21 +38,17 @@ identify_subject_cols <- function(.df, .subject_col) {
     ) %>%
     # Transform the data into a long format with column names and their corresponding boolean values
     tidyr::pivot_longer(
-      cols = tidyselect::everything(),
-      names_to = "name",
-      values_to = "all_constant"
+      cols = tidyselect::everything()
     ) %>%
     # Filter to retain only those columns that are constant within each subject across the entire data frame
-    dplyr::filter(all_constant) %>%
+    dplyr::filter(value) %>%
     # Extract the names of these columns
-    dplyr::pull(name)
+    dplyr::pull(name) %>%
+    sort()
 
-  out <-
-    if (length(constant_cols) > 0) {
-      sort(constant_cols)
-    } else {
-      "none"
-    }
+  if (length(constant_cols) == 0) {
+    constant_cols <- "none"
+  }
 
-  out
+  constant_cols
 }
