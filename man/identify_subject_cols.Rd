@@ -17,15 +17,4 @@ A character vector of column names that are constant within each subject.
 \description{
 This function identifies columns in a data frame that are constant within each subject defined by a specified subject variable.
 }
-\examples{
-df <- data.frame(
-  subject = c(1, 1, 2, 2),
-  x = c(5, 5, 5, 5),
-  y = c(1, 2, 1, 2),
-  z = c("a", "a", "a", "a")
-)
-identify_subject_cols(df, "subject")
-# Returns c("x", "z")
-
-}
 \keyword{internal}
