@@ -13,36 +13,20 @@ identify_subject_cols <- function(.df, .subject_col) {
     stop("Subject column '", .subject_col, "' does not exist in the data frame.")
   }
 
-  # Summarize within subjects to check if columns are constant in each subject
-  subject_columns <-
-    .df %>%
-    dplyr::group_by(!!rlang::sym(.subject_col)) %>%
-    # Summarize each column by checking if all values within each subject are identical
-    dplyr::summarise(
-      dplyr::across(
-        tidyselect::everything(),
-        ~ dplyr::n_distinct(.x) == 1
-      )
-    ) %>%
-    dplyr::ungroup()
-
   # Identify columns that are constant within all subjects
   constant_cols <-
-    subject_columns %>%
-    # For each column (excluding the subject column), check if it is constant across all subjects
+    .df %>%
+    dplyr::group_by(!!rlang::sym(.subject_col)) %>%
     dplyr::summarise(
-      dplyr::across(
-        -!!rlang::sym(.subject_col),
-        ~ all(.x)
-      )
+      dplyr::across(tidyselect::everything(), ~ dplyr::n_distinct(.x) == 1)
     ) %>%
-    # Transform the data into a long format with column names and their corresponding boolean values
-    tidyr::pivot_longer(
-      cols = tidyselect::everything()
+    dplyr::ungroup() %>%
+    # Summarize all columns other than .subject_col
+    dplyr::summarise(
+      across(-!!rlang::sym(.subject_col), ~ all(.x))
     ) %>%
-    # Filter to retain only those columns that are constant within each subject across the entire data frame
+    tidyr::pivot_longer(cols = tidyselect::everything()) %>%
     dplyr::filter(value) %>%
-    # Extract the names of these columns
     dplyr::pull(name) %>%
     sort()
 
