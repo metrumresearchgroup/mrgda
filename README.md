@@ -9,60 +9,202 @@
 Status](https://github.com/metrumresearchgroup/mrgda/actions/workflows/main.yaml/badge.svg)](https://github.com/metrumresearchgroup/mrgda/actions/workflows/main.yaml)
 <!-- badges: end -->
 
-## Overview
+```r
+library(tidyverse)
+library(here)
+library(assertthat)
 
-`mrgda` is a data assembly helper, providing a set of functions that
-help you assemble, explore and validate your data set.
+# Prepare to save individual domain assembly pieces
+# sl: subject level
+# tv: time varying
+out <- list(sl = list(), tv = list())
 
-### Featured Vignettes
+# Spec --------------------------------------------------------------------
+pk_spec <- yspec::ys_load(here("data/derived/pk.yaml"))
 
--   [Getting
-    Started](https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html)
-    – Introduction to commonly used data assembly `mrgda` functions.
--   [Assigning
-    IDs](https://metrumresearchgroup.github.io/mrgda/articles/assigning-id.html)
-    – Background on `assign_id()`. `assign_id()` helps you assign a
-    unique numeric identifier to each subject in your data set. Its
-    purpose is to ensure the same numeric identifier is consistently
-    assigned to each subject throughout a project
+# Source data -------------------------------------------------------------
+src_100 <- mrgda::read_src_dir(here::here("data", "source", "100"))
 
-## Documentation
+# Demographics ------------------------------------------------------------
+src_100$dm %>% pivot_longer(c(ACTARM, SEX, RACE, ETHNIC)) %>% count(name, value)
 
-Public documentation of all functions is hosted at
-<https://metrumresearchgroup.github.io/mrgda/>
+dm_1 <-
+  src_100$dm %>%
+  transmute(
+    USUBJID,
+    STUDYID,
+    SEX = case_when(
+      SEX == "F" ~ 1,
+      SEX == "M" ~ 2, 
+      TRUE ~ -99
+    ),
+    RACE = case_when(
+      RACE == "WHITE" ~ 1,
+      RACE == "BLACK OR AFRICAN AMERICAN" ~ 2,
+      RACE == "AMERICAN INDIAN OR ALASKA NATIVE" ~ 3,
+      RACE == "OTHER" ~ 6,
+      TRUE ~ -99
+    ),
+    BLAGE = AGE
+  )
 
-## Getting help
+out$sl$dm <- dm_1
 
-If you encounter a clear bug, please file an issue with a minimal
-reproducible example on
-[mrgda](https://github.com/metrumresearchgroup/mrgda/issues).
+assert_that(!(any(out$sl$dm == -99, na.rm = TRUE)))
 
-#### Developer Notes
+# Vitals ------------------------------------------------------------------
+src_100$vs %>% count(VSTESTCD, VSBLFL, VSSTRESU)
 
-<details closed>
-<summary>
-Developer Notes
-</summary>
+vs_0 <-
+  src_100$vs %>%
+  filter(USUBJID %in% out$sl$dm$USUBJID)
 
-`mrgda` uses [pkgr](https://github.com/metrumresearchgroup/pkgr) to
-manage development dependencies and
-[renv](https://rstudio.github.io/renv/) to provide isolation. To
-replicate this environment,
+vs_tests <- c("WEIGHT", "HEIGHT")
 
-1.  clone the repo
+vs_1 <-
+  vs_0 %>%
+  filter(
+    VSBLFL == "Y",
+    VSTESTCD %in% vs_tests
+  ) %>%
+  select(
+    USUBJID,
+    VSTESTCD,
+    VSSTRESN
+  ) %>%
+  pivot_wider(
+    names_from = VSTESTCD, 
+    values_from = VSSTRESN
+  ) %>%
+  transmute(
+    USUBJID,
+    BLWT = WEIGHT, 
+    BLBMI = WEIGHT / ((HEIGHT / 100) ^ 2)
+  )
 
-2.  install [pkgr](https://github.com/metrumresearchgroup/pkgr)
+out$sl$vs <- vs_1
 
-3.  open package in an R session and run `renv::init(bare = TRUE)`
+assert_that(!any(duplicated(out$sl$vs$USUBJID)))
+assert_that(!(anyNA(out$sl$vs)))
 
-    -   install `renv` \> 0.8.3-4 into default `.libPaths()` prior to
-        this step if not already installed
+# PK ----------------------------------------------------------------------
+src_100$pc %>% count(PCTEST, PCSTAT)
+src_100$pc %>% filter(is.na(PCSTRESN)) %>% count(PCTEST, PCORRES, PCSTAT)
 
-4.  run `pkgr install` in terminal within package directory
+pc_0 <-
+  src_100$pc %>%
+  filter(
+    USUBJID %in% out$sl$dm$USUBJID,
+    PCTEST == "DRUG-X",
+    PCSTAT != "NOT DONE"
+  )
 
-5.  restart session
+pc_1 <-
+  pc_0 %>%
+  transmute(
+    USUBJID,
+    DV = PCSTRESN,
+    BLQ = case_when(PCORRES == "<LLOQ" ~ 1, TRUE ~ 0),
+    EVID = case_when(BLQ == 1 ~ 2, TRUE ~ 0),
+    MDV = case_when(BLQ == 1 ~ 0, TRUE ~ 1),
+    DATETIME = ymd_hms(PCDTC),
+    LLOQ = PCLLOQ
+  )
 
-Then, launch R with the repo as the working directory (open the project
-in RStudio). `renv` will activate and find the project library.
+pc_1 %>% count(is.na(DV), BLQ)
 
-</details>
+out$tv$pc <- pc_1
+
+assert_that(
+  !any(duplicated(out$tv$pc[, c("USUBJID", "DATETIME")])),
+  !anyNA(out$tv$pc$DATETIME)
+)
+
+# Dosing ------------------------------------------------------------------
+src_100$ex %>% count(EXTRT, EXDOSFRM, EXDOSFRQ, EXDOSU, EXDOSE)
+
+# Ensure each row is a single dose
+assert_that(all(src_100$ex$EXSTDTC == src_100$ex$EXENDTC))
+
+ex_0 <-
+  src_100$ex %>%
+  filter(USUBJID %in% out$sl$dm$USUBJID)
+
+ex_1 <-
+  ex_0 %>%
+  left_join(out$sl$dm %>% select(USUBJID, ACTARM)) %>%
+  left_join(out$sl$vs %>% select(USUBJID, WT))
+
+ex_2 <-
+  ex_1 %>%
+  transmute(
+    USUBJID,
+    AMT = EXDOSE,
+    EVID = 1,
+    DATETIME = ymd_hms(EXSTDTC),
+    MDV = 1
+  )
+
+out$tv$dosing <- ex_2
+
+assert_that(!any(out$tv$dosing == -99, na.rm = TRUE))
+
+# Combine Domains ---------------------------------------------------------
+assert_that(
+  all(map(out$sl, ~ !any(duplicated(.x[["USUBJID"]]))) %>% unlist())
+)
+
+pk_0 <-
+  bind_rows(out$tv) %>%
+  left_join(
+    reduce(out$sl, full_join)
+  ) %>%
+  arrange(USUBJID, DATETIME)
+
+pk_1 <-
+  pk_0 %>%
+  group_by(USUBJID) %>%
+  mutate(
+    FIRST_DOSE_TIME = min(DATETIME[EVID == 1], na.rm = TRUE),
+    N_DOSES = cumsum(EVID == 1),
+    N_DOSES = replace_na(N_DOSES, 0),
+    TIME = as.numeric(difftime(DATETIME, FIRST_DOSE_TIME, units = "hours"))
+  ) %>%
+  group_by(N_DOSES, .add = TRUE) %>%
+  mutate(
+    TAD = as.numeric(difftime(DATETIME, min(DATETIME), units = "hours")),
+    DOSE_HAD_PK = any(EVID == 0, na.rm = TRUE)
+  ) %>%
+  group_by(USUBJID) %>%
+  mutate(
+    NEW_DOSE = N_DOSES != lag(N_DOSES, default = first(N_DOSES)),
+    OCC = cumsum(NEW_DOSE & DOSE_HAD_PK) * (N_DOSES != 0)
+  ) %>%
+  ungroup()
+
+pk_2 <-
+  pk_1 %>%
+  mutate(DOSE = AMT) %>%
+  group_by(USUBJID) %>%
+  fill(c("DOSE"), .direction = "downup") %>%
+  ungroup()
+
+pk_3 <-
+  pk_2 %>%
+  mutate(
+    ID = as.integer(fct_inorder(USUBJID)),
+    NUM = 1:n(),
+    C = NA_character_
+  )
+
+pk_out <- pk_3 %>% select(names(pk_spec))
+
+# Write dataset -----------------------------------------------------------
+yspec::ys_check(pk_out, pk_spec)
+
+mrgda::write_derived(
+  .data = pk_out,
+  .spec = pk_spec,
+  .file = "data/derived/pk.csv"
+)
+```
