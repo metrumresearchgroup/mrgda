@@ -22,7 +22,7 @@ Status](https://github.com/metrumresearchgroup/mrgda/actions/workflows/main.yaml
 #   - File path management (`here`)
 #   - Assertion checks (`assertthat`)
 #   - yspec specifications (`yspec`)
-#   - Reading source data from a standardized directory (`mrgda`)
+#   - Reading and writing data from standardized directories (`mrgda`)
 library(tidyverse)
 library(here)
 library(assertthat)
