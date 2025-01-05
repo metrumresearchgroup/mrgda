@@ -291,10 +291,13 @@ pk_0 <-
 
 ## 9. Add NONMEM-Specific Derived Columns
 
-We add columns such as: - `FIRST_DOSE_TIME`: the earliest dose time per
-subject - `N_DOSES`: running count of doses - `TIME`: time since first
-dose - `TAD`: time since current dose - `OCC`: occasion number (for
-modeling)
+We add columns such as:
+
+-   `FIRST_DOSE_TIME`: the earliest dose time per subject
+-   `N_DOSES`: running count of doses
+-   `TIME`: time since first dose
+-   `TAD`: time since current dose
+-   `OCC`: occasion number (for modeling)
 
 ``` r
 pk_1 <-
