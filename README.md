@@ -15,10 +15,6 @@ Status](https://github.com/metrumresearchgroup/mrgda/actions/workflows/main.yaml
 #   1. Assemble an analysis-ready PK dataset from SDTM-like source domains.
 #   2. Produce a single CSV file suitable for NONMEM, with additional metadata 
 #      checks via a yspec specification.
-#
-# Audience:
-#   Someone with NONMEM/SDTM knowledge, but new to using tidyverse tools 
-#   for data assembly in R.
 ###############################################################################
 
 # Load libraries for:
@@ -30,6 +26,8 @@ Status](https://github.com/metrumresearchgroup/mrgda/actions/workflows/main.yaml
 library(tidyverse)
 library(here)
 library(assertthat)
+library(yspec)
+library(mrgda)
 
 # Prepare a list to store data pieces
 # 'sl' = subject-level data
@@ -41,7 +39,7 @@ out <- list(sl = list(), tv = list())
 #    We load a specification file for our final PK dataset schema.
 #    This spec tells us which columns we expect, their labels, units, and so forth.
 # -----------------------------------------------------------------------------
-pk_spec <- yspec::ys_load(here("data/derived/pk.yaml"))
+pk_spec <- ys_load(here("data/derived/pk.yaml"))
 
 # -----------------------------------------------------------------------------
 # 2. Source data
@@ -52,7 +50,7 @@ pk_spec <- yspec::ys_load(here("data/derived/pk.yaml"))
 #    src_100$pc  -> Concentrations domain
 #    src_100$ex  -> Exposure (dosing) domain
 # -----------------------------------------------------------------------------
-src_100 <- mrgda::read_src_dir(here::here("data", "source", "100"))
+src_100 <- read_src_dir(here::here("data", "source", "100"))
 
 # -----------------------------------------------------------------------------
 # 3. Demographics (DM domain)
@@ -338,10 +336,10 @@ pk_out <- pk_3 %>% select(names(pk_spec))
 # -----------------------------------------------------------------------------
 
 # Validate dataset structure (variable types, missingness) against the spec
-yspec::ys_check(pk_out, pk_spec)
+ys_check(pk_out, pk_spec)
 
 # Write the final derived dataset to disk as CSV
-mrgda::write_derived(
+write_derived(
   .data = pk_out,
   .spec = pk_spec,
   .file = "data/derived/pk.csv"
