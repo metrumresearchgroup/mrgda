@@ -1,13 +1,13 @@
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 # mrgda <a href='https:/metrumresearchgroup.github.io/mrgda'><img src='man/figures/logo.png' align="right" width="135px"/></a>
 
 <!-- badges: start -->
-
 [![Build
 Status](https://github.com/metrumresearchgroup/mrgda/actions/workflows/main.yaml/badge.svg)](https://github.com/metrumresearchgroup/mrgda/actions/workflows/main.yaml)
 <!-- badges: end -->
+
+
+# Data Assembly
 
 ```r
 ###############################################################################
