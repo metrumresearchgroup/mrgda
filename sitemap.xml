@@ -1,138 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/404.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/LICENSE.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/articles/assigning-id.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/articles/explain-code.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/articles/getting-started.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/articles/index.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/authors.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/index.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/news/index.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/assign_id.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/check_for_v_pkgs.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/create_global_filter.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/create_v_datatable.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/diffdf_value_changes_to_df.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/execute_data_diffs.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/explain.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/filter_v_subject.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/find_df_with_col.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/fmt_bg_file.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/format_v_headers.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/gather_data_history.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/gather_data_labels.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/gather_v_cols.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/get_base_df.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/index.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/make_v_caption.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/mrgda-package.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/pipe.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/prettyNum2.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/query_src_list.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/random_dynamic_port.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/read_csv_dots.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/read_src_dir.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/run_app_bg.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/setup_v_list.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/skip_if_v_missing_deps.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/stop_if_v_missing_deps.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/v.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/v_global_server.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/v_global_ui.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/v_mod_server.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/v_mod_ui.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/v_shiny_internal.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/write_csv_dots.html</loc>
-  </url>
-  <url>
-    <loc>https://metrumresearchgroup.github.io/mrgda/reference/write_derived.html</loc>
-  </url>
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/404.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/LICENSE.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/articles/assigning-id.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/articles/explain-code.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/articles/index.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/authors.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/index.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/news/index.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/assign_id.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/diffdf_value_changes_to_df.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/execute_data_diffs.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/explain.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/gather_data_history.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/gather_data_labels.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/get_base_df.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/index.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/mrgda-package.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/pipe.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/query_src_list.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/read_csv_dots.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/read_src_dir.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/write_csv_dots.html</loc></url>
+<url><loc>https://metrumresearchgroup.github.io/mrgda/reference/write_derived.html</loc></url>
 </urlset>
+

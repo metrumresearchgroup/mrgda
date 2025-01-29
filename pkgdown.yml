@@ -1,12 +1,10 @@
 pandoc: 3.1.8
-pkgdown: 2.0.7
+pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   assigning-id: assigning-id.html
   explain-code: explain-code.html
-  getting-started: getting-started.html
-last_built: 2024-07-30T16:33Z
+last_built: 2025-01-29T19:15Z
 urls:
   reference: https://metrumresearchgroup.github.io/mrgda/reference
   article: https://metrumresearchgroup.github.io/mrgda/articles
-
