@@ -22,7 +22,9 @@ withr::with_tempdir({
                          gsub(".csv", ".xpt", basename(.temp_csv), fixed = TRUE))
   .xpt_in <- haven::read_xpt(.xpt_in_name) %>% suppressMessages()
   .xpt_in_labels <- purrr::map(.xpt_in, ~ attr(.x, "label"))
-  .history <- paste0(gsub(".csv", "", .temp_csv, fixed = TRUE),"/history.csv")
+  .dir_folder <- gsub(".csv", "", .temp_csv, fixed = TRUE)
+  .history <- paste0(.dir_folder,"/history.csv")
+  .spec_saved <- paste0(.dir_folder,"/spec_list.yaml")
 })
 
 test_that("write_derived write csv: csv is written correctly and matches data", {
@@ -89,3 +91,6 @@ test_that("comma is automatically removed from comment", {
   expect_true(df$Comment == "Add var1  var2  var3")
 })
 
+test_that("write_derived outputs spec in meta data folder", {
+  expect_true(file.exists(.spec_saved))
+})
