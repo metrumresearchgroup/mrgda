@@ -106,6 +106,11 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
     stop("Defined .subject_col '", .subject_col, "' not found in data")
   }
 
+  # Determine and write out subject columns ---------------------------------
+  subject_columns <- identify_subject_cols(.df = .data, .subject_col = .subject_col)
+
+  yaml::write_yaml(subject_columns, file = file.path(.meta_data_folder, "subject-columns.yml"))
+
   # Execute data diffs ------------------------------------------------------
   compare_df <- read_csv_dots(.file)
 
