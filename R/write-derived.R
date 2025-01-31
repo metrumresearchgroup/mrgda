@@ -87,7 +87,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   # Write out the spec
   .spec_list <-
     purrr::map(as.list(.spec), ~ {
-      .x[intersect(names(.x), c("short", "type", "unit", "values", "decode"))]
+      .x[intersect(c("short", "type", "unit", "values", "decode"), names(.x))]
     })
 
   yaml::write_yaml(.spec_list, file.path(.meta_data_folder, "spec_list.yaml"))
