@@ -23,7 +23,7 @@ identify_subject_cols <- function(.df, .subject_col) {
     dplyr::ungroup() %>%
     # Summarize all columns other than .subject_col
     dplyr::summarise(
-      across(-!!rlang::sym(.subject_col), ~ all(.x))
+      dplyr::across(-!!rlang::sym(.subject_col), ~ all(.x))
     ) %>%
     tidyr::pivot_longer(cols = tidyselect::everything()) %>%
     dplyr::filter(value) %>%
