@@ -60,7 +60,8 @@ globalVariables(
     "MRGDA_PARSE_DATETIME",
     "ID_SORT",
     ".output_dir",
-    "Previous Revision"
+    "Previous Revision",
+    "all_constant"
   )
 )
 
