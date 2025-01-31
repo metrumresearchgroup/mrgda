@@ -24,7 +24,7 @@ withr::with_tempdir({
   .xpt_in_labels <- purrr::map(.xpt_in, ~ attr(.x, "label"))
   .dir_folder <- gsub(".csv", "", .temp_csv, fixed = TRUE)
   .history <- paste0(.dir_folder,"/history.csv")
-  .spec_saved <- paste0(.dir_folder,"/spec_list.yaml")
+  .spec_saved <- paste0(.dir_folder,"/spec-list.yml")
 })
 
 test_that("write_derived write csv: csv is written correctly and matches data", {
