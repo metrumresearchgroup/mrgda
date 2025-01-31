@@ -1,5 +1,5 @@
 ---
-title: "Code Documentation with explain"
+title: "explain-code"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{explain-code}

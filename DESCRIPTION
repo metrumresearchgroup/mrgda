@@ -14,7 +14,7 @@ BugReports: https://github.com/metrumresearchgroup/mrgda/issues
 License: GPL (>= 3)
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 Imports: 
     cli (>= 3.3.0),
     dplyr,
@@ -24,7 +24,6 @@ Imports:
     purrr,
     rlang (>= 1.0.2),
     tidyr,
-    tidyselect,
     yspec,
     tibble,
     diffdf,
@@ -34,7 +33,6 @@ Imports:
     rprojroot,
     crayon,
     forcats,
-    assertthat,
     stringr,
     knitr,
     readr
@@ -43,17 +41,7 @@ Suggests:
     withr (>= 2.5.0),
     callr,
     devtools,
-    DT,
-    httpuv,
-    htmltools,
-    pillar,
-    pingr,
     rstudioapi,
-    rvest,
-    shiny (>= 1.6.0),
-    shinydashboard,
-    shinydashboardPlus (>= 2.0.0),
-    shinyWidgets,
     rmarkdown
 Config/testthat/edition: 3
 VignetteBuilder: 
