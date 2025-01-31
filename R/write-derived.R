@@ -84,6 +84,14 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
     name = paste0("a", substr(gsub("[^[:alnum:]]", "", .data_name), 1, 7)) # Max of 8 chars
   )
 
+  # Write out the spec
+  .spec_list <-
+    purrr::map(as.list(.spec), ~ {
+      .x[intersect(c("short", "type", "unit", "values", "decode"), names(.x))]
+    })
+
+  yaml::write_yaml(.spec_list, file.path(.meta_data_folder, "spec_list.yaml"))
+
   # Try to render spec
   silence_console_output(
     yspec::render_fda_define(
