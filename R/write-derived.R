@@ -90,7 +90,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
       .x[intersect(c("short", "type", "unit", "values", "decode"), names(.x))]
     })
 
-  yaml::write_yaml(.spec_list, file.path(.meta_data_folder, "spec_list.yaml"))
+  yaml::write_yaml(.spec_list, file.path(.meta_data_folder, "spec-list.yml"))
 
   # Try to render spec
   silence_console_output(
