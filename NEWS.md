@@ -2,7 +2,9 @@
 
 ## New features and changes
 
-- `write_derived' now writes out columns that have a unique value per subject. (#230)
+- `write_derived` now writes out columns that have a unique value per subject. (#230)
+- `write_derived` now writes out the spec to a file. (#233)
+- `v` function removed. (#234)
 
 # mrgda 0.12.1
 
