@@ -33,7 +33,11 @@ out$sl$dm <-
   transmute(
     USUBJID,
     STUDYID,
-    SEX = if_else(SEX == "F", 1, if_else(SEX == "M", 2, -99)),
+    SEX = case_when(
+      SEX == "F" ~ 1,
+      SEX == "M" ~ 2,
+      TRUE ~ -99
+    ),
     RACE = case_when(
       RACE == "WHITE" ~ 1,
       RACE == "BLACK OR AFRICAN AMERICAN" ~ 2,
@@ -82,7 +86,7 @@ out$tv$pc <-
     DV = PCSTRESN,
     BLQ = if_else(PCORRES == "<LLOQ", 1, 0),
     EVID = if_else(BLQ == 1, 2, 0),
-    MDV = if_else(BLQ == 1, 0, 1),
+    MDV = if_else(is.na(DV), 1, 0),
     DATETIME = ymd_hms(PCDTC),
     LLOQ = PCLLOQ
   )
