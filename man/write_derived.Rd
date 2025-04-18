@@ -13,7 +13,8 @@ write_derived(
   .prev_file = NULL,
   .compare_from_svn = TRUE,
   .return_base_compare = FALSE,
-  .execute_diffs = TRUE
+  .execute_diffs = TRUE,
+  .run_nm_diagnostics = FALSE
 )
 }
 \arguments{
@@ -34,6 +35,8 @@ write_derived(
 \item{.return_base_compare}{logical. Should the two current and previous versions of the datasets be returned?}
 
 \item{.execute_diffs}{logical. Should the diffs be executed?}
+
+\item{.run_nm_diagnostics}{logical. If TRUE, run nonmem diagnostics (default FALSE)}
 }
 \description{
 This function will take a data frame in R and write it out to csv.

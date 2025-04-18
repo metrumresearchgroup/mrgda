@@ -1,6 +1,6 @@
 Package: mrgda
 Title: Tools for Data Assembly
-Version: 0.12.1.9001
+Version: 0.12.1.9002
 Authors@R: 
     c(
     person(given = "Eric", family = "Anderson", email = "andersone@metrumrg.com", role = c("aut", "cre")),
@@ -36,14 +36,16 @@ Imports:
     stringr,
     knitr,
     readr,
-    tidyselect
+    tidyselect,
+    lastdose
 Suggests: 
     testthat (>= 3.1.10),
     withr (>= 2.5.0),
     callr,
     devtools,
     rstudioapi,
-    rmarkdown
+    rmarkdown,
+    pdftools
 Config/testthat/edition: 3
 VignetteBuilder: 
     knitr
