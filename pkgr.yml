@@ -9,10 +9,11 @@ Packages:
   - styler
   - mpn.scorecard
   - roxygen2
+  - ellmer
 
 Repos:
   - CRAN: https://cran.rstudio.com
-  - MPN: https://mpn.metworx.com/snapshots/stable/2024-06-12 # used for mrg packages
+  - MPN: https://mpn.metworx.com/snapshots/stable/2025-03-26 # used for mrg packages
 
 Lockfile:
     Type: renv

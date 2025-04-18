@@ -13,6 +13,7 @@
 #' @param .compare_from_svn logical. Should the data comparison be done on the latest svn version? (If not, local version is used)
 #' @param .return_base_compare logical. Should the two current and previous versions of the datasets be returned?
 #' @param .execute_diffs logical. Should the diffs be executed?
+#' @param .run_nm_diagnostics logical. If TRUE, run nonmem diagnostics (default FALSE)
 #' @examples
 #'\dontrun{
 #' nm_spec <- yspec::ys_load(system.file("derived", "pk.yml", package = "mrgda"))
@@ -21,7 +22,16 @@
 #'}
 #' @md
 #' @export
-write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "ID", .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
+write_derived <- function(.data,
+                          .spec,
+                          .file,
+                          .comment = NULL,
+                          .subject_col = "ID",
+                          .prev_file = NULL,
+                          .compare_from_svn = TRUE,
+                          .return_base_compare = FALSE,
+                          .execute_diffs = TRUE,
+                          .run_nm_diagnostics = FALSE) {
 
   if (tools::file_ext(.file) != "csv") {
     stop("'.file' must reference a 'csv' file")
@@ -110,6 +120,30 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   subject_columns <- identify_subject_cols(.df = .data, .subject_col = .subject_col)
 
   yaml::write_yaml(subject_columns, file = file.path(.meta_data_folder, "subject-columns.yml"))
+
+  # Run diagnostics (optional, failsafe) ------------------------------------
+  if (isTRUE(.run_nm_diagnostics)) {
+
+    tryCatch(
+      create_nm_diagnostics(
+        .data         = .data,
+        .subject_cols = subject_columns,
+        .spec         = .spec,
+        .subject_col  = .subject_col,
+        .outdir       = .meta_data_folder,
+        .filename     = "nm-diagnostics.pdf"
+      ),
+      error = function(e) {
+        # write the error to a text file inside the meta‑data folder
+        err_file <- file.path(.meta_data_folder, "nm-diagnostics-error.txt")
+        writeLines(c(format(Sys.time(), "%Y-%m-%d %H:%M:%S"), e$message), err_file)
+
+        # also emit a message so the pipeline keeps going
+        message("Diagnostics generation failed, continuing: ", e$message)
+      }
+    )
+
+  }
 
   # Execute data diffs ------------------------------------------------------
   compare_df <- read_csv_dots(.file)
