@@ -48,3 +48,18 @@ test_that("read_src_dir works with a directory containing csv files", {
 
 })
 
+test_that("labels match filenames across all xpt files", {
+  path <- system.file("example-sdtm", package = "mrgda")
+  files <- list.files(path, pattern = "\\.xpt$", full.names = TRUE)
+
+  for (f in files) {
+    nm <- tools::file_path_sans_ext(basename(f))
+    if (grepl("^mrgda", nm)) next
+
+    expected_label <- paste("Label for", toupper(nm), "dataset")
+    df <- haven::read_xpt(f)
+    actual_label <- attr(df, "label")
+
+    expect_equal(actual_label, expected_label)
+  }
+})
