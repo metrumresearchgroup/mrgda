@@ -22,6 +22,7 @@ read_src_dir <- function(.path,
                          .file_types = "detect",
                          .read_domains = NULL) {
   .out <- list()
+  md5_hashes <- list()
 
   .files_of_interest <- list_files_of_type(.path = .path, .file_types = .file_types)
 
@@ -76,8 +77,9 @@ read_src_dir <- function(.path,
       n_fail <- n_fail + 1
     } else {
       cli::cli_alert_success(file.i)
-      .out[[tools::file_path_sans_ext(basename(file.i))]] <- data.i
-      .out$mrgda_src_meta$md5[[tools::file_path_sans_ext(basename(file.i))]] <- unname(tools::md5sum(file.i))
+      domain_name.i <- tools::file_path_sans_ext(basename(file.i))
+      .out[[domain_name.i]] <- data.i
+      md5_hashes[[domain_name.i]] <- unname(tools::md5sum(file.i))
       n_pass <- n_pass + 1
     }
 
@@ -91,6 +93,7 @@ read_src_dir <- function(.path,
     gather_data_labels(.out)
 
   # metadata
+  .out$mrgda_src_meta$md5  <- md5_hashes
   .out$mrgda_src_meta$type <- .files_of_interest$type
   .out$mrgda_src_meta$path <- .path
 
