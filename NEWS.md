@@ -1,8 +1,14 @@
-# mrgda development
+# mrgda 0.13.0
 
 ## New features and changes
 
-- `write_derived' now writes out columns that have a unique value per subject. (#230)
+- `v` function was removed. (#234)
+- `write_derived` now writes out the spec to the meta data folder. (#233)
+- `write_derived` now writes out columns that have a unique value per subject. (#230)
+
+## Bug fixes
+
+- `read_src_dir` label mis-alignment issue fixed. (#242)
 
 # mrgda 0.12.1
 
