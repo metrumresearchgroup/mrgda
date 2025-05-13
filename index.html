@@ -40,7 +40,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.12.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.13.0</span>
       </span>
     </div>
 
@@ -94,107 +94,37 @@
 <!-- badges: start -->
 
 <div class="section level2">
-<h2 id="overview">Overview<a class="anchor" aria-label="anchor" href="#overview"></a>
+<h2 id="example-da">Example DA<a class="anchor" aria-label="anchor" href="#example-da"></a>
 </h2>
-<p>This document demonstrates how to assemble a pharmacokinetics (PK) dataset from multiple <em>SDTM</em> source domains. We will produce a final CSV file suitable for NONMEM analyses. The document is structured into clear steps:</p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Load libraries</strong><br>
-</li>
-<li>
-<strong>Load the PK data specification (from <code>yspec</code>)</strong><br>
-</li>
-<li>
-<strong>Read in the SDTM data</strong><br>
-</li>
-<li>
-<strong>Prepare demographics</strong><br>
-</li>
-<li>
-<strong>Prepare vitals (weight, height, BMI)</strong><br>
-</li>
-<li>
-<strong>Prepare PK concentrations</strong><br>
-</li>
-<li>
-<strong>Prepare dosing data</strong><br>
-</li>
-<li>
-<strong>Combine domains</strong><br>
-</li>
-<li>
-<strong>Add NONMEM-specific derived columns</strong><br>
-</li>
-<li>
-<strong>Carry forward dose amounts</strong><br>
-</li>
-<li><strong>Finalize and export</strong></li>
-</ol>
-<p>Let’s get started.</p>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_1-load-required-libraries">1. Load Required Libraries<a class="anchor" aria-label="anchor" href="#id_1-load-required-libraries"></a>
-</h2>
-<p>We use a number of libraries for data manipulation, file path management, assertion checks, reading/writing standardized data, and more.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span>  <span class="co"># For data manipulation and piping</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://here.r-lib.org/" class="external-link">here</a></span><span class="op">)</span>       <span class="co"># For managing file paths</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">assertthat</span><span class="op">)</span> <span class="co"># For simple assertion checks</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/metrumresearchgroup/yspec" class="external-link">yspec</a></span><span class="op">)</span>      <span class="co"># For handling dataset specifications</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://metrumresearchgroup.github.io/mrgda/">mrgda</a></span><span class="op">)</span>      <span class="co"># For reading/writing data from standardized directories</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org" class="external-link">lubridate</a></span><span class="op">)</span>  <span class="co"># For working with dates/times</span></span></code></pre></div>
-<p>We’ll also prepare a list (<code>out</code>) that will store our <em>subject-level</em> (sl) and <em>time-varying</em> (tv) data as we go.</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Prepare a list to store data pieces</span></span>
-<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
-<span>  sl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,  <span class="co"># subject-level data</span></span>
-<span>  tv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># time-varying data</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_2-load-the-pk-data-specification">2. Load the PK Data Specification<a class="anchor" aria-label="anchor" href="#id_2-load-the-pk-data-specification"></a>
-</h2>
-<p>Our final dataset must adhere to a schema defined in a <code>yspec</code> YAML file. This file details which columns we expect, along with labels, units, and other metadata.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pk_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yspec/man/ys_load.html" class="external-link">ys_load</a></span><span class="op">(</span><span class="fu">here</span><span class="op">(</span><span class="st">"data/derived/pk.yaml"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_3-read-in-the-source-data">3. Read in the Source Data<a class="anchor" aria-label="anchor" href="#id_3-read-in-the-source-data"></a>
-</h2>
-<p>Let’s read all the SDTM data for a study called “100.” Each domain (like <code>dm</code>, <code>vs</code>, <code>pc</code>, <code>ex</code>) is automatically placed in a named list. For example, <code>src_100$dm</code> is the Demographics domain, <code>src_100$pc</code> is the Concentrations domain, etc.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">src_100</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_src_dir.html">read_src_dir</a></span><span class="op">(</span><span class="fu">here</span><span class="op">(</span><span class="st">"data"</span>, <span class="st">"source"</span>, <span class="st">"100"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_4-prepare-demographics-dm-domain">4. Prepare Demographics (DM Domain)<a class="anchor" aria-label="anchor" href="#id_4-prepare-demographics-dm-domain"></a>
-</h2>
-<p>We want to transform certain demographic variables into numeric codes, rename them for our final dataset, and do some quick checks.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Inspect a few demographic variables:</span></span>
-<span><span class="va">src_100</span><span class="op">$</span><span class="va">dm</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu">pivot_longer</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">ACTARM</span>, <span class="va">SEX</span>, <span class="va">RACE</span>, <span class="va">ETHNIC</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">name</span>, <span class="va">value</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Load required libraries</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://here.r-lib.org/" class="external-link">here</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">assertthat</span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/metrumresearchgroup/yspec" class="external-link">yspec</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://metrumresearchgroup.github.io/mrgda/">mrgda</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org" class="external-link">lubridate</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Create a subject-level demographics dataset</span></span>
-<span><span class="va">dm_1</span> <span class="op">&lt;-</span></span>
+<span><span class="co"># Prepare storage list</span></span>
+<span><span class="va">out</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>sl <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>, tv <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Load PK specification</span></span>
+<span><span class="va">pk_spec</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/pkg/yspec/man/ys_load.html" class="external-link">ys_load</a></span><span class="op">(</span><span class="fu">here</span><span class="op">(</span><span class="st">"data/derived/pk.yaml"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Read SDTM source data</span></span>
+<span><span class="va">src_100</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_src_dir.html">read_src_dir</a></span><span class="op">(</span><span class="fu">here</span><span class="op">(</span><span class="st">"data"</span>, <span class="st">"source"</span>, <span class="st">"100"</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Prepare Demographics</span></span>
+<span><span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">dm</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">src_100</span><span class="op">$</span><span class="va">dm</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
-<span>    <span class="co"># Keep subject ID and study ID</span></span>
 <span>    <span class="va">USUBJID</span>,</span>
 <span>    <span class="va">STUDYID</span>,</span>
-<span>    </span>
-<span>    <span class="co"># Convert SEX from 'F'/'M' to numeric (1 or 2); -99 for unexpected</span></span>
 <span>    SEX <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>      <span class="va">SEX</span> <span class="op">==</span> <span class="st">"F"</span> <span class="op">~</span> <span class="fl">1</span>,</span>
-<span>      <span class="va">SEX</span> <span class="op">==</span> <span class="st">"M"</span> <span class="op">~</span> <span class="fl">2</span>, </span>
+<span>      <span class="va">SEX</span> <span class="op">==</span> <span class="st">"M"</span> <span class="op">~</span> <span class="fl">2</span>,</span>
 <span>      <span class="cn">TRUE</span> <span class="op">~</span> <span class="op">-</span><span class="fl">99</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    </span>
-<span>    <span class="co"># Convert RACE to numeric categories; -99 if not recognized</span></span>
 <span>    RACE <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span></span>
 <span>      <span class="va">RACE</span> <span class="op">==</span> <span class="st">"WHITE"</span> <span class="op">~</span> <span class="fl">1</span>,</span>
 <span>      <span class="va">RACE</span> <span class="op">==</span> <span class="st">"BLACK OR AFRICAN AMERICAN"</span> <span class="op">~</span> <span class="fl">2</span>,</span>
@@ -202,124 +132,57 @@
 <span>      <span class="va">RACE</span> <span class="op">==</span> <span class="st">"OTHER"</span> <span class="op">~</span> <span class="fl">6</span>,</span>
 <span>      <span class="cn">TRUE</span> <span class="op">~</span> <span class="op">-</span><span class="fl">99</span></span>
 <span>    <span class="op">)</span>,</span>
-<span>    </span>
-<span>    <span class="co"># Baseline age</span></span>
 <span>    BLAGE <span class="op">=</span> <span class="va">AGE</span></span>
 <span>  <span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/assertthat/man/assert_that.html" class="external-link">assert_that</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">dm</span> <span class="op">==</span> <span class="op">-</span><span class="fl">99</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Store in our subject-level list</span></span>
-<span><span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">dm</span> <span class="op">&lt;-</span> <span class="va">dm_1</span></span>
-<span></span>
-<span><span class="co"># Check that we did not unintentionally code any row as -99</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/assertthat/man/assert_that.html" class="external-link">assert_that</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">dm</span> <span class="op">==</span> <span class="op">-</span><span class="fl">99</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_5-prepare-vitals-vs-domain">5. Prepare Vitals (VS Domain)<a class="anchor" aria-label="anchor" href="#id_5-prepare-vitals-vs-domain"></a>
-</h2>
-<p>From the vitals data, we’ll collect baseline weight and height, then compute BMI.</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Quick summary of test codes, baseline flags, and units</span></span>
-<span><span class="va">src_100</span><span class="op">$</span><span class="va">vs</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">VSTESTCD</span>, <span class="va">VSBLFL</span>, <span class="va">VSSTRESU</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Filter vitals data to only those in DM</span></span>
-<span><span class="va">vs_0</span> <span class="op">&lt;-</span></span>
+<span><span class="co"># Prepare Vitals</span></span>
+<span><span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">vs</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">src_100</span><span class="op">$</span><span class="va">vs</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">USUBJID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">dm</span><span class="op">$</span><span class="va">USUBJID</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># We'll focus on WEIGHT and HEIGHT at baseline</span></span>
-<span><span class="va">vs_tests</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WEIGHT"</span>, <span class="st">"HEIGHT"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">vs_1</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">vs_0</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
-<span>    <span class="va">VSBLFL</span> <span class="op">==</span> <span class="st">"Y"</span>,            <span class="co"># baseline records only</span></span>
-<span>    <span class="va">VSTESTCD</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">vs_tests</span>    <span class="co"># only weight &amp; height</span></span>
+<span>    <span class="va">USUBJID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">dm</span><span class="op">$</span><span class="va">USUBJID</span>,</span>
+<span>    <span class="va">VSBLFL</span> <span class="op">==</span> <span class="st">"Y"</span>,</span>
+<span>    <span class="va">VSTESTCD</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WEIGHT"</span>, <span class="st">"HEIGHT"</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">USUBJID</span>, <span class="va">VSTESTCD</span>, <span class="va">VSSTRESN</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">pivot_wider</span><span class="op">(</span>names_from <span class="op">=</span> <span class="va">VSTESTCD</span>, values_from <span class="op">=</span> <span class="va">VSSTRESN</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
+<span>    <span class="va">USUBJID</span>,</span>
+<span>    <span class="va">VSTESTCD</span>,</span>
+<span>    <span class="va">VSSTRESN</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">pivot_wider</span><span class="op">(</span></span>
+<span>    names_from <span class="op">=</span> <span class="va">VSTESTCD</span>,</span>
+<span>    values_from <span class="op">=</span> <span class="va">VSSTRESN</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
 <span>    <span class="va">USUBJID</span>,</span>
-<span>    BLWT <span class="op">=</span> <span class="va">WEIGHT</span>, </span>
-<span>    BLBMI <span class="op">=</span> <span class="va">WEIGHT</span> <span class="op">/</span> <span class="op">(</span><span class="op">(</span><span class="va">HEIGHT</span> <span class="op">/</span> <span class="fl">100</span><span class="op">)</span> <span class="op">^</span> <span class="fl">2</span><span class="op">)</span></span>
+<span>    BLWT <span class="op">=</span> <span class="va">WEIGHT</span>,</span>
+<span>    BLBMI <span class="op">=</span> <span class="va">WEIGHT</span> <span class="op">/</span> <span class="op">(</span><span class="op">(</span><span class="va">HEIGHT</span> <span class="op">/</span> <span class="fl">100</span><span class="op">)</span><span class="op">^</span><span class="fl">2</span><span class="op">)</span></span>
 <span>  <span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/assertthat/man/assert_that.html" class="external-link">assert_that</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">vs</span><span class="op">$</span><span class="va">USUBJID</span><span class="op">)</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">vs</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">vs</span> <span class="op">&lt;-</span> <span class="va">vs_1</span></span>
-<span></span>
-<span><span class="co"># Ensure no duplicates or missing data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/assertthat/man/assert_that.html" class="external-link">assert_that</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">vs</span><span class="op">$</span><span class="va">USUBJID</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/assertthat/man/assert_that.html" class="external-link">assert_that</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">vs</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_6-prepare-pk-concentrations-pc-domain">6. Prepare PK Concentrations (PC Domain)<a class="anchor" aria-label="anchor" href="#id_6-prepare-pk-concentrations-pc-domain"></a>
-</h2>
-<p>We’ll focus on a single analyte called <code>"DRUG-X"</code>, convert below-limit-of-quantification (BLQ) flags, and set columns like <code>EVID</code> and <code>MDV</code> for NONMEM.</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Quick look at test names and statuses in PC</span></span>
-<span><span class="va">src_100</span><span class="op">$</span><span class="va">pc</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">PCTEST</span>, <span class="va">PCSTAT</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Rows missing numeric results</span></span>
-<span><span class="va">src_100</span><span class="op">$</span><span class="va">pc</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">PCSTRESN</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">PCTEST</span>, <span class="va">PCORRES</span>, <span class="va">PCSTAT</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Filter to keep only relevant PK data</span></span>
-<span><span class="va">pc_0</span> <span class="op">&lt;-</span></span>
+<span><span class="co"># Prepare PK concentrations</span></span>
+<span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">$</span><span class="va">pc</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="va">src_100</span><span class="op">$</span><span class="va">pc</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span></span>
 <span>    <span class="va">USUBJID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">dm</span><span class="op">$</span><span class="va">USUBJID</span>,</span>
 <span>    <span class="va">PCTEST</span> <span class="op">==</span> <span class="st">"DRUG-X"</span>,</span>
 <span>    <span class="va">PCSTAT</span> <span class="op">!=</span> <span class="st">"NOT DONE"</span></span>
-<span>  <span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Create final PK columns</span></span>
-<span><span class="va">pc_1</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">pc_0</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
 <span>    <span class="va">USUBJID</span>,</span>
-<span>    DV <span class="op">=</span> <span class="va">PCSTRESN</span>,  <span class="co"># observed concentration</span></span>
-<span>    BLQ <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">PCORRES</span> <span class="op">==</span> <span class="st">"&lt;LLOQ"</span> <span class="op">~</span> <span class="fl">1</span>, <span class="cn">TRUE</span> <span class="op">~</span> <span class="fl">0</span><span class="op">)</span>,</span>
-<span>    <span class="co"># EVID=2 for BLQ; otherwise 0</span></span>
-<span>    EVID <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">BLQ</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="fl">2</span>, <span class="cn">TRUE</span> <span class="op">~</span> <span class="fl">0</span><span class="op">)</span>,</span>
-<span>    <span class="co"># MDV=0 for BLQ (we keep the observation), else 1</span></span>
-<span>    MDV <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/case_when.html" class="external-link">case_when</a></span><span class="op">(</span><span class="va">BLQ</span> <span class="op">==</span> <span class="fl">1</span> <span class="op">~</span> <span class="fl">0</span>, <span class="cn">TRUE</span> <span class="op">~</span> <span class="fl">1</span><span class="op">)</span>,</span>
+<span>    DV <span class="op">=</span> <span class="va">PCSTRESN</span>,</span>
+<span>    BLQ <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">PCORRES</span> <span class="op">==</span> <span class="st">"&lt;LLOQ"</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>    EVID <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="va">BLQ</span> <span class="op">==</span> <span class="fl">1</span>, <span class="fl">2</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>    MDV <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/if_else.html" class="external-link">if_else</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">DV</span><span class="op">)</span>, <span class="fl">1</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>    DATETIME <span class="op">=</span> <span class="fu">ymd_hms</span><span class="op">(</span><span class="va">PCDTC</span><span class="op">)</span>,</span>
 <span>    LLOQ <span class="op">=</span> <span class="va">PCLLOQ</span></span>
 <span>  <span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/assertthat/man/assert_that.html" class="external-link">assert_that</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">$</span><span class="va">pc</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"USUBJID"</span>, <span class="st">"DATETIME"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>, <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">$</span><span class="va">pc</span><span class="op">$</span><span class="va">DATETIME</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Some quick checks</span></span>
-<span><span class="va">pc_1</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">DV</span><span class="op">)</span>, <span class="va">BLQ</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">$</span><span class="va">pc</span> <span class="op">&lt;-</span> <span class="va">pc_1</span></span>
-<span></span>
-<span><span class="co"># Verify uniqueness of (USUBJID, DATETIME) pairs</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/assertthat/man/assert_that.html" class="external-link">assert_that</a></span><span class="op">(</span></span>
-<span>  <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">$</span><span class="va">pc</span><span class="op">[</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"USUBJID"</span>, <span class="st">"DATETIME"</span><span class="op">)</span><span class="op">]</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>  <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">anyNA</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">$</span><span class="va">pc</span><span class="op">$</span><span class="va">DATETIME</span><span class="op">)</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_7-prepare-dosing-ex-domain">7. Prepare Dosing (EX Domain)<a class="anchor" aria-label="anchor" href="#id_7-prepare-dosing-ex-domain"></a>
-</h2>
-<p>Dosing records typically have <code>EVID=1</code> and <code>MDV=1</code> in NONMEM. We also confirm that each record has a start and end time that match.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Quick look at EX domain fields</span></span>
-<span><span class="va">src_100</span><span class="op">$</span><span class="va">ex</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/count.html" class="external-link">count</a></span><span class="op">(</span><span class="va">EXTRT</span>, <span class="va">EXDOSFRM</span>, <span class="va">EXDOSFRQ</span>, <span class="va">EXDOSU</span>, <span class="va">EXDOSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Check if each record is for a single dose event</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/assertthat/man/assert_that.html" class="external-link">assert_that</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span><span class="va">src_100</span><span class="op">$</span><span class="va">ex</span><span class="op">$</span><span class="va">EXSTDTC</span> <span class="op">==</span> <span class="va">src_100</span><span class="op">$</span><span class="va">ex</span><span class="op">$</span><span class="va">EXENDTC</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Filter EX data to keep only subjects in DM</span></span>
-<span><span class="va">ex_0</span> <span class="op">&lt;-</span> <span class="va">src_100</span><span class="op">$</span><span class="va">ex</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">USUBJID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">dm</span><span class="op">$</span><span class="va">USUBJID</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Convert to standard NONMEM columns</span></span>
-<span><span class="va">ex_1</span> <span class="op">&lt;-</span> <span class="va">ex_0</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span><span class="co"># Prepare dosing</span></span>
+<span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">$</span><span class="va">dosing</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">src_100</span><span class="op">$</span><span class="va">ex</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">USUBJID</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">out</span><span class="op">$</span><span class="va">sl</span><span class="op">$</span><span class="va">dm</span><span class="op">$</span><span class="va">USUBJID</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
 <span>    <span class="va">USUBJID</span>,</span>
 <span>    AMT <span class="op">=</span> <span class="va">EXDOSE</span>,</span>
@@ -327,115 +190,75 @@
 <span>    DATETIME <span class="op">=</span> <span class="fu">ymd_hms</span><span class="op">(</span><span class="va">EXSTDTC</span><span class="op">)</span>,</span>
 <span>    MDV <span class="op">=</span> <span class="fl">1</span></span>
 <span>  <span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/assertthat/man/assert_that.html" class="external-link">assert_that</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">$</span><span class="va">dosing</span> <span class="op">==</span> <span class="op">-</span><span class="fl">99</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">$</span><span class="va">dosing</span> <span class="op">&lt;-</span> <span class="va">ex_1</span></span>
-<span></span>
-<span><span class="co"># Check that we haven't coded anything as -99 in dosing</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/assertthat/man/assert_that.html" class="external-link">assert_that</a></span><span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">$</span><span class="va">dosing</span> <span class="op">==</span> <span class="op">-</span><span class="fl">99</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_8-combine-domains">8. Combine Domains<a class="anchor" aria-label="anchor" href="#id_8-combine-domains"></a>
-</h2>
-<p>Now, we combine time-varying data (PC + dosing) into one dataset and then left-join the subject-level (demographics and vitals) information.</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Ensure no duplicates in subject-level data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/assertthat/man/assert_that.html" class="external-link">assert_that</a></span><span class="op">(</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/all.html" class="external-link">all</a></span><span class="op">(</span></span>
-<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map.html" class="external-link">map_lgl</a></span><span class="op">(</span></span>
-<span>      <span class="va">out</span><span class="op">$</span><span class="va">sl</span>, </span>
-<span>      <span class="op">~</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/duplicated.html" class="external-link">duplicated</a></span><span class="op">(</span><span class="va">.x</span><span class="op">[[</span><span class="st">"USUBJID"</span><span class="op">]</span><span class="op">]</span><span class="op">)</span><span class="op">)</span></span>
-<span>    <span class="op">)</span></span>
+<span><span class="co"># Prepare time-varying vitals</span></span>
+<span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">$</span><span class="va">wt</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">src_100</span><span class="op">$</span><span class="va">vs</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">VSTEST</span> <span class="op">==</span> <span class="st">"WEIGHT"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/transmute.html" class="external-link">transmute</a></span><span class="op">(</span></span>
+<span>    <span class="va">USUBJID</span>,</span>
+<span>    WT <span class="op">=</span> <span class="va">VSSTRESN</span>,</span>
+<span>    DATETIME <span class="op">=</span> <span class="fu">ymd_hms</span><span class="op">(</span><span class="va">VSDTC</span><span class="op">)</span>,</span>
+<span>    EVID <span class="op">=</span> <span class="op">-</span><span class="fl">99</span></span>
 <span>  <span class="op">)</span></span>
-<span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Bind time-varying data vertically, then join subject-level data</span></span>
-<span><span class="va">pk_0</span> <span class="op">&lt;-</span></span>
+<span><span class="co"># Combine domains</span></span>
+<span><span class="va">pk_data0</span> <span class="op">&lt;-</span> </span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/bind_rows.html" class="external-link">bind_rows</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">tv</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span></span>
-<span>    <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/reduce.html" class="external-link">reduce</a></span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">sl</span>, <span class="va">full_join</span><span class="op">)</span>,</span>
-<span>    by <span class="op">=</span> <span class="st">"USUBJID"</span></span>
-<span>  <span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">USUBJID</span>, <span class="va">DATETIME</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_9-add-nonmem-specific-derived-columns">9. Add NONMEM-Specific Derived Columns<a class="anchor" aria-label="anchor" href="#id_9-add-nonmem-specific-derived-columns"></a>
-</h2>
-<p>We add columns such as:</p>
-<ul>
-<li>
-<code>FIRST_DOSE_TIME</code>: the earliest dose time per subject</li>
-<li>
-<code>N_DOSES</code>: running count of doses</li>
-<li>
-<code>TIME</code>: time since first dose</li>
-<li>
-<code>TAD</code>: time since current dose</li>
-<li>
-<code>OCC</code>: occasion number (for modeling)</li>
-</ul>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pk_1</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">pk_0</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate-joins.html" class="external-link">left_join</a></span><span class="op">(</span><span class="fu">reduce</span><span class="op">(</span><span class="va">out</span><span class="op">$</span><span class="va">sl</span>, <span class="va">full_join</span><span class="op">)</span>, by <span class="op">=</span> <span class="st">"USUBJID"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">USUBJID</span>, <span class="va">DATETIME</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Fill weight and remove placeholder records</span></span>
+<span><span class="va">pk_data1</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">pk_data0</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">USUBJID</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">fill</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"WT"</span><span class="op">)</span>, .direction <span class="op">=</span> <span class="st">"downup"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">EVID</span> <span class="op">!=</span> <span class="op">-</span><span class="fl">99</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Add NONMEM-specific derived columns</span></span>
+<span><span class="va">pk_data2</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">pk_data1</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">USUBJID</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    FIRST_DOSE_TIME <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">DATETIME</span><span class="op">[</span><span class="va">EVID</span> <span class="op">==</span> <span class="fl">1</span><span class="op">]</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>,</span>
-<span>    N_DOSES <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">EVID</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>,</span>
-<span>    N_DOSES <span class="op">=</span> <span class="fu">replace_na</span><span class="op">(</span><span class="va">N_DOSES</span>, <span class="fl">0</span><span class="op">)</span>,</span>
+<span>    N_DOSES <span class="op">=</span> <span class="fu">replace_na</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">EVID</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span>, <span class="fl">0</span><span class="op">)</span>,</span>
 <span>    TIME <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">difftime</a></span><span class="op">(</span><span class="va">DATETIME</span>, <span class="va">FIRST_DOSE_TIME</span>, units <span class="op">=</span> <span class="st">"hours"</span><span class="op">)</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">N_DOSES</span>, .add <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">USUBJID</span>, <span class="va">N_DOSES</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    TAD <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/difftime.html" class="external-link">difftime</a></span><span class="op">(</span><span class="va">DATETIME</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">min</a></span><span class="op">(</span><span class="va">DATETIME</span><span class="op">)</span>, units <span class="op">=</span> <span class="st">"hours"</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    DOSE_HAD_PK <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/any.html" class="external-link">any</a></span><span class="op">(</span><span class="va">EVID</span> <span class="op">==</span> <span class="fl">0</span>, na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">USUBJID</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
-<span>    NEW_DOSE <span class="op">=</span> <span class="va">N_DOSES</span> <span class="op">!=</span> <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">N_DOSES</span>, default <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">N_DOSES</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>    NEW_DOSE <span class="op">=</span> <span class="va">N_DOSES</span> <span class="op">!=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/lead-lag.html" class="external-link">lag</a></span><span class="op">(</span><span class="va">N_DOSES</span>, default <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/nth.html" class="external-link">first</a></span><span class="op">(</span><span class="va">N_DOSES</span><span class="op">)</span><span class="op">)</span>,</span>
 <span>    OCC <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/cumsum.html" class="external-link">cumsum</a></span><span class="op">(</span><span class="va">NEW_DOSE</span> <span class="op">&amp;</span> <span class="va">DOSE_HAD_PK</span><span class="op">)</span> <span class="op">*</span> <span class="op">(</span><span class="va">N_DOSES</span> <span class="op">!=</span> <span class="fl">0</span><span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_10-carry-forward-dose-amounts">10. Carry Forward Dose Amounts<a class="anchor" aria-label="anchor" href="#id_10-carry-forward-dose-amounts"></a>
-</h2>
-<p>To facilitate some modeling approaches and visualizations, we fill in <code>DOSE</code> so that observations following a dose record inherit the same amount.</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pk_2</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">pk_1</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Carry forward dose amounts</span></span>
+<span><span class="va">pk_data3</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">pk_data2</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>DOSE <span class="op">=</span> <span class="va">AMT</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">USUBJID</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/fill.html" class="external-link">fill</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"DOSE"</span><span class="op">)</span>, .direction <span class="op">=</span> <span class="st">"downup"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="id_11-finalize-and-export-the-dataset">11. Finalize and Export the Dataset<a class="anchor" aria-label="anchor" href="#id_11-finalize-and-export-the-dataset"></a>
-</h2>
-<p>We assign unique integer IDs per subject, add a numeric row index, and then reorder columns according to our specification (<code>pk_spec</code>). Finally, we do a <code>yspec</code> validation and write to disk as CSV.</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">pk_3</span> <span class="op">&lt;-</span></span>
-<span>  <span class="va">pk_2</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/fill.html" class="external-link">fill</a></span><span class="op">(</span><span class="va">DOSE</span>, .direction <span class="op">=</span> <span class="st">"downup"</span><span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Finalize dataset</span></span>
+<span><span class="va">pk_data_final</span> <span class="op">&lt;-</span> </span>
+<span>  <span class="va">pk_data3</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    ID <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/integer.html" class="external-link">as.integer</a></span><span class="op">(</span><span class="fu">forcats</span><span class="fu">::</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_inorder.html" class="external-link">fct_inorder</a></span><span class="op">(</span><span class="va">USUBJID</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>    NUM <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/context.html" class="external-link">n</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>    NUM <span class="op">=</span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">row_number</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>    C <span class="op">=</span> <span class="cn">NA_character_</span></span>
-<span>  <span class="op">)</span></span>
+<span>  <span class="op">)</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pk_spec</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Reorder columns to match the spec</span></span>
-<span><span class="va">pk_out</span> <span class="op">&lt;-</span> <span class="va">pk_3</span> <span class="op"><a href="reference/pipe.html">%&gt;%</a></span> <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">pk_spec</span><span class="op">)</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Validate</span></span>
-<span><span class="fu"><a href="https://rdrr.io/pkg/yspec/man/ys_check.html" class="external-link">ys_check</a></span><span class="op">(</span><span class="va">pk_out</span>, <span class="va">pk_spec</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Write the final derived dataset to disk</span></span>
-<span><span class="fu"><a href="reference/write_derived.html">write_derived</a></span><span class="op">(</span></span>
-<span>  .data <span class="op">=</span> <span class="va">pk_out</span>,</span>
-<span>  .spec <span class="op">=</span> <span class="va">pk_spec</span>,</span>
-<span>  .file <span class="op">=</span> <span class="st">"data/derived/pk.csv"</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Validate and export</span></span>
+<span><span class="fu"><a href="https://rdrr.io/pkg/yspec/man/ys_check.html" class="external-link">ys_check</a></span><span class="op">(</span><span class="va">pk_data_final</span>, <span class="va">pk_spec</span><span class="op">)</span></span>
+<span><span class="fu"><a href="reference/write_derived.html">write_derived</a></span><span class="op">(</span><span class="va">pk_data_final</span>, <span class="va">pk_spec</span>, <span class="fu">here</span><span class="op">(</span><span class="st">"data/derived/pk.csv"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </div>
