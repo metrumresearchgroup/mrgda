@@ -1,8 +1,8 @@
 mrgda – Data Assembly Workflow
 ================
 
-- [Example DA](#example-da)
-- [1 Initialization](#1-initialization)
+- [Background](#background)
+- [1 Source data](#1-source-data)
   - [Key Function: `read_src_dir()`](#key-function-read_src_dir)
 - [2 Subject-level domains](#2-subject-level-domains)
   - [Demographics](#demographics)
@@ -32,11 +32,7 @@ mrgda – Data Assembly Workflow
 
 <img src="man/figures/logo.png" width="150px" />
 
-# Example DA
-
-The R Markdown below reproduces the complete data-assembly (DA) workflow
-for the `mrgda` example study. Knit the file with `github_document`
-output to refresh the `README.md` that appears on your GitHub page.
+# Background
 
 This workflow utilizes several key functions from the `mrgda` package to
 streamline the data assembly process. We’ll highlight three of them:
@@ -46,7 +42,7 @@ streamline the data assembly process. We’ll highlight three of them:
 - `write_derived()`: For exporting the final analysis dataset along with
   its metadata.
 
-# 1 Initialization
+# 1 Source data
 
 ## Key Function: `read_src_dir()`
 
