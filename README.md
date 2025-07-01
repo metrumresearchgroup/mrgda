@@ -1,5 +1,6 @@
-mrgda – [Data Assembly Workflow](https://docs.google.com/presentation/d/129PoYxjcYMp5lWMFoMZj-hgvuAOFHB4CEbCUIDbNdh8/edit?usp=sharing)
-================
+# mrgda – Data Assembly Workflow
+
+[Link to Data Assembly Demystified Presentation](https://docs.google.com/presentation/d/129PoYxjcYMp5lWMFoMZj-hgvuAOFHB4CEbCUIDbNdh8/edit?usp=sharing)
 
 - [Background](#background)
 - [1 Source data](#1-source-data)
