@@ -1,3 +1,12 @@
+test_that("read_src_dir works with a directory containing tsv files", {
+  tmp_dir <- tempdir()
+  tsv_file <- file.path(tmp_dir, "test.tsv")
+  df <- data.frame(A = 1:3, B = c("x", "y", "z"))
+  readr::write_tsv(df, tsv_file)
+  src_list2 <- read_src_dir(tmp_dir, .file_types = "tsv")
+  expect_true("test" %in% names(src_list2))
+  expect_equal(src_list2$test, readr::read_tsv(tsv_file))
+})
 path <- system.file("example-sdtm", package = "mrgda")
 src_list <- read_src_dir(.path = path) %>% suppressMessages()
 

@@ -43,8 +43,10 @@ read_src_dir <- function(.path,
       haven::read_sas
     } else if (.files_of_interest$type == "csv") {
       readr::read_csv
+    } else if (.files_of_interest$type == "tsv") {
+      function(file, ...) readr::read_tsv(file, ...)
     } else {
-      stop("'.file_types' must be 'csv', 'sas7bdat', or 'xpt'")
+      stop("'.file_types' must be 'csv', 'tsv', 'sas7bdat', or 'xpt'")
     }
 
   .file_sizes <- dplyr::tibble()
