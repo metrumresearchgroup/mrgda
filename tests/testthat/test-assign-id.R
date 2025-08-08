@@ -42,7 +42,7 @@ test_that("assign_id function works correctly", {
   .data_new_subject <- data.frame(USUBJID = c("A", "B", "C", "D", "E"))
   test_that("Function correctly adds new subjects", {
     df_with_new_ids <- assign_id(.data_new_subject, .new_data_file, .subject_col = "USUBJID") %>% suppressMessages()
-    expect_equal(df_with_new_ids$ID, c(1, 2, 3, 4, 5))
+    expect_equal(df_with_new_ids$ID, c("A", "B", "C", "D", "E"))
   })
 
 
@@ -65,7 +65,7 @@ test_that("assign_id function works correctly", {
     data_w_id2 <-
       assign_id(.data = data, .new_data_file, .subject_col = "USUBJID") %>% suppressMessages()
 
-    expect_true(data_w_id2$ID[data_w_id2$USUBJID == "C"] == 3)
+  expect_true(data_w_id2$ID[data_w_id2$USUBJID == "C"] == "C")
     expect_true(nrow(data_w_id2) == 7)
   })
 
@@ -99,7 +99,7 @@ test_that("assign_id sets new ID's larger than the previous data even if no subj
 
   expect_equal(nrow(ids_assigned), 3)
   expect_equal(ncol(ids_assigned), 2)
-  expect_true(all(c(20, 21, 22) %in% unique(ids_assigned$ID)))
+  expect_true(all(c("T", "U", "V") %in% unique(ids_assigned$ID)))
 
   data2 <- dplyr::tibble(USUBJID2 = c("E", "F", "G"))
   expect_error(assign_id(.data = data2, .subject_col = "USUBJID2", .previously_derived_path = lookup_path))

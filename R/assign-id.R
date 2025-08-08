@@ -77,19 +77,49 @@ assign_id <- function(.data, .previously_derived_path = NULL, .subject_col = "US
   # For subjects without ID, create a new unique ID for them
   # If some subjects had previous ID, new ID's started at 1 plus the max ID in the previous data
 
-  data_join_id_lookup <-
-    .data %>%
-    dplyr::left_join(prev_id_lookup) %>%
-    dplyr::mutate(
-      mrgda_MAX_ID = suppressWarnings(max(prev_id_lookup$ID, na.rm = TRUE)),
-      mrgda_MAX_ID = ifelse(mrgda_MAX_ID == -Inf, 0, mrgda_MAX_ID),
-      mrgda_SUBJ_NEED_ID = ifelse(is.na(ID), !!sym(.subject_col), NA),
-      ID = ifelse(
-        is.na(ID),
-        as.numeric(forcats::fct_inorder(mrgda_SUBJ_NEED_ID)) + mrgda_MAX_ID,
-        ID)
-    ) %>%
-    dplyr::select(-tidyr::starts_with("mrgda_")) %>%
+
+  # Helper to generate letter IDs: A, B, ..., Z, AA, BB, ...
+  letter_ids <- function(n, start = 1) {
+    # n: number of IDs to generate
+    # start: starting index (1 = A, 2 = B, ...)
+    ids <- character(n)
+    alphabet <- LETTERS
+    for (i in seq_len(n)) {
+      idx <- start + i - 1
+      if (idx <= 26) {
+        ids[i] <- alphabet[idx]
+      } else {
+        # After Z, repeat letters: AA, BB, ...
+        rep_count <- ((idx - 1) %/% 26)
+        letter_idx <- ((idx - 1) %% 26) + 1
+        ids[i] <- paste(rep(alphabet[letter_idx], rep_count + 1), collapse = "")
+      }
+    }
+    ids
+  }
+
+  # Find max previous ID (as letter index)
+  prev_ids <- prev_id_lookup$ID
+  prev_ids_num <- function(ids) {
+    # Convert letter IDs to numeric index: A=1, ..., Z=26, AA=27, BB=28, ...
+    sapply(ids, function(x) {
+      if (is.na(x)) return(NA_integer_)
+      # Count how many times the first letter is repeated
+      nchar(x) * (match(substr(x, 1, 1), LETTERS))
+    })
+  }
+  max_prev_id <- suppressWarnings(max(prev_ids_num(prev_ids), na.rm = TRUE))
+  if (is.infinite(max_prev_id)) max_prev_id <- 0
+
+  # Assign IDs
+  .data2 <- .data %>% dplyr::left_join(prev_id_lookup)
+  need_id <- which(is.na(.data2$ID))
+  n_new <- length(need_id)
+  if (n_new > 0) {
+    new_ids <- letter_ids(n_new, start = max_prev_id + 1)
+    .data2$ID[need_id] <- new_ids
+  }
+  data_join_id_lookup <- .data2 %>%
     dplyr::select(dplyr::all_of(c("ID", .subject_col))) %>%
     dplyr::distinct() %>%
     suppressMessages()
