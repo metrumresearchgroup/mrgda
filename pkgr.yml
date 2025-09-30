@@ -12,9 +12,9 @@ Packages:
 
 Repos:
   - CRAN: https://cran.rstudio.com
-  - MPN: https://mpn.metworx.com/snapshots/stable/2024-06-12 # used for mrg packages
+  - MPN: https://mpn.metworx.com/snapshots/stable/2025-09-17 # used for mrg packages
 
 Lockfile:
     Type: renv
 
-Rpath: ${R_EXE_4_3}
+Rpath: ${R_EXE_4_5}

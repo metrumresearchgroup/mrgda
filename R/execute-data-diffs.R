@@ -231,6 +231,35 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
         dplyr::summarise(`N Occurrences` = dplyr::n()) %>%
         suppressMessages() %>%
         dplyr::ungroup()
+
+      top_value_transitions <-
+        out$subject_diffs %>%
+        dplyr::count(
+          VARIABLE,
+          BASE,
+          COMPARE,
+          wt = `N Occurrences`,
+          name = "N Occurrences"
+        ) %>%
+        dplyr::group_by(VARIABLE) %>%
+        dplyr::slice_max(`N Occurrences`, n = 5, with_ties = TRUE) %>%
+        dplyr::ungroup() %>%
+        dplyr::arrange(dplyr::desc(`N Occurrences`), VARIABLE)
+
+      if (nrow(top_value_transitions) > 0) {
+        cli::cli_alert_info("Top value transitions by variable")
+        print(
+          cli::boxx(
+            padding = 0,
+            knitr::kable(
+              x = top_value_transitions,
+              align = "c",
+              format = "simple"
+            )
+          )
+        )
+      }
+
     }
   }
 
