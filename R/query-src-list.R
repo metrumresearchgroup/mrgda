@@ -10,7 +10,7 @@
 #' @examples
 #' path <- system.file("example-sdtm", package = "mrgda")
 #'
-#' src_list <- read_src_dir(path)
+#' src_list <- read_src_dir(path, .file_types = "xpt")
 #'
 #' # Summarize source directory
 #' query_src_list(src_list, .string = "RACE")

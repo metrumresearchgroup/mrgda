@@ -4,12 +4,12 @@
 \alias{read_src_dir}
 \title{Read in every domain in a source data directory.}
 \usage{
-read_src_dir(.path, .file_types = "detect", .read_domains = NULL)
+read_src_dir(.path, .file_types, .read_domains = NULL)
 }
 \arguments{
 \item{.path}{Full path to the source data directory.}
 
-\item{.file_types}{Type of files being read in (e.g. 'sas7bat'). The default ('detect') will determine file type based on the most occurring file type in .path.}
+\item{.file_types}{Type of files being read in (e.g. 'sas7bat').}
 
 \item{.read_domains}{Character vector of domains to read in (e.g. c('dm', 'lb') - default is to load all domains).}
 }
@@ -19,9 +19,9 @@ This function takes a path to a source data directory (typically SDTM or ADaM fo
 \examples{
 path <- system.file("example-sdtm", package = "mrgda")
 # Read in all source files
-src_list <- read_src_dir(.path = path, .file_types = "detect")
+src_list <- read_src_dir(.path = path, .file_types = "xpt")
 
 # Read in only "dm" and "lb" domains
-src_list <- read_src_dir(.path = path, .file_types = "detect", .read_domains = c("dm", "lb"))
+src_list <- read_src_dir(.path = path, .file_types = "xpt", .read_domains = c("dm", "lb"))
 
 }

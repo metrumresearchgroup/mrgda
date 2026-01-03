@@ -1,5 +1,5 @@
 path <- system.file("example-sdtm", package = "mrgda")
-src_list <- read_src_dir(path) %>% suppressMessages()
+src_list <- read_src_dir(path, .file_types = "xpt") %>% suppressMessages()
 
 
 
