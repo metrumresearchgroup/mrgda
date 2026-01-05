@@ -4,23 +4,33 @@
 #' This function takes a path to a source data directory (typically SDTM or ADaM folder), reads in every data file, and returns a named list of the data objects.
 #'
 #' @param .path Full path to the source data directory.
-#' @param .file_types Type of files being read in (e.g. 'sas7bat'). The default ('detect') will determine file type based on the most occurring file type in .path.
+#' @param .file_types Type of files being read in (e.g. 'sas7bat').
 #' @param .read_domains Character vector of domains to read in (e.g. c('dm', 'lb') - default is to load all domains).
 #'
 #'
 #' @examples
 #' path <- system.file("example-sdtm", package = "mrgda")
 #' # Read in all source files
-#' src_list <- read_src_dir(.path = path, .file_types = "detect")
+#' src_list <- read_src_dir(.path = path, .file_types = "xpt")
 #'
 #' # Read in only "dm" and "lb" domains
-#' src_list <- read_src_dir(.path = path, .file_types = "detect", .read_domains = c("dm", "lb"))
+#' src_list <- read_src_dir(.path = path, .file_types = "xpt", .read_domains = c("dm", "lb"))
 #'
 #' @md
 #' @export
 read_src_dir <- function(.path,
-                         .file_types = "detect",
+                         .file_types,
                          .read_domains = NULL) {
+
+  if (missing(.file_types) || is.null(.file_types)) {
+    stop("'.file_types' is required. Must be 'csv', 'sas7bdat', or 'xpt'")
+  }
+  .file_types <- tolower(.file_types)
+  valid_file_types <- c("csv", "sas7bdat", "xpt")
+  if (!(.file_types %in% valid_file_types)) {
+    stop("'.file_types' must be 'csv', 'sas7bdat', or 'xpt'")
+  }
+
   .out <- list()
   md5_hashes <- list()
 

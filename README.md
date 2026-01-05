@@ -53,9 +53,8 @@ a specified source data directory, such as an SDTM or ADaM folder.
 
 - **Path Specification**: You provide the full path to the source data
   directory using the `.path` argument.
-- **File Type Detection**: The function can auto-detect file types
-  (e.g., CSV, SAS7BDAT, XPT) if `.file_types` is set to `"detect"` (the
-  default). Alternatively, you can specify the type.
+- **File Type Selection**: You must specify the file type (e.g., CSV,
+  SAS7BDAT, XPT) via `.file_types`.
 - **Selective Domain Loading**: If you only need specific domains, you
   can provide a character vector of domain names to the `.read_domains`
   argument (e.g., `c('dm', 'lb')`). By default, it loads all domains.
@@ -77,7 +76,7 @@ out <- list(sl = list(), tv = list())
 target_spec <- ys_load(here("data/derived/pk.yaml"))
 
 # Read SDTM source data from the '100' subdirectory
-src_100 <- read_src_dir(here("data", "source", "100"))
+src_100 <- read_src_dir(here("data", "source", "100"), .file_types = "xpt")
 ```
 
 # 2 Subject-level domains

@@ -1,5 +1,5 @@
 path <- system.file("example-sdtm", package = "mrgda")
-src_list <- read_src_dir(.path = path) %>% suppressMessages()
+src_list <- read_src_dir(.path = path, .file_types = "xpt") %>% suppressMessages()
 
 test_that("query_src_list returns all domain and column combinations with a matching string", {
   query_white <- query_src_list(.src_list = src_list, .string = "WHITE") %>% suppressMessages()
