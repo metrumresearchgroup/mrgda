@@ -22,11 +22,11 @@ read_src_dir <- function(.path,
                          .file_types,
                          .read_domains = NULL) {
 
-  valid_file_types <- c("csv", "sas7bdat", "xpt")
   if (missing(.file_types) || is.null(.file_types)) {
-    stop("'.file_types' must be 'csv', 'sas7bdat', or 'xpt'")
+    stop("'.file_types' is required. Must be 'csv', 'sas7bdat', or 'xpt'")
   }
   .file_types <- tolower(.file_types)
+  valid_file_types <- c("csv", "sas7bdat", "xpt")
   if (!(.file_types %in% valid_file_types)) {
     stop("'.file_types' must be 'csv', 'sas7bdat', or 'xpt'")
   }
