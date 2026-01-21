@@ -31,6 +31,9 @@ test_that("get_base_df output check: returns a data frame for base_df if the fil
 
 
 test_that("get_base_df output check returns TRUE for from_svn if .compare_from_svn is TRUE and the file exists in SVN", {
+  if (Sys.which("svn") == "" || Sys.which("svnadmin") == "") {
+    testthat::skip("svn and svnadmin are required for this test")
+  }
   svn_dir1 <- local_svn_repo()
   withr::defer(unlink(svn_dir1, recursive = TRUE))
 

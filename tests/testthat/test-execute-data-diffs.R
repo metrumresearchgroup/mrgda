@@ -97,3 +97,12 @@ test_that("execute_data_diffs works with removing columns", {
   expect_equal(diffs$value[2], "C")
 })
 
+test_that("execute_data_diffs handles row-only diffs without VarDiff entries", {
+  base_df <- data.frame(ID = c(1, 1), A = c("a", "a"))
+  compare_df <- data.frame(ID = c(1, 1, 1), A = c("a", "a", "a"))
+
+  diffs <- execute_data_diffs(base_df, compare_df, "ID")
+
+  expect_true(nrow(diffs$subject_diffs) == 0)
+  expect_true(nrow(diffs$diffs) > 0)
+})

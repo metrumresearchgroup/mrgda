@@ -220,9 +220,22 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
 
   if (length(id_diffs) > 0) {
 
-    id_diffs_out <- purrr::map_dfr(id_diffs, diffdf_value_changes_to_df, .id = .subject_col)
+    id_diffs_out_list <- purrr::imap(
+      id_diffs,
+      ~ {
+        diff_out <- diffdf_value_changes_to_df(.x)
+        if (is.null(diff_out)) {
+          return(NULL)
+        }
+        diff_out[[.subject_col]] <- .y
+        diff_out
+      }
+    )
+    id_diffs_out_list <- purrr::compact(id_diffs_out_list)
 
-    if (nrow(id_diffs_out) > 0) {
+    if (length(id_diffs_out_list) > 0) {
+
+      id_diffs_out <- dplyr::bind_rows(id_diffs_out_list)
 
       out$subject_diffs <-
         id_diffs_out %>%

@@ -69,3 +69,15 @@ test_that("gather_data_history works for third update", {
   expect_true(mtcars_history$`N Col`[1] == "11")
   expect_true(mtcars_history$`N ID`[1] == "0")
 })
+
+test_that("gather_data_history accepts missing prev_rev", {
+  history_no_rev <-
+    gather_data_history(
+      .cur_data = mtcars,
+      .cur_history = dplyr::tibble(),
+      .comment = "No revision provided"
+    )
+
+  expect_true(nrow(history_no_rev) == 1)
+  expect_true(history_no_rev$`Previous Revision`[1] == "")
+})

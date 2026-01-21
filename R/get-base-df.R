@@ -16,7 +16,7 @@ get_base_df <- function(.prev_file, .compare_from_svn){
 
   base <- .prev_file
   from_svn <- FALSE
-  prev_rev <- NA
+  prev_rev <- NA_character_
 
   if (.compare_from_svn) {
 
@@ -26,18 +26,33 @@ get_base_df <- function(.prev_file, .compare_from_svn){
 
     base_temp <- tempfile(fileext = ".csv")
 
-    prev_rev <- try(
-      system(paste0("svn info 2>/dev/null -r HEAD ", base, " | grep Revision | awk '{print $2}'"), intern = TRUE)
+    svn_info <- tryCatch(
+      system2("svn", c("info", "-r", "HEAD", base), stdout = TRUE, stderr = TRUE),
+      error = function(e) e
     )
 
-    if (length(prev_rev) > 0) {
+    if (inherits(svn_info, "error")) {
+      warning("SVN unavailable; unable to retrieve revision info for ", base, call. = FALSE)
+    } else {
+      rev_line <- svn_info[grepl("^Revision:", svn_info)]
+      if (length(rev_line) == 0) {
+        warning("SVN info did not include a revision for ", base, call. = FALSE)
+      } else {
+        prev_rev <- sub("^Revision:\\s*", "", rev_line[[1]])
+      }
+    }
 
-      export_try <- try(system(paste0("svn export -r ", prev_rev, " ", base ," ", base_temp, " > /dev/null 2>&1")))
-
-      if (export_try == 0) {
+    if (!is.na(prev_rev)) {
+      export_try <- tryCatch(
+        system2("svn", c("export", "-r", prev_rev, base, base_temp), stdout = TRUE, stderr = TRUE),
+        error = function(e) e
+      )
+      export_status <- attr(export_try, "status")
+      if (!inherits(export_try, "error") && (is.null(export_status) || export_status == 0)) {
         from_svn <- TRUE
         base <- base_temp
-        svn_rev <- prev_rev
+      } else {
+        warning("SVN export failed for ", base, call. = FALSE)
       }
     }
 

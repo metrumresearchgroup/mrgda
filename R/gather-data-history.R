@@ -11,10 +11,14 @@
 #' @param .prev_rev A value representing the previous revision or version number. If not provided,
 #'        it won't be logged.
 #' @keywords internal
-gather_data_history <- function(.cur_data, .cur_history, .comment = NULL, .prev_rev) {
+gather_data_history <- function(.cur_data, .cur_history, .comment = NULL, .prev_rev = NULL) {
 
   if (is.null(.comment)) {
     .comment <- "No comment"
+  }
+
+  if (is.null(.prev_rev)) {
+    .prev_rev <- NA
   }
 
   .history <-

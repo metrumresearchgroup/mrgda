@@ -4,7 +4,7 @@
 \alias{gather_data_history}
 \title{Gather Data History}
 \usage{
-gather_data_history(.cur_data, .cur_history, .comment = NULL, .prev_rev)
+gather_data_history(.cur_data, .cur_history, .comment = NULL, .prev_rev = NULL)
 }
 \arguments{
 \item{.cur_data}{A data frame containing the current version of the data.}

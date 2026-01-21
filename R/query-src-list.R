@@ -20,18 +20,37 @@ query_src_list <- function(.src_list, .string) {
 
   .src_list$mrgda_src_meta <- NULL
 
-  src_list_char <- purrr::map(
-    .src_list, ~ .x %>% dplyr::mutate_all(as.character)
-  )
-
-  matches <- src_list_char[grepl(.string, src_list_char, ignore.case = TRUE)]
-
   hits <- dplyr::tibble()
 
-  for (df.i in names(matches)) {
+  for (df.i in names(.src_list)) {
 
-    matches.i <- grepl(.string, matches[[df.i]], ignore.case = TRUE)
-    colmatches.i <- names(matches[[df.i]])[matches.i]
+    df <- .src_list[[df.i]]
+    if (!is.data.frame(df)) {
+      next
+    }
+
+    name_matches <- grepl(.string, names(df), ignore.case = TRUE)
+
+    label_matches <- purrr::map_lgl(
+      names(df),
+      ~ {
+        label.i <- attr(df[[.x]], "label")
+        if (is.null(label.i)) {
+          return(FALSE)
+        }
+        grepl(.string, as.character(label.i), ignore.case = TRUE)
+      }
+    )
+
+    value_matches <- purrr::map_lgl(
+      df,
+      ~ {
+        value_char <- tryCatch(as.character(.x), error = function(e) NA_character_)
+        any(grepl(.string, value_char, ignore.case = TRUE), na.rm = TRUE)
+      }
+    )
+
+    colmatches.i <- names(df)[name_matches | label_matches | value_matches]
 
     if (length(colmatches.i) > 0) {
 
@@ -49,7 +68,7 @@ query_src_list <- function(.src_list, .string) {
     }
   }
 
-  if (length(matches) == 0) {
+  if (nrow(hits) == 0) {
     cli::cli_alert_danger(paste0("No matches found for ", .string))
   } else {
     hits %>% dplyr::mutate(MATCHING = .string)
