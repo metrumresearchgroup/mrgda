@@ -2,36 +2,26 @@
 % Please edit documentation in R/query-src-list.R
 \name{query_src_list}
 \alias{query_src_list}
-\title{Search source data domains for a topic}
+\title{Query source data domains for a topic}
 \usage{
-query_src_list(
-  .src_list,
-  .string,
-  .include_values = TRUE,
-  .case_sensitive = FALSE
-)
+query_src_list(.src_list, .string, .ignore_case = TRUE)
 }
 \arguments{
 \item{.src_list}{A source list created using read_src_dir.}
 
 \item{.string}{string to search for (not case sensitive by default)}
 
-\item{.include_values}{logical. Should column values be searched? Defaults to TRUE}
-
-\item{.case_sensitive}{logical. Should the search be case sensitive? Defaults to FALSE.}
+\item{.ignore_case}{logical. Should the search not be case sensitive? Defaults to TRUE}
 }
 \description{
-Search a source list for a string across domain names, column names, column labels,
-and (optionally) column values so you can quickly locate data of interest.
+Search a source list for a string across column names, column labels,
+column values so you can quickly locate data of interest.
 }
 \examples{
 path <- system.file("example-sdtm", package = "mrgda")
 src_list <- read_src_dir(path, .file_types = "xpt")
 
-# Search by column name or label
-query_src_list(src_list, .string = "RACE", .include_values = FALSE)
-
-# Search by actual values (may be slower)
+query_src_list(src_list, .string = "RACE")
 query_src_list(src_list, .string = "F")
 
 }

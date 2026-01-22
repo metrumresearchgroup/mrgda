@@ -10,7 +10,7 @@ test_that("query_src_list finds domain and column metadata matches", {
 })
 
 test_that("query_src_list can search values when requested", {
-  res <- query_src_list(src_list, .string = "WHITE", .include_values = TRUE) %>% suppressMessages()
+  res <- query_src_list(src_list, .string = "WHITE") %>% suppressMessages()
 
   expect_true(any(res$MATCH_TYPE == "value"))
   expect_true(any(!is.na(res$VALUE[res$MATCH_TYPE == "value"])))
