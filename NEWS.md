@@ -2,7 +2,7 @@
 
 ## New features and changes
 
-- `query_src_list` now searches across values in addition to column and label names.
+- `query_src_list` now searches across values in addition to column and label names. (#251)
 
 # mrgda 0.13.0
 
