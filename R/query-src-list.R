@@ -73,7 +73,15 @@ query_src_list <- function(.src_list, .string, .ignore_case = TRUE) {
     VALUE = character()
   )
 
-  value_hits <- dplyr::bind_rows(lapply(names(.src_list), function(domain.i) {
+  domains <- names(.src_list)
+  bar_id <- cli::cli_progress_bar(
+    "Querying domains",
+    total = length(domains)
+  )
+
+  value_hits <- dplyr::bind_rows(lapply(seq_along(domains), function(i) {
+    domain.i <- domains[[i]]
+    cli::cli_progress_update(id = bar_id)
     df.i <- .src_list[[domain.i]]
     if (!is.data.frame(df.i)) {
       return(NULL)
@@ -100,6 +108,7 @@ query_src_list <- function(.src_list, .string, .ignore_case = TRUE) {
       )
     }))
   }))
+  cli::cli_progress_done(id = bar_id)
 
   hits <- dplyr::bind_rows(base_hits, col_hits, label_hits, value_hits)
 
