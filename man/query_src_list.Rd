@@ -2,25 +2,26 @@
 % Please edit documentation in R/query-src-list.R
 \name{query_src_list}
 \alias{query_src_list}
-\title{Query a source list.}
+\title{Query source data domains for a topic}
 \usage{
-query_src_list(.src_list, .string)
+query_src_list(.src_list, .string, .ignore_case = TRUE)
 }
 \arguments{
 \item{.src_list}{A source list created using read_src_dir.}
 
-\item{.string}{string to search for (not case sensitive)}
+\item{.string}{string to search for (not case sensitive by default)}
+
+\item{.ignore_case}{logical. Should the search not be case sensitive? Defaults to TRUE}
 }
 \description{
-Use this to search for a character string across every element in a source data list including
-the name, label and contents.
+Search a source list for a string across column names, column labels,
+column values so you can quickly locate data of interest.
 }
 \examples{
 path <- system.file("example-sdtm", package = "mrgda")
-
 src_list <- read_src_dir(path, .file_types = "xpt")
 
-# Summarize source directory
 query_src_list(src_list, .string = "RACE")
+query_src_list(src_list, .string = "F")
 
 }
