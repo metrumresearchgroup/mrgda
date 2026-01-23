@@ -15,23 +15,23 @@ compare_src_lists(.src_list1, .src_list2, .subject_col = "USUBJID")
 Defaults to "USUBJID".}
 }
 \value{
-A list with class "src_list_comparison" containing:
+A tibble with one row per domain and columns:
 \describe{
-\item{domain_summary}{Tibble showing which domains are in each list}
-\item{domain_details}{Tibble with detailed comparison for common domains}
-\item{column_changes}{List of column additions/removals per domain}
-\item{subject_changes}{List of subject additions/removals per domain}
+\item{DOMAIN}{Domain name}
+\item{NROW_DIFF}{Difference in number of rows (list2 - list1)}
+\item{NCOL_DIFF}{Difference in number of columns (list2 - list1)}
+\item{NSUBJ_DIFF}{Difference in number of unique subjects (list2 - list1)}
 }
 }
 \description{
 Compare two source lists (typically created by \code{read_src_dir()}) and return
-a summary of differences including domains, rows, columns, and subjects.
+a data frame summarizing differences in rows, columns, and subjects per domain.
 }
 \examples{
 \dontrun{
 src_list1 <- read_src_dir(path1, .file_types = "xpt")
 src_list2 <- read_src_dir(path2, .file_types = "xpt")
-comparison <- compare_src_lists(src_list1, src_list2)
+compare_src_lists(src_list1, src_list2)
 }
 
 }
