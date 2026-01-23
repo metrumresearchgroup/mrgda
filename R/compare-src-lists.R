@@ -69,25 +69,22 @@ compare_src_lists <- function(.src_list1,
     in_list1 <- !is.null(df1) && is.data.frame(df1)
     in_list2 <- !is.null(df2) && is.data.frame(df2)
 
-    # Handle missing domains
-    if (!in_list1) {
-      nrow1 <- 0
-      ncol1 <- 0
-      nsubj1 <- 0
+    # Use NA for diffs if domain is missing from either list
+    if (!in_list1 || !in_list2) {
+      row_diff <- NA_integer_
+      col_diff <- NA_integer_
+      subj_diff <- NA_integer_
     } else {
       nrow1 <- nrow(df1)
-      ncol1 <- ncol(df1)
-      nsubj1 <- if (.subject_col %in% names(df1)) length(unique(df1[[.subject_col]])) else 0
-    }
-
-    if (!in_list2) {
-      nrow2 <- 0
-      ncol2 <- 0
-      nsubj2 <- 0
-    } else {
       nrow2 <- nrow(df2)
+      ncol1 <- ncol(df1)
       ncol2 <- ncol(df2)
+      nsubj1 <- if (.subject_col %in% names(df1)) length(unique(df1[[.subject_col]])) else 0
       nsubj2 <- if (.subject_col %in% names(df2)) length(unique(df2[[.subject_col]])) else 0
+
+      row_diff <- nrow2 - nrow1
+      col_diff <- ncol2 - ncol1
+      subj_diff <- nsubj2 - nsubj1
     }
 
     out <- dplyr::bind_rows(
@@ -96,9 +93,9 @@ compare_src_lists <- function(.src_list1,
         DOMAIN = domain.i,
         LIST1 = in_list1,
         LIST2 = in_list2,
-        ROWS = nrow2 - nrow1,
-        COLS = ncol2 - ncol1,
-        SUBJ = nsubj2 - nsubj1
+        ROWS = row_diff,
+        COLS = col_diff,
+        SUBJ = subj_diff
       )
     )
   }
