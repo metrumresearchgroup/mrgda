@@ -25,7 +25,10 @@
 src_list_summary <- function(.src_list, .subject_col = "USUBJID") {
   stopifnot(
     "`.src_list` must be a list" = is.list(.src_list),
-    "`.subject_col` must be a single character string" = is.character(.subject_col) && length(.subject_col) == 1
+    "`.subject_col` must be a single character string" = is.character(
+      .subject_col
+    ) &&
+      length(.subject_col) == 1
   )
 
   meta <- c("mrgda_labels", "mrgda_src_meta")
@@ -34,22 +37,35 @@ src_list_summary <- function(.src_list, .subject_col = "USUBJID") {
 
   if (length(domains) == 0) {
     return(tibble::tibble(
-      Domain = character(), Rows = integer(), Cols = integer(),
-      Subjects = integer(), `Row/Subj` = double(),
-      `Date Min` = character(), `Date Max` = character(), `Date Col` = character()
+      Domain = character(),
+      Rows = integer(),
+      Cols = integer(),
+      Subjects = integer(),
+      `Row/Subj` = double(),
+      `Date Min` = character(),
+      `Date Max` = character(),
+      `Date Col` = character()
     ))
   }
 
   purrr::imap_dfr(domains[sort(names(domains))], function(df, domain) {
     dtc <- extract_dtc_range(df)
-    nsubj <- if (.subject_col %in% names(df)) dplyr::n_distinct(df[[.subject_col]]) else NA_integer_
+    nsubj <- if (.subject_col %in% names(df)) {
+      dplyr::n_distinct(df[[.subject_col]])
+    } else {
+      NA_integer_
+    }
 
     tibble::tibble(
       Domain = domain,
       Rows = nrow(df),
       Cols = ncol(df),
       Subjects = nsubj,
-      `Row/Subj` = if (!is.na(nsubj) && nsubj > 0) round(nrow(df) / nsubj, 1) else NA_real_,
+      `Row/Subj` = if (!is.na(nsubj) && nsubj > 0) {
+        round(nrow(df) / nsubj, 1)
+      } else {
+        NA_real_
+      },
       `Date Min` = dtc$min,
       `Date Max` = dtc$max,
       `Date Col` = dtc$col

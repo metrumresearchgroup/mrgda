@@ -33,11 +33,18 @@
 #' }
 #'
 #' @export
-compare_src_lists <- function(.src_list1, .src_list2, .subject_col = "USUBJID") {
+compare_src_lists <- function(
+  .src_list1,
+  .src_list2,
+  .subject_col = "USUBJID"
+) {
   stopifnot(
     "`.src_list1` must be a list" = is.list(.src_list1),
     "`.src_list2` must be a list" = is.list(.src_list2),
-    "`.subject_col` must be a single character string" = is.character(.subject_col) && length(.subject_col) == 1
+    "`.subject_col` must be a single character string" = is.character(
+      .subject_col
+    ) &&
+      length(.subject_col) == 1
   )
 
   sum1 <- src_list_summary(.src_list1, .subject_col)
@@ -52,15 +59,24 @@ compare_src_lists <- function(.src_list1, .src_list2, .subject_col = "USUBJID") 
     status <- dplyr::case_when(
       !in1 ~ "added",
       !in2 ~ "removed",
-      is_data_identical(.src_list1[[domain]], .src_list2[[domain]]) ~ "identical",
+      is_data_identical(
+        .src_list1[[domain]],
+        .src_list2[[domain]]
+      ) ~ "identical",
       TRUE ~ "modified"
     )
 
     if (status != "modified") {
       return(tibble::tibble(
-        Domain = domain, Status = status,
-        Rows = status, Cols = status, Subjects = status, `Row/Subj` = status,
-        `Date Min` = status, `Date Max` = status, `Date Col` = status
+        Domain = domain,
+        Status = status,
+        Rows = status,
+        Cols = status,
+        Subjects = status,
+        `Row/Subj` = status,
+        `Date Min` = status,
+        `Date Max` = status,
+        `Date Col` = status
       ))
     }
 
@@ -108,6 +124,8 @@ fmt_diff <- function(v1, v2) {
 #' Format number with comma separators
 #' @noRd
 fmt_num <- function(x) {
-  if (!is.numeric(x)) return(x)
+  if (!is.numeric(x)) {
+    return(x)
+  }
   format(x, big.mark = ",", scientific = FALSE, trim = TRUE)
 }
