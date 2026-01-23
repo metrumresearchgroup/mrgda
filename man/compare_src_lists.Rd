@@ -2,30 +2,36 @@
 % Please edit documentation in R/compare-src-lists.R
 \name{compare_src_lists}
 \alias{compare_src_lists}
-\title{Compare two source lists}
+\title{Compare Two Source Lists}
 \usage{
 compare_src_lists(.src_list1, .src_list2, .subject_col = "USUBJID")
 }
 \arguments{
-\item{.src_list1}{First source list to compare (considered the "base").}
+\item{.src_list1}{First source list (the "base" for comparison).}
 
-\item{.src_list2}{Second source list to compare (considered the "compare").}
+\item{.src_list2}{Second source list (the "compare" target).}
 
-\item{.subject_col}{Character string specifying the subject ID column name.
-Defaults to "USUBJID".}
+\item{.subject_col}{Subject ID column name. Defaults to \code{"USUBJID"}.}
 }
 \value{
-A tibble with one row per domain showing comparison results.
+A tibble with one row per domain containing:
+\itemize{
+\item \code{Domain}: Domain name
+\item \code{Status}: One of "identical", "modified", "added", or "removed"
+\item \code{Rows}, \code{Cols}, \code{Subjects}, \verb{Row/Subj (\%)}: Count comparisons
+\item \verb{Date Min}, \verb{Date Max}: Date range from first DTC column
+\item \verb{Date Col}: Name of the DTC column used
+}
 }
 \description{
-Compare two source lists (typically created by \code{read_src_dir()}) and return
-a data frame summarizing differences in rows, columns, and subjects per domain.
+Compares two source lists (typically from \code{\link[=read_src_dir]{read_src_dir()}}) and returns
+a summary of differences in rows, columns, and subjects per domain.
 }
 \examples{
 \dontrun{
-src_list1 <- read_src_dir(path1, .file_types = "xpt")
-src_list2 <- read_src_dir(path2, .file_types = "xpt")
-compare_src_lists(src_list1, src_list2)
+src1 <- read_src_dir(path1, .file_types = "xpt")
+src2 <- read_src_dir(path2, .file_types = "xpt")
+compare_src_lists(src1, src2)
 }
 
 }
