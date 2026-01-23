@@ -18,29 +18,21 @@ A tibble with one row per domain containing:
 \itemize{
 \item \code{Domain}: Domain name
 \item \code{Status}: One of \code{"identical"}, \code{"modified"}, \code{"added"}, or \code{"removed"}
-\item \code{Rows}: Row count comparison
-\item \code{Cols}: Column count comparison
-\item \code{Subjects}: Unique subject count comparison
-\item \verb{Row/Subj (\%)}: Rows per subject ratio
-\item \verb{Date Min}, \verb{Date Max}: Date range from the first column ending in "DTC"
-\item \verb{Date Col}: Name of the DTC column used for date range
+\item \code{Rows}, \code{Cols}, \code{Subjects}, \code{Row/Subj}: Count comparisons
+\item \verb{Date Min}, \verb{Date Max}: Date range comparisons
+\item \verb{Date Col}: Name of the DTC column used
 }
 
 Status meanings:
 \itemize{
-\item \code{"identical"}: Data frames are equal (via \code{all.equal()} ignoring attributes/class)
+\item \code{"identical"}: Data frames are equal (ignoring attributes/class)
 \item \code{"modified"}: Data differs (even if summary stats match)
 \item \code{"added"}: Domain only in \code{.src_list2}
 \item \code{"removed"}: Domain only in \code{.src_list1}
 }
 
-For \code{"modified"} domains, values are formatted as:
-\itemize{
-\item \code{"X -> Y"}: Value changed from X to Y
-\item \code{"X (identical)"}: Summary stat unchanged (but data may differ)
-\item \code{"X (new)"}: Value only in \code{.src_list2}
-\item \code{"X (removed)"}: Value only in \code{.src_list1}
-}
+For \code{"modified"} domains, values show \code{"X -> Y"} for changes or
+\code{"X (identical)"} when unchanged.
 }
 \description{
 Compares two source lists (typically from \code{\link[=read_src_dir]{read_src_dir()}}) and returns
@@ -53,4 +45,7 @@ src2 <- read_src_dir(path2, .file_types = "xpt")
 compare_src_lists(src1, src2)
 }
 
+}
+\seealso{
+\code{\link[=src_list_summary]{src_list_summary()}} for summarizing a single source list
 }

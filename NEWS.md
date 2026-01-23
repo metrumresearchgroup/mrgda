@@ -2,7 +2,9 @@
 
 ## New features and changes
 
-- Added `compare_src_lists()` to compare two source lists and summarize differences in rows, columns, subjects, and date ranges per domain. (#252)
+- Added `src_list_summary()` to summarize a source list with row counts, column counts, subject counts, and date ranges per domain. (#252)
+
+- Added `compare_src_lists()` to compare two source lists and show differences. Uses `src_list_summary()` under the hood. (#252)
 
 - `query_src_list` now searches across values in addition to column and label names. (#251)
 

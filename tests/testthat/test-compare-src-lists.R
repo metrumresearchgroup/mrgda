@@ -1,4 +1,4 @@
-# Test fixtures
+# Test fixtures for src_list_summary and compare_src_lists
 make_src_list <- function(...) {
   domains <- list(...)
   domains$mrgda_labels <- data.frame(DOMAIN = character(), COLUMN_NAME = character(), COLUMN_LABEL = character())
@@ -22,7 +22,67 @@ make_df <- function(nrow = 10, ncol = 5, subjects = 3, add_dtc = FALSE, dtc_date
 }
 
 
-# Input validation tests
+# src_list_summary tests
+test_that("src_list_summary validates inputs", {
+  expect_error(src_list_summary("not a list"), "must be a list")
+  expect_error(src_list_summary(list(), .subject_col = 123), "must be a single character")
+})
+
+test_that("src_list_summary returns empty tibble for empty list", {
+  result <- src_list_summary(list())
+  expect_s3_class(result, "tbl_df")
+  expect_equal(nrow(result), 0)
+})
+
+test_that("src_list_summary calculates correct stats", {
+  df <- make_df(nrow = 12, ncol = 5, subjects = 3)
+  src <- make_src_list(dm = df)
+
+  result <- src_list_summary(src)
+
+  expect_equal(nrow(result), 1)
+  expect_equal(result$Domain, "dm")
+  expect_equal(result$Rows, 12)
+  expect_equal(result$Cols, 5)
+  expect_equal(result$Subjects, 3)
+  expect_equal(result$`Row/Subj`, 4)
+})
+
+test_that("src_list_summary handles multiple domains", {
+  df1 <- make_df(nrow = 10, ncol = 3, subjects = 2)
+  df2 <- make_df(nrow = 20, ncol = 5, subjects = 4)
+  src <- make_src_list(ae = df1, dm = df2)
+
+  result <- src_list_summary(src)
+
+  expect_equal(nrow(result), 2)
+  expect_equal(result$Domain, c("ae", "dm"))
+})
+
+test_that("src_list_summary extracts date range", {
+  dates <- c("2024-01-01T10:00:00", "2024-06-15T12:30:00", "2024-12-31T23:59:59")
+  df <- make_df(nrow = 3, add_dtc = TRUE, dtc_dates = dates)
+  src <- make_src_list(ae = df)
+
+  result <- src_list_summary(src)
+
+  expect_equal(result$`Date Min`, "2024-01-01")
+  expect_equal(result$`Date Max`, "2024-12-31")
+  expect_equal(result$`Date Col`, "AESTDTC")
+})
+
+test_that("src_list_summary excludes metadata elements", {
+  df <- make_df()
+  src <- make_src_list(dm = df)
+
+  result <- src_list_summary(src)
+
+  expect_false("mrgda_labels" %in% result$Domain)
+  expect_false("mrgda_src_meta" %in% result$Domain)
+})
+
+
+# Input validation tests for compare_src_lists
 test_that("compare_src_lists validates inputs", {
   expect_error(compare_src_lists("not a list", list()), "must be a list")
   expect_error(compare_src_lists(list(), "not a list"), "must be a list")
@@ -245,7 +305,7 @@ test_that("compare_src_lists calculates Row/Subj correctly", {
 
   result <- compare_src_lists(src1, src2)
 
-  expect_equal(result$`Row/Subj (%)`, "5 -> 10")
+  expect_equal(result$`Row/Subj`, "5 -> 10")
 })
 
 
@@ -263,31 +323,31 @@ test_that("compare_src_lists excludes metadata elements from comparison", {
 
 
 # Helper function tests
-test_that("get_dtc_range handles empty data frame", {
-  result <- mrgda:::get_dtc_range(data.frame())
+test_that("extract_dtc_range handles empty data frame", {
+  result <- mrgda:::extract_dtc_range(data.frame())
   expect_true(is.na(result$min))
   expect_true(is.na(result$max))
   expect_true(is.na(result$col))
 })
 
-test_that("get_dtc_range handles NULL input", {
-  result <- mrgda:::get_dtc_range(NULL)
+test_that("extract_dtc_range handles NULL input", {
+  result <- mrgda:::extract_dtc_range(NULL)
   expect_true(is.na(result$min))
   expect_true(is.na(result$max))
   expect_true(is.na(result$col))
 })
 
-test_that("get_dtc_range handles invalid dates", {
+test_that("extract_dtc_range handles invalid dates", {
   df <- data.frame(AESTDTC = c("invalid-date", "not-a-date-x", ""))
-  result <- mrgda:::get_dtc_range(df)
+  result <- mrgda:::extract_dtc_range(df)
   expect_equal(result$col, "AESTDTC")
   expect_true(is.na(result$min))
   expect_true(is.na(result$max))
 })
 
-test_that("get_dtc_range handles partial dates", {
+test_that("extract_dtc_range handles partial dates", {
   df <- data.frame(AESTDTC = c("2024", "2024-01", "2024-01-15T10:00:00"))
-  result <- mrgda:::get_dtc_range(df)
+  result <- mrgda:::extract_dtc_range(df)
   expect_equal(result$col, "AESTDTC")
   expect_equal(result$min, "2024-01-15")
   expect_equal(result$max, "2024-01-15")
