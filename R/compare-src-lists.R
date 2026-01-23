@@ -12,9 +12,11 @@
 #' @return A tibble with one row per domain and columns:
 #' \describe{
 #'   \item{DOMAIN}{Domain name}
-#'   \item{NROW_DIFF}{Difference in number of rows (list2 - list1)}
-#'   \item{NCOL_DIFF}{Difference in number of columns (list2 - list1)}
-#'   \item{NSUBJ_DIFF}{Difference in number of unique subjects (list2 - list1)}
+#'   \item{LIST1}{Logical indicating if domain is present in .src_list1}
+#'   \item{LIST2}{Logical indicating if domain is present in .src_list2}
+#'   \item{ROWS}{Difference in number of rows (list2 - list1)}
+#'   \item{COLS}{Difference in number of columns (list2 - list1)}
+#'   \item{SUBJ}{Difference in number of unique subjects (list2 - list1)}
 #' }
 #'
 #' @examples
@@ -53,17 +55,22 @@ compare_src_lists <- function(.src_list1,
   # Build comparison data frame
   out <- dplyr::tibble(
     DOMAIN = character(),
-    NROW_DIFF = integer(),
-    NCOL_DIFF = integer(),
-    NSUBJ_DIFF = integer()
+    LIST1 = logical(),
+    LIST2 = logical(),
+    ROWS = integer(),
+    COLS = integer(),
+    SUBJ = integer()
   )
 
   for (domain.i in all_domains) {
     df1 <- .src_list1[[domain.i]]
     df2 <- .src_list2[[domain.i]]
 
+    in_list1 <- !is.null(df1) && is.data.frame(df1)
+    in_list2 <- !is.null(df2) && is.data.frame(df2)
+
     # Handle missing domains
-    if (is.null(df1) || !is.data.frame(df1)) {
+    if (!in_list1) {
       nrow1 <- 0
       ncol1 <- 0
       nsubj1 <- 0
@@ -73,7 +80,7 @@ compare_src_lists <- function(.src_list1,
       nsubj1 <- if (.subject_col %in% names(df1)) length(unique(df1[[.subject_col]])) else 0
     }
 
-    if (is.null(df2) || !is.data.frame(df2)) {
+    if (!in_list2) {
       nrow2 <- 0
       ncol2 <- 0
       nsubj2 <- 0
@@ -87,9 +94,11 @@ compare_src_lists <- function(.src_list1,
       out,
       dplyr::tibble(
         DOMAIN = domain.i,
-        NROW_DIFF = nrow2 - nrow1,
-        NCOL_DIFF = ncol2 - ncol1,
-        NSUBJ_DIFF = nsubj2 - nsubj1
+        LIST1 = in_list1,
+        LIST2 = in_list2,
+        ROWS = nrow2 - nrow1,
+        COLS = ncol2 - ncol1,
+        SUBJ = nsubj2 - nsubj1
       )
     )
   }

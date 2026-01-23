@@ -18,9 +18,11 @@ Defaults to "USUBJID".}
 A tibble with one row per domain and columns:
 \describe{
 \item{DOMAIN}{Domain name}
-\item{NROW_DIFF}{Difference in number of rows (list2 - list1)}
-\item{NCOL_DIFF}{Difference in number of columns (list2 - list1)}
-\item{NSUBJ_DIFF}{Difference in number of unique subjects (list2 - list1)}
+\item{LIST1}{Logical indicating if domain is present in .src_list1}
+\item{LIST2}{Logical indicating if domain is present in .src_list2}
+\item{ROWS}{Difference in number of rows (list2 - list1)}
+\item{COLS}{Difference in number of columns (list2 - list1)}
+\item{SUBJ}{Difference in number of unique subjects (list2 - list1)}
 }
 }
 \description{
