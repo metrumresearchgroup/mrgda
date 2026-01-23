@@ -112,13 +112,22 @@ get_domain_stats <- function(df, subject_col) {
 #' Format difference between two values
 #' @noRd
 fmt_diff <- function(v1, v2) {
+  f1 <- fmt_val(v1)
+  f2 <- fmt_val(v2)
   dplyr::case_when(
     is.na(v1) & is.na(v2) ~ NA_character_,
-    is.na(v1) ~ paste0(v2, " (new)"),
-    is.na(v2) ~ paste0(v1, " (removed)"),
-    v1 == v2 ~ paste0(v1, " (identical)"),
-    TRUE ~ paste0(v1, " -> ", v2)
+    is.na(v1) ~ paste0(f2, " (new)"),
+    is.na(v2) ~ paste0(f1, " (removed)"),
+    v1 == v2 ~ paste0(f1, " (identical)"),
+    TRUE ~ paste0(f1, " -> ", f2)
   )
+}
+
+#' Format a single value with comma separators for numbers
+#' @noRd
+fmt_val <- function(x) {
+  if (!is.numeric(x)) return(x)
+  format(x, big.mark = ",", scientific = FALSE, trim = TRUE)
 }
 
 
