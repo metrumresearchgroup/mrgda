@@ -305,8 +305,28 @@ test_that("format_change shows arrow for different values", {
 
 test_that("format_date_change handles all cases", {
   expect_true(is.na(mrgda:::format_date_change(NA, NA)))
-  expect_equal(mrgda:::format_date_change(NA, "2024-01-01"), "(new) 2024-01-01")
+  expect_equal(mrgda:::format_date_change(NA, "2024-01-01"), "2024-01-01 (new)")
   expect_equal(mrgda:::format_date_change("2024-01-01", NA), "2024-01-01 (removed)")
-  expect_equal(mrgda:::format_date_change("2024-01-01", "2024-01-01"), "2024-01-01 (no change)")
+  expect_equal(mrgda:::format_date_change("2024-01-01", "2024-01-01"), "2024-01-01 (identical)")
   expect_equal(mrgda:::format_date_change("2024-01-01", "2024-12-31"), "2024-01-01 -> 2024-12-31")
+})
+
+test_that("format_count_change shows value even when unchanged", {
+  expect_true(is.na(mrgda:::format_count_change(NA, NA)))
+  expect_equal(mrgda:::format_count_change(NA, 10), "10 (new)")
+  expect_equal(mrgda:::format_count_change(10, NA), "10 (removed)")
+  expect_equal(mrgda:::format_count_change(10, 10), "10 (identical)")
+  expect_equal(mrgda:::format_count_change(10, 20), "10 -> 20")
+})
+
+test_that("compare_src_lists shows subject count when unchanged", {
+  df1 <- make_df(nrow = 10, subjects = 5)
+  df2 <- make_df(nrow = 20, subjects = 5)
+  src1 <- make_src_list(dm = df1)
+  src2 <- make_src_list(dm = df2)
+
+  result <- compare_src_lists(src1, src2)
+
+  expect_equal(result$Status, "modified")
+  expect_equal(result$Subjects, "5 (identical)")
 })
