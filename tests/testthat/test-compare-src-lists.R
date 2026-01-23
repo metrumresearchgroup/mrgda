@@ -294,20 +294,14 @@ test_that("get_dtc_range handles partial dates", {
 })
 
 
-test_that("format_date_change handles all cases", {
-  expect_true(is.na(mrgda:::format_date_change(NA, NA)))
-  expect_equal(mrgda:::format_date_change(NA, "2024-01-01"), "2024-01-01 (new)")
-  expect_equal(mrgda:::format_date_change("2024-01-01", NA), "2024-01-01 (removed)")
-  expect_equal(mrgda:::format_date_change("2024-01-01", "2024-01-01"), "2024-01-01 (identical)")
-  expect_equal(mrgda:::format_date_change("2024-01-01", "2024-12-31"), "2024-01-01 -> 2024-12-31")
-})
-
-test_that("format_count_change shows value even when unchanged", {
-  expect_true(is.na(mrgda:::format_count_change(NA, NA)))
-  expect_equal(mrgda:::format_count_change(NA, 10), "10 (new)")
-  expect_equal(mrgda:::format_count_change(10, NA), "10 (removed)")
-  expect_equal(mrgda:::format_count_change(10, 10), "10 (identical)")
-  expect_equal(mrgda:::format_count_change(10, 20), "10 -> 20")
+test_that("fmt_diff handles all cases", {
+  expect_true(is.na(mrgda:::fmt_diff(NA, NA)))
+  expect_equal(mrgda:::fmt_diff(NA, "2024-01-01"), "2024-01-01 (new)")
+  expect_equal(mrgda:::fmt_diff("2024-01-01", NA), "2024-01-01 (removed)")
+  expect_equal(mrgda:::fmt_diff("2024-01-01", "2024-01-01"), "2024-01-01 (identical)")
+  expect_equal(mrgda:::fmt_diff("2024-01-01", "2024-12-31"), "2024-01-01 -> 2024-12-31")
+  expect_equal(mrgda:::fmt_diff(10, 10), "10 (identical)")
+  expect_equal(mrgda:::fmt_diff(10, 20), "10 -> 20")
 })
 
 test_that("compare_src_lists shows subject count when unchanged", {

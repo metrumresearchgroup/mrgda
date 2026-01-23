@@ -17,15 +17,27 @@ compare_src_lists(.src_list1, .src_list2, .subject_col = "USUBJID")
 A tibble with one row per domain containing:
 \itemize{
 \item \code{Domain}: Domain name
-\item \code{Status}: One of "identical", "modified", "added", or "removed"
-\item \code{Rows}, \code{Cols}, \code{Subjects}, \verb{Row/Subj (\%)}: Count comparisons
-\item \verb{Date Min}, \verb{Date Max}: Date range from first DTC column
-\item \verb{Date Col}: Name of the DTC column used
+\item \code{Status}: One of \code{"identical"}, \code{"modified"}, \code{"added"}, or \code{"removed"}
+\item \code{Rows}: Row count comparison
+\item \code{Cols}: Column count comparison
+\item \code{Subjects}: Unique subject count comparison
+\item \verb{Row/Subj (\%)}: Rows per subject ratio
+\item \verb{Date Min}, \verb{Date Max}: Date range from the first column ending in "DTC"
+\item \verb{Date Col}: Name of the DTC column used for date range
+}
+
+For \code{"identical"}, \code{"added"}, or \code{"removed"} domains, all columns display
+the status. For \code{"modified"} domains, values are formatted as:
+\itemize{
+\item \code{"X -> Y"}: Value changed from X to Y
+\item \code{"X (identical)"}: Value unchanged
+\item \code{"X (new)"}: Value only in \code{.src_list2}
+\item \code{"X (removed)"}: Value only in \code{.src_list1}
 }
 }
 \description{
 Compares two source lists (typically from \code{\link[=read_src_dir]{read_src_dir()}}) and returns
-a summary of differences in rows, columns, and subjects per domain.
+a summary of differences in rows, columns, subjects, and date ranges per domain.
 }
 \examples{
 \dontrun{
