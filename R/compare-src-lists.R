@@ -18,10 +18,15 @@
 #' - `Date Min`, `Date Max`: Date range from the first column ending in "DTC"
 #' - `Date Col`: Name of the DTC column used for date range
 #'
-#' For `"identical"`, `"added"`, or `"removed"` domains, all columns display
-#' the status. For `"modified"` domains, values are formatted as:
+#' Status meanings:
+#' - `"identical"`: Data frames are equal (via `all.equal()` ignoring attributes/class)
+#' - `"modified"`: Data differs (even if summary stats match)
+#' - `"added"`: Domain only in `.src_list2`
+#' - `"removed"`: Domain only in `.src_list1`
+#'
+#' For `"modified"` domains, values are formatted as:
 #' - `"X -> Y"`: Value changed from X to Y
-#' - `"X (identical)"`: Value unchanged
+#' - `"X (identical)"`: Summary stat unchanged (but data may differ)
 #' - `"X (new)"`: Value only in `.src_list2`
 #' - `"X (removed)"`: Value only in `.src_list1`
 #'
@@ -50,18 +55,19 @@ compare_src_lists <- function(.src_list1,
   )))
 
   purrr::map_dfr(all_domains, function(domain) {
-    s1 <- get_domain_stats(.src_list1[[domain]], .subject_col)
-    s2 <- get_domain_stats(.src_list2[[domain]], .subject_col)
+    df1 <- .src_list1[[domain]]
+    df2 <- .src_list2[[domain]]
+    s1 <- get_domain_stats(df1, .subject_col)
+    s2 <- get_domain_stats(df2, .subject_col)
 
     status <- dplyr::case_when(
       !s1$exists & s2$exists ~ "added",
       s1$exists & !s2$exists ~ "removed",
-      s1$nrow == s2$nrow & s1$ncol == s2$ncol &
-        (is.na(s1$nsubj) & is.na(s2$nsubj) | identical(s1$nsubj, s2$nsubj)) ~ "identical",
+      isTRUE(all.equal(df1, df2, check.attributes = FALSE, check.class = FALSE)) ~ "identical",
       TRUE ~ "modified"
     )
 
-    if (status != "modified") {
+    if (status %in% c("identical", "added", "removed")) {
       return(dplyr::tibble(
         Domain = domain, Status = status,
         Rows = status, Cols = status, Subjects = status, `Row/Subj (%)` = status,

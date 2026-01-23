@@ -26,11 +26,18 @@ A tibble with one row per domain containing:
 \item \verb{Date Col}: Name of the DTC column used for date range
 }
 
-For \code{"identical"}, \code{"added"}, or \code{"removed"} domains, all columns display
-the status. For \code{"modified"} domains, values are formatted as:
+Status meanings:
+\itemize{
+\item \code{"identical"}: Data frames are equal (via \code{all.equal()} ignoring attributes/class)
+\item \code{"modified"}: Data differs (even if summary stats match)
+\item \code{"added"}: Domain only in \code{.src_list2}
+\item \code{"removed"}: Domain only in \code{.src_list1}
+}
+
+For \code{"modified"} domains, values are formatted as:
 \itemize{
 \item \code{"X -> Y"}: Value changed from X to Y
-\item \code{"X (identical)"}: Value unchanged
+\item \code{"X (identical)"}: Summary stat unchanged (but data may differ)
 \item \code{"X (new)"}: Value only in \code{.src_list2}
 \item \code{"X (removed)"}: Value only in \code{.src_list1}
 }

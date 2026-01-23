@@ -2,6 +2,8 @@
 
 ## New features and changes
 
+- Added `compare_src_lists()` to compare two source lists and summarize differences in rows, columns, subjects, and date ranges per domain. (#252)
+
 - `query_src_list` now searches across values in addition to column and label names. (#251)
 
 # mrgda 0.13.0
