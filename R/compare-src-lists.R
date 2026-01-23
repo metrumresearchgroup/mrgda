@@ -243,10 +243,7 @@ get_dtc_range <- function(df) {
   }
 
   # Parse dates, ignoring failures
-  parsed <- tryCatch(
-    as.Date(all_dates),
-    error = function(e) as.Date(NA)
-  )
+  parsed <- suppressWarnings(readr::parse_date(all_dates))
   parsed <- parsed[!is.na(parsed)]
 
   if (length(parsed) == 0) {
