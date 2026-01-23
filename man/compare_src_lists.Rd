@@ -18,11 +18,13 @@ Defaults to "USUBJID".}
 A tibble with one row per domain and columns:
 \describe{
 \item{DOMAIN}{Domain name}
-\item{LIST1}{Logical indicating if domain is present in .src_list1}
-\item{LIST2}{Logical indicating if domain is present in .src_list2}
-\item{ROWS}{Difference in number of rows (list2 - list1)}
-\item{COLS}{Difference in number of columns (list2 - list1)}
-\item{SUBJ}{Difference in number of unique subjects (list2 - list1)}
+\item{STATUS}{Comparison status: "identical", "modified", "added", or "removed"}
+\item{ROWS1, ROWS2}{Number of rows in each list}
+\item{COLS1, COLS2}{Number of columns in each list}
+\item{SUBJ1, SUBJ2}{Number of unique subjects in each list}
+\item{RPS1, RPS2}{Records per subject (rows/subjects) in each list}
+\item{DT_MIN1, DT_MAX1}{Date range (min/max) from DTC columns in list1}
+\item{DT_MIN2, DT_MAX2}{Date range (min/max) from DTC columns in list2}
 }
 }
 \description{

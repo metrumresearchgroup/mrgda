@@ -12,11 +12,13 @@
 #' @return A tibble with one row per domain and columns:
 #' \describe{
 #'   \item{DOMAIN}{Domain name}
-#'   \item{LIST1}{Logical indicating if domain is present in .src_list1}
-#'   \item{LIST2}{Logical indicating if domain is present in .src_list2}
-#'   \item{ROWS}{Difference in number of rows (list2 - list1)}
-#'   \item{COLS}{Difference in number of columns (list2 - list1)}
-#'   \item{SUBJ}{Difference in number of unique subjects (list2 - list1)}
+#'   \item{STATUS}{Comparison status: "identical", "modified", "added", or "removed"}
+#'   \item{ROWS1, ROWS2}{Number of rows in each list}
+#'   \item{COLS1, COLS2}{Number of columns in each list}
+#'   \item{SUBJ1, SUBJ2}{Number of unique subjects in each list}
+#'   \item{RPS1, RPS2}{Records per subject (rows/subjects) in each list}
+#'   \item{DT_MIN1, DT_MAX1}{Date range (min/max) from DTC columns in list1}
+#'   \item{DT_MIN2, DT_MAX2}{Date range (min/max) from DTC columns in list2}
 #' }
 #'
 #' @examples
@@ -53,52 +55,117 @@ compare_src_lists <- function(.src_list1,
   all_domains <- sort(unique(c(domains1, domains2)))
 
   # Build comparison data frame
-  out <- dplyr::tibble(
-    DOMAIN = character(),
-    LIST1 = logical(),
-    LIST2 = logical(),
-    ROWS = integer(),
-    COLS = integer(),
-    SUBJ = integer()
-  )
-
-  for (domain.i in all_domains) {
+  results <- lapply(all_domains, function(domain.i) {
     df1 <- .src_list1[[domain.i]]
     df2 <- .src_list2[[domain.i]]
 
     in_list1 <- !is.null(df1) && is.data.frame(df1)
     in_list2 <- !is.null(df2) && is.data.frame(df2)
 
-    # Use NA for diffs if domain is missing from either list
-    if (!in_list1 || !in_list2) {
-      row_diff <- NA_integer_
-      col_diff <- NA_integer_
-      subj_diff <- NA_integer_
-    } else {
+    # Get counts for list1
+    if (in_list1) {
       nrow1 <- nrow(df1)
-      nrow2 <- nrow(df2)
       ncol1 <- ncol(df1)
-      ncol2 <- ncol(df2)
-      nsubj1 <- if (.subject_col %in% names(df1)) length(unique(df1[[.subject_col]])) else 0
-      nsubj2 <- if (.subject_col %in% names(df2)) length(unique(df2[[.subject_col]])) else 0
-
-      row_diff <- nrow2 - nrow1
-      col_diff <- ncol2 - ncol1
-      subj_diff <- nsubj2 - nsubj1
+      nsubj1 <- if (.subject_col %in% names(df1)) length(unique(df1[[.subject_col]])) else NA_integer_
+      rps1 <- if (!is.na(nsubj1) && nsubj1 > 0) round(nrow1 / nsubj1, 1) else NA_real_
+      dtc1 <- get_dtc_range(df1)
+    } else {
+      nrow1 <- NA_integer_
+      ncol1 <- NA_integer_
+      nsubj1 <- NA_integer_
+      rps1 <- NA_real_
+      dtc1 <- list(min = NA_character_, max = NA_character_)
     }
 
-    out <- dplyr::bind_rows(
-      out,
-      dplyr::tibble(
-        DOMAIN = domain.i,
-        LIST1 = in_list1,
-        LIST2 = in_list2,
-        ROWS = row_diff,
-        COLS = col_diff,
-        SUBJ = subj_diff
-      )
+    # Get counts for list2
+    if (in_list2) {
+      nrow2 <- nrow(df2)
+      ncol2 <- ncol(df2)
+      nsubj2 <- if (.subject_col %in% names(df2)) length(unique(df2[[.subject_col]])) else NA_integer_
+      rps2 <- if (!is.na(nsubj2) && nsubj2 > 0) round(nrow2 / nsubj2, 1) else NA_real_
+      dtc2 <- get_dtc_range(df2)
+    } else {
+      nrow2 <- NA_integer_
+      ncol2 <- NA_integer_
+      nsubj2 <- NA_integer_
+      rps2 <- NA_real_
+      dtc2 <- list(min = NA_character_, max = NA_character_)
+    }
+
+    # Determine status
+    status <- dplyr::case_when(
+      !in_list1 & in_list2 ~ "added",
+      in_list1 & !in_list2 ~ "removed",
+      nrow1 == nrow2 & ncol1 == ncol2 &
+        (is.na(nsubj1) & is.na(nsubj2) | (!is.na(nsubj1) & !is.na(nsubj2) & nsubj1 == nsubj2)) ~ "identical",
+      TRUE ~ "modified"
     )
+
+    dplyr::tibble(
+      DOMAIN = domain.i,
+      STATUS = status,
+      ROWS1 = nrow1,
+      ROWS2 = nrow2,
+      COLS1 = ncol1,
+      COLS2 = ncol2,
+      SUBJ1 = nsubj1,
+      SUBJ2 = nsubj2,
+      RPS1 = rps1,
+      RPS2 = rps2,
+      DT_MIN1 = dtc1$min,
+      DT_MAX1 = dtc1$max,
+      DT_MIN2 = dtc2$min,
+      DT_MAX2 = dtc2$max
+    )
+  })
+
+  dplyr::bind_rows(results)
+}
+
+
+#' Get date range from DTC columns
+#'
+#' @param df A data frame
+#' @return Named list with min and max dates, or NAs if none found
+#' @keywords internal
+#' @noRd
+get_dtc_range <- function(df) {
+  if (is.null(df) || !is.data.frame(df)) {
+    return(list(min = NA_character_, max = NA_character_))
   }
 
-  out
+  dtc_cols <- grep("DTC$", names(df), value = TRUE)
+
+  if (length(dtc_cols) == 0) {
+    return(list(min = NA_character_, max = NA_character_))
+  }
+
+  # Extract date portion from all DTC columns
+  all_dates <- unlist(lapply(dtc_cols, function(col) {
+    vals <- as.character(df[[col]])
+    vals <- vals[!is.na(vals) & nzchar(vals)]
+    # Only keep values that look like full dates (YYYY-MM-DD)
+    vals <- vals[nchar(vals) >= 10]
+    substr(vals, 1, 10)
+  }))
+
+  if (length(all_dates) == 0) {
+    return(list(min = NA_character_, max = NA_character_))
+  }
+
+  # Parse dates, ignoring failures
+  parsed <- tryCatch(
+    as.Date(all_dates),
+    error = function(e) as.Date(NA)
+  )
+  parsed <- parsed[!is.na(parsed)]
+
+  if (length(parsed) == 0) {
+    return(list(min = NA_character_, max = NA_character_))
+  }
+
+  list(
+    min = as.character(min(parsed)),
+    max = as.character(max(parsed))
+  )
 }
