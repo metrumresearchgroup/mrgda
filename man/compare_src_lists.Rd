@@ -17,14 +17,14 @@ Defaults to "USUBJID".}
 \value{
 A tibble with one row per domain and columns:
 \describe{
-\item{DOMAIN}{Domain name}
-\item{STATUS}{Comparison status: "identical", "modified", "added", or "removed"}
-\item{ROWS1, ROWS2}{Number of rows in each list}
-\item{COLS1, COLS2}{Number of columns in each list}
-\item{SUBJ1, SUBJ2}{Number of unique subjects in each list}
-\item{RPS1, RPS2}{Records per subject (rows/subjects) in each list}
-\item{DT_MIN1, DT_MAX1}{Date range (min/max) from DTC columns in list1}
-\item{DT_MIN2, DT_MAX2}{Date range (min/max) from DTC columns in list2}
+\item{Domain}{Domain name}
+\item{Status}{Comparison status: "identical", "modified", "added", or "removed"}
+\item{Rows 1, Rows 2}{Number of rows in each list}
+\item{Cols 1, Cols 2}{Number of columns in each list}
+\item{Subjects 1, Subjects 2}{Number of unique subjects in each list}
+\item{Rec/Subj 1, Rec/Subj 2}{Records per subject (rows/subjects) in each list}
+\item{Min Date 1, Max Date 1}{Date range from DTC columns in list1}
+\item{Min Date 2, Max Date 2}{Date range from DTC columns in list2}
 }
 }
 \description{

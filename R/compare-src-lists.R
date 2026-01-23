@@ -11,14 +11,14 @@
 #'
 #' @return A tibble with one row per domain and columns:
 #' \describe{
-#'   \item{DOMAIN}{Domain name}
-#'   \item{STATUS}{Comparison status: "identical", "modified", "added", or "removed"}
-#'   \item{ROWS1, ROWS2}{Number of rows in each list}
-#'   \item{COLS1, COLS2}{Number of columns in each list}
-#'   \item{SUBJ1, SUBJ2}{Number of unique subjects in each list}
-#'   \item{RPS1, RPS2}{Records per subject (rows/subjects) in each list}
-#'   \item{DT_MIN1, DT_MAX1}{Date range (min/max) from DTC columns in list1}
-#'   \item{DT_MIN2, DT_MAX2}{Date range (min/max) from DTC columns in list2}
+#'   \item{Domain}{Domain name}
+#'   \item{Status}{Comparison status: "identical", "modified", "added", or "removed"}
+#'   \item{Rows 1, Rows 2}{Number of rows in each list}
+#'   \item{Cols 1, Cols 2}{Number of columns in each list}
+#'   \item{Subjects 1, Subjects 2}{Number of unique subjects in each list}
+#'   \item{Rec/Subj 1, Rec/Subj 2}{Records per subject (rows/subjects) in each list}
+#'   \item{Min Date 1, Max Date 1}{Date range from DTC columns in list1}
+#'   \item{Min Date 2, Max Date 2}{Date range from DTC columns in list2}
 #' }
 #'
 #' @examples
@@ -102,20 +102,20 @@ compare_src_lists <- function(.src_list1,
     )
 
     dplyr::tibble(
-      DOMAIN = domain.i,
-      STATUS = status,
-      ROWS1 = nrow1,
-      ROWS2 = nrow2,
-      COLS1 = ncol1,
-      COLS2 = ncol2,
-      SUBJ1 = nsubj1,
-      SUBJ2 = nsubj2,
-      RPS1 = rps1,
-      RPS2 = rps2,
-      DT_MIN1 = dtc1$min,
-      DT_MAX1 = dtc1$max,
-      DT_MIN2 = dtc2$min,
-      DT_MAX2 = dtc2$max
+      Domain = domain.i,
+      Status = status,
+      `Rows 1` = nrow1,
+      `Rows 2` = nrow2,
+      `Cols 1` = ncol1,
+      `Cols 2` = ncol2,
+      `Subjects 1` = nsubj1,
+      `Subjects 2` = nsubj2,
+      `Rec/Subj 1` = rps1,
+      `Rec/Subj 2` = rps2,
+      `Min Date 1` = dtc1$min,
+      `Max Date 1` = dtc1$max,
+      `Min Date 2` = dtc2$min,
+      `Max Date 2` = dtc2$max
     )
   })
 
