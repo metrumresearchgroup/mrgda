@@ -364,6 +364,12 @@ test_that("fmt_diff handles all cases", {
   expect_equal(mrgda:::fmt_diff(10, 20), "10 -> 20")
 })
 
+test_that("fmt_num formats large numbers with commas", {
+  expect_equal(mrgda:::fmt_num(1000), "1,000")
+  expect_equal(mrgda:::fmt_num(1000000), "1,000,000")
+  expect_equal(mrgda:::fmt_num("text"), "text")
+})
+
 test_that("compare_src_lists shows subject count when unchanged", {
   df1 <- make_df(nrow = 10, subjects = 5)
   df2 <- make_df(nrow = 20, subjects = 5)

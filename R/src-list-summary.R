@@ -26,8 +26,7 @@ src_list_summary <- function(.src_list, .subject_col = "USUBJID") {
   stopifnot(
     "`.src_list` must be a list" = is.list(.src_list),
     "`.subject_col` must be a single character string" = is.character(.subject_col) && length(.subject_col) == 1
-
-)
+  )
 
   meta <- c("mrgda_labels", "mrgda_src_meta")
   domains <- .src_list[setdiff(names(.src_list), meta)] %>%
@@ -62,27 +61,26 @@ src_list_summary <- function(.src_list, .subject_col = "USUBJID") {
 #' Extract date range from first DTC column
 #' @noRd
 extract_dtc_range <- function(df) {
-  empty <- list(min = NA_character_, max = NA_character_, col = NA_character_)
-
-  if (is.null(df) || ncol(df) == 0) return(empty)
+  if (is.null(df) || ncol(df) == 0) {
+    return(list(min = NA_character_, max = NA_character_, col = NA_character_))
+  }
 
   dtc_col <- stringr::str_subset(names(df), "DTC$")[1]
-  if (is.na(dtc_col)) return(empty)
+  if (is.na(dtc_col)) {
+    return(list(min = NA_character_, max = NA_character_, col = NA_character_))
+  }
 
   dates <- df[[dtc_col]] %>%
     as.character() %>%
     stringr::str_subset("^.{10,}") %>%
     stringr::str_sub(1, 10)
 
-  if (length(dates) == 0) return(list(min = NA_character_, max = NA_character_, col = dtc_col))
-
-  parsed <- tryCatch(
-    as.Date(dates),
-    error = function(e) as.Date(NA)
-  )
+  parsed <- tryCatch(as.Date(dates), error = function(e) as.Date(NA))
   parsed <- parsed[!is.na(parsed)]
 
-  if (length(parsed) == 0) return(list(min = NA_character_, max = NA_character_, col = dtc_col))
-
-  list(min = as.character(min(parsed)), max = as.character(max(parsed)), col = dtc_col)
+  list(
+    min = if (length(parsed) > 0) as.character(min(parsed)) else NA_character_,
+    max = if (length(parsed) > 0) as.character(max(parsed)) else NA_character_,
+    col = dtc_col
+  )
 }

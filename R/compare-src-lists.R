@@ -108,6 +108,6 @@ fmt_diff <- function(v1, v2) {
 #' Format number with comma separators
 #' @noRd
 fmt_num <- function(x) {
- if (!is.numeric(x)) return(x)
+  if (!is.numeric(x)) return(x)
   format(x, big.mark = ",", scientific = FALSE, trim = TRUE)
 }
