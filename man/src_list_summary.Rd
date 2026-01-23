@@ -18,7 +18,7 @@ A tibble with one row per domain containing:
 \item \code{Rows}: Number of rows
 \item \code{Cols}: Number of columns
 \item \code{Subjects}: Number of unique subjects
-\item \code{Row/Subj}: Rows per subject ratio
+\item \code{Rows/Subj (ratio)}: Rows per subject ratio
 \item \verb{Date Min}, \verb{Date Max}: Date range from the first column ending in "DTC"
 \item \verb{Date Col}: Name of the DTC column used
 }

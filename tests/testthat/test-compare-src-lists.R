@@ -45,7 +45,7 @@ test_that("src_list_summary calculates correct stats", {
   expect_equal(result$Rows, 12)
   expect_equal(result$Cols, 5)
   expect_equal(result$Subjects, 3)
-  expect_equal(result$`Row/Subj`, 4)
+  expect_equal(result$`Rows/Subj (ratio)`, 4)
 })
 
 test_that("src_list_summary handles multiple domains", {
@@ -296,8 +296,8 @@ test_that("compare_src_lists uses first DTC column only", {
 })
 
 
-# Row/Subj calculation tests
-test_that("compare_src_lists calculates Row/Subj correctly", {
+# Rows/Subj (ratio) calculation tests
+test_that("compare_src_lists calculates Rows/Subj (ratio) correctly", {
   df1 <- make_df(nrow = 10, subjects = 2)  # 5 rows per subject
   df2 <- make_df(nrow = 20, subjects = 2)  # 10 rows per subject
   src1 <- make_src_list(dm = df1)
@@ -305,7 +305,7 @@ test_that("compare_src_lists calculates Row/Subj correctly", {
 
   result <- compare_src_lists(src1, src2)
 
-  expect_equal(result$`Row/Subj`, "5 -> 10")
+  expect_equal(result$`Rows/Subj (ratio)`, "5 -> 10")
 })
 
 

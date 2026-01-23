@@ -10,7 +10,7 @@
 #' @return A tibble with one row per domain containing:
 #' - `Domain`: Domain name
 #' - `Status`: One of `"identical"`, `"modified"`, `"added"`, or `"removed"`
-#' - `Rows`, `Cols`, `Subjects`, `Row/Subj`: Count comparisons
+#' - `Rows`, `Cols`, `Subjects`, `Rows/Subj (ratio)`: Count comparisons
 #' - `Date Min`, `Date Max`: Date range comparisons
 #' - `Date Col`: Name of the DTC column used
 #'
@@ -38,6 +38,7 @@ compare_src_lists <- function(
   .src_list2,
   .subject_col = "USUBJID"
 ) {
+  # Validate inputs
   stopifnot(
     "`.src_list1` must be a list" = is.list(.src_list1),
     "`.src_list2` must be a list" = is.list(.src_list2),
@@ -47,15 +48,20 @@ compare_src_lists <- function(
       length(.subject_col) == 1
   )
 
+  # Generate summary statistics for each source list
   sum1 <- src_list_summary(.src_list1, .subject_col)
   sum2 <- src_list_summary(.src_list2, .subject_col)
 
+  # Get all unique domains from both lists
   all_domains <- union(sum1$Domain, sum2$Domain) %>% sort()
 
+  # Compare each domain and build result tibble
   purrr::map_dfr(all_domains, function(domain) {
+    # Check which lists contain this domain
     in1 <- domain %in% sum1$Domain
     in2 <- domain %in% sum2$Domain
 
+    # Determine domain status based on presence and data equality
     status <- dplyr::case_when(
       !in1 ~ "added",
       !in2 ~ "removed",
@@ -66,6 +72,7 @@ compare_src_lists <- function(
       TRUE ~ "modified"
     )
 
+    # For non-modified domains, return status as the value for all columns
     if (status != "modified") {
       return(tibble::tibble(
         Domain = domain,
@@ -73,23 +80,25 @@ compare_src_lists <- function(
         Rows = status,
         Cols = status,
         Subjects = status,
-        `Row/Subj` = status,
+        `Rows/Subj (ratio)` = status,
         `Date Min` = status,
         `Date Max` = status,
         `Date Col` = status
       ))
     }
 
+    # For modified domains, extract summaries and format differences
     s1 <- dplyr::filter(sum1, .data$Domain == domain)
     s2 <- dplyr::filter(sum2, .data$Domain == domain)
 
+    # Build comparison row showing "old -> new" for changed values
     tibble::tibble(
       Domain = domain,
       Status = status,
       Rows = fmt_diff(s1$Rows, s2$Rows),
       Cols = fmt_diff(s1$Cols, s2$Cols),
       Subjects = fmt_diff(s1$Subjects, s2$Subjects),
-      `Row/Subj` = fmt_diff(s1$`Row/Subj`, s2$`Row/Subj`),
+      `Rows/Subj (ratio)` = fmt_diff(s1$`Rows/Subj (ratio)`, s2$`Rows/Subj (ratio)`),
       `Date Min` = fmt_diff(s1$`Date Min`, s2$`Date Min`),
       `Date Max` = fmt_diff(s1$`Date Max`, s2$`Date Max`),
       `Date Col` = dplyr::coalesce(s2$`Date Col`, s1$`Date Col`)
@@ -101,6 +110,7 @@ compare_src_lists <- function(
 #' Check if two data frames are identical (ignoring attributes/class)
 #' @noRd
 is_data_identical <- function(df1, df2) {
+  # Use all.equal with attribute/class checks disabled to compare only data values
   isTRUE(all.equal(df1, df2, check.attributes = FALSE, check.class = FALSE))
 }
 
@@ -108,9 +118,16 @@ is_data_identical <- function(df1, df2) {
 #' Format difference between two values
 #' @noRd
 fmt_diff <- function(v1, v2) {
+  # Format both values for display
   f1 <- fmt_num(v1)
   f2 <- fmt_num(v2)
 
+  # Return appropriate format based on value changes:
+  # - NA if both missing
+  # - "(new)" if only in second list
+  # - "(removed)" if only in first list
+  # - "(identical)" if values match
+  # - "old -> new" if values differ
   dplyr::case_when(
     is.na(v1) & is.na(v2) ~ NA_character_,
     is.na(v1) ~ paste0(f2, " (new)"),
@@ -124,8 +141,10 @@ fmt_diff <- function(v1, v2) {
 #' Format number with comma separators
 #' @noRd
 fmt_num <- function(x) {
+  # Pass through non-numeric values unchanged
   if (!is.numeric(x)) {
     return(x)
   }
+  # Format with thousands separators for readability (e.g., 1000 -> "1,000")
   format(x, big.mark = ",", scientific = FALSE, trim = TRUE)
 }

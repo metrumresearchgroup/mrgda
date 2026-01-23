@@ -18,7 +18,7 @@ A tibble with one row per domain containing:
 \itemize{
 \item \code{Domain}: Domain name
 \item \code{Status}: One of \code{"identical"}, \code{"modified"}, \code{"added"}, or \code{"removed"}
-\item \code{Rows}, \code{Cols}, \code{Subjects}, \code{Row/Subj}: Count comparisons
+\item \code{Rows}, \code{Cols}, \code{Subjects}, \code{Rows/Subj (ratio)}: Count comparisons
 \item \verb{Date Min}, \verb{Date Max}: Date range comparisons
 \item \verb{Date Col}: Name of the DTC column used
 }
