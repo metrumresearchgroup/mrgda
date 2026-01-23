@@ -91,8 +91,8 @@ compare_src_lists <- function(.src_list1,
       TRUE ~ "modified"
     )
 
-    # For identical domains, blank out the details so changes stand out
-    if (status == "identical") {
+    # For identical/added/removed domains, blank out the details
+    if (status %in% c("identical", "added", "removed")) {
       return(dplyr::tibble(
         Domain = domain.i,
         Status = status,
@@ -100,21 +100,21 @@ compare_src_lists <- function(.src_list1,
         Cols = NA_character_,
         Subjects = NA_character_,
         `Rec/Subj` = NA_character_,
-        `Date Range` = NA_character_,
+        `Date Min` = NA_character_,
+        `Date Max` = NA_character_,
         `Date Cols` = NA_character_
       ))
     }
 
-    # Format comparison strings
-    rows_str <- format_comparison(nrow1, nrow2, status)
-    cols_str <- format_comparison(ncol1, ncol2, status)
-    subj_str <- format_comparison(nsubj1, nsubj2, status)
-    rps_str <- format_comparison(rps1, rps2, status)
+    # Format comparison strings - only show if changed
+    rows_str <- if (identical(nrow1, nrow2)) NA_character_ else format_comparison(nrow1, nrow2, status)
+    cols_str <- if (identical(ncol1, ncol2)) NA_character_ else format_comparison(ncol1, ncol2, status)
+    subj_str <- if (identical(nsubj1, nsubj2)) NA_character_ else format_comparison(nsubj1, nsubj2, status)
+    rps_str <- if (identical(rps1, rps2)) NA_character_ else format_comparison(rps1, rps2, status)
 
-    # Format date range
-    range1 <- format_date_range(dtc1$min, dtc1$max)
-    range2 <- format_date_range(dtc2$min, dtc2$max)
-    date_str <- format_comparison_char(range1, range2, status)
+    # Format date min/max separately - only show if changed
+    date_min_str <- if (identical(dtc1$min, dtc2$min)) NA_character_ else format_comparison_char(dtc1$min, dtc2$min, status)
+    date_max_str <- if (identical(dtc1$max, dtc2$max)) NA_character_ else format_comparison_char(dtc1$max, dtc2$max, status)
 
     # Get DTC columns (union of both lists)
     dtc_cols <- unique(c(dtc1$cols, dtc2$cols))
@@ -127,7 +127,8 @@ compare_src_lists <- function(.src_list1,
       Cols = cols_str,
       Subjects = subj_str,
       `Rec/Subj` = rps_str,
-      `Date Range` = date_str,
+      `Date Min` = date_min_str,
+      `Date Max` = date_max_str,
       `Date Cols` = dtc_cols_str
     )
   })
