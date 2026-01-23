@@ -64,7 +64,7 @@ compare_src_lists <- function(.src_list1,
       ncol1 <- NA_integer_
       nsubj1 <- NA_integer_
       rps1 <- NA_real_
-      dtc1 <- list(min = NA_character_, max = NA_character_, cols = character(0))
+      dtc1 <- list(min = NA_character_, max = NA_character_, col = NA_character_)
     }
 
     # Get counts for list2
@@ -79,7 +79,7 @@ compare_src_lists <- function(.src_list1,
       ncol2 <- NA_integer_
       nsubj2 <- NA_integer_
       rps2 <- NA_real_
-      dtc2 <- list(min = NA_character_, max = NA_character_, cols = character(0))
+      dtc2 <- list(min = NA_character_, max = NA_character_, col = NA_character_)
     }
 
     # Determine status
@@ -102,7 +102,7 @@ compare_src_lists <- function(.src_list1,
         `Row/Subj (%)` = status,
         `Date Min` = status,
         `Date Max` = status,
-        `Date Cols` = status
+        `Date Col` = status
       ))
     }
 
@@ -116,9 +116,8 @@ compare_src_lists <- function(.src_list1,
     date_min_str <- format_date_comparison(dtc1$min, dtc2$min)
     date_max_str <- format_date_comparison(dtc1$max, dtc2$max)
 
-    # Get DTC columns (union of both lists)
-    dtc_cols <- unique(c(dtc1$cols, dtc2$cols))
-    dtc_cols_str <- if (length(dtc_cols) > 0) paste(dtc_cols, collapse = ", ") else NA_character_
+    # Get DTC column (use list2's column if available, otherwise list1's)
+    dtc_col <- if (!is.na(dtc2$col)) dtc2$col else dtc1$col
 
     dplyr::tibble(
       Domain = domain.i,
@@ -129,7 +128,7 @@ compare_src_lists <- function(.src_list1,
       `Row/Subj (%)` = rps_str,
       `Date Min` = date_min_str,
       `Date Max` = date_max_str,
-      `Date Cols` = dtc_cols_str
+      `Date Col` = dtc_col
     )
   })
 
@@ -235,17 +234,16 @@ get_dtc_range <- function(df) {
   dtc_cols <- grep("DTC$", names(df), value = TRUE)
 
   if (length(dtc_cols) == 0) {
-    return(list(min = NA_character_, max = NA_character_, cols = character(0)))
+    return(list(min = NA_character_, max = NA_character_, col = NA_character_))
   }
 
-  # Extract date portion from all DTC columns
-  all_dates <- unlist(lapply(dtc_cols, function(col) {
-    vals <- as.character(df[[col]])
-    vals <- vals[!is.na(vals) & nzchar(vals)]
-    # Only keep values that look like full dates (YYYY-MM-DD)
-    vals <- vals[nchar(vals) >= 10]
-    substr(vals, 1, 10)
-  }))
+  # Use the first DTC column found
+  dtc_col <- dtc_cols[1]
+  vals <- as.character(df[[dtc_col]])
+  vals <- vals[!is.na(vals) & nzchar(vals)]
+  # Only keep values that look like full dates (YYYY-MM-DD)
+  vals <- vals[nchar(vals) >= 10]
+  all_dates <- substr(vals, 1, 10)
 
   if (length(all_dates) == 0) {
     return(list(min = NA_character_, max = NA_character_, cols = dtc_cols))
@@ -256,12 +254,12 @@ get_dtc_range <- function(df) {
   parsed <- parsed[!is.na(parsed)]
 
   if (length(parsed) == 0) {
-    return(list(min = NA_character_, max = NA_character_, cols = dtc_cols))
+    return(list(min = NA_character_, max = NA_character_, col = dtc_col))
   }
 
   list(
     min = as.character(min(parsed)),
     max = as.character(max(parsed)),
-    cols = dtc_cols
+    col = dtc_col
   )
 }
