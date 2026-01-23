@@ -293,15 +293,6 @@ test_that("get_dtc_range handles partial dates", {
   expect_equal(result$max, "2024-01-15")
 })
 
-test_that("format_change returns NA for identical values", {
-  expect_true(is.na(mrgda:::format_change(5, 5)))
-  expect_true(is.na(mrgda:::format_change(NA, NA)))
-})
-
-test_that("format_change shows arrow for different values", {
-  expect_equal(mrgda:::format_change(5, 10), "5 -> 10")
-  expect_equal(mrgda:::format_change(NA, 10), "NA -> 10")
-})
 
 test_that("format_date_change handles all cases", {
   expect_true(is.na(mrgda:::format_date_change(NA, NA)))

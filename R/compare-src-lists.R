@@ -145,26 +145,14 @@ build_comparison_row <- function(domain, status, stats1, stats2) {
   dplyr::tibble(
     Domain = domain,
     Status = status,
-    Rows = format_change(stats1$nrow, stats2$nrow),
-    Cols = format_change(stats1$ncol, stats2$ncol),
+    Rows = format_count_change(stats1$nrow, stats2$nrow),
+    Cols = format_count_change(stats1$ncol, stats2$ncol),
     Subjects = format_count_change(stats1$nsubj, stats2$nsubj),
-    `Row/Subj (%)` = format_change(stats1$rps, stats2$rps),
+    `Row/Subj (%)` = format_count_change(stats1$rps, stats2$rps),
     `Date Min` = format_date_change(stats1$dtc$min, stats2$dtc$min),
     `Date Max` = format_date_change(stats1$dtc$max, stats2$dtc$max),
     `Date Col` = dtc_col
   )
-}
-
-
-#' Format value change (show arrow if different, NA if same)
-#' @param val1 Value from list1
-#' @param val2 Value from list2
-#' @return Formatted string or NA
-#' @noRd
-format_change <- function(val1, val2) {
-  if (identical(val1, val2)) return(NA_character_)
-  if (is.na(val1) && is.na(val2)) return(NA_character_)
-  paste0(val1, " -> ", val2)
 }
 
 
