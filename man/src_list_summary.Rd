@@ -34,3 +34,6 @@ src_list_summary(src)
 }
 
 }
+\seealso{
+\code{\link[=compare_src_lists]{compare_src_lists()}} for comparing two source lists
+}

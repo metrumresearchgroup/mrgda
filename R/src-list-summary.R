@@ -15,6 +15,8 @@
 #' - `Date Min`, `Date Max`: Date range from the first column ending in "DTC"
 #' - `Date Col`: Name of the DTC column used
 #'
+#' @seealso [compare_src_lists()] for comparing two source lists
+#'
 #' @examples
 #' \dontrun{
 #' src <- read_src_dir(path, .file_types = "xpt")
