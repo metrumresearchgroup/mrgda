@@ -91,18 +91,18 @@ compare_src_lists <- function(.src_list1,
       TRUE ~ "modified"
     )
 
-    # For identical/added/removed domains, blank out the details
+    # For identical/added/removed domains, repeat status in every column
     if (status %in% c("identical", "added", "removed")) {
       return(dplyr::tibble(
         Domain = domain.i,
         Status = status,
-        Rows = NA_character_,
-        Cols = NA_character_,
-        Subjects = NA_character_,
-        `Rec/Subj` = NA_character_,
-        `Date Min` = NA_character_,
-        `Date Max` = NA_character_,
-        `Date Cols` = NA_character_
+        Rows = status,
+        Cols = status,
+        Subjects = status,
+        `Rec/Subj` = status,
+        `Date Min` = status,
+        `Date Max` = status,
+        `Date Cols` = status
       ))
     }
 
