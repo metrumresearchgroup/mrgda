@@ -112,9 +112,9 @@ compare_src_lists <- function(.src_list1,
     subj_str <- if (identical(nsubj1, nsubj2)) NA_character_ else format_comparison(nsubj1, nsubj2, status)
     rps_str <- if (identical(rps1, rps2)) NA_character_ else format_comparison(rps1, rps2, status)
 
-    # Format date min/max separately - only show if changed
-    date_min_str <- if (identical(dtc1$min, dtc2$min)) NA_character_ else format_comparison_char(dtc1$min, dtc2$min, status)
-    date_max_str <- if (identical(dtc1$max, dtc2$max)) NA_character_ else format_comparison_char(dtc1$max, dtc2$max, status)
+    # Format date min/max - show value with "(no change)" if unchanged
+    date_min_str <- format_date_comparison(dtc1$min, dtc2$min)
+    date_max_str <- format_date_comparison(dtc1$max, dtc2$max)
 
     # Get DTC columns (union of both lists)
     dtc_cols <- unique(c(dtc1$cols, dtc2$cols))
@@ -197,18 +197,27 @@ format_comparison_char <- function(val1, val2, status) {
 }
 
 
-#' Format date range as string
+#' Format date comparison - show value with change indicator
 #'
-#' @param min_date Min date
-#' @param max_date Max date
-#' @return Formatted string like "2020-01-01 to 2020-12-31"
+#' @param val1 Date from list1
+#' @param val2 Date from list2
+#' @return Formatted string
 #' @keywords internal
 #' @noRd
-format_date_range <- function(min_date, max_date) {
-  if (is.na(min_date) || is.na(max_date)) {
+format_date_comparison <- function(val1, val2) {
+  if (is.na(val1) && is.na(val2)) {
     return(NA_character_)
   }
-  paste0(min_date, " to ", max_date)
+  if (is.na(val1)) {
+    return(paste0("(new) ", val2))
+  }
+  if (is.na(val2)) {
+    return(paste0(val1, " (removed)"))
+  }
+  if (val1 == val2) {
+    return(paste0(val1, " (no change)"))
+  }
+  paste0(val1, " -> ", val2)
 }
 
 
