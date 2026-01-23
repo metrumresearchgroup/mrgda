@@ -9,17 +9,7 @@
 #' @param .subject_col Character string specifying the subject ID column name.
 #'   Defaults to "USUBJID".
 #'
-#' @return A tibble with one row per domain and columns:
-#' \describe{
-#'   \item{Domain}{Domain name}
-#'   \item{Status}{Comparison status: "identical", "modified", "added", or "removed"}
-#'   \item{Rows 1, Rows 2}{Number of rows in each list}
-#'   \item{Cols 1, Cols 2}{Number of columns in each list}
-#'   \item{Subjects 1, Subjects 2}{Number of unique subjects in each list}
-#'   \item{Rec/Subj 1, Rec/Subj 2}{Records per subject (rows/subjects) in each list}
-#'   \item{Min Date 1, Max Date 1}{Date range from DTC columns in list1}
-#'   \item{Min Date 2, Max Date 2}{Date range from DTC columns in list2}
-#' }
+#' @return A tibble with one row per domain showing comparison results.
 #'
 #' @examples
 #' \dontrun{
@@ -74,7 +64,7 @@ compare_src_lists <- function(.src_list1,
       ncol1 <- NA_integer_
       nsubj1 <- NA_integer_
       rps1 <- NA_real_
-      dtc1 <- list(min = NA_character_, max = NA_character_)
+      dtc1 <- list(min = NA_character_, max = NA_character_, cols = character(0))
     }
 
     # Get counts for list2
@@ -89,7 +79,7 @@ compare_src_lists <- function(.src_list1,
       ncol2 <- NA_integer_
       nsubj2 <- NA_integer_
       rps2 <- NA_real_
-      dtc2 <- list(min = NA_character_, max = NA_character_)
+      dtc2 <- list(min = NA_character_, max = NA_character_, cols = character(0))
     }
 
     # Determine status
@@ -101,21 +91,44 @@ compare_src_lists <- function(.src_list1,
       TRUE ~ "modified"
     )
 
+    # For identical domains, blank out the details so changes stand out
+    if (status == "identical") {
+      return(dplyr::tibble(
+        Domain = domain.i,
+        Status = status,
+        Rows = NA_character_,
+        Cols = NA_character_,
+        Subjects = NA_character_,
+        `Rec/Subj` = NA_character_,
+        `Date Range` = NA_character_,
+        `Date Cols` = NA_character_
+      ))
+    }
+
+    # Format comparison strings
+    rows_str <- format_comparison(nrow1, nrow2, status)
+    cols_str <- format_comparison(ncol1, ncol2, status)
+    subj_str <- format_comparison(nsubj1, nsubj2, status)
+    rps_str <- format_comparison(rps1, rps2, status)
+
+    # Format date range
+    range1 <- format_date_range(dtc1$min, dtc1$max)
+    range2 <- format_date_range(dtc2$min, dtc2$max)
+    date_str <- format_comparison_char(range1, range2, status)
+
+    # Get DTC columns (union of both lists)
+    dtc_cols <- unique(c(dtc1$cols, dtc2$cols))
+    dtc_cols_str <- if (length(dtc_cols) > 0) paste(dtc_cols, collapse = ", ") else NA_character_
+
     dplyr::tibble(
       Domain = domain.i,
       Status = status,
-      `Rows 1` = nrow1,
-      `Rows 2` = nrow2,
-      `Cols 1` = ncol1,
-      `Cols 2` = ncol2,
-      `Subjects 1` = nsubj1,
-      `Subjects 2` = nsubj2,
-      `Rec/Subj 1` = rps1,
-      `Rec/Subj 2` = rps2,
-      `Min Date 1` = dtc1$min,
-      `Max Date 1` = dtc1$max,
-      `Min Date 2` = dtc2$min,
-      `Max Date 2` = dtc2$max
+      Rows = rows_str,
+      Cols = cols_str,
+      Subjects = subj_str,
+      `Rec/Subj` = rps_str,
+      `Date Range` = date_str,
+      `Date Cols` = dtc_cols_str
     )
   })
 
@@ -123,21 +136,96 @@ compare_src_lists <- function(.src_list1,
 }
 
 
+#' Format numeric comparison as string
+#'
+#' @param val1 Value from list1
+#' @param val2 Value from list2
+#' @param status Domain status
+#' @return Formatted string
+#' @keywords internal
+#' @noRd
+format_comparison <- function(val1, val2, status) {
+  if (status == "added") {
+    return(paste0("(+) ", val2))
+  }
+  if (status == "removed") {
+    return(paste0(val1, " (-)"))
+  }
+  if (is.na(val1) && is.na(val2)) {
+    return(NA_character_)
+  }
+  if (is.na(val1) || is.na(val2)) {
+    return(paste0(val1, " -> ", val2))
+  }
+  if (val1 == val2) {
+    return(as.character(val1))
+  }
+  paste0(val1, " -> ", val2)
+}
+
+
+#' Format character comparison as string
+#'
+#' @param val1 Value from list1
+#' @param val2 Value from list2
+#' @param status Domain status
+#' @return Formatted string
+#' @keywords internal
+#' @noRd
+format_comparison_char <- function(val1, val2, status) {
+  if (status == "added") {
+    if (is.na(val2)) return(NA_character_)
+    return(paste0("(+) ", val2))
+  }
+  if (status == "removed") {
+    if (is.na(val1)) return(NA_character_)
+    return(paste0(val1, " (-)"))
+  }
+  if (is.na(val1) && is.na(val2)) {
+    return(NA_character_)
+  }
+  if (is.na(val1) || is.na(val2)) {
+    v1 <- if (is.na(val1)) "NA" else val1
+    v2 <- if (is.na(val2)) "NA" else val2
+    return(paste0(v1, " -> ", v2))
+  }
+  if (val1 == val2) {
+    return(val1)
+  }
+  paste0(val1, " -> ", val2)
+}
+
+
+#' Format date range as string
+#'
+#' @param min_date Min date
+#' @param max_date Max date
+#' @return Formatted string like "2020-01-01 to 2020-12-31"
+#' @keywords internal
+#' @noRd
+format_date_range <- function(min_date, max_date) {
+  if (is.na(min_date) || is.na(max_date)) {
+    return(NA_character_)
+  }
+  paste0(min_date, " to ", max_date)
+}
+
+
 #' Get date range from DTC columns
 #'
 #' @param df A data frame
-#' @return Named list with min and max dates, or NAs if none found
+#' @return Named list with min, max dates and column names
 #' @keywords internal
 #' @noRd
 get_dtc_range <- function(df) {
   if (is.null(df) || !is.data.frame(df)) {
-    return(list(min = NA_character_, max = NA_character_))
+    return(list(min = NA_character_, max = NA_character_, cols = character(0)))
   }
 
   dtc_cols <- grep("DTC$", names(df), value = TRUE)
 
   if (length(dtc_cols) == 0) {
-    return(list(min = NA_character_, max = NA_character_))
+    return(list(min = NA_character_, max = NA_character_, cols = character(0)))
   }
 
   # Extract date portion from all DTC columns
@@ -150,7 +238,7 @@ get_dtc_range <- function(df) {
   }))
 
   if (length(all_dates) == 0) {
-    return(list(min = NA_character_, max = NA_character_))
+    return(list(min = NA_character_, max = NA_character_, cols = dtc_cols))
   }
 
   # Parse dates, ignoring failures
@@ -161,11 +249,12 @@ get_dtc_range <- function(df) {
   parsed <- parsed[!is.na(parsed)]
 
   if (length(parsed) == 0) {
-    return(list(min = NA_character_, max = NA_character_))
+    return(list(min = NA_character_, max = NA_character_, cols = dtc_cols))
   }
 
   list(
     min = as.character(min(parsed)),
-    max = as.character(max(parsed))
+    max = as.character(max(parsed)),
+    cols = dtc_cols
   )
 }
