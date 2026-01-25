@@ -1,4 +1,4 @@
-# Test fixtures for src_list_summary and compare_src_lists
+# Test fixtures for summarize_src_list and compare_src_lists
 make_src_list <- function(...) {
   domains <- list(...)
   domains$mrgda_labels <- data.frame(DOMAIN = character(), COLUMN_NAME = character(), COLUMN_LABEL = character())
@@ -22,23 +22,23 @@ make_df <- function(nrow = 10, ncol = 5, subjects = 3, add_dtc = FALSE, dtc_date
 }
 
 
-# src_list_summary tests
-test_that("src_list_summary validates inputs", {
-  expect_error(src_list_summary("not a list"), "must be a list")
-  expect_error(src_list_summary(list(), .subject_col = 123), "must be a single character")
+# summarize_src_list tests
+test_that("summarize_src_list validates inputs", {
+  expect_error(summarize_src_list("not a list"), "must be a list")
+  expect_error(summarize_src_list(list(), .subject_col = 123), "must be a single character")
 })
 
-test_that("src_list_summary returns empty tibble for empty list", {
-  result <- src_list_summary(list())
+test_that("summarize_src_list returns empty tibble for empty list", {
+  result <- summarize_src_list(list())
   expect_s3_class(result, "tbl_df")
   expect_equal(nrow(result), 0)
 })
 
-test_that("src_list_summary calculates correct stats", {
+test_that("summarize_src_list calculates correct stats", {
   df <- make_df(nrow = 12, ncol = 5, subjects = 3)
   src <- make_src_list(dm = df)
 
-  result <- src_list_summary(src)
+  result <- summarize_src_list(src)
 
   expect_equal(nrow(result), 1)
   expect_equal(result$Domain, "dm")
@@ -48,93 +48,93 @@ test_that("src_list_summary calculates correct stats", {
   expect_equal(result$`Rows/Subj (ratio)`, 4)
 })
 
-test_that("src_list_summary handles multiple domains", {
+test_that("summarize_src_list handles multiple domains", {
   df1 <- make_df(nrow = 10, ncol = 3, subjects = 2)
   df2 <- make_df(nrow = 20, ncol = 5, subjects = 4)
   src <- make_src_list(ae = df1, dm = df2)
 
-  result <- src_list_summary(src)
+  result <- summarize_src_list(src)
 
   expect_equal(nrow(result), 2)
   expect_equal(result$Domain, c("ae", "dm"))
 })
 
-test_that("src_list_summary extracts date range", {
+test_that("summarize_src_list extracts date range", {
   dates <- c("2024-01-01T10:00:00", "2024-06-15T12:30:00", "2024-12-31T23:59:59")
   df <- make_df(nrow = 3, add_dtc = TRUE, dtc_dates = dates)
   src <- make_src_list(ae = df)
 
-  result <- src_list_summary(src)
+  result <- summarize_src_list(src)
 
   expect_equal(result$`Date Min`, "2024-01-01")
   expect_equal(result$`Date Max`, "2024-12-31")
   expect_equal(result$`Date Col`, "AESTDTC")
 })
 
-test_that("src_list_summary excludes metadata elements", {
+test_that("summarize_src_list excludes metadata elements", {
   df <- make_df()
   src <- make_src_list(dm = df)
 
-  result <- src_list_summary(src)
+  result <- summarize_src_list(src)
 
   expect_false("mrgda_labels" %in% result$Domain)
   expect_false("mrgda_src_meta" %in% result$Domain)
 })
 
-test_that("src_list_summary returns NA for missing subject column", {
+test_that("summarize_src_list returns NA for missing subject column", {
   df <- data.frame(X = 1:10, Y = letters[1:10])
   src <- make_src_list(dm = df)
 
-  result <- src_list_summary(src)
+  result <- summarize_src_list(src)
 
   expect_true(is.na(result$Subjects))
   expect_true(is.na(result$`Rows/Subj (ratio)`))
 })
 
-test_that("src_list_summary returns NA for missing DTC column", {
+test_that("summarize_src_list returns NA for missing DTC column", {
   df <- make_df(add_dtc = FALSE)
   src <- make_src_list(dm = df)
 
-  result <- src_list_summary(src)
+  result <- summarize_src_list(src)
 
   expect_true(is.na(result$`Date Min`))
   expect_true(is.na(result$`Date Max`))
   expect_true(is.na(result$`Date Col`))
 })
 
-test_that("src_list_summary returns domains in sorted order", {
+test_that("summarize_src_list returns domains in sorted order", {
   df <- make_df()
   src <- make_src_list(zz = df, aa = df, mm = df)
 
-  result <- src_list_summary(src)
+  result <- summarize_src_list(src)
 
   expect_equal(result$Domain, c("aa", "mm", "zz"))
 })
 
-test_that("src_list_summary uses custom subject column", {
+test_that("summarize_src_list uses custom subject column", {
   df <- data.frame(SUBJID = c("A", "A", "B", "C"), X = 1:4)
   src <- make_src_list(dm = df)
 
-  result <- src_list_summary(src, .subject_col = "SUBJID")
+  result <- summarize_src_list(src, .subject_col = "SUBJID")
 
   expect_equal(result$Subjects, 3)
   expect_equal(result$`Rows/Subj (ratio)`, round(4 / 3, 1))
 })
 
-test_that("src_list_summary rounds Rows/Subj ratio to 1 decimal", {
+test_that("summarize_src_list rounds Rows/Subj ratio to 1 decimal", {
   df <- make_df(nrow = 10, subjects = 3)  # 10/3 = 3.333...
   src <- make_src_list(dm = df)
 
-  result <- src_list_summary(src)
+  result <- summarize_src_list(src)
 
   expect_equal(result$`Rows/Subj (ratio)`, 3.3)
 })
 
-test_that("src_list_summary returns correct column types", {
+test_that("summarize_src_list returns correct column types", {
   df <- make_df(nrow = 1000, ncol = 50, subjects = 100, add_dtc = TRUE)
   src <- make_src_list(dm = df)
 
-  result <- src_list_summary(src)
+  result <- summarize_src_list(src)
 
   expect_type(result$Domain, "character")
   expect_type(result$Rows, "integer")
@@ -517,11 +517,11 @@ test_that("compare_src_lists handles empty domain (0 rows)", {
   expect_equal(result$Rows, "10 -> 0")
 })
 
-test_that("src_list_summary handles empty domain (0 rows)", {
+test_that("summarize_src_list handles empty domain (0 rows)", {
   df <- make_df()[0, ]
   src <- make_src_list(dm = df)
 
-  result <- src_list_summary(src)
+  result <- summarize_src_list(src)
 
   expect_equal(result$Rows, 0)
   expect_equal(result$Subjects, 0)
@@ -557,7 +557,7 @@ test_that("compare_src_lists marks identical when only attributes differ", {
 
 
 # Non-data.frame elements in list
-test_that("src_list_summary ignores non-data.frame elements", {
+test_that("summarize_src_list ignores non-data.frame elements", {
   df <- make_df()
   src <- list(
     dm = df,
@@ -567,7 +567,7 @@ test_that("src_list_summary ignores non-data.frame elements", {
     mrgda_src_meta = list()
   )
 
-  result <- src_list_summary(src)
+  result <- summarize_src_list(src)
 
   expect_equal(nrow(result), 1)
   expect_equal(result$Domain, "dm")

@@ -20,11 +20,11 @@
 #' @examples
 #' \dontrun{
 #' src <- read_src_dir(path, .file_types = "xpt")
-#' src_list_summary(src)
+#' summarize_src_list(src)
 #' }
 #'
 #' @export
-src_list_summary <- function(.src_list, .subject_col = "USUBJID") {
+summarize_src_list <- function(.src_list, .subject_col = "USUBJID") {
   # Validate inputs
   stopifnot(
     "`.src_list` must be a list" = is.list(.src_list),

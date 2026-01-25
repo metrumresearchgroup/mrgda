@@ -47,5 +47,5 @@ compare_src_lists(src1, src2)
 
 }
 \seealso{
-\code{\link[=src_list_summary]{src_list_summary()}} for summarizing a single source list
+\code{\link[=summarize_src_list]{summarize_src_list()}} for summarizing a single source list
 }

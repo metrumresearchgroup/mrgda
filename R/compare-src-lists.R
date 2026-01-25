@@ -23,7 +23,7 @@
 #' For `"modified"` domains, values show `"X -> Y"` for changes or
 #' `"X (identical)"` when unchanged.
 #'
-#' @seealso [src_list_summary()] for summarizing a single source list
+#' @seealso [summarize_src_list()] for summarizing a single source list
 #'
 #' @examples
 #' \dontrun{
@@ -49,8 +49,8 @@ compare_src_lists <- function(
   )
 
   # Generate summary statistics for each source list
-  sum1 <- src_list_summary(.src_list1, .subject_col)
-  sum2 <- src_list_summary(.src_list2, .subject_col)
+  sum1 <- summarize_src_list(.src_list1, .subject_col)
+  sum2 <- summarize_src_list(.src_list2, .subject_col)
 
   # Get all unique domains from both lists
   all_domains <- union(sum1$Domain, sum2$Domain) %>% sort()
