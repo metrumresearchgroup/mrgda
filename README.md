@@ -1,10 +1,21 @@
 # mrgda
 
-![mrgda logo](man/figures/logo.png)
+<img src="man/figures/logo.png" width="80" />
 
 mrgda is a small set of R helpers for assembling and inspecting clinical-style source data and derived datasets.
 
-Examples below are illustrative; the outputs are mocked to show what the console would print.
+## Table of contents
+
+- [read_src_dir()](#read_src_dir)
+- [summarize_src_list()](#summarize_src_list)
+- [compare_src_lists()](#compare_src_lists)
+- [query_src_list()](#query_src_list)
+- [assign_id()](#assign_id)
+- [read_csv_dots()](#read_csv_dots)
+- [write_csv_dots()](#write_csv_dots)
+- [execute_data_diffs()](#execute_data_diffs)
+- [write_derived()](#write_derived)
+- [explain()](#explain)
 
 ## read_src_dir()
 
@@ -59,14 +70,13 @@ compare_src_lists(src_v1, src_v2) %>% dplyr::select(Domain, Status, Rows)
 Search across column names, labels, and values to find where a concept lives.
 
 ```r
-query_src_list(src, "RACE")
+query_src_list(src, "anti-drug antibody")
 ```
 
 ```text
-# A tibble: 2 x 4
+# A tibble: 1 x 4
   DOMAIN COLUMN MATCH_TYPE VALUE
-  dm     RACE   column     NA
-  dm     RACE   label      Race
+  is     ISTEST label      Anti-drug antibody
 ```
 
 ## assign_id()
@@ -160,16 +170,4 @@ Explanation: Check duplicate time stamps
 
 # A tibble: 0 x 3
   ID TIME n
-```
-
-## `%>%` (pipe)
-
-Re-exported magrittr pipe for readable data transforms.
-
-```r
-1:5 %>% sum()
-```
-
-```text
-[1] 15
 ```
