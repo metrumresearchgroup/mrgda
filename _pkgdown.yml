@@ -16,6 +16,8 @@ reference:
     contents:
     - read_src_dir
     - query_src_list
+    - compare_src_lists
+    - summarize_src_list
   - title: Data Creation
     desc: Write NONMEM data set
     contents:

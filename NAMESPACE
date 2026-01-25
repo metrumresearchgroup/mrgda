@@ -2,11 +2,13 @@
 
 export("%>%")
 export(assign_id)
+export(compare_src_lists)
 export(execute_data_diffs)
 export(explain)
 export(query_src_list)
 export(read_csv_dots)
 export(read_src_dir)
+export(summarize_src_list)
 export(write_csv_dots)
 export(write_derived)
 import(rlang)
