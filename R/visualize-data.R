@@ -43,7 +43,7 @@ visualize_data <- function(.csv_path, .spec_path = NULL) {
   data_vars <- names(data)
   default_x <- if (length(data_vars) > 0) data_vars[[1]] else ""
   default_y <- if (length(data_vars) > 1) data_vars[[2]] else default_x
-  default_hover <- head(data_vars, 5)
+  default_hover <- utils::head(data_vars, 5)
 
   ui <- bslib::page_navbar(
     title = NULL,
@@ -192,7 +192,7 @@ visualize_data <- function(.csv_path, .spec_path = NULL) {
       y <- plot_data[[input$y_var]]
       hover_vars <- input$hover_vars
       hover_vars <- hover_vars[hover_vars %in% data_vars]
-      hover_vars <- head(hover_vars, 5)
+      hover_vars <- utils::head(hover_vars, 5)
       hover_text <- NULL
       if (length(hover_vars) > 0) {
         hover_df <- plot_data[, hover_vars, drop = FALSE]

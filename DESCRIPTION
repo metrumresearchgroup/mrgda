@@ -38,7 +38,9 @@ Imports:
     knitr,
     readr,
     shiny,
-    tidyselect
+    tidyselect,
+    DT,
+    plotly
 Suggests: 
     testthat (>= 3.1.10),
     withr (>= 2.5.0),
