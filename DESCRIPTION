@@ -39,7 +39,7 @@ Imports:
     readr,
     shiny,
     tidyselect,
-    DT,
+    ggplot2,
     plotly
 Suggests: 
     testthat (>= 3.1.10),

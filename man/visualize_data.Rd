@@ -15,10 +15,10 @@ visualize_data(.csv_path, .spec_path = NULL)
 A Shiny app object.
 }
 \description{
-Launch an interactive Shiny app for exploring a CSV data set. The Visualizer tab
+Launch an interactive Shiny app for exploring a CSV data set. The Visualizer view
 provides a scatter plot with selectable X/Y axes, optional color grouping, hover
-fields (up to five), and ad hoc filters for numeric ranges or categorical values.
-The Tabulizer tab renders a searchable table view of the same data.
+fields based on the active axis/color/facet/filter selections, and ad hoc filters
+for numeric ranges or categorical values.
 }
 \details{
 CSV files are read with \code{\link[=read_csv_dots]{read_csv_dots()}}, so "." values are interpreted as \code{NA}.

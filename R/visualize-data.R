@@ -1,9 +1,9 @@
 #' Load the mrgda Shiny app
 #'
-#' Launch an interactive Shiny app for exploring a CSV data set. The Visualizer tab
+#' Launch an interactive Shiny app for exploring a CSV data set. The Visualizer view
 #' provides a scatter plot with selectable X/Y axes, optional color grouping, hover
-#' fields (up to five), and ad hoc filters for numeric ranges or categorical values.
-#' The Tabulizer tab renders a searchable table view of the same data.
+#' fields based on the active axis/color/facet/filter selections, and ad hoc filters
+#' for numeric ranges or categorical values.
 #'
 #' CSV files are read with [read_csv_dots()], so "." values are interpreted as `NA`.
 #' If a YAML specification is supplied, it is loaded with [yspec::ys_load()] and
@@ -37,62 +37,59 @@ visualize_data <- function(.csv_path, .spec_path = NULL) {
     # Load in spec
     spec <- yspec::ys_load(.spec_path)
 
-    data <- yspec::ys_factors(data, spec)
+    data <- yspec::ys_add_factors(data, spec, .suffix = "")
   }
 
   data_vars <- names(data)
   default_x <- if (length(data_vars) > 0) data_vars[[1]] else ""
   default_y <- if (length(data_vars) > 1) data_vars[[2]] else default_x
-  default_hover <- utils::head(data_vars, 5)
+  default_hover <- unique(c(default_x, default_y))
 
-  ui <- bslib::page_navbar(
-    title = NULL,
+  ui <- bslib::page_fluid(
     theme = bslib::bs_theme(version = 5),
-    bslib::nav_panel(
-      "Visualizer",
-      bslib::layout_sidebar(
-        sidebar = bslib::sidebar(
-          shiny::selectInput(
-            inputId = "x_var",
-            label = "X-axis",
-            choices = data_vars,
-            selected = default_x
-          ),
-          shiny::selectInput(
-            inputId = "y_var",
-            label = "Y-axis",
-            choices = data_vars,
-            selected = default_y
-          ),
-          shiny::selectInput(
-            inputId = "color_var",
-            label = "Color by",
-            choices = c("None" = "", data_vars),
-            selected = ""
-          ),
-          shiny::selectizeInput(
-            inputId = "filter_vars",
-            label = "Filter variables",
-            choices = data_vars,
-            multiple = TRUE
-          ),
-          shiny::uiOutput("filter_ui"),
-          shiny::selectizeInput(
-            inputId = "hover_vars",
-            label = "Hover variables (max 5)",
-            choices = data_vars,
-            selected = default_hover,
-            multiple = TRUE,
-            options = list(maxItems = 5)
-          )
+    bslib::layout_sidebar(
+      sidebar = bslib::sidebar(
+        shiny::selectInput(
+          inputId = "x_var",
+          label = "X-axis",
+          choices = data_vars,
+          selected = default_x
         ),
-        plotly::plotlyOutput("scatter_plot")
-      )
-    ),
-    bslib::nav_panel(
-      "Tabulizer",
-      DT::dataTableOutput("tabulizer_data")
-    ),
+        shiny::selectInput(
+          inputId = "y_var",
+          label = "Y-axis",
+          choices = data_vars,
+          selected = default_y
+        ),
+        shiny::selectInput(
+          inputId = "color_var",
+          label = "Color by",
+          choices = c("None" = "", data_vars),
+          selected = ""
+        ),
+        shiny::selectInput(
+          inputId = "facet_var",
+          label = "Facet by",
+          choices = c("None" = "", data_vars),
+          selected = ""
+        ),
+        shiny::selectizeInput(
+          inputId = "hover_vars",
+          label = "Hover variables",
+          choices = data_vars,
+          selected = default_hover,
+          multiple = TRUE
+        ),
+        shiny::selectizeInput(
+          inputId = "filter_vars",
+          label = "Filter variables",
+          choices = data_vars,
+          multiple = TRUE
+        ),
+        shiny::uiOutput("filter_ui")
+      ),
+      shiny::uiOutput("scatter_plot_ui")
+    )
   )
 
   server <- function(input, output, session) {
@@ -145,13 +142,37 @@ visualize_data <- function(.csv_path, .spec_path = NULL) {
       do.call(shiny::tagList, ui_list)
     })
 
-    output$tabulizer_data <- DT::renderDataTable({
-      DT::datatable(
-        data,
-        filter = "top",
-        options = list(pageLength = 25, autoWidth = TRUE)
+    auto_hover_vars <- shiny::reactive({
+      vars <- c(
+        input$x_var,
+        input$y_var,
+        if (!is.null(input$color_var) && nzchar(input$color_var)) input$color_var else NULL,
+        if (!is.null(input$facet_var) && nzchar(input$facet_var)) input$facet_var else NULL,
+        input$filter_vars
       )
+      vars <- vars[!is.na(vars) & nzchar(vars)]
+      unique(vars)
     })
+
+    shiny::observeEvent(
+      list(
+        input$x_var,
+        input$y_var,
+        input$color_var,
+        input$facet_var,
+        input$filter_vars
+      ),
+      {
+        selected <- unique(c(auto_hover_vars(), input$hover_vars))
+        shiny::updateSelectizeInput(
+          session,
+          "hover_vars",
+          choices = data_vars,
+          selected = selected
+        )
+      },
+      ignoreInit = FALSE
+    )
 
     filtered_data <- shiny::reactive({
       vars <- input$filter_vars
@@ -185,14 +206,20 @@ visualize_data <- function(.csv_path, .spec_path = NULL) {
       plot_data
     })
 
-    output$scatter_plot <- plotly::renderPlotly({
+    plot_spec <- shiny::reactive({
       plot_data <- filtered_data()
       shiny::req(input$x_var, input$y_var)
       x <- plot_data[[input$x_var]]
       y <- plot_data[[input$y_var]]
-      hover_vars <- input$hover_vars
+      keep_xy <- !is.na(x) & !is.na(y)
+      plot_data <- plot_data[keep_xy, , drop = FALSE]
+      x <- x[keep_xy]
+      y <- y[keep_xy]
+      if (nrow(plot_data) == 0) {
+        return(list(empty = TRUE))
+      }
+      hover_vars <- unique(c(auto_hover_vars(), input$hover_vars))
       hover_vars <- hover_vars[hover_vars %in% data_vars]
-      hover_vars <- utils::head(hover_vars, 5)
       hover_text <- NULL
       if (length(hover_vars) > 0) {
         hover_df <- plot_data[, hover_vars, drop = FALSE]
@@ -209,26 +236,127 @@ visualize_data <- function(.csv_path, .spec_path = NULL) {
           function(row) paste(paste0(hover_vars, ": ", row), collapse = "<br>")
         )
       }
+
+      color_data <- NULL
       if (!is.null(input$color_var) && nzchar(input$color_var)) {
         color_data <- plot_data[[input$color_var]]
-        plotly::plot_ly(
-          x = x,
-          y = y,
-          type = "scatter",
-          mode = "markers",
-          color = color_data,
-          text = hover_text,
-          hoverinfo = if (is.null(hover_text)) "x+y" else "text"
+      }
+
+      facet_data <- NULL
+      if (!is.null(input$facet_var) && nzchar(input$facet_var)) {
+        facet_data <- plot_data[[input$facet_var]]
+      }
+
+      base_df <- data.frame(
+        x = x,
+        y = y,
+        hover_text = if (is.null(hover_text)) NA_character_ else hover_text,
+        stringsAsFactors = FALSE
+      )
+      if (!is.null(color_data)) {
+        base_df$color <- if (is.factor(color_data)) as.character(color_data) else color_data
+      }
+      if (!is.null(facet_data)) {
+        facet_vals <- if (is.factor(facet_data)) as.character(facet_data) else facet_data
+        facet_vals[is.na(facet_vals)] <- "(Missing)"
+        base_df$facet <- facet_vals
+      }
+
+      list(
+        empty = FALSE,
+        base_df = base_df,
+        has_color = !is.null(color_data),
+        has_facet = !is.null(facet_data),
+        tooltip = if (is.null(hover_text)) "x+y" else "text",
+        x_label = input$x_var,
+        y_label = input$y_var,
+        color_label = if (!is.null(color_data)) input$color_var else NULL
+      )
+    })
+
+    build_plot <- function(plot_df, spec, facets_per_plot = NULL) {
+      gg_args <- list(
+        data = plot_df,
+        mapping = ggplot2::aes(
+          x = .data$x,
+          y = .data$y,
+          text = .data$hover_text
         )
+      )
+      if (isTRUE(spec$has_color)) {
+        gg_args$mapping <- ggplot2::aes(
+          x = .data$x,
+          y = .data$y,
+          text = .data$hover_text,
+          color = .data$color
+        )
+      }
+
+      gg_plot <- do.call(ggplot2::ggplot, gg_args) +
+        ggplot2::geom_point() +
+        ggplot2::labs(
+          x = spec$x_label,
+          y = spec$y_label,
+          color = spec$color_label
+        ) +
+        ggplot2::theme_bw() +
+        ggplot2::theme(
+          panel.grid.minor = ggplot2::element_blank(),
+          panel.grid.major = ggplot2::element_line(color = "grey85"),
+          panel.background = ggplot2::element_rect(fill = "white"),
+          plot.background = ggplot2::element_rect(fill = "white")
+        )
+
+      if (isTRUE(spec$has_facet)) {
+        gg_plot <- gg_plot + ggplot2::facet_wrap(~facet, ncol = 3)
+      }
+
+      plotly::ggplotly(gg_plot, tooltip = spec$tooltip)
+    }
+
+    output$scatter_plot_ui <- shiny::renderUI({
+      spec <- plot_spec()
+      if (isTRUE(spec$empty)) {
+        return(
+          shiny::div(
+            class = "text-muted",
+            "No rows remain after filtering for non-missing X/Y values."
+          )
+        )
+      }
+      if (!isTRUE(spec$has_facet)) {
+        output$scatter_plot_1 <- plotly::renderPlotly({
+          build_plot(spec$base_df, spec)
+        })
+        return(plotly::plotlyOutput("scatter_plot_1", height = "800px"))
+      }
+
+      facet_levels <- unique(spec$base_df$facet)
+      facet_groups <- split(
+        facet_levels,
+        ceiling(seq_along(facet_levels) / 9)
+      )
+
+      ui_list <- lapply(seq_along(facet_groups), function(i) {
+        output_id <- paste0("scatter_plot_", i)
+        facet_subset <- facet_groups[[i]]
+        output[[output_id]] <- plotly::renderPlotly({
+          plot_df <- spec$base_df[spec$base_df$facet %in% facet_subset, , drop = FALSE]
+          build_plot(plot_df, spec)
+        })
+        plotly::plotlyOutput(output_id, height = "800px")
+      })
+
+      if (length(ui_list) > 1) {
+        tabs <- lapply(seq_along(ui_list), function(i) {
+          shiny::tabPanel(
+            title = paste0("Facets ", i),
+            ui_list[[i]]
+          )
+        })
+        do.call(shiny::tabsetPanel, tabs)
       } else {
-        plotly::plot_ly(
-          x = x,
-          y = y,
-          type = "scatter",
-          mode = "markers",
-          text = hover_text,
-          hoverinfo = if (is.null(hover_text)) "x+y" else "text"
-        )
+        do.call(shiny::tagList, ui_list)
       }
     })
   }
