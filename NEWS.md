@@ -2,6 +2,7 @@
 
 ## New features and changes
 
+- Added `visualize_data` function to allow users to investigate data sets. (#253)
 - `query_src_list` now searches across values in addition to column and label names. (#251)
 
 # mrgda 0.13.0

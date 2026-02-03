@@ -28,3 +28,4 @@ reference:
     - explain
     - read_csv_dots
     - write_csv_dots
+    - visualize_data
