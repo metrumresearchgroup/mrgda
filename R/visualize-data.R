@@ -73,6 +73,14 @@ visualize_data <- function(.csv_path, .spec_path = NULL) {
           choices = c("None" = "", data_vars),
           selected = ""
         ),
+        shiny::conditionalPanel(
+          condition = "input.facet_var !== ''",
+          shiny::checkboxInput(
+            inputId = "facet_free_scales",
+            label = "Free facet axes",
+            value = FALSE
+          )
+        ),
         shiny::selectizeInput(
           inputId = "hover_vars",
           label = "Hover variables",
@@ -270,7 +278,8 @@ visualize_data <- function(.csv_path, .spec_path = NULL) {
         tooltip = if (is.null(hover_text)) "x+y" else "text",
         x_label = input$x_var,
         y_label = input$y_var,
-        color_label = if (!is.null(color_data)) input$color_var else NULL
+        color_label = if (!is.null(color_data)) input$color_var else NULL,
+        facet_free_scales = isTRUE(input$facet_free_scales)
       )
     })
 
@@ -308,7 +317,8 @@ visualize_data <- function(.csv_path, .spec_path = NULL) {
         )
 
       if (isTRUE(spec$has_facet)) {
-        gg_plot <- gg_plot + ggplot2::facet_wrap(~facet, ncol = 3)
+        facet_scales <- if (isTRUE(spec$facet_free_scales)) "free" else "fixed"
+        gg_plot <- gg_plot + ggplot2::facet_wrap(~facet, ncol = 3, scales = facet_scales)
       }
 
       plotly::ggplotly(gg_plot, tooltip = spec$tooltip)
