@@ -47,56 +47,61 @@ visualize_data <- function(.csv_path, .spec_path = NULL) {
 
   ui <- bslib::page_fluid(
     theme = bslib::bs_theme(version = 5),
-    bslib::layout_sidebar(
-      sidebar = bslib::sidebar(
-        shiny::selectInput(
-          inputId = "x_var",
-          label = "X-axis",
-          choices = data_vars,
-          selected = default_x
-        ),
-        shiny::selectInput(
-          inputId = "y_var",
-          label = "Y-axis",
-          choices = data_vars,
-          selected = default_y
-        ),
-        shiny::selectInput(
-          inputId = "color_var",
-          label = "Color by",
-          choices = c("None" = "", data_vars),
-          selected = ""
-        ),
-        shiny::selectInput(
-          inputId = "facet_var",
-          label = "Facet by",
-          choices = c("None" = "", data_vars),
-          selected = ""
-        ),
-        shiny::conditionalPanel(
-          condition = "input.facet_var !== ''",
-          shiny::checkboxInput(
-            inputId = "facet_free_scales",
-            label = "Free facet axes",
-            value = FALSE
-          )
-        ),
-        shiny::selectizeInput(
-          inputId = "hover_vars",
-          label = "Hover variables",
-          choices = data_vars,
-          selected = default_hover,
-          multiple = TRUE
-        ),
-        shiny::selectizeInput(
-          inputId = "filter_vars",
-          label = "Filter variables",
-          choices = data_vars,
-          multiple = TRUE
-        ),
-        shiny::uiOutput("filter_ui")
-      ),
-      shiny::uiOutput("scatter_plot_ui")
+    shiny::tabsetPanel(
+      shiny::tabPanel(
+        title = "General visualizer",
+        bslib::layout_sidebar(
+          sidebar = bslib::sidebar(
+            shiny::selectInput(
+              inputId = "x_var",
+              label = "X-axis",
+              choices = data_vars,
+              selected = default_x
+            ),
+            shiny::selectInput(
+              inputId = "y_var",
+              label = "Y-axis",
+              choices = data_vars,
+              selected = default_y
+            ),
+            shiny::selectInput(
+              inputId = "color_var",
+              label = "Color by",
+              choices = c("None" = "", data_vars),
+              selected = ""
+            ),
+            shiny::selectInput(
+              inputId = "facet_var",
+              label = "Facet by",
+              choices = c("None" = "", data_vars),
+              selected = ""
+            ),
+            shiny::conditionalPanel(
+              condition = "input.facet_var !== ''",
+              shiny::checkboxInput(
+                inputId = "facet_free_scales",
+                label = "Free facet axes",
+                value = FALSE
+              )
+            ),
+            shiny::selectizeInput(
+              inputId = "hover_vars",
+              label = "Hover variables",
+              choices = data_vars,
+              selected = default_hover,
+              multiple = TRUE
+            ),
+            shiny::selectizeInput(
+              inputId = "filter_vars",
+              label = "Filter variables",
+              choices = data_vars,
+              multiple = TRUE
+            ),
+            shiny::uiOutput("filter_ui")
+          ),
+          shiny::uiOutput("scatter_plot_ui")
+        )
+      )
     )
   )
 
