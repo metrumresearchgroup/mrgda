@@ -488,15 +488,6 @@ dataset versions and understand their contents.
     (derived from the `yspec` object).
   - **Define-XML**: Rendered HTML and PDF versions of the data
     definition (using `yspec::render_fda_define`).
-  - **`subject-columns.yml`**: A YAML file identifying subject-level
-    columns.
-  - **`history.csv`**: Tracks changes to the dataset across versions,
-    including user, date/time, comments, and revision numbers (if
-    applicable).
-  - **`sys-info.yml`**: System information at the time of writing (user,
-    R version, OS).
-  - **`dependencies.yml`**: If run within an RStudio project, it
-    attempts to find scripts that use this derived file.
   - **`diffs.csv` & `subject-diffs.csv`**: If a previous version of the
     dataset is available (either locally or from SVN, controlled by
     `.compare_from_svn`), it generates diff reports highlighting changes
