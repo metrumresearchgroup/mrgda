@@ -27,9 +27,6 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
   # Initialize to empty data frames
   out$diffs <- tibble::tribble(~name, ~value)
 
-  out$subject_diffs <-
-    tibble::tribble(~SUBJECT, ~VARIABLE, ~BASE, ~COMPARE,~`N Occurrences`)
-
   # Diffs across entire data ------------------------------------------------
   full_diff <- suppressMessages(
     diffdf::diffdf(
@@ -108,7 +105,6 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
   if(is.null(.subject_col)){
 
     out$diffs <- print_diffs
-    out$subject_diffs <- NULL
     out$value_diffs <- diffdf_value_changes_to_df(full_diff)
 
     print(
@@ -160,79 +156,6 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
     )
   )
 
-
-  # Clear out NUM -----------------------------------------------------------
-  .base_df[["NUM"]] <- NULL
-  .compare_df[["NUM"]] <- NULL
-  names_in_common <- names_in_common[names_in_common != "NUM"]
-
-  # Diffs by id -------------------------------------------------------------
-  id_diffs <- list()
-  ids <- unique(dplyr::intersect(.base_df[[.subject_col]], .compare_df[[.subject_col]]))
-  cli::cli_progress_bar("Checking data differences", total = length(ids))
-
-  for (id.i in ids) {
-
-    cli::cli_progress_update()
-
-    base_df.i <-
-      .base_df[.base_df[[.subject_col]] == id.i, ] %>%
-      dplyr::select(dplyr::all_of(names_in_common))
-
-    compare_df.i <-
-      .compare_df[.compare_df[[.subject_col]] == id.i, ] %>%
-      dplyr::select(dplyr::all_of(names_in_common))
-
-    # If they are identical (we do not care if attributes are different),
-    # skip the diffdf check to save time
-    all_equal.i <- all.equal(
-      target = base_df.i,
-      current = compare_df.i,
-      check.attributes = FALSE
-    )
-
-    if (!isTRUE(all_equal.i)) {
-
-      diff.i <-
-        suppressMessages(
-          diffdf::diffdf(
-            base = base_df.i,
-            compare = compare_df.i,
-            suppress_warnings = TRUE,
-            strict_numeric = FALSE,
-            strict_factor = FALSE
-          )
-        )
-
-      if (length(diff.i) > 0) {
-        id_diffs[[as.character(id.i)]] <- diff.i
-      }
-
-      rm(diff.i)
-
-    }
-
-    rm(all_equal.i)
-
-  }
-
-  cli::cli_progress_done()
-
-  if (length(id_diffs) > 0) {
-
-    id_diffs_out <- purrr::map_dfr(id_diffs, diffdf_value_changes_to_df, .id = .subject_col)
-
-    if (nrow(id_diffs_out) > 0) {
-
-      out$subject_diffs <-
-        id_diffs_out %>%
-        dplyr::mutate_all(as.character) %>%
-        dplyr::group_by(!!sym(.subject_col), VARIABLE, BASE, COMPARE) %>%
-        dplyr::summarise(`N Occurrences` = dplyr::n()) %>%
-        suppressMessages() %>%
-        dplyr::ungroup()
-    }
-  }
 
   return(out)
 }

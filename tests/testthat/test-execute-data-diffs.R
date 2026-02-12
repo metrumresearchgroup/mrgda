@@ -30,21 +30,9 @@ test_that("The function identifies and outputs differences", {
 })
 
 
-# 4. Test: The function properly identifies and outputs differences based on IDs.
-test_that("The function identifies and outputs differences based on IDs", {
-  diffs <- execute_data_diffs(.base_df, .compare_df, "ID")
-  id_diffs <- diffs$subject_diffs
-  expect_equal(nrow(id_diffs), 1)
-  expect_equal(id_diffs$ID[1], "3")
-  expect_equal(id_diffs$BASE[1], "2.5")
-  expect_equal(id_diffs$COMPARE[1], "3")
-})
-
-# 4. Test: The function properly identifies and outputs differences based on IDs.
 test_that("The function returns nothing if there are no diffs detected", {
   df <- execute_data_diffs(.base_df, .base_df, "ID")
   expect_true(nrow(df$diffs) == 0)
-  expect_true(nrow(df$subject_diffs) == 0)
   expect_message(execute_data_diffs(.base_df, .base_df, "ID"), "No diffs since last version found")
 })
 
@@ -54,7 +42,6 @@ test_that("The function works if .suject_col is NULL", {
   lst <- execute_data_diffs(.base_df2, .compare_df2, .subject_col = NULL)
   expect_false(rlang::is_empty(lst$diffs))
   expect_equal(lst$value_diffs$BASE[1], "2.5")
-  expect_true(is.null(lst$subject_diffs))
 
   x <-  try(execute_data_diffs(.base_df2, .compare_df2, .subject_col = "ID"), silent = TRUE)
 

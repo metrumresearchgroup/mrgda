@@ -109,11 +109,6 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
       x = diffs$diffs,
       file = file.path(.meta_data_folder, 'diffs.csv')
     )
-
-    write_csv_dots(
-      x = diffs$subject_diffs,
-      file = file.path(.meta_data_folder, 'subject-diffs.csv')
-    )
   }
 
   cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))
