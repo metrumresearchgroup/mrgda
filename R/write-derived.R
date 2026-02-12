@@ -8,7 +8,6 @@
 #' @param .spec a yspec object
 #' @param .file csv file name to write out to (including path)
 #' @param .subject_col subject column name (defaults to ID)
-#' @param .comment explanation of data
 #' @param .prev_file csv file name of previous version (defaults to .file)
 #' @param .compare_from_svn logical. Should the data comparison be done on the latest svn version? (If not, local version is used)
 #' @param .return_base_compare logical. Should the two current and previous versions of the datasets be returned?
@@ -21,7 +20,7 @@
 #'}
 #' @md
 #' @export
-write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "ID", .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
+write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
 
   if (tools::file_ext(.file) != "csv") {
     stop("'.file' must reference a 'csv' file")
@@ -56,18 +55,6 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
   .data_location <- dirname(.file)
   .data_name <- tools::file_path_sans_ext(basename(.file))
   .meta_data_folder <- file.path(.data_location, .data_name)
-
-  .cur_history <- tryCatch(
-    read_csv_dots(file.path(.meta_data_folder, "history.csv")),
-    error = identity
-  )
-
-  if (inherits(.cur_history, "error")) {
-    .cur_history <- dplyr::tibble()
-  } else {
-    .cur_history <- .cur_history %>% dplyr::mutate_all(as.character)
-    .cur_history[is.na(.cur_history)] <- ""
-  }
 
   # Create directory anew if it exists
   if (dir.exists(.meta_data_folder)) {
@@ -106,11 +93,6 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
     stop("Defined .subject_col '", .subject_col, "' not found in data")
   }
 
-  # Determine and write out subject columns ---------------------------------
-  subject_columns <- identify_subject_cols(.df = .data, .subject_col = .subject_col)
-
-  yaml::write_yaml(subject_columns, file = file.path(.meta_data_folder, "subject-columns.yml"))
-
   # Execute data diffs ------------------------------------------------------
   compare_df <- read_csv_dots(.file)
 
@@ -127,67 +109,7 @@ write_derived <- function(.data, .spec, .file, .comment = NULL, .subject_col = "
       x = diffs$diffs,
       file = file.path(.meta_data_folder, 'diffs.csv')
     )
-
-    write_csv_dots(
-      x = diffs$subject_diffs,
-      file = file.path(.meta_data_folder, 'subject-diffs.csv')
-    )
   }
-
-
-  # Store system info -------------------------------------------------------
-  .sys_info <- Sys.info()
-  .r_version <- R.Version()
-  .sys_time <- Sys.time()
-
-  .sys_print <- list(
-    User = .sys_info[['user']],
-    Datetime = as.character(.sys_time),
-    `R Version` = .r_version$version.string,
-    Release = .sys_info[['release']],
-    Version = .sys_info[['version']]
-  )
-
-  yaml::write_yaml(.sys_print, file = file.path(.meta_data_folder, "sys-info.yml"))
-
-
-  # Determine and save dependencies -----------------------------------------
-  rstudio_proj <- tryCatch(
-    rprojroot::find_rstudio_root_file(),
-    error = identity
-  )
-
-  if (!inherits(rstudio_proj, "error")) {
-    dependencies <-
-      find_in_files(.paths = c(
-        file.path(rstudio_proj, "script"),
-        file.path(rstudio_proj, "model")
-      ),
-      .string = basename(.file))
-
-    yaml::write_yaml(dependencies, file = file.path(.meta_data_folder, "dependencies.yml"))
-  }
-
-
-  # Update history ----------------------------------------------------------
-
-  # Protect against commas in comment
-  if (!is.null(.comment)) {
-    .comment <- gsub(",", " ", .comment, fixed=TRUE)
-  }
-
-  .history <-
-    gather_data_history(
-      .cur_data = .data,
-      .cur_history = .cur_history,
-      .comment = .comment,
-      .prev_rev = base_df_list$prev_rev
-    )
-
-  write_csv_dots(
-    x = .history,
-    file = file.path(.meta_data_folder, 'history.csv')
-  )
 
   cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))
   cli::cli_alert(paste0("Metadata folder: ", cli::col_blue(tools::file_path_as_absolute(.meta_data_folder))))
