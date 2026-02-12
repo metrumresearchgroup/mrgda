@@ -404,7 +404,7 @@ The `write_derived()` function is responsible for exporting your final, processe
     * **XPT file**: An FDA-style XPT version of the dataset (using `haven::write_xpt`).
     * **`spec-list.yml`**: A YAML file containing the data specification (derived from the `yspec` object).
     * **Define-XML**: Rendered HTML and PDF versions of the data definition (using `yspec::render_fda_define`).
-    * **`diffs.csv` & `subject-diffs.csv`**: If a previous version of the dataset is available (either locally or from SVN, controlled by `.compare_from_svn`), it generates diff reports highlighting changes between versions.
+    * **`diffs.csv`**: If a previous version of the dataset is available (either locally or from SVN, controlled by `.compare_from_svn`), it generates diff reports highlighting changes between versions.
 * **Versioning & Comparison**:
     * `.prev_file`: Path to the previous version of the CSV file (defaults to `.file` if not specified).
     * `.compare_from_svn`: Logical; if `TRUE`, it compares against the latest SVN version of `.prev_file`.
