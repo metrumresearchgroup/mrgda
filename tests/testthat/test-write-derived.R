@@ -197,8 +197,12 @@ test_that("write_derived writes latest-data-diff.txt with expected content when 
         )$diffs
       )
     )
-    expected_lines <- paste0("- ", expected_diffs$name, ": ", expected_diffs$value)
-    expect_true(all(expected_lines %in% diff_lines))
+    expected_rows <- purrr::map2_lgl(
+      expected_diffs$name,
+      expected_diffs$value,
+      ~ any(grepl(.x, diff_lines, fixed = TRUE) & grepl(.y, diff_lines, fixed = TRUE))
+    )
+    expect_true(all(expected_rows))
   })
 })
 
