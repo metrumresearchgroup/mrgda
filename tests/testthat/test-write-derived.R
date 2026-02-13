@@ -156,7 +156,7 @@ test_that("write_derived recreates legacy metadata folder when diffs.csv is pres
 
     expect_message(
       write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE),
-      regexp = "previous `write_derived\\(\\)` functionality"
+      regexp = "Legacy metadata format detected; recreating metadata folder"
     )
 
     expect_false(file.exists(legacy_diffs))

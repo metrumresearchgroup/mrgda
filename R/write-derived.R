@@ -60,10 +60,10 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
   .legacy_diffs_file <- file.path(.meta_data_folder, "diffs.csv")
 
   if (dir.exists(.meta_data_folder) && file.exists(.legacy_diffs_file)) {
-    cli::cli_alert_warning(c(
-      paste0("Legacy metadata detected in ", .meta_data_folder, "."),
-      "This metadata folder was created by previous `write_derived()` functionality (`diffs.csv` detected).",
-      "The metadata folder will be removed and recreated for backward compatibility."
+    cli::cli_alert_warning(paste0(
+      "Legacy metadata format detected; recreating metadata folder.\n",
+      "- Path: ", .meta_data_folder, "\n",
+      "- Reason: found legacy `diffs.csv` from previous `write_derived()` behavior."
     ))
     unlink(.meta_data_folder, recursive = TRUE)
   }
