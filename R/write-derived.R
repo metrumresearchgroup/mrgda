@@ -57,6 +57,7 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
   .data_location <- dirname(.file)
   .data_name <- tools::file_path_sans_ext(basename(.file))
   .meta_data_folder <- file.path(.data_location, .data_name)
+  # One-time migration: legacy metadata used diffs.csv; if present, recreate folder.
   .legacy_diffs_file <- file.path(.meta_data_folder, "diffs.csv")
 
   if (dir.exists(.meta_data_folder) && file.exists(.legacy_diffs_file)) {
