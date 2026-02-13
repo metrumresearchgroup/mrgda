@@ -191,6 +191,10 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
     cli::cli_alert_info("No data/spec diffs detected; last-run-summary.txt not updated.")
   }
 
+  if (has_summary_diffs) {
+    writeLines("")
+  }
+
   cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))
   cli::cli_alert(paste0("Metadata folder: ", cli::col_blue(tools::file_path_as_absolute(.meta_data_folder))))
 
