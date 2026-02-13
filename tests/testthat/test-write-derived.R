@@ -60,7 +60,7 @@ test_that("write_derived skips xpt and define when csv and spec are unchanged", 
   })
 })
 
-test_that("write_derived keeps existing diffs.csv when there are no new diffs", {
+test_that("write_derived leaves diffs.csv untouched on unchanged re-run", {
   withr::with_tempdir({
     .csv <- paste0(getwd(), "/pk.csv")
     write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
@@ -76,7 +76,111 @@ test_that("write_derived keeps existing diffs.csv when there are no new diffs", 
     expect_true(file.exists(diffs_path))
     diffs_mtime <- file.mtime(diffs_path)
 
+    # Re-run with same data — nothing should be touched (no VCS diff)
     write_derived(.data = nm2, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
+
+    expect_true(file.exists(diffs_path))
+    expect_equal(file.mtime(diffs_path), diffs_mtime)
+  })
+})
+
+test_that("write_derived regenerates xpt and define when data changes", {
+  withr::with_tempdir({
+    .csv <- paste0(getwd(), "/pk.csv")
+    write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
+
+    .meta <- gsub(".csv", "", .csv, fixed = TRUE)
+    xpt_time <- file.mtime(file.path(.meta, "pk.xpt"))
+    Sys.sleep(1)
+
+    nm2 <- nm
+    nm2$WT[1] <- nm2$WT[1] + 1
+
+    write_derived(.data = nm2, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
+
+    expect_gt(file.mtime(file.path(.meta, "pk.xpt")), xpt_time)
+  })
+})
+
+test_that("write_derived also skips define document when unchanged", {
+  withr::with_tempdir({
+    .csv <- paste0(getwd(), "/pk.csv")
+    write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
+
+    .meta <- gsub(".csv", "", .csv, fixed = TRUE)
+    define_files <- list.files(.meta, pattern = "^define", full.names = TRUE)
+    skip_if(length(define_files) == 0, "define document was not rendered")
+    define_time <- file.mtime(define_files[1])
+    Sys.sleep(1)
+
+    write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
+
+    expect_equal(file.mtime(define_files[1]), define_time)
+  })
+})
+
+test_that("write_derived preserves existing files in metadata folder across unchanged runs", {
+  withr::with_tempdir({
+    .csv <- paste0(getwd(), "/pk.csv")
+    write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
+
+    .meta <- gsub(".csv", "", .csv, fixed = TRUE)
+    extra_file <- file.path(.meta, "extra-note.txt")
+    writeLines("keep me", extra_file)
+
+    write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
+
+    expect_true(file.exists(extra_file))
+    expect_equal(readLines(extra_file), "keep me")
+  })
+})
+
+test_that("write_derived writes diffs.csv with correct content when data changes", {
+  withr::with_tempdir({
+    .csv <- paste0(getwd(), "/pk.csv")
+    write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
+
+    nm2 <- nm
+    nm2$WT[1] <- nm2$WT[1] + 1
+
+    write_derived(.data = nm2, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
+
+    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "diffs.csv")
+    expect_true(file.exists(diffs_path))
+    diffs <- read_csv_dots(diffs_path)
+    expect_gt(nrow(diffs), 0)
+    # Diffs should mention the WT variable
+    expect_true(any(grepl("WT", diffs$name, ignore.case = TRUE) | grepl("WT", unlist(diffs), ignore.case = TRUE)))
+  })
+})
+
+test_that("write_derived leaves stale diffs.csv untouched when spec changes but data does not", {
+  withr::with_tempdir({
+    .csv <- paste0(getwd(), "/pk.csv")
+    write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
+
+    # Plant a stale diffs.csv (simulates leftover from old version or prior change)
+    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "diffs.csv")
+    writeLines("name,value", diffs_path)
+    expect_true(file.exists(diffs_path))
+    diffs_mtime <- file.mtime(diffs_path)
+
+    # Modify the spec (change a label) but keep data identical
+    nm_spec2 <- nm_spec
+    nm_spec2$WT$short <- "Modified Weight Label"
+
+    # spec-list.yml changes → .needs_update TRUE → diffs computed → empty → file not touched
+    write_derived(.data = nm, .spec = nm_spec2, .file = .csv, .compare_from_svn = FALSE) %>%
       suppressMessages()
 
     expect_true(file.exists(diffs_path))
