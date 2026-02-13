@@ -8,12 +8,13 @@
 #' @param .subject_col A string representing the column name to be used for subject-based differences.
 #'        Set to `NULL` for data frames not containing an subject column.
 #' @param .base_from_svn Logical. Was base df exported from svn?
+#' @param .print_output Logical. Should console output be printed?
 #'
 #' @return No return value, but this function will write files to the specified output directory
 #'         containing the differences between the input data frames.
 #'
 #' @export
-execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_svn = FALSE){
+execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_svn = FALSE, .print_output = TRUE){
 
   # Exit if no names in common ----------------------------------------------
   names_in_common <- dplyr::intersect(names(.base_df), names(.compare_df))
@@ -39,11 +40,15 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
   )
 
   if (length(full_diff) == 0) {
-    cli::cli_alert_info("No diffs since last version found")
+    if (.print_output) {
+      cli::cli_alert_info("No diffs since last version found")
+    }
     return(out)
   }
 
-  cli::cli_alert_info("Diffs since last version:")
+  if (.print_output) {
+    cli::cli_alert_info("Diffs since last version:")
+  }
 
   n_row_diff <- nrow(.compare_df) - nrow(.base_df)
 
@@ -107,16 +112,18 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
     out$diffs <- print_diffs
     out$value_diffs <- diffdf_value_changes_to_df(full_diff)
 
-    print(
-      cli::boxx(
-        padding = 0,
-        knitr::kable(
-          x = out$diffs,
-          align = 'c',
-          format = "simple"
+    if (.print_output) {
+      print(
+        cli::boxx(
+          padding = 0,
+          knitr::kable(
+            x = out$diffs,
+            align = 'c',
+            format = "simple"
+          )
         )
       )
-    )
+    }
     return(out)
   }
 
@@ -145,16 +152,18 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
   out$diffs <- print_diffs
 
 
-  print(
-    cli::boxx(
-      padding = 0,
-      knitr::kable(
-        x = print_diffs,
-        align = 'c',
-        format = "simple"
+  if (.print_output) {
+    print(
+      cli::boxx(
+        padding = 0,
+        knitr::kable(
+          x = print_diffs,
+          align = 'c',
+          format = "simple"
+        )
       )
     )
-  )
+  }
 
 
   return(out)
