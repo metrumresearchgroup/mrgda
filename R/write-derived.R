@@ -4,6 +4,10 @@
 #' This function will take a data frame in R and write it out to csv.
 #' It also creates a metadata folder, storing the xpt file along with other useful information.
 #'
+#' The csv and spec-list.yml are always written. The xpt, define document, and
+#' diffs are only regenerated when the csv or spec-list.yml content has changed,
+#' avoiding unnecessary diffs in version control from embedded timestamps.
+#'
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .file csv file name to write out to (including path)
@@ -45,33 +49,29 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
     cli::cli_abort(paste0("Comma found in following column(s):", paste(names(check_for_commas), collapse = ", ")))
   }
 
+  # Prepare Metadata Folder -------------------------------------------------
+  .data_location <- dirname(.file)
+  .data_name <- tools::file_path_sans_ext(basename(.file))
+  .meta_data_folder <- file.path(.data_location, .data_name)
+
+  # Capture checksums before any writes (for skip-if-unchanged logic)
+  old_csv_md5 <- if (file.exists(.file)) {
+    unname(tools::md5sum(.file))
+  }
+  old_spec_md5 <- if (file.exists(file.path(.meta_data_folder, "spec-list.yml"))) {
+    unname(tools::md5sum(file.path(.meta_data_folder, "spec-list.yml")))
+  }
+
   # Write Out New Version ---------------------------------------------------
   write_csv_dots(
     x = .data,
     file = .file
   )
 
-  # Prepare Metadata Folder -------------------------------------------------
-  .data_location <- dirname(.file)
-  .data_name <- tools::file_path_sans_ext(basename(.file))
-  .meta_data_folder <- file.path(.data_location, .data_name)
-
-  # Create directory anew if it exists
-  if (dir.exists(.meta_data_folder)) {
-    unlink(.meta_data_folder, recursive = TRUE)
+  if (!dir.exists(.meta_data_folder)) {
+    dir.create(.meta_data_folder)
   }
 
-  dir.create(.meta_data_folder)
-
-  # Write Out Metadata ------------------------------------------------------
-  haven::write_xpt(
-    data = yspec::ys_add_labels(.data, .spec),
-    path = file.path(.meta_data_folder, paste0(.data_name, ".xpt")),
-    version = 5, # Use version 5
-    name = paste0("a", substr(gsub("[^[:alnum:]]", "", .data_name), 1, 7)) # Max of 8 chars
-  )
-
-  # Write out the spec
   .spec_list <-
     purrr::map(as.list(.spec), ~ {
       .x[intersect(c("short", "type", "unit", "values", "decode"), names(.x))]
@@ -79,14 +79,29 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
 
   yaml::write_yaml(.spec_list, file.path(.meta_data_folder, "spec-list.yml"))
 
-  # Try to render spec
-  silence_console_output(
-    yspec::render_fda_define(
-      x = .spec,
-      stem = "define",
-      output_dir = .meta_data_folder
+  # Skip XPT/define writes if CSV and spec are unchanged (avoids SVN diffs from timestamps)
+  .needs_update <- is.null(old_csv_md5) | is.null(old_spec_md5) |
+    !identical(old_csv_md5, unname(tools::md5sum(.file))) |
+    !identical(old_spec_md5, unname(tools::md5sum(file.path(.meta_data_folder, "spec-list.yml"))))
+
+  if (.needs_update) {
+    # Write Out Metadata ------------------------------------------------------
+    haven::write_xpt(
+      data = yspec::ys_add_labels(.data, .spec),
+      path = file.path(.meta_data_folder, paste0(.data_name, ".xpt")),
+      version = 5, # Use version 5
+      name = paste0("a", substr(gsub("[^[:alnum:]]", "", .data_name), 1, 7)) # Max of 8 chars
     )
-  )
+
+    # Try to render spec
+    silence_console_output(
+      yspec::render_fda_define(
+        x = .spec,
+        stem = "define",
+        output_dir = .meta_data_folder
+      )
+    )
+  }
 
   # Search for ID column
   if (!.subject_col %in% colnames(.data)) {
@@ -96,7 +111,7 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
   # Execute data diffs ------------------------------------------------------
   compare_df <- read_csv_dots(.file)
 
-  if (!is.null(base_df_list$base_df) & .execute_diffs) {
+  if (!is.null(base_df_list$base_df) & .execute_diffs & .needs_update) {
     diffs <-
       execute_data_diffs(
         .base_df = base_df_list$base_df,
@@ -105,10 +120,12 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
         .base_from_svn = base_df_list$from_svn
       )
 
-    write_csv_dots(
-      x = diffs$diffs,
-      file = file.path(.meta_data_folder, 'diffs.csv')
-    )
+    if (nrow(diffs$diffs) > 0) {
+      write_csv_dots(
+        x = diffs$diffs,
+        file = file.path(.meta_data_folder, 'diffs.csv')
+      )
+    }
   }
 
   cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))

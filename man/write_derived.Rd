@@ -35,6 +35,10 @@ write_derived(
 \description{
 This function will take a data frame in R and write it out to csv.
 It also creates a metadata folder, storing the xpt file along with other useful information.
+
+The csv and spec-list.yml are always written. The xpt, define document, and
+diffs are only regenerated when the csv or spec-list.yml content has changed,
+avoiding unnecessary diffs in version control from embedded timestamps.
 }
 \examples{
 \dontrun{
