@@ -24,6 +24,8 @@ build_run_summary_lines <- function(
       format = "simple"
     )
     summary_lines <- c(summary_lines, "", "Data changes:", data_diff_table)
+  } else {
+    summary_lines <- c(summary_lines, "", "Data changes:", "No data diffs detected.")
   }
 
   if (nrow(.spec_diff_rows) > 0) {
@@ -32,6 +34,8 @@ build_run_summary_lines <- function(
       format = "simple"
     )
     summary_lines <- c(summary_lines, "", "Spec changes:", spec_diff_table)
+  } else {
+    summary_lines <- c(summary_lines, "", "Spec changes:", "No spec diffs detected.")
   }
 
   summary_lines

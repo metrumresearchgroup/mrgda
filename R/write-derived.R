@@ -63,26 +63,42 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
   .data_name <- tools::file_path_sans_ext(basename(.file))
   .meta_data_folder <- file.path(.data_location, .data_name)
   .spec_list_file <- file.path(.meta_data_folder, "spec-list.yml")
-  # One-time migration: legacy metadata used diffs.csv; if present, recreate folder.
+  # LEGACY_ONLY: one-time migration from `diffs.csv` metadata layout.
+  # Remove this block after all projects are migrated.
   .legacy_diffs_file <- file.path(.meta_data_folder, "diffs.csv")
+  legacy_recreated <- FALSE
+  legacy_old_spec_md5 <- NULL
+  legacy_old_spec_list <- list()
 
   if (dir.exists(.meta_data_folder) && file.exists(.legacy_diffs_file)) {
+    if (file.exists(.spec_list_file)) {
+      legacy_old_spec_md5 <- unname(tools::md5sum(.spec_list_file))
+      legacy_old_spec_list <- yaml::read_yaml(.spec_list_file)
+      if (is.null(legacy_old_spec_list)) {
+        legacy_old_spec_list <- list()
+      }
+    }
+
     cli::cli_alert_warning("Legacy metadata format detected; recreating metadata folder.")
     unlink(.meta_data_folder, recursive = TRUE)
+    legacy_recreated <- TRUE
   }
 
   # Capture checksums before any writes (for skip-if-unchanged logic)
   old_csv_md5 <- if (file.exists(.file)) {
     unname(tools::md5sum(.file))
   }
-  old_spec_md5 <- if (file.exists(.spec_list_file)) {
-    unname(tools::md5sum(.spec_list_file))
+  old_spec_md5 <- legacy_old_spec_md5
+  old_spec_list <- legacy_old_spec_list
+
+  if (is.null(old_spec_md5) && file.exists(.spec_list_file)) {
+    old_spec_md5 <- unname(tools::md5sum(.spec_list_file))
   }
-  old_spec_list <- if (file.exists(.spec_list_file)) {
-    yaml::read_yaml(.spec_list_file)
-  } else {
-    list()
+
+  if (length(old_spec_list) == 0 && file.exists(.spec_list_file)) {
+    old_spec_list <- yaml::read_yaml(.spec_list_file)
   }
+
   if (is.null(old_spec_list)) {
     old_spec_list <- list()
   }
@@ -113,7 +129,7 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
   }
 
   # Skip XPT/define writes if CSV and spec are unchanged (avoids SVN diffs from timestamps)
-  .needs_update <- is.null(old_csv_md5) | is.null(old_spec_md5) |
+  .needs_update <- legacy_recreated | is.null(old_csv_md5) | is.null(old_spec_md5) |
     !identical(old_csv_md5, unname(tools::md5sum(.file))) |
     !identical(old_spec_md5, unname(tools::md5sum(.spec_list_file)))
 
