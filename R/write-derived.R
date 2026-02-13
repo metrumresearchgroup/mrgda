@@ -63,13 +63,12 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
   .data_name <- tools::file_path_sans_ext(basename(.file))
   .meta_data_folder <- file.path(.data_location, .data_name)
   .spec_list_file <- file.path(.meta_data_folder, "spec-list.yml")
-  # LEGACY_ONLY: one-time migration from `diffs.csv` metadata layout.
-  # Remove this block after all projects are migrated.
+  # One-time migration from `diffs.csv` metadata layout.
+  ### --- LEGACY CODE START (1)
   .legacy_diffs_file <- file.path(.meta_data_folder, "diffs.csv")
   legacy_recreated <- FALSE
   legacy_old_spec_md5 <- NULL
   legacy_old_spec_list <- list()
-
   if (dir.exists(.meta_data_folder) && file.exists(.legacy_diffs_file)) {
     if (file.exists(.spec_list_file)) {
       legacy_old_spec_md5 <- unname(tools::md5sum(.spec_list_file))
@@ -83,13 +82,16 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
     unlink(.meta_data_folder, recursive = TRUE)
     legacy_recreated <- TRUE
   }
+  ### --- LEGACY CODE END (1)
 
   # Capture checksums before any writes (for skip-if-unchanged logic)
   old_csv_md5 <- if (file.exists(.file)) {
     unname(tools::md5sum(.file))
   }
+  ### --- LEGACY CODE START (2)
   old_spec_md5 <- legacy_old_spec_md5
   old_spec_list <- legacy_old_spec_list
+  ### --- LEGACY CODE END (2)
 
   if (is.null(old_spec_md5) && file.exists(.spec_list_file)) {
     old_spec_md5 <- unname(tools::md5sum(.spec_list_file))
@@ -129,7 +131,11 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
   }
 
   # Skip XPT/define writes if CSV and spec are unchanged (avoids SVN diffs from timestamps)
-  .needs_update <- legacy_recreated | is.null(old_csv_md5) | is.null(old_spec_md5) |
+  .needs_update <-
+    ### --- LEGACY CODE START (3)
+    legacy_recreated |
+    ### --- LEGACY CODE END (3)
+    is.null(old_csv_md5) | is.null(old_spec_md5) |
     !identical(old_csv_md5, unname(tools::md5sum(.file))) |
     !identical(old_spec_md5, unname(tools::md5sum(.spec_list_file)))
 
