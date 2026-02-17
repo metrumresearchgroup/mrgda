@@ -231,7 +231,7 @@ test_that("write_derived rewrites last-run-summary.txt with spec changes when da
 
     diff_lines <- readLines(diffs_path)
     expect_true(any(grepl("^Spec changes:$", diff_lines)))
-    expect_true(any(grepl("Spec Updated: WT", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("Updated: WT", diff_lines, fixed = TRUE)))
     expect_true(any(grepl("short", diff_lines, fixed = TRUE)))
     expect_true(any(grepl("^Data changes:$", diff_lines)))
     expect_true(any(grepl("^No data diffs detected\\.$", diff_lines)))

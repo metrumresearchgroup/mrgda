@@ -176,6 +176,8 @@ write_derived <- function(
   # Spec and data diffs: run both whenever content changed
   spec_diff_rows <- tibble::tibble(name = character(), value = character())
   data_diff_rows <- tibble::tibble(name = character(), value = character())
+  data_standard_rows <- tibble::tibble(name = character(), value = character())
+  data_variable_rows <- tibble::tibble(name = character(), value = character())
   compare_df <- read_csv_dots(.file)
 
   if (.execute_diffs && .needs_update) {
@@ -196,6 +198,8 @@ write_derived <- function(
         .print_output = FALSE
       )
       data_diff_rows <- data_diffs$diffs
+      data_standard_rows <- data_diffs$standard_diffs
+      data_variable_rows <- data_diffs$variable_diffs
     }
   }
 
@@ -221,7 +225,8 @@ write_derived <- function(
     generated_at_fmt <- format(generated_at, "%Y-%m-%d %H:%M:%S %z")
 
     summary_lines <- build_run_summary_lines(
-      .data_diff_rows = data_diff_rows,
+      .data_standard_rows = data_standard_rows,
+      .data_variable_rows = data_variable_rows,
       .spec_diff_rows = spec_diff_rows,
       .baseline_info = baseline_info,
       .generated_at = generated_at,

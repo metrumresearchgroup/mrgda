@@ -1,6 +1,9 @@
 #' Build summary lines for write_derived output
 #'
-#' @param .data_diff_rows A two-column tibble (`name`, `value`) of data diffs.
+#' @param .data_standard_rows A two-column tibble (`name`, `value`) of standard
+#'   data diffs (Rows, Columns, Subjects).
+#' @param .data_variable_rows A two-column tibble (`name`, `value`) of
+#'   variable-specific data diffs (value changes, added/removed columns).
 #' @param .spec_diff_rows A two-column tibble (`name`, `value`) of spec diffs.
 #' @param .generated_at POSIXct time used in the summary header.
 #' @param .generated_by Username used in the summary header.
@@ -11,7 +14,8 @@
 #' @return A character vector of lines for console/file output.
 #' @noRd
 build_run_summary_lines <- function(
-    .data_diff_rows,
+    .data_standard_rows,
+    .data_variable_rows,
     .spec_diff_rows,
     .generated_at = Sys.time(),
     .generated_by = Sys.info()[["user"]],
@@ -26,12 +30,22 @@ build_run_summary_lines <- function(
     summary_lines <- c(summary_lines, paste0("Compared against: ", .baseline_info))
   }
 
-  if (nrow(.data_diff_rows) > 0) {
-    data_diff_table <- knitr::kable(
-      x = .data_diff_rows,
+  has_data_diffs <- nrow(.data_standard_rows) > 0 || nrow(.data_variable_rows) > 0
+
+  if (has_data_diffs) {
+    standard_table <- knitr::kable(
+      x = .data_standard_rows,
       format = "simple"
     )
-    summary_lines <- c(summary_lines, "", "Data changes:", data_diff_table)
+    summary_lines <- c(summary_lines, "", "Data changes:", standard_table)
+
+    if (nrow(.data_variable_rows) > 0) {
+      variable_table <- knitr::kable(
+        x = .data_variable_rows,
+        format = "simple"
+      )
+      summary_lines <- c(summary_lines, "", "Variable changes:", variable_table)
+    }
   } else {
     summary_lines <- c(summary_lines, "", "Data changes:", "No data diffs detected.")
   }

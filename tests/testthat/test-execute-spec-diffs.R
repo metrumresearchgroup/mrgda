@@ -17,9 +17,9 @@ test_that("execute_spec_diffs identifies added removed and updated spec content"
   out <- execute_spec_diffs(.base_spec, .compare_spec)
   diffs <- out$diffs
 
-  expect_true(any(diffs$name == "Spec Variables Added" & diffs$value == "AGE"))
-  expect_true(any(diffs$name == "Spec Variables Removed" & diffs$value == "ID"))
-  expect_true(any(diffs$name == "Spec Updated: WT" & grepl("short", diffs$value, fixed = TRUE)))
+  expect_true(any(diffs$name == "Added" & diffs$value == "AGE"))
+  expect_true(any(diffs$name == "Removed" & diffs$value == "ID"))
+  expect_true(any(diffs$name == "Updated: WT" & grepl("short", diffs$value, fixed = TRUE)))
 })
 
 test_that("execute_spec_diffs handles NULL inputs", {

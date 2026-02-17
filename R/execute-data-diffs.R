@@ -27,6 +27,8 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
 
   # Initialize to empty data frames
   out$diffs <- tibble::tribble(~name, ~value)
+  out$standard_diffs <- tibble::tibble(name = character(), value = character())
+  out$variable_diffs <- tibble::tibble(name = character(), value = character())
 
   # Diffs across entire data ------------------------------------------------
   full_diff <- suppressMessages(
@@ -50,98 +52,89 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
     cli::cli_alert_info("Diffs since last version:")
   }
 
-  n_row_diff <- nrow(.compare_df) - nrow(.base_df)
+  # ── Standard summary rows (Rows, Columns, Subjects) ─────────────────────
 
+  n_row_diff <- nrow(.compare_df) - nrow(.base_df)
   n_row_diff_msg <- dplyr::case_when(
     n_row_diff == 0 ~ "No change",
     n_row_diff < 0 ~ paste0(gsub("-", "", as.character(n_row_diff), fixed=TRUE), " removed"),
     n_row_diff > 0 ~ paste0(n_row_diff, " added")
   )
 
-  print_diffs <- tibble::tibble(
-    name = "Rows",
-    value = n_row_diff_msg
+  n_col_diff <- ncol(.compare_df) - ncol(.base_df)
+  n_col_diff_msg <- dplyr::case_when(
+    n_col_diff == 0 ~ "No change",
+    n_col_diff < 0 ~ paste0(gsub("-", "", as.character(n_col_diff), fixed=TRUE), " removed"),
+    n_col_diff > 0 ~ paste0(n_col_diff, " added")
   )
 
-  if (!is.null(full_diff$ExtColsBase)) {
+  standard_diffs <- tibble::tibble(
+    name = c("Rows", "Columns"),
+    value = c(n_row_diff_msg, n_col_diff_msg)
+  )
 
-    print_diffs <- dplyr::bind_rows(
-      print_diffs,
+  if (!is.null(.subject_col)) {
+    datas_have_id <- (.subject_col %in% names(.base_df)) &&
+      (.subject_col %in% names(.compare_df))
+
+    if (!datas_have_id) {
+      stop(glue::glue(
+        "The specified `.subject_col` ({.subject_col}) is not present in one or both of the data frames"
+      ))
+    }
+
+    n_id_diff <- length(unique(.compare_df[[.subject_col]])) -
+      length(unique(.base_df[[.subject_col]]))
+    n_id_diff_msg <- dplyr::case_when(
+      n_id_diff == 0 ~ "No change",
+      n_id_diff < 0 ~ paste0(gsub("-", "", as.character(n_id_diff), fixed=TRUE), " removed"),
+      n_id_diff > 0 ~ paste0(n_id_diff, " added")
+    )
+
+    standard_diffs <- dplyr::bind_rows(
+      standard_diffs,
+      tibble::tibble(name = "Subjects", value = n_id_diff_msg)
+    )
+  }
+
+  # ── Variable-specific rows ─────────────────────────────────────────────
+
+  variable_diffs <- tibble::tibble(name = character(), value = character())
+
+  if (!is.null(full_diff$ExtColsBase)) {
+    variable_diffs <- dplyr::bind_rows(
+      variable_diffs,
       tibble::tibble(
         name = "Removed Columns",
         value = paste(full_diff$ExtColsBase$COLUMNS, collapse = ", ")
       )
     )
-
   }
 
   if (!is.null(full_diff$ExtColsComp)) {
-
-    print_diffs <- dplyr::bind_rows(
-      print_diffs,
+    variable_diffs <- dplyr::bind_rows(
+      variable_diffs,
       tibble::tibble(
         name = "New Columns",
         value = paste(full_diff$ExtColsComp$COLUMNS, collapse = ", ")
       )
     )
-
   }
 
-
   if (!is.null(full_diff$NumDiff)) {
-
-    print_diffs <- dplyr::bind_rows(
-      print_diffs,
+    variable_diffs <- dplyr::bind_rows(
+      variable_diffs,
       full_diff$NumDiff %>%
         dplyr::transmute(name = Variable, value = paste0(`No of Differences`, " diffs"))
     )
   }
 
-
-  if(is.null(.subject_col)){
-
-    out$diffs <- print_diffs
-    out$value_diffs <- diffdf_value_changes_to_df(full_diff)
-
-    if (.print_output) {
-      print(
-        cli::boxx(
-          padding = 0,
-          knitr::kable(
-            x = out$diffs,
-            align = 'c',
-            format = "simple"
-          )
-        )
-      )
-    }
-    return(out)
-  }
-
-  datas_have_id <- (.subject_col %in% names(.base_df)) && (.subject_col %in% names(.compare_df))
-
-  if(!datas_have_id){
-    stop(glue::glue("The specified `.subject_col` ({.subject_col}) is not present in one or both of the data frames"))
-  }
-
-  n_id_diff <- length(unique(.compare_df[[.subject_col]])) - length(unique(.base_df[[.subject_col]]))
-
-  n_id_diff_msg <- dplyr::case_when(
-    n_id_diff == 0 ~ "No change",
-    n_id_diff < 0 ~ paste0(gsub("-", "", as.character(n_id_diff), fixed=TRUE), " removed"),
-    n_id_diff > 0 ~ paste0(n_id_diff, " added")
-  )
-
-  print_diffs <- dplyr::bind_rows(
-    print_diffs,
-    tibble::tibble(
-      name = "IDs",
-      value = n_id_diff_msg
-    )
-  )
-
+  print_diffs <- dplyr::bind_rows(standard_diffs, variable_diffs)
   out$diffs <- print_diffs
+  out$standard_diffs <- standard_diffs
+  out$variable_diffs <- variable_diffs
 
+  out$value_diffs <- diffdf_value_changes_to_df(full_diff)
 
   if (.print_output) {
     print(
@@ -155,7 +148,6 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
       )
     )
   }
-
 
   return(out)
 }

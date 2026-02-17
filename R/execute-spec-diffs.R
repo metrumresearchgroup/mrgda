@@ -36,7 +36,7 @@ execute_spec_diffs <- function(.base_spec, .compare_spec) {
     out$diffs <- dplyr::bind_rows(
       out$diffs,
       tibble::tibble(
-        name = "Spec Variables Added",
+        name = "Added",
         value = paste(added_spec_vars, collapse = ", ")
       )
     )
@@ -46,7 +46,7 @@ execute_spec_diffs <- function(.base_spec, .compare_spec) {
     out$diffs <- dplyr::bind_rows(
       out$diffs,
       tibble::tibble(
-        name = "Spec Variables Removed",
+        name = "Removed",
         value = paste(removed_spec_vars, collapse = ", ")
       )
     )
@@ -69,7 +69,7 @@ execute_spec_diffs <- function(.base_spec, .compare_spec) {
       }
 
       tibble::tibble(
-        name = paste0("Spec Updated: ", .var),
+        name = paste0("Updated: ", .var),
         value = paste(changed_fields, collapse = ", ")
       )
     }) %>%

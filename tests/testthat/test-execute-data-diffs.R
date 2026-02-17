@@ -24,9 +24,12 @@ test_that("The function identifies and outputs differences", {
   diffs <- diffs_list$diffs
   expect_equal(diffs$name[1], "Rows")
   expect_equal(diffs$value[1], "1 added")
-  expect_equal(diffs$name[2], "New Columns")
-  expect_equal(diffs$value[2], "C")
-  expect_equal(diffs$value[4], "1 added")
+  expect_equal(diffs$name[2], "Columns")
+  expect_equal(diffs$value[2], "1 added")
+  expect_equal(diffs$name[3], "Subjects")
+  expect_equal(diffs$value[3], "1 added")
+  expect_true(any(grepl("New Columns", diffs$name)))
+  expect_true(any(grepl("C", diffs$value)))
 })
 
 
@@ -80,7 +83,9 @@ test_that("execute_data_diffs works with removing columns", {
 
   diffs <- diffs_list3$diffs
   expect_equal(diffs$value[1], "1 removed")
-  expect_equal(diffs$name[2], "Removed Columns")
-  expect_equal(diffs$value[2], "C")
+  expect_equal(diffs$name[2], "Columns")
+  expect_equal(diffs$value[2], "1 removed")
+  expect_true(any(grepl("Removed Columns", diffs$name)))
+  expect_true(any(diffs$value == "C"))
 })
 
