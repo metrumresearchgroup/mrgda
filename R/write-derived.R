@@ -43,12 +43,22 @@ write_derived <- function(
   .return_base_compare = FALSE,
   .execute_diffs = TRUE
 ) {
-  # Input validation ---------------------------------------------------------
+
+  # Flow:
+  #   1. Validate inputs
+  #   2. Derive paths
+  #   3. Snapshot old state (baselines + md5s, before writing anything)
+  #   4. Write csv and spec-list (always)
+  #   5. Regenerate xpt and define (only when content changed)
+  #   6. Compute and report diffs
+  #   7. Return
+
+  # ── 1. Validate inputs ────────────────────────────────────────────────────
+
   if (tools::file_ext(.file) != "csv") {
     cli::cli_abort("{.arg .file} must reference a {.val csv} file")
   }
 
-  # Ensure data conforms to spec before writing anything
   spec_check <- yspec::ys_check(.data, .spec, error_on_fail = FALSE) %>%
     suppressMessages()
 
@@ -64,7 +74,6 @@ write_derived <- function(
     )
   }
 
-  # Commas in values would corrupt the csv output
   check_for_commas <- purrr::map(
     .data,
     ~ any(stringr::str_detect(string = .x, pattern = ","), na.rm = TRUE)
@@ -77,23 +86,17 @@ write_derived <- function(
     )
   }
 
-  # Retrieve the previous version of the data for diffing later.
-  # Uses svn or local copy depending on .compare_from_svn.
+  # ── 2. Derive paths ───────────────────────────────────────────────────────
+
   if (is.null(.prev_file)) {
     .prev_file <- .file
   }
-  base_df_list <- get_svn_baseline(.prev_file, .compare_from_svn)
-
-  # Derive paths -------------------------------------------------------------
-  # Metadata lives in a folder named after the csv (e.g. pk.csv -> pk/)
   .data_location <- dirname(.file)
   .data_name <- tools::file_path_sans_ext(basename(.file))
   .meta_data_folder <- file.path(.data_location, .data_name)
   .spec_list_file <- file.path(.meta_data_folder, "spec-list.yml")
 
-  # Legacy check -------------------------------------------------------------
-  # Older versions of this package stored diffs in a diffs.csv file.
-  # That format is no longer supported.
+  # Guard against legacy metadata format (diffs.csv)
   .legacy_diffs_file <- file.path(.meta_data_folder, "diffs.csv")
   if (dir.exists(.meta_data_folder) && file.exists(.legacy_diffs_file)) {
     .abs_meta <- tools::file_path_as_absolute(.meta_data_folder)
@@ -104,8 +107,13 @@ write_derived <- function(
     ))
   }
 
-  # Retrieve the previous version of the spec for diffing later.
-  # Uses svn or local copy depending on .compare_from_svn.
+  # ── 3. Snapshot old state ──────────────────────────────────────────────────
+  # Everything here runs BEFORE any files are written so we capture the
+  # previous version of both data and spec for diffing, plus md5 checksums
+  # to detect whether content actually changed after writing.
+
+  # Baselines for diffing (from SVN or local, depending on .compare_from_svn)
+  base_df_list <- get_svn_baseline(.prev_file, .compare_from_svn)
   base_spec_list <- get_svn_baseline(
     .prev_file = .spec_list_file,
     .compare_from_svn = .compare_from_svn,
@@ -113,9 +121,7 @@ write_derived <- function(
     .file_ext = ".yml"
   )
 
-  # Capture old state before any writes --------------------------------------
-  # Snapshot md5 checksums so we can detect changes after writing.
-  # NULL md5 means the file didn't exist yet (first run).
+  # md5 checksums (NULL = file doesn't exist yet, i.e. first run)
   old_csv_md5 <- if (file.exists(.file)) {
     unname(tools::md5sum(.file))
   }
@@ -123,38 +129,31 @@ write_derived <- function(
     unname(tools::md5sum(.spec_list_file))
   }
 
-  # Write csv and spec-list (always) -----------------------------------------
-  write_csv_dots(
-    x = .data,
-    file = .file
-  )
+  # ── 4. Write csv and spec-list (always) ────────────────────────────────────
+
+  write_csv_dots(x = .data, file = .file)
 
   if (!dir.exists(.meta_data_folder)) {
     dir.create(.meta_data_folder)
   }
 
-  # Extract only the spec fields we want to persist
   .spec_list <- purrr::map(
     as.list(.spec),
-    ~ {
-      .x[intersect(c("short", "type", "unit", "values", "decode"), names(.x))]
-    }
+    ~ .x[intersect(c("short", "type", "unit", "values", "decode"), names(.x))]
   )
 
   yaml::write_yaml(.spec_list, .spec_list_file)
 
-  # Determine if csv or spec changed -----------------------------------------
-  # Compare md5 checksums before and after writing. If either file is new
-  # (NULL md5) or its content changed, downstream artifacts need regenerating.
+  # ── 5. Regenerate xpt and define (only when content changed) ───────────────
+  # These files embed timestamps, so we skip regeneration when nothing changed
+  # to keep version-control diffs clean.
+
   .needs_update <-
     is.null(old_csv_md5) |
     is.null(old_spec_md5) |
     !identical(old_csv_md5, unname(tools::md5sum(.file))) |
     !identical(old_spec_md5, unname(tools::md5sum(.spec_list_file)))
 
-  # Write xpt and define (only when csv or spec changed) ---------------------
-  # These files contain embedded timestamps, so we only regenerate them when
-  # actual content changed to keep version control diffs clean.
   if (.needs_update) {
     haven::write_xpt(
       data = yspec::ys_add_labels(.data, .spec),
@@ -172,48 +171,62 @@ write_derived <- function(
     )
   }
 
-  # Execute diffs ------------------------------------------------------------
-  # Compare old vs new spec-list for added/removed/updated fields
-  spec_diff_rows <- tibble::tibble(name = character(), value = character())
-  if (!is.null(base_spec_list$base_df)) {
-    spec_diff_rows <- execute_spec_diffs(
-      .base_spec = base_spec_list$base_df,
-      .compare_spec = yaml::read_yaml(.spec_list_file)
-    )$diffs
-  }
+  # ── 6. Compute and report diffs ────────────────────────────────────────────
 
-  # Compare old vs new data for row/column/value changes
+  # Spec and data diffs: run both whenever content changed
+  spec_diff_rows <- tibble::tibble(name = character(), value = character())
+  data_diff_rows <- tibble::tibble(name = character(), value = character())
   compare_df <- read_csv_dots(.file)
 
-  data_diff_rows <- tibble::tibble(name = character(), value = character())
-  if (!is.null(base_df_list$base_df) && .execute_diffs && .needs_update) {
-    diffs <- execute_data_diffs(
-      .base_df = base_df_list$base_df,
-      .compare_df = compare_df,
-      .subject_col = .subject_col,
-      .base_from_svn = base_df_list$from_svn,
-      .print_output = FALSE
-    )
-    data_diff_rows <- diffs$diffs
+  if (.execute_diffs && .needs_update) {
+    if (!is.null(base_spec_list$base_df)) {
+      spec_diffs <- execute_spec_diffs(
+        .base_spec = base_spec_list$base_df,
+        .compare_spec = yaml::read_yaml(.spec_list_file)
+      )
+      spec_diff_rows <- spec_diffs$diffs
+    }
+
+    if (!is.null(base_df_list$base_df)) {
+      data_diffs <- execute_data_diffs(
+        .base_df = base_df_list$base_df,
+        .compare_df = compare_df,
+        .subject_col = .subject_col,
+        .base_from_svn = base_df_list$from_svn,
+        .print_output = FALSE
+      )
+      data_diff_rows <- data_diffs$diffs
+    }
   }
 
-  # Write summary ------------------------------------------------------------
-  # Print and save a human-readable summary of what changed. Only written
-  # when there are actual diffs to report.
+  # Build baseline info string for the summary header
+  baseline_info <- if (base_df_list$from_svn) {
+    parts <- paste0("SVN r", base_df_list$prev_rev)
+    if (!is.na(base_df_list$svn_author)) {
+      parts <- paste(parts, "by", base_df_list$svn_author)
+    }
+    if (!is.na(base_df_list$svn_date)) {
+      parts <- paste0(parts, " (", base_df_list$svn_date, ")")
+    }
+    parts
+  } else {
+    "local"
+  }
+
+  # Print and write summary (only when there are actual diffs)
   has_summary_diffs <- nrow(data_diff_rows) > 0 || nrow(spec_diff_rows) > 0
   if (has_summary_diffs) {
     summary_lines <- build_run_summary_lines(
       .data_diff_rows = data_diff_rows,
-      .spec_diff_rows = spec_diff_rows
+      .spec_diff_rows = spec_diff_rows,
+      .baseline_info = baseline_info
     )
 
     writeLines(summary_lines)
-
     writeLines(
       text = summary_lines,
       con = file.path(.meta_data_folder, "last-run-summary.txt")
     )
-
     writeLines("")
   } else {
     cli::cli_alert_info(
@@ -230,7 +243,8 @@ write_derived <- function(
     cli::col_blue(tools::file_path_as_absolute(.meta_data_folder))
   ))
 
-  # Return -------------------------------------------------------------------
+  # ── 7. Return ──────────────────────────────────────────────────────────────
+
   if (.return_base_compare) {
     return(
       list(

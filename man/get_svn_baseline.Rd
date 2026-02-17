@@ -21,9 +21,14 @@ get_svn_baseline(
 \item{.file_ext}{A string indicating the file extension for the temp file. Defaults to \code{".csv"}.}
 }
 \value{
-A list containing two elements: 'base_df' and 'from_svn'.
-'base_df' is the dataframe read from the file (or NULL if the file does not exist).
-'from_svn' is a boolean indicating whether the file was successfully exported from svn.
+A list containing:
+\itemize{
+\item \code{base_df}: the dataframe read from the file (or NULL if the file does not exist).
+\item \code{from_svn}: a boolean indicating whether the file was successfully exported from svn.
+\item \code{prev_rev}: the SVN revision number (or NA).
+\item \code{svn_author}: the last-changed author from SVN (or NA).
+\item \code{svn_date}: the last-changed date from SVN (or NA).
+}
 }
 \description{
 This function is used to get the base dataframe from a previous file or from an svn file.

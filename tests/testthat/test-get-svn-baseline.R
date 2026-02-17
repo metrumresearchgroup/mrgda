@@ -15,6 +15,13 @@ test_that("get_svn_baseline output check: returns FALSE for from_svn if .compare
   expect_false(result$from_svn)
 })
 
+# Test 3b: svn_author and svn_date should be NA when not comparing from SVN
+test_that("get_svn_baseline returns NA for svn_author and svn_date when not from SVN", {
+  result <- get_svn_baseline("test.csv", FALSE)
+  expect_true(is.na(result$svn_author))
+  expect_true(is.na(result$svn_date))
+})
+
 # Test 4: The function should return a data frame for base_df if the file exists
 test_that("get_svn_baseline output check: returns a data frame for base_df if the file exists", {
   # Create a test file
@@ -67,6 +74,8 @@ test_that("get_svn_baseline output check returns TRUE for from_svn if .compare_f
     result <- get_svn_baseline(file.path(svn_dir2, "df.csv"), TRUE)
     expect_true(result$from_svn)
     expect_true(all(result$base_df == mtcars))
+    expect_false(is.na(result$svn_author))
+    expect_false(is.na(result$svn_date))
   })
 
 
