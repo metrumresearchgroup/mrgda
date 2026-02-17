@@ -14,8 +14,8 @@
 #' The summary is printed to the console and written to last-run-summary.txt
 #' only when at least one data or spec diff exists.
 #'
-#' If a legacy metadata folder containing diffs.csv is detected, the metadata
-#' folder is removed and recreated before writing new outputs.
+#' If a legacy metadata folder containing diffs.csv is detected, an error is
+#' raised asking the user to delete the folder before re-running.
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
@@ -45,23 +45,26 @@ write_derived <- function(
 ) {
   # Input validation ---------------------------------------------------------
   if (tools::file_ext(.file) != "csv") {
-    stop("'.file' must reference a 'csv' file")
+    cli::cli_abort("{.arg .file} must reference a {.val csv} file")
   }
 
+  # Ensure data conforms to spec before writing anything
   spec_check <- yspec::ys_check(.data, .spec, error_on_fail = FALSE) %>%
     suppressMessages()
 
   if (!spec_check) {
-    stop(
-      "Spec check failed. Please run 'yspec::ys_check()' and ensure it passes.",
-      call. = FALSE
+    cli::cli_abort(
+      "Spec check failed. Please run {.fn yspec::ys_check} and ensure it passes."
     )
   }
 
   if (!.subject_col %in% colnames(.data)) {
-    stop("Defined .subject_col '", .subject_col, "' not found in data")
+    cli::cli_abort(
+      "Defined {.arg .subject_col} {.val {.subject_col}} not found in data"
+    )
   }
 
+  # Commas in values would corrupt the csv output
   check_for_commas <- purrr::map(
     .data,
     ~ any(stringr::str_detect(string = .x, pattern = ","), na.rm = TRUE)
@@ -69,53 +72,54 @@ write_derived <- function(
 
   check_for_commas <- check_for_commas[unlist(check_for_commas)]
   if (length(check_for_commas) > 0) {
-    cli::cli_abort(paste0(
-      "Comma found in following column(s):",
-      paste(names(check_for_commas), collapse = ", ")
-    ))
+    cli::cli_abort(
+      "Comma found in following column(s): {.val {names(check_for_commas)}}"
+    )
   }
 
-  # Base version for data diff -----------------------------------------------
-  .prev_file <- ifelse(is.null(.prev_file), .file, .prev_file)
-  base_df_list <- get_base_df(.prev_file, .compare_from_svn)
+  # Retrieve the previous version of the data for diffing later.
+  # Uses svn or local copy depending on .compare_from_svn.
+  if (is.null(.prev_file)) .prev_file <- .file
+  base_df_list <- get_svn_baseline(.prev_file, .compare_from_svn)
 
   # Derive paths -------------------------------------------------------------
+  # Metadata lives in a folder named after the csv (e.g. pk.csv -> pk/)
   .data_location <- dirname(.file)
   .data_name <- tools::file_path_sans_ext(basename(.file))
   .meta_data_folder <- file.path(.data_location, .data_name)
   .spec_list_file <- file.path(.meta_data_folder, "spec-list.yml")
 
+  # Legacy check -------------------------------------------------------------
+  # Older versions of this package stored diffs in a diffs.csv file.
+  # That format is no longer supported.
+  .legacy_diffs_file <- file.path(.meta_data_folder, "diffs.csv")
+  if (dir.exists(.meta_data_folder) && file.exists(.legacy_diffs_file)) {
+    .abs_meta <- tools::file_path_as_absolute(.meta_data_folder)
+    cli::cli_abort(c(
+      "The metadata folder uses an outdated format that is no longer supported.",
+      "i" = "Please delete it and re-run {.fn write_derived}.",
+      " " = '{.code fs::dir_delete("{(.abs_meta)}")}'
+    ))
+  }
+
+  # Retrieve the previous version of the spec for diffing later.
+  # Uses svn or local copy depending on .compare_from_svn.
+  base_spec_list <- get_svn_baseline(
+    .prev_file = .spec_list_file,
+    .compare_from_svn = .compare_from_svn,
+    .reader = yaml::read_yaml,
+    .file_ext = ".yml"
+  )
+
   # Capture old state before any writes --------------------------------------
-  # NULL md5 means the file did not exist, which forces a full update.
+  # Snapshot md5 checksums so we can detect changes after writing.
+  # NULL md5 means the file didn't exist yet (first run).
   old_csv_md5 <- if (file.exists(.file)) {
     unname(tools::md5sum(.file))
   }
   old_spec_md5 <- if (file.exists(.spec_list_file)) {
     unname(tools::md5sum(.spec_list_file))
   }
-
-  # Old spec content for spec diffing (must happen before legacy migration
-  # or spec rewrite).
-  old_spec_list <- if (file.exists(.spec_list_file)) {
-    yaml::read_yaml(.spec_list_file)
-  }
-  if (is.null(old_spec_list)) {
-    old_spec_list <- list()
-  }
-
-  # Legacy migration ---------------------------------------------------------
-  # One-time migration from `diffs.csv` metadata layout.
-  ### --- LEGACY CODE START
-  .legacy_diffs_file <- file.path(.meta_data_folder, "diffs.csv")
-  legacy_recreated <- FALSE
-  if (dir.exists(.meta_data_folder) && file.exists(.legacy_diffs_file)) {
-    cli::cli_alert_warning(
-      "Legacy metadata format detected; recreating metadata folder."
-    )
-    unlink(.meta_data_folder, recursive = TRUE)
-    legacy_recreated <- TRUE
-  }
-  ### --- LEGACY CODE END
 
   # Write csv and spec-list (always) -----------------------------------------
   write_csv_dots(
@@ -127,6 +131,7 @@ write_derived <- function(
     dir.create(.meta_data_folder)
   }
 
+  # Extract only the spec fields we want to persist
   .spec_list <- purrr::map(
     as.list(.spec),
     ~ {
@@ -137,14 +142,17 @@ write_derived <- function(
   yaml::write_yaml(.spec_list, .spec_list_file)
 
   # Determine if csv or spec changed -----------------------------------------
+  # Compare md5 checksums before and after writing. If either file is new
+  # (NULL md5) or its content changed, downstream artifacts need regenerating.
   .needs_update <-
-    legacy_recreated | ### LEGACY
     is.null(old_csv_md5) |
     is.null(old_spec_md5) |
     !identical(old_csv_md5, unname(tools::md5sum(.file))) |
     !identical(old_spec_md5, unname(tools::md5sum(.spec_list_file)))
 
   # Write xpt and define (only when csv or spec changed) ---------------------
+  # These files contain embedded timestamps, so we only regenerate them when
+  # actual content changed to keep version control diffs clean.
   if (.needs_update) {
     haven::write_xpt(
       data = yspec::ys_add_labels(.data, .spec),
@@ -163,18 +171,20 @@ write_derived <- function(
   }
 
   # Execute diffs ------------------------------------------------------------
+  # Compare old vs new spec-list for added/removed/updated fields
   spec_diff_rows <- tibble::tibble(name = character(), value = character())
-  if (!is.null(old_spec_md5)) {
+  if (!is.null(base_spec_list$base_df)) {
     spec_diff_rows <- execute_spec_diffs(
-      .base_spec = old_spec_list,
+      .base_spec = base_spec_list$base_df,
       .compare_spec = yaml::read_yaml(.spec_list_file)
     )$diffs
   }
 
+  # Compare old vs new data for row/column/value changes
   compare_df <- read_csv_dots(.file)
 
   data_diff_rows <- tibble::tibble(name = character(), value = character())
-  if (!is.null(base_df_list$base_df) & .execute_diffs & .needs_update) {
+  if (!is.null(base_df_list$base_df) && .execute_diffs && .needs_update) {
     diffs <- execute_data_diffs(
       .base_df = base_df_list$base_df,
       .compare_df = compare_df,
@@ -186,6 +196,8 @@ write_derived <- function(
   }
 
   # Write summary ------------------------------------------------------------
+  # Print and save a human-readable summary of what changed. Only written
+  # when there are actual diffs to report.
   has_summary_diffs <- nrow(data_diff_rows) > 0 || nrow(spec_diff_rows) > 0
   if (has_summary_diffs) {
     summary_lines <- build_run_summary_lines(

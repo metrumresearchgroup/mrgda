@@ -6,13 +6,15 @@
 #'
 #' @param .prev_file A string indicating the path of the previous file.
 #' @param .compare_from_svn A boolean flag to determine if the function should compare from svn.
+#' @param .reader A function used to read the file. Defaults to `read_csv_dots`.
+#' @param .file_ext A string indicating the file extension for the temp file. Defaults to `".csv"`.
 #'
 #' @return A list containing two elements: 'base_df' and 'from_svn'.
 #' 'base_df' is the dataframe read from the file (or NULL if the file does not exist).
 #' 'from_svn' is a boolean indicating whether the file was successfully exported from svn.
 #'
 #' @keywords internal
-get_base_df <- function(.prev_file, .compare_from_svn){
+get_svn_baseline <- function(.prev_file, .compare_from_svn, .reader = read_csv_dots, .file_ext = ".csv"){
 
   base <- .prev_file
   from_svn <- FALSE
@@ -24,7 +26,7 @@ get_base_df <- function(.prev_file, .compare_from_svn){
     on.exit(setwd(cur_dir))
     setwd(rprojroot::find_rstudio_root_file())
 
-    base_temp <- tempfile(fileext = ".csv")
+    base_temp <- tempfile(fileext = .file_ext)
 
     prev_rev <- try(
       system(paste0("svn info 2>/dev/null -r HEAD ", base, " | grep Revision | awk '{print $2}'"), intern = TRUE)
@@ -45,7 +47,7 @@ get_base_df <- function(.prev_file, .compare_from_svn){
 
   base_df <-
     if (file.exists(base)) {
-      read_csv_dots(base)
+      .reader(base)
     } else {
       NULL
     }

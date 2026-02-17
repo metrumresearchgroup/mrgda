@@ -142,33 +142,7 @@ test_that("write_derived preserves existing files in metadata folder across unch
   })
 })
 
-# LEGACY_ONLY: migration coverage for old metadata folders containing `diffs.csv`.
-test_that("write_derived recreates legacy metadata folder when diffs.csv is present", {
-  withr::with_tempdir({
-    .csv <- paste0(getwd(), "/pk.csv")
-    write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
-      suppressMessages()
-
-    .meta <- gsub(".csv", "", .csv, fixed = TRUE)
-    legacy_diffs <- file.path(.meta, "diffs.csv")
-    legacy_note <- file.path(.meta, "legacy-note.txt")
-    writeLines("name,value", legacy_diffs)
-    writeLines("legacy file", legacy_note)
-
-    expect_message(
-      write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE),
-      regexp = "Legacy metadata format detected; recreating metadata folder"
-    )
-
-    expect_false(file.exists(legacy_diffs))
-    expect_false(file.exists(legacy_note))
-    expect_true(file.exists(file.path(.meta, "spec-list.yml")))
-    expect_true(file.exists(file.path(.meta, "pk.xpt")))
-  })
-})
-
-# LEGACY_ONLY: ensure spec baseline is preserved during legacy metadata migration.
-test_that("write_derived retains legacy spec baseline for spec diffs during migration", {
+test_that("write_derived errors when legacy metadata folder with diffs.csv is present", {
   withr::with_tempdir({
     .csv <- paste0(getwd(), "/pk.csv")
     write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
@@ -177,19 +151,10 @@ test_that("write_derived retains legacy spec baseline for spec diffs during migr
     .meta <- gsub(".csv", "", .csv, fixed = TRUE)
     writeLines("name,value", file.path(.meta, "diffs.csv"))
 
-    nm_spec2 <- nm_spec
-    nm_spec2$WT$short <- "Modified Weight Label"
-
-    write_derived(.data = nm, .spec = nm_spec2, .file = .csv, .compare_from_svn = FALSE) %>%
-      suppressMessages()
-
-    summary_path <- file.path(.meta, "last-run-summary.txt")
-    expect_true(file.exists(summary_path))
-    summary_lines <- readLines(summary_path)
-    expect_true(any(grepl("^Spec changes:$", summary_lines)))
-    expect_true(any(grepl("Spec Updated: WT", summary_lines, fixed = TRUE)))
-    expect_true(any(grepl("short", summary_lines, fixed = TRUE)))
-    expect_true(file.exists(file.path(.meta, "pk.xpt")))
+    expect_error(
+      write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE),
+      regexp = "outdated format"
+    )
   })
 })
 
