@@ -22,11 +22,11 @@ temp_dir <- tempdir()
 test_that("The function identifies and outputs differences", {
   diffs_list <- execute_data_diffs(.base_df, .compare_df, "ID")
   diffs <- diffs_list$diffs
-  expect_equal(diffs$name[1], "N Rows Diff")
-  expect_equal(diffs$value[1], "1 row(s) added")
+  expect_equal(diffs$name[1], "Rows")
+  expect_equal(diffs$value[1], "1 added")
   expect_equal(diffs$name[2], "New Columns")
   expect_equal(diffs$value[2], "C")
-  expect_equal(diffs$value[5], "1 ID(s) added")
+  expect_equal(diffs$value[4], "1 added")
 })
 
 
@@ -79,7 +79,7 @@ test_that("execute_data_diffs works with removing columns", {
   diffs_list3 <- execute_data_diffs(.base_df3, .compare_df3, "ID")
 
   diffs <- diffs_list3$diffs
-  expect_equal(diffs$value[1], "1 row(s) removed")
+  expect_equal(diffs$value[1], "1 removed")
   expect_equal(diffs$name[2], "Removed Columns")
   expect_equal(diffs$value[2], "C")
 })

@@ -53,13 +53,13 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
   n_row_diff <- nrow(.compare_df) - nrow(.base_df)
 
   n_row_diff_msg <- dplyr::case_when(
-    n_row_diff == 0 ~ "No change in N rows",
-    n_row_diff < 0 ~ paste0(gsub("-", "", as.character(n_row_diff), fixed=TRUE), " row(s) removed"),
-    n_row_diff > 0 ~ paste0(n_row_diff, " row(s) added")
+    n_row_diff == 0 ~ "No change",
+    n_row_diff < 0 ~ paste0(gsub("-", "", as.character(n_row_diff), fixed=TRUE), " removed"),
+    n_row_diff > 0 ~ paste0(n_row_diff, " added")
   )
 
   print_diffs <- tibble::tibble(
-    name = "N Rows Diff",
+    name = "Rows",
     value = n_row_diff_msg
   )
 
@@ -93,18 +93,9 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
     print_diffs <- dplyr::bind_rows(
       print_diffs,
       full_diff$NumDiff %>%
-        dplyr::transmute(name = Variable, value = paste0("N Diffs: ", `No of Differences`))
+        dplyr::transmute(name = Variable, value = paste0(`No of Differences`, " diffs"))
     )
   }
-
-  print_diffs <- dplyr::bind_rows(
-    print_diffs,
-    tibble::tibble(
-      name = "Compare data from",
-      value = dplyr::if_else(.base_from_svn, "svn", "local")
-    )
-  )
-
 
 
   if(is.null(.subject_col)){
@@ -136,15 +127,15 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
   n_id_diff <- length(unique(.compare_df[[.subject_col]])) - length(unique(.base_df[[.subject_col]]))
 
   n_id_diff_msg <- dplyr::case_when(
-    n_id_diff == 0 ~ "No change in N IDs",
-    n_id_diff < 0 ~ paste0(gsub("-", "", as.character(n_id_diff), fixed=TRUE), " ID(s) removed"),
-    n_id_diff > 0 ~ paste0(n_id_diff, " ID(s) added")
+    n_id_diff == 0 ~ "No change",
+    n_id_diff < 0 ~ paste0(gsub("-", "", as.character(n_id_diff), fixed=TRUE), " removed"),
+    n_id_diff > 0 ~ paste0(n_id_diff, " added")
   )
 
   print_diffs <- dplyr::bind_rows(
     print_diffs,
     tibble::tibble(
-      name = "N IDs Diff",
+      name = "IDs",
       value = n_id_diff_msg
     )
   )
