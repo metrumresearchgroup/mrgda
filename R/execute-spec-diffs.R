@@ -56,7 +56,7 @@ execute_spec_diffs <- function(.base_spec, .compare_spec) {
   common_spec_vars <- intersect(base_vars, compare_vars)
 
   if (length(common_spec_vars) > 0) {
-    spec_field_updates <- purrr::map_dfr(common_spec_vars, function(.var) {
+    spec_field_updates <- purrr::map(common_spec_vars, function(.var) {
       old_var <- .base_spec[[.var]]
       new_var <- .compare_spec[[.var]]
 
@@ -72,7 +72,8 @@ execute_spec_diffs <- function(.base_spec, .compare_spec) {
         name = paste0("Spec Updated: ", .var),
         value = paste(changed_fields, collapse = ", ")
       )
-    })
+    }) %>%
+      purrr::list_rbind()
 
     out$diffs <- dplyr::bind_rows(out$diffs, spec_field_updates)
   }

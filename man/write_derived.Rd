@@ -43,8 +43,8 @@ embedded timestamps.
 
 last-run-summary.txt includes separate sections for data changes and
 spec-list changes (added/removed variables and updated spec fields).
-The same summary content is always printed to the console; the file is only
-overwritten when at least one data/spec diff exists.
+The summary is printed to the console and written to last-run-summary.txt
+only when at least one data or spec diff exists.
 
 If a legacy metadata folder containing diffs.csv is detected, the metadata
 folder is removed and recreated before writing new outputs.
