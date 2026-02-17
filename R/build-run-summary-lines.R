@@ -1,3 +1,33 @@
+#' Format a name-value tibble as indented, aligned lines
+#'
+#' @param .df A two-column tibble with `name` and `value` columns.
+#' @return A character vector of formatted lines.
+#' @noRd
+format_kv_lines <- function(.df) {
+  max_width <- max(nchar(.df$name))
+  paste0("  ", format(.df$name, width = max_width), "   ", .df$value)
+}
+
+#' Print a name-value tibble to console with cli styling
+#'
+#' Values of `"No change"` are dimmed; all other values are highlighted.
+#'
+#' @param .df A two-column tibble with `name` and `value` columns.
+#' @noRd
+print_styled_kv <- function(.df) {
+  max_width <- max(nchar(.df$name))
+  for (i in seq_len(nrow(.df))) {
+    padded_name <- format(.df$name[i], width = max_width)
+    val <- .df$value[i]
+    if (val == "No change") {
+      styled_val <- cli::style_dim(val)
+    } else {
+      styled_val <- cli::style_bold(cli::col_cyan(val))
+    }
+    cat(paste0("  ", padded_name, "   ", styled_val, "\n"))
+  }
+}
+
 #' Build summary lines for write_derived output
 #'
 #' @param .data_standard_rows A two-column tibble (`name`, `value`) of standard
@@ -33,29 +63,17 @@ build_run_summary_lines <- function(
   has_data_diffs <- nrow(.data_standard_rows) > 0 || nrow(.data_variable_rows) > 0
 
   if (has_data_diffs) {
-    standard_table <- knitr::kable(
-      x = .data_standard_rows,
-      format = "simple"
-    )
-    summary_lines <- c(summary_lines, "", "Data changes:", standard_table)
+    summary_lines <- c(summary_lines, "", "Data changes:", format_kv_lines(.data_standard_rows))
 
     if (nrow(.data_variable_rows) > 0) {
-      variable_table <- knitr::kable(
-        x = .data_variable_rows,
-        format = "simple"
-      )
-      summary_lines <- c(summary_lines, "", "Variable changes:", variable_table)
+      summary_lines <- c(summary_lines, "", "Variable changes:", format_kv_lines(.data_variable_rows))
     }
   } else {
     summary_lines <- c(summary_lines, "", "Data changes:", "No data diffs detected.")
   }
 
   if (nrow(.spec_diff_rows) > 0) {
-    spec_diff_table <- knitr::kable(
-      x = .spec_diff_rows,
-      format = "simple"
-    )
-    summary_lines <- c(summary_lines, "", "Spec changes:", spec_diff_table)
+    summary_lines <- c(summary_lines, "", "Spec changes:", format_kv_lines(.spec_diff_rows))
   } else {
     summary_lines <- c(summary_lines, "", "Spec changes:", "No spec diffs detected.")
   }

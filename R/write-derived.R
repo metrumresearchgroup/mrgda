@@ -234,6 +234,9 @@ write_derived <- function(
     )
 
     # Console output (styled with cli)
+    .abs_file <- tools::file_path_as_absolute(.file)
+    .abs_meta <- tools::file_path_as_absolute(.meta_data_folder)
+
     cat("\n")
     cli::cli_rule(cli::style_bold("write_derived summary"))
     cli::cli_text("{.strong Generated at:} {generated_at_fmt}")
@@ -241,17 +244,30 @@ write_derived <- function(
     if (!is.null(baseline_info)) {
       cli::cli_text("{.strong Compared against:} {baseline_info}")
     }
-    body_start <- which(summary_lines == "")[1]
-    writeLines(summary_lines[body_start:length(summary_lines)])
-    writeLines("")
-    cli::cli_alert_success(paste0(
-      "File written: ",
-      cli::col_blue(tools::file_path_as_absolute(.file))
-    ))
-    cli::cli_alert_success(paste0(
-      "Metadata folder: ",
-      cli::col_blue(tools::file_path_as_absolute(.meta_data_folder))
-    ))
+
+    has_data_diffs <- nrow(data_standard_rows) > 0 || nrow(data_variable_rows) > 0
+    if (has_data_diffs) {
+      cli::cli_h3("Data changes")
+      print_styled_kv(data_standard_rows)
+      if (nrow(data_variable_rows) > 0) {
+        cli::cli_h3("Variable changes")
+        print_styled_kv(data_variable_rows)
+      }
+    } else {
+      cli::cli_h3("Data changes")
+      cli::cli_text("{cli::style_dim('No data diffs detected.')}")
+    }
+
+    cli::cli_h3("Spec changes")
+    if (nrow(spec_diff_rows) > 0) {
+      print_styled_kv(spec_diff_rows)
+    } else {
+      cli::cli_text("{cli::style_dim('No spec diffs detected.')}")
+    }
+
+    cat("\n")
+    cli::cli_alert_success("File written: {.file {(.abs_file)}}")
+    cli::cli_alert_success("Metadata folder: {.file {(.abs_meta)}}")
     cli::cli_rule()
 
     # File output (plain text)
@@ -261,17 +277,14 @@ write_derived <- function(
     )
   } else {
     cat("\n")
+    .abs_file <- tools::file_path_as_absolute(.file)
+    .abs_meta <- tools::file_path_as_absolute(.meta_data_folder)
+
     cli::cli_rule(cli::style_bold("write_derived summary"))
     cli::cli_alert_info("No data/spec diffs detected; last-run-summary.txt not updated.")
-    writeLines("")
-    cli::cli_alert_success(paste0(
-      "File written: ",
-      cli::col_blue(tools::file_path_as_absolute(.file))
-    ))
-    cli::cli_alert_success(paste0(
-      "Metadata folder: ",
-      cli::col_blue(tools::file_path_as_absolute(.meta_data_folder))
-    ))
+    cat("\n")
+    cli::cli_alert_success("File written: {.file {(.abs_file)}}")
+    cli::cli_alert_success("Metadata folder: {.file {(.abs_meta)}}")
     cli::cli_rule()
   }
 
