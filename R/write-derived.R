@@ -79,7 +79,9 @@ write_derived <- function(
 
   # Retrieve the previous version of the data for diffing later.
   # Uses svn or local copy depending on .compare_from_svn.
-  if (is.null(.prev_file)) .prev_file <- .file
+  if (is.null(.prev_file)) {
+    .prev_file <- .file
+  }
   base_df_list <- get_svn_baseline(.prev_file, .compare_from_svn)
 
   # Derive paths -------------------------------------------------------------
