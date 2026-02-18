@@ -14,8 +14,8 @@
 #' The summary is printed to the console and written to last-run-summary.txt
 #' only when at least one data or spec diff exists.
 #'
-#' If a legacy metadata folder containing diffs.csv is detected, an error is
-#' raised asking the user to delete the folder before re-running.
+#' If a legacy metadata folder containing diffs.csv is detected, it is
+#' automatically removed and regenerated.
 #'
 #' @param .data a data frame
 #' @param .spec a yspec object
@@ -96,15 +96,11 @@ write_derived <- function(
   .meta_data_folder <- file.path(.data_location, .data_name)
   .spec_list_file <- file.path(.meta_data_folder, "spec-list.yml")
 
-  # Guard against legacy metadata format (diffs.csv)
+  # Remove legacy metadata folder (contained diffs.csv) and start fresh
   .legacy_diffs_file <- file.path(.meta_data_folder, "diffs.csv")
   if (dir.exists(.meta_data_folder) && file.exists(.legacy_diffs_file)) {
-    .abs_meta <- tools::file_path_as_absolute(.meta_data_folder)
-    cli::cli_abort(c(
-      "The metadata folder uses an outdated format that is no longer supported.",
-      "i" = "Please delete it and re-run {.fn write_derived}.",
-      " " = '{.code fs::dir_delete("{(.abs_meta)}")}'
-    ))
+    cli::cli_alert_info("Removing legacy metadata folder and regenerating.")
+    unlink(.meta_data_folder, recursive = TRUE)
   }
 
   # ── 3. Snapshot old state ──────────────────────────────────────────────────

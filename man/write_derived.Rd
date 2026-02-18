@@ -46,8 +46,8 @@ spec-list changes (added/removed variables and updated spec fields).
 The summary is printed to the console and written to last-run-summary.txt
 only when at least one data or spec diff exists.
 
-If a legacy metadata folder containing diffs.csv is detected, an error is
-raised asking the user to delete the folder before re-running.
+If a legacy metadata folder containing diffs.csv is detected, it is
+automatically removed and regenerated.
 }
 \examples{
 \dontrun{

@@ -142,7 +142,7 @@ test_that("write_derived preserves existing files in metadata folder across unch
   })
 })
 
-test_that("write_derived errors when legacy metadata folder with diffs.csv is present", {
+test_that("write_derived removes legacy metadata folder with diffs.csv and regenerates", {
   withr::with_tempdir({
     .csv <- paste0(getwd(), "/pk.csv")
     write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
@@ -151,10 +151,13 @@ test_that("write_derived errors when legacy metadata folder with diffs.csv is pr
     .meta <- gsub(".csv", "", .csv, fixed = TRUE)
     writeLines("name,value", file.path(.meta, "diffs.csv"))
 
-    expect_error(
+    expect_message(
       write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE),
-      regexp = "outdated format"
+      regexp = "legacy"
     )
+
+    expect_false(file.exists(file.path(.meta, "diffs.csv")))
+    expect_true(file.exists(file.path(.meta, "spec-list.yml")))
   })
 })
 
