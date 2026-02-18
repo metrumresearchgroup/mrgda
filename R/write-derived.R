@@ -93,6 +93,8 @@ write_derived <- function(
   .meta_data_folder <- file.path(.data_location, .data_name)
   .spec_list_file <- file.path(.meta_data_folder, "spec-list.yml")
 
+  cli::cli_rule("write_derived")
+
   # Remove legacy metadata folder (contained diffs.csv) and start fresh
   .legacy_diffs_file <- file.path(.meta_data_folder, "diffs.csv")
   if (dir.exists(.meta_data_folder) && file.exists(.legacy_diffs_file)) {
@@ -123,8 +125,6 @@ write_derived <- function(
   }
 
   # ── 4. Write csv and spec-list (always) ────────────────────────────────────
-
-  cli::cli_rule("write_derived")
 
   write_csv_dots(x = .data, file = .file)
 
