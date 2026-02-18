@@ -1,3 +1,19 @@
+#' Format a count with its diff as a parenthetical
+#'
+#' @param .current The current count.
+#' @param .diff The difference (current - baseline).
+#' @return A formatted string like `"1020 (No change)"` or `"19 (-1)"`.
+#' @noRd
+format_count_diff <- function(.current, .diff) {
+  if (.diff == 0) {
+    paste0(.current, " (No change)")
+  } else if (.diff > 0) {
+    paste0(.current, " (+", .diff, ")")
+  } else {
+    paste0(.current, " (", .diff, ")")
+  }
+}
+
 #' Execute Differences Between Data Frames
 #'
 #' This function executes the comparison of two data frames, generates
@@ -54,19 +70,15 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
 
   # ── Standard summary rows (Rows, Columns, Subjects) ─────────────────────
 
-  n_row_diff <- nrow(.compare_df) - nrow(.base_df)
-  n_row_diff_msg <- dplyr::case_when(
-    n_row_diff == 0 ~ "No change",
-    n_row_diff < 0 ~ paste0(gsub("-", "", as.character(n_row_diff), fixed=TRUE), " removed"),
-    n_row_diff > 0 ~ paste0(n_row_diff, " added")
-  )
+  n_base_rows <- nrow(.base_df)
+  n_comp_rows <- nrow(.compare_df)
+  n_row_diff <- n_comp_rows - n_base_rows
+  n_row_diff_msg <- format_count_diff(n_comp_rows, n_row_diff)
 
-  n_col_diff <- ncol(.compare_df) - ncol(.base_df)
-  n_col_diff_msg <- dplyr::case_when(
-    n_col_diff == 0 ~ "No change",
-    n_col_diff < 0 ~ paste0(gsub("-", "", as.character(n_col_diff), fixed=TRUE), " removed"),
-    n_col_diff > 0 ~ paste0(n_col_diff, " added")
-  )
+  n_base_cols <- ncol(.base_df)
+  n_comp_cols <- ncol(.compare_df)
+  n_col_diff <- n_comp_cols - n_base_cols
+  n_col_diff_msg <- format_count_diff(n_comp_cols, n_col_diff)
 
   standard_diffs <- tibble::tibble(
     name = c("Rows", "Columns"),
@@ -83,13 +95,10 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
       ))
     }
 
-    n_id_diff <- length(unique(.compare_df[[.subject_col]])) -
-      length(unique(.base_df[[.subject_col]]))
-    n_id_diff_msg <- dplyr::case_when(
-      n_id_diff == 0 ~ "No change",
-      n_id_diff < 0 ~ paste0(gsub("-", "", as.character(n_id_diff), fixed=TRUE), " removed"),
-      n_id_diff > 0 ~ paste0(n_id_diff, " added")
-    )
+    n_base_ids <- length(unique(.base_df[[.subject_col]]))
+    n_comp_ids <- length(unique(.compare_df[[.subject_col]]))
+    n_id_diff <- n_comp_ids - n_base_ids
+    n_id_diff_msg <- format_count_diff(n_comp_ids, n_id_diff)
 
     standard_diffs <- dplyr::bind_rows(
       standard_diffs,
