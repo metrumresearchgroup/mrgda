@@ -130,7 +130,9 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
     )
   }
 
-  if (!is.null(full_diff$NumDiff)) {
+  if (!is.null(full_diff$NumDiff) && n_row_diff == 0) {
+    # Row count unchanged — show per-column diff counts (meaningful edits)
+    # When rows change, per-column diffs are noise from row shifts
     variable_diffs <- dplyr::bind_rows(
       variable_diffs,
       full_diff$NumDiff %>%

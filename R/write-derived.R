@@ -235,44 +235,13 @@ write_derived <- function(
       .baseline_info = baseline_info
     )
 
-    # Console output (styled with cli)
+    # Console and file output
     .abs_file <- tools::file_path_as_absolute(.file)
-    .rule <- paste(rep("=", 65), collapse = "")
-    .thin_rule <- paste(rep("-", 65), collapse = "")
-    .lbl_width <- nchar("Comparing against:")
 
     cat("\n")
-    cat(paste0(.rule, "\n"))
-    cat(paste0("  ", cli::style_bold("WRITE DERIVED SUMMARY"), "\n"))
-    cat(paste0(.rule, "\n"))
-    cat(paste0("  ", cli::style_bold(format("Current:", width = .lbl_width)), "  ", current_info, "\n"))
-    cat(paste0("  ", cli::style_bold(format("Comparing against:", width = .lbl_width)), "  ", baseline_info, "\n"))
-    cat(paste0(.thin_rule, "\n"))
+    writeLines(summary_lines)
+    cat(paste0("  File written: ", .abs_file, "\n"))
 
-    has_data_diffs <- nrow(data_standard_rows) > 0 || nrow(data_variable_rows) > 0
-    if (has_data_diffs) {
-      cat(paste0("\n  ", cli::style_bold("DATA CHANGES"), "\n"))
-      print_styled_kv(data_standard_rows)
-      if (nrow(data_variable_rows) > 0) {
-        cat(paste0("\n  ", cli::style_bold("VARIABLE CHANGES"), "\n"))
-        print_styled_kv(data_variable_rows)
-      }
-    } else {
-      cat(paste0("\n  ", cli::style_bold("DATA CHANGES"), "\n"))
-      cat(paste0("    ", cli::style_dim("No data diffs detected."), "\n"))
-    }
-
-    cat(paste0("\n  ", cli::style_bold("SPEC CHANGES"), "\n"))
-    if (nrow(spec_diff_rows) > 0) {
-      print_styled_kv(spec_diff_rows)
-    } else {
-      cat(paste0("    ", cli::style_dim("No spec diffs detected."), "\n"))
-    }
-
-    cat(paste0("\n", .rule, "\n"))
-    cli::cli_alert_success("File written: {.file {(.abs_file)}}")
-
-    # File output (plain text)
     writeLines(
       text = summary_lines,
       con = file.path(.meta_data_folder, "last-run-summary.txt")
@@ -281,8 +250,8 @@ write_derived <- function(
     .abs_file <- tools::file_path_as_absolute(.file)
 
     cat("\n")
-    cli::cli_alert_info("No data/spec diffs detected; last-run-summary.txt not updated.")
-    cli::cli_alert_success("File written: {.file {(.abs_file)}}")
+    cat("No data/spec diffs detected; last-run-summary.txt not updated.\n")
+    cat(paste0("File written: ", .abs_file, "\n"))
   }
 
   # ── 7. Return ──────────────────────────────────────────────────────────────

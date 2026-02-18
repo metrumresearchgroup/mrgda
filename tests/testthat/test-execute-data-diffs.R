@@ -30,6 +30,9 @@ test_that("The function identifies and outputs differences", {
   expect_equal(diffs$value[3], "4 (+1)")
   expect_true(any(grepl("New Columns", diffs$name)))
   expect_true(any(grepl("C", diffs$value)))
+  # Rows changed — per-column value diffs suppressed (noise from row shifts)
+  expect_false(any(diffs$name == "Values changed"))
+  expect_false(any(grepl("diffs$", diffs$value)))
 })
 
 

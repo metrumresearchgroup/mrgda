@@ -8,26 +8,6 @@ format_kv_lines <- function(.df) {
   paste0("    ", format(.df$name, width = max_width), "   ", .df$value)
 }
 
-#' Print a name-value tibble to console with cli styling
-#'
-#' Values containing `"No change"` are dimmed; all other values are highlighted.
-#'
-#' @param .df A two-column tibble with `name` and `value` columns.
-#' @noRd
-print_styled_kv <- function(.df) {
-  max_width <- max(nchar(.df$name))
-  for (i in seq_len(nrow(.df))) {
-    padded_name <- format(.df$name[i], width = max_width)
-    val <- .df$value[i]
-    if (grepl("No change", val, fixed = TRUE)) {
-      styled_val <- cli::style_dim(val)
-    } else {
-      styled_val <- cli::style_bold(cli::col_cyan(val))
-    }
-    cat(paste0("    ", padded_name, "   ", styled_val, "\n"))
-  }
-}
-
 #' Build summary lines for write_derived output
 #'
 #' @param .data_standard_rows A two-column tibble (`name`, `value`) of standard
