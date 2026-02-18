@@ -18,15 +18,15 @@ test_that("build_run_summary_lines includes header and all sections when both di
     .data_standard_rows = standard_diffs,
     .data_variable_rows = variable_diffs,
     .spec_diff_rows = spec_diffs,
-    .current_info = "local by tester at 2026-01-02 03:04:05",
-    .baseline_info = "r120 by jsmith at 2026-01-15 10:30:45"
+    .current_info = "by tester at 2026-01-02 03:04:05",
+    .baseline_info = "by jsmith at 2026-01-15 10:30:45 (r120)"
   )
 
   expect_true(any(grepl("WRITE DERIVED SUMMARY", lines, fixed = TRUE)))
-  expect_true(any(grepl("Current:", lines, fixed = TRUE)))
-  expect_true(any(grepl("Comparing against:", lines, fixed = TRUE)))
-  expect_true(any(grepl("local by tester", lines, fixed = TRUE)))
-  expect_true(any(grepl("r120 by jsmith", lines, fixed = TRUE)))
+  expect_true(any(grepl("Local:", lines, fixed = TRUE)))
+  expect_true(any(grepl("Repository:", lines, fixed = TRUE)))
+  expect_true(any(grepl("by tester", lines, fixed = TRUE)))
+  expect_true(any(grepl("by jsmith", lines, fixed = TRUE)))
   expect_true(any(grepl("DATA CHANGES", lines, fixed = TRUE)))
   expect_true(any(grepl("VARIABLE CHANGES", lines, fixed = TRUE)))
   expect_true(any(grepl("SPEC CHANGES", lines, fixed = TRUE)))
@@ -47,14 +47,14 @@ test_that("build_run_summary_lines omits Variable changes section when no variab
     .data_standard_rows = standard_diffs,
     .data_variable_rows = empty_rows,
     .spec_diff_rows = empty_rows,
-    .current_info = "local by tester at 2026-01-02 03:04:05",
-    .baseline_info = "local by tester"
+    .current_info = "by tester at 2026-01-02 03:04:05",
+    .baseline_info = "by tester"
   )
 
   expect_true(any(grepl("DATA CHANGES", lines, fixed = TRUE)))
   expect_false(any(grepl("VARIABLE CHANGES", lines, fixed = TRUE)))
   expect_true(any(grepl("SPEC CHANGES", lines, fixed = TRUE)))
-  expect_true(any(grepl("No spec diffs detected", lines, fixed = TRUE)))
+  expect_true(any(grepl("No spec diffs found", lines, fixed = TRUE)))
 })
 
 test_that("build_run_summary_lines includes no-diff text when both inputs are empty", {
@@ -62,16 +62,16 @@ test_that("build_run_summary_lines includes no-diff text when both inputs are em
     .data_standard_rows = empty_rows,
     .data_variable_rows = empty_rows,
     .spec_diff_rows = empty_rows,
-    .current_info = "local by tester at 2026-01-02 03:04:05",
-    .baseline_info = "local by tester"
+    .current_info = "by tester at 2026-01-02 03:04:05",
+    .baseline_info = "by tester"
   )
 
-  expect_true(any(grepl("Current:", lines, fixed = TRUE)))
-  expect_true(any(grepl("Comparing against:", lines, fixed = TRUE)))
+  expect_true(any(grepl("Local:", lines, fixed = TRUE)))
+  expect_true(any(grepl("Repository:", lines, fixed = TRUE)))
   expect_true(any(grepl("DATA CHANGES", lines, fixed = TRUE)))
-  expect_true(any(grepl("No data diffs detected", lines, fixed = TRUE)))
+  expect_true(any(grepl("No data diffs found", lines, fixed = TRUE)))
   expect_true(any(grepl("SPEC CHANGES", lines, fixed = TRUE)))
-  expect_true(any(grepl("No spec diffs detected", lines, fixed = TRUE)))
+  expect_true(any(grepl("No spec diffs found", lines, fixed = TRUE)))
 })
 
 test_that("build_run_summary_lines includes baseline info", {
@@ -79,9 +79,9 @@ test_that("build_run_summary_lines includes baseline info", {
     .data_standard_rows = empty_rows,
     .data_variable_rows = empty_rows,
     .spec_diff_rows = empty_rows,
-    .current_info = "local by tester at 2026-01-02 03:04:05",
-    .baseline_info = "r120 by jsmith at 2026-01-15 10:30:45"
+    .current_info = "by tester at 2026-01-02 03:04:05",
+    .baseline_info = "by jsmith at 2026-01-15 10:30:45 (r120)"
   )
 
-  expect_true(any(grepl("r120 by jsmith", lines, fixed = TRUE)))
+  expect_true(any(grepl("by jsmith", lines, fixed = TRUE)))
 })

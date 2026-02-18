@@ -4,15 +4,12 @@
 #' This function will take a data frame in R and write it out to csv.
 #' It also creates a metadata folder, storing the xpt file along with other useful information.
 #'
-#' The csv and spec-list.yml are always written. The xpt, define document, and
-#' last-run-summary.txt are only regenerated when the csv or spec-list.yml
-#' content has changed, avoiding unnecessary diffs in version control from
-#' embedded timestamps.
+#' The csv and spec-list.yml are always written. The xpt and define document
+#' are only regenerated when the csv or spec-list.yml content has changed,
+#' avoiding unnecessary diffs in version control from embedded timestamps.
 #'
-#' last-run-summary.txt includes separate sections for data changes and
-#' spec-list changes (added/removed variables and updated spec fields).
-#' The summary is printed to the console and written to last-run-summary.txt
-#' only when at least one data or spec diff exists.
+#' Diffs are always computed against the baseline (SVN or local) and reported
+#' in last-run-summary.txt whenever at least one data or spec diff exists.
 #'
 #' If a legacy metadata folder containing diffs.csv is detected, it is
 #' automatically removed and regenerated.
@@ -128,6 +125,7 @@ write_derived <- function(
   # ── 4. Write csv and spec-list (always) ────────────────────────────────────
 
   write_csv_dots(x = .data, file = .file)
+  cli::cli_alert_success("csv written")
 
   if (!dir.exists(.meta_data_folder)) {
     dir.create(.meta_data_folder)
@@ -139,6 +137,7 @@ write_derived <- function(
   )
 
   yaml::write_yaml(.spec_list, .spec_list_file)
+  cli::cli_alert_success("spec-list.yml written")
 
   # ── 5. Regenerate xpt and define (only when content changed) ───────────────
   # These files embed timestamps, so we skip regeneration when nothing changed
@@ -165,18 +164,19 @@ write_derived <- function(
         output_dir = .meta_data_folder
       )
     )
+
+    cli::cli_alert_success("xpt and define regenerated (content changed)")
   }
 
   # ── 6. Compute and report diffs ────────────────────────────────────────────
 
-  # Spec and data diffs: run both whenever content changed
   spec_diff_rows <- tibble::tibble(name = character(), value = character())
   data_diff_rows <- tibble::tibble(name = character(), value = character())
   data_standard_rows <- tibble::tibble(name = character(), value = character())
   data_variable_rows <- tibble::tibble(name = character(), value = character())
   compare_df <- read_csv_dots(.file)
 
-  if (.execute_diffs && .needs_update) {
+  if (.execute_diffs) {
     if (!is.null(base_spec_list$base_df)) {
       spec_diffs <- execute_spec_diffs(
         .base_spec = base_spec_list$base_df,
@@ -198,7 +198,7 @@ write_derived <- function(
     }
   }
 
-  # Print and write summary (only when there are actual diffs)
+  # Print and write summary
   .abs_file <- tools::file_path_as_absolute(.file)
   has_summary_diffs <- nrow(data_diff_rows) > 0 || nrow(spec_diff_rows) > 0
 
@@ -207,20 +207,22 @@ write_derived <- function(
     generated_by <- Sys.info()[["user"]]
     generated_at_fmt <- format(generated_at, "%Y-%m-%d %H:%M:%S")
 
-    current_info <- paste0("local by ", generated_by, " at ", generated_at_fmt)
+    current_info <- paste0("by ", generated_by, " at ", generated_at_fmt)
 
     baseline_info <- if (base_df_list$from_svn) {
-      parts <- paste0("r", base_df_list$prev_rev)
+      parts <- "by "
       if (!is.na(base_df_list$svn_author)) {
-        parts <- paste0(parts, " by ", base_df_list$svn_author)
+        parts <- paste0(parts, base_df_list$svn_author)
+      } else {
+        parts <- paste0(parts, "unknown")
       }
       if (!is.na(base_df_list$svn_date)) {
         svn_date_clean <- sub(" [+-]\\d{4}$", "", base_df_list$svn_date)
         parts <- paste0(parts, " at ", svn_date_clean)
       }
-      parts
+      paste0(parts, " (r", base_df_list$prev_rev, ")")
     } else {
-      paste0("local by ", generated_by)
+      paste0("by ", generated_by)
     }
 
     summary_lines <- build_run_summary_lines(
@@ -233,17 +235,16 @@ write_derived <- function(
 
     cat("\n")
     writeLines(summary_lines)
-    cat(paste0("  File written: ", .abs_file, "\n"))
 
     writeLines(
       text = summary_lines,
       con = file.path(.meta_data_folder, "last-run-summary.txt")
     )
-  } else {
-    cat("\n")
-    cat("No data/spec diffs detected; last-run-summary.txt not updated.\n")
-    cat(paste0("File written: ", .abs_file, "\n"))
+  } else if (!.needs_update) {
+    cli::cli_alert_info("No changes found")
   }
+
+  cli::cli_alert_success("File: {.path {(.abs_file)}}")
 
   # ── 7. Return ──────────────────────────────────────────────────────────────
 

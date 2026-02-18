@@ -177,11 +177,11 @@ test_that("write_derived writes last-run-summary.txt with expected content when 
     expect_true(file.exists(diffs_path))
 
     diff_lines <- readLines(diffs_path)
-    expect_true(any(grepl("Current:", diff_lines, fixed = TRUE)))
-    expect_true(any(grepl("Comparing against:", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("Local:", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("Repository:", diff_lines, fixed = TRUE)))
     expect_true(any(grepl("DATA CHANGES", diff_lines, fixed = TRUE)))
     expect_true(any(grepl("SPEC CHANGES", diff_lines, fixed = TRUE)))
-    expect_true(any(grepl("No spec diffs detected", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("No spec diffs found", diff_lines, fixed = TRUE)))
 
     # Body should contain the same row content that would have been written to diffs.csv
     expected_diffs <- execute_data_diffs(
@@ -209,8 +209,8 @@ test_that("write_derived rewrites last-run-summary.txt with spec changes when da
     diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "last-run-summary.txt")
     writeLines(
       c(
-        "Current:            local by stale-user at 2026-01-01 00:00:00",
-        "Comparing against:  local by stale-user",
+        "Local:       by stale-user at 2026-01-01 00:00:00",
+        "Repository:  by stale-user",
         "",
         "- stale: stale"
       ),
@@ -236,11 +236,11 @@ test_that("write_derived rewrites last-run-summary.txt with spec changes when da
     expect_true(any(grepl("Updated: WT", diff_lines, fixed = TRUE)))
     expect_true(any(grepl("short", diff_lines, fixed = TRUE)))
     expect_true(any(grepl("DATA CHANGES", diff_lines, fixed = TRUE)))
-    expect_true(any(grepl("No data diffs detected", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("No data diffs found", diff_lines, fixed = TRUE)))
   })
 })
 
-test_that("write_derived does not recompute diffs when .needs_update is FALSE", {
+test_that("write_derived computes diffs even when csv is unchanged", {
   withr::with_tempdir({
     .csv <- paste0(getwd(), "/pk.csv")
     .prev <- paste0(getwd(), "/prev.csv")
@@ -248,18 +248,7 @@ test_that("write_derived does not recompute diffs when .needs_update is FALSE", 
     write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
       suppressMessages()
 
-    readr::write_csv(nm, .prev, na = ".")
-    write_derived(
-      .data = nm,
-      .spec = nm_spec,
-      .file = .csv,
-      .prev_file = .prev,
-      .compare_from_svn = FALSE
-    ) %>% suppressMessages()
-
-    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "last-run-summary.txt")
-    expect_false(file.exists(diffs_path))
-
+    # prev differs from current — diffs should be reported even though csv is unchanged
     nm_prev <- nm
     nm_prev$WT[1] <- nm_prev$WT[1] + 1
     readr::write_csv(nm_prev, .prev, na = ".")
@@ -272,7 +261,11 @@ test_that("write_derived does not recompute diffs when .needs_update is FALSE", 
       .compare_from_svn = FALSE
     ) %>% suppressMessages()
 
-    expect_false(file.exists(diffs_path))
+    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "last-run-summary.txt")
+    expect_true(file.exists(diffs_path))
+
+    diff_lines <- readLines(diffs_path)
+    expect_true(any(grepl("DATA CHANGES", diff_lines, fixed = TRUE)))
   })
 })
 

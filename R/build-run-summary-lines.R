@@ -15,9 +15,9 @@ format_kv_lines <- function(.df) {
 #' @param .data_variable_rows A two-column tibble (`name`, `value`) of
 #'   variable-specific data diffs (value changes, added/removed columns).
 #' @param .spec_diff_rows A two-column tibble (`name`, `value`) of spec diffs.
-#' @param .current_info Character string describing the current run
-#'   (e.g. `"local by anderson at 2026-02-17 18:54:01"`).
-#' @param .baseline_info Character string describing the baseline
+#' @param .current_info Character string describing the local version
+#'   (e.g. `"andersone at 2026-02-17 18:54:01"`).
+#' @param .baseline_info Character string describing the repository version
 #'   (e.g. `"r255 by andersone at 2026-01-28 11:45:21"`).
 #'
 #' @return A character vector of lines for console/file output.
@@ -32,13 +32,13 @@ build_run_summary_lines <- function(
   rule <- paste(rep("=", 65), collapse = "")
   thin_rule <- paste(rep("-", 65), collapse = "")
 
-  lbl_width <- nchar("Comparing against:")
+  lbl_width <- nchar("Repository:")
   header <- c(
     rule,
     "  WRITE DERIVED SUMMARY",
     rule,
-    paste0("  ", format("Current:", width = lbl_width), "  ", .current_info),
-    paste0("  ", format("Comparing against:", width = lbl_width), "  ", .baseline_info),
+    paste0("  ", format("Local:", width = lbl_width), "  ", .current_info),
+    paste0("  ", format("Repository:", width = lbl_width), "  ", .baseline_info),
     thin_rule
   )
 
@@ -52,13 +52,13 @@ build_run_summary_lines <- function(
       body <- c(body, "", "  VARIABLE CHANGES", format_kv_lines(.data_variable_rows))
     }
   } else {
-    body <- c(body, "", "  DATA CHANGES", "    No data diffs detected.")
+    body <- c(body, "", "  DATA CHANGES", "    No data diffs found.")
   }
 
   if (nrow(.spec_diff_rows) > 0) {
     body <- c(body, "", "  SPEC CHANGES", format_kv_lines(.spec_diff_rows))
   } else {
-    body <- c(body, "", "  SPEC CHANGES", "    No spec diffs detected.")
+    body <- c(body, "", "  SPEC CHANGES", "    No spec diffs found.")
   }
 
   c(header, body, "", rule)
