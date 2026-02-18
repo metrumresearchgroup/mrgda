@@ -124,6 +124,8 @@ write_derived <- function(
 
   # ── 4. Write csv and spec-list (always) ────────────────────────────────────
 
+  cli::cli_rule("write_derived")
+
   write_csv_dots(x = .data, file = .file)
 
   if (!dir.exists(.meta_data_folder)) {
@@ -254,6 +256,7 @@ write_derived <- function(
 
   .rel_file <- fs::path_rel(.abs_file)
   cli::cli_alert_success("Derived dataset: {.path {(.rel_file)}}")
+  cli::cli_rule()
 
   # ── 7. Return ──────────────────────────────────────────────────────────────
 
