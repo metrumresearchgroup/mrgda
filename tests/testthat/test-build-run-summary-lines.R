@@ -22,16 +22,19 @@ test_that("build_run_summary_lines includes header and all sections when both di
     .baseline_info = "r120 by jsmith at 2026-01-15 10:30:45"
   )
 
+  expect_true(any(grepl("WRITE DERIVED SUMMARY", lines, fixed = TRUE)))
   expect_true(any(grepl("Current:", lines, fixed = TRUE)))
   expect_true(any(grepl("Comparing against:", lines, fixed = TRUE)))
   expect_true(any(grepl("local by tester", lines, fixed = TRUE)))
   expect_true(any(grepl("r120 by jsmith", lines, fixed = TRUE)))
-  expect_true(any(grepl("^Data changes:$", lines)))
-  expect_true(any(grepl("^Variable changes:$", lines)))
-  expect_true(any(grepl("^Spec changes:$", lines)))
+  expect_true(any(grepl("DATA CHANGES", lines, fixed = TRUE)))
+  expect_true(any(grepl("VARIABLE CHANGES", lines, fixed = TRUE)))
+  expect_true(any(grepl("SPEC CHANGES", lines, fixed = TRUE)))
   expect_true(any(grepl("Rows", lines, fixed = TRUE)))
   expect_true(any(grepl("WT", lines, fixed = TRUE)))
   expect_true(any(grepl("Updated: WT", lines, fixed = TRUE)))
+  # Should have === borders
+  expect_true(any(grepl("^=+$", lines)))
 })
 
 test_that("build_run_summary_lines omits Variable changes section when no variable diffs", {
@@ -48,10 +51,10 @@ test_that("build_run_summary_lines omits Variable changes section when no variab
     .baseline_info = "local by tester"
   )
 
-  expect_true(any(grepl("^Data changes:$", lines)))
-  expect_false(any(grepl("^Variable changes:$", lines)))
-  expect_true(any(grepl("^Spec changes:$", lines)))
-  expect_true(any(grepl("^No spec diffs detected\\.$", lines)))
+  expect_true(any(grepl("DATA CHANGES", lines, fixed = TRUE)))
+  expect_false(any(grepl("VARIABLE CHANGES", lines, fixed = TRUE)))
+  expect_true(any(grepl("SPEC CHANGES", lines, fixed = TRUE)))
+  expect_true(any(grepl("No spec diffs detected", lines, fixed = TRUE)))
 })
 
 test_that("build_run_summary_lines includes no-diff text when both inputs are empty", {
@@ -65,10 +68,10 @@ test_that("build_run_summary_lines includes no-diff text when both inputs are em
 
   expect_true(any(grepl("Current:", lines, fixed = TRUE)))
   expect_true(any(grepl("Comparing against:", lines, fixed = TRUE)))
-  expect_true(any(grepl("^Data changes:$", lines)))
-  expect_true(any(grepl("^No data diffs detected\\.$", lines)))
-  expect_true(any(grepl("^Spec changes:$", lines)))
-  expect_true(any(grepl("^No spec diffs detected\\.$", lines)))
+  expect_true(any(grepl("DATA CHANGES", lines, fixed = TRUE)))
+  expect_true(any(grepl("No data diffs detected", lines, fixed = TRUE)))
+  expect_true(any(grepl("SPEC CHANGES", lines, fixed = TRUE)))
+  expect_true(any(grepl("No spec diffs detected", lines, fixed = TRUE)))
 })
 
 test_that("build_run_summary_lines includes baseline info", {

@@ -174,11 +174,11 @@ test_that("write_derived writes last-run-summary.txt with expected content when 
     expect_true(file.exists(diffs_path))
 
     diff_lines <- readLines(diffs_path)
-    expect_true(any(grepl("^Current:", diff_lines)))
-    expect_true(any(grepl("^Comparing against:", diff_lines)))
-    expect_true(any(grepl("^Data changes:$", diff_lines)))
-    expect_true(any(grepl("^Spec changes:$", diff_lines)))
-    expect_true(any(grepl("^No spec diffs detected\\.$", diff_lines)))
+    expect_true(any(grepl("Current:", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("Comparing against:", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("DATA CHANGES", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("SPEC CHANGES", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("No spec diffs detected", diff_lines, fixed = TRUE)))
 
     # Body should contain the same row content that would have been written to diffs.csv
     expected_diffs <- execute_data_diffs(
@@ -230,11 +230,11 @@ test_that("write_derived rewrites last-run-summary.txt with spec changes when da
     expect_gt(file.mtime(diffs_path), diffs_mtime)
 
     diff_lines <- readLines(diffs_path)
-    expect_true(any(grepl("^Spec changes:$", diff_lines)))
+    expect_true(any(grepl("SPEC CHANGES", diff_lines, fixed = TRUE)))
     expect_true(any(grepl("Updated: WT", diff_lines, fixed = TRUE)))
     expect_true(any(grepl("short", diff_lines, fixed = TRUE)))
-    expect_true(any(grepl("^Data changes:$", diff_lines)))
-    expect_true(any(grepl("^No data diffs detected\\.$", diff_lines)))
+    expect_true(any(grepl("DATA CHANGES", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("No data diffs detected", diff_lines, fixed = TRUE)))
   })
 })
 

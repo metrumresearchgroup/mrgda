@@ -5,12 +5,12 @@
 #' @noRd
 format_kv_lines <- function(.df) {
   max_width <- max(nchar(.df$name))
-  paste0("  ", format(.df$name, width = max_width), "   ", .df$value)
+  paste0("    ", format(.df$name, width = max_width), "   ", .df$value)
 }
 
 #' Print a name-value tibble to console with cli styling
 #'
-#' Values of `"No change"` are dimmed; all other values are highlighted.
+#' Values containing `"No change"` are dimmed; all other values are highlighted.
 #'
 #' @param .df A two-column tibble with `name` and `value` columns.
 #' @noRd
@@ -24,7 +24,7 @@ print_styled_kv <- function(.df) {
     } else {
       styled_val <- cli::style_bold(cli::col_cyan(val))
     }
-    cat(paste0("  ", padded_name, "   ", styled_val, "\n"))
+    cat(paste0("    ", padded_name, "   ", styled_val, "\n"))
   }
 }
 
@@ -49,28 +49,37 @@ build_run_summary_lines <- function(
     .current_info,
     .baseline_info
 ) {
-  summary_lines <- c(
-    paste0("Current:            ", .current_info),
-    paste0("Comparing against:  ", .baseline_info)
+  rule <- paste(rep("=", 65), collapse = "")
+  thin_rule <- paste(rep("-", 65), collapse = "")
+
+  lbl_width <- nchar("Comparing against:")
+  header <- c(
+    rule,
+    "  WRITE DERIVED SUMMARY",
+    rule,
+    paste0("  ", format("Current:", width = lbl_width), "  ", .current_info),
+    paste0("  ", format("Comparing against:", width = lbl_width), "  ", .baseline_info),
+    thin_rule
   )
 
   has_data_diffs <- nrow(.data_standard_rows) > 0 || nrow(.data_variable_rows) > 0
 
+  body <- character()
   if (has_data_diffs) {
-    summary_lines <- c(summary_lines, "", "Data changes:", format_kv_lines(.data_standard_rows))
+    body <- c(body, "", "  DATA CHANGES", format_kv_lines(.data_standard_rows))
 
     if (nrow(.data_variable_rows) > 0) {
-      summary_lines <- c(summary_lines, "", "Variable changes:", format_kv_lines(.data_variable_rows))
+      body <- c(body, "", "  VARIABLE CHANGES", format_kv_lines(.data_variable_rows))
     }
   } else {
-    summary_lines <- c(summary_lines, "", "Data changes:", "No data diffs detected.")
+    body <- c(body, "", "  DATA CHANGES", "    No data diffs detected.")
   }
 
   if (nrow(.spec_diff_rows) > 0) {
-    summary_lines <- c(summary_lines, "", "Spec changes:", format_kv_lines(.spec_diff_rows))
+    body <- c(body, "", "  SPEC CHANGES", format_kv_lines(.spec_diff_rows))
   } else {
-    summary_lines <- c(summary_lines, "", "Spec changes:", "No spec diffs detected.")
+    body <- c(body, "", "  SPEC CHANGES", "    No spec diffs detected.")
   }
 
-  summary_lines
+  c(header, body, "", rule)
 }

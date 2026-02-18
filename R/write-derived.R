@@ -237,35 +237,40 @@ write_derived <- function(
 
     # Console output (styled with cli)
     .abs_file <- tools::file_path_as_absolute(.file)
+    .rule <- paste(rep("=", 65), collapse = "")
+    .thin_rule <- paste(rep("-", 65), collapse = "")
+    .lbl_width <- nchar("Comparing against:")
 
     cat("\n")
-    cli::cli_rule(cli::style_bold("write_derived summary"))
-    cli::cli_text("{.strong Current:}            {current_info}")
-    cli::cli_text("{.strong Comparing against:}  {baseline_info}")
+    cat(paste0(.rule, "\n"))
+    cat(paste0("  ", cli::style_bold("WRITE DERIVED SUMMARY"), "\n"))
+    cat(paste0(.rule, "\n"))
+    cat(paste0("  ", cli::style_bold(format("Current:", width = .lbl_width)), "  ", current_info, "\n"))
+    cat(paste0("  ", cli::style_bold(format("Comparing against:", width = .lbl_width)), "  ", baseline_info, "\n"))
+    cat(paste0(.thin_rule, "\n"))
 
     has_data_diffs <- nrow(data_standard_rows) > 0 || nrow(data_variable_rows) > 0
     if (has_data_diffs) {
-      cli::cli_h3("Data changes")
+      cat(paste0("\n  ", cli::style_bold("DATA CHANGES"), "\n"))
       print_styled_kv(data_standard_rows)
       if (nrow(data_variable_rows) > 0) {
-        cli::cli_h3("Variable changes")
+        cat(paste0("\n  ", cli::style_bold("VARIABLE CHANGES"), "\n"))
         print_styled_kv(data_variable_rows)
       }
     } else {
-      cli::cli_h3("Data changes")
-      cli::cli_text("{cli::style_dim('No data diffs detected.')}")
+      cat(paste0("\n  ", cli::style_bold("DATA CHANGES"), "\n"))
+      cat(paste0("    ", cli::style_dim("No data diffs detected."), "\n"))
     }
 
-    cli::cli_h3("Spec changes")
+    cat(paste0("\n  ", cli::style_bold("SPEC CHANGES"), "\n"))
     if (nrow(spec_diff_rows) > 0) {
       print_styled_kv(spec_diff_rows)
     } else {
-      cli::cli_text("{cli::style_dim('No spec diffs detected.')}")
+      cat(paste0("    ", cli::style_dim("No spec diffs detected."), "\n"))
     }
 
-    cat("\n")
+    cat(paste0("\n", .rule, "\n"))
     cli::cli_alert_success("File written: {.file {(.abs_file)}}")
-    cli::cli_rule()
 
     # File output (plain text)
     writeLines(
@@ -273,14 +278,11 @@ write_derived <- function(
       con = file.path(.meta_data_folder, "last-run-summary.txt")
     )
   } else {
-    cat("\n")
     .abs_file <- tools::file_path_as_absolute(.file)
 
-    cli::cli_rule(cli::style_bold("write_derived summary"))
-    cli::cli_alert_info("No data/spec diffs detected; last-run-summary.txt not updated.")
     cat("\n")
+    cli::cli_alert_info("No data/spec diffs detected; last-run-summary.txt not updated.")
     cli::cli_alert_success("File written: {.file {(.abs_file)}}")
-    cli::cli_rule()
   }
 
   # ── 7. Return ──────────────────────────────────────────────────────────────
