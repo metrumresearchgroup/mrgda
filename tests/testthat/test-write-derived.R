@@ -185,7 +185,6 @@ test_that("write_derived writes last-run-summary.txt with expected content when 
       .base_df = nm,
       .compare_df = nm2,
       .subject_col = "ID",
-      .base_from_svn = FALSE,
       .print_output = FALSE
     )$diffs
     expected_rows <- purrr::map2_lgl(

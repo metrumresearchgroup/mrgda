@@ -194,7 +194,6 @@ write_derived <- function(
         .base_df = base_df_list$base_df,
         .compare_df = compare_df,
         .subject_col = .subject_col,
-        .base_from_svn = base_df_list$from_svn,
         .print_output = FALSE
       )
       data_diff_rows <- data_diffs$diffs
@@ -203,30 +202,31 @@ write_derived <- function(
     }
   }
 
-  # Build comparison info for the summary header
-  generated_at <- Sys.time()
-  generated_by <- Sys.info()[["user"]]
-  generated_at_fmt <- format(generated_at, "%Y-%m-%d %H:%M:%S")
-
-  current_info <- paste0("local by ", generated_by, " at ", generated_at_fmt)
-
-  baseline_info <- if (base_df_list$from_svn) {
-    parts <- paste0("r", base_df_list$prev_rev)
-    if (!is.na(base_df_list$svn_author)) {
-      parts <- paste0(parts, " by ", base_df_list$svn_author)
-    }
-    if (!is.na(base_df_list$svn_date)) {
-      svn_date_clean <- sub(" [+-]\\d{4}$", "", base_df_list$svn_date)
-      parts <- paste0(parts, " at ", svn_date_clean)
-    }
-    parts
-  } else {
-    paste0("local by ", generated_by)
-  }
-
   # Print and write summary (only when there are actual diffs)
+  .abs_file <- tools::file_path_as_absolute(.file)
   has_summary_diffs <- nrow(data_diff_rows) > 0 || nrow(spec_diff_rows) > 0
+
   if (has_summary_diffs) {
+    generated_at <- Sys.time()
+    generated_by <- Sys.info()[["user"]]
+    generated_at_fmt <- format(generated_at, "%Y-%m-%d %H:%M:%S")
+
+    current_info <- paste0("local by ", generated_by, " at ", generated_at_fmt)
+
+    baseline_info <- if (base_df_list$from_svn) {
+      parts <- paste0("r", base_df_list$prev_rev)
+      if (!is.na(base_df_list$svn_author)) {
+        parts <- paste0(parts, " by ", base_df_list$svn_author)
+      }
+      if (!is.na(base_df_list$svn_date)) {
+        svn_date_clean <- sub(" [+-]\\d{4}$", "", base_df_list$svn_date)
+        parts <- paste0(parts, " at ", svn_date_clean)
+      }
+      parts
+    } else {
+      paste0("local by ", generated_by)
+    }
+
     summary_lines <- build_run_summary_lines(
       .data_standard_rows = data_standard_rows,
       .data_variable_rows = data_variable_rows,
@@ -234,9 +234,6 @@ write_derived <- function(
       .current_info = current_info,
       .baseline_info = baseline_info
     )
-
-    # Console and file output
-    .abs_file <- tools::file_path_as_absolute(.file)
 
     cat("\n")
     writeLines(summary_lines)
@@ -247,8 +244,6 @@ write_derived <- function(
       con = file.path(.meta_data_folder, "last-run-summary.txt")
     )
   } else {
-    .abs_file <- tools::file_path_as_absolute(.file)
-
     cat("\n")
     cat("No data/spec diffs detected; last-run-summary.txt not updated.\n")
     cat(paste0("File written: ", .abs_file, "\n"))

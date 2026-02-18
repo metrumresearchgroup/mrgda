@@ -23,14 +23,13 @@ format_count_diff <- function(.current, .diff) {
 #' @param .compare_df A data frame to compare against the base data frame.
 #' @param .subject_col A string representing the column name to be used for subject-based differences.
 #'        Set to `NULL` for data frames not containing an subject column.
-#' @param .base_from_svn Logical. Was base df exported from svn?
 #' @param .print_output Logical. Should console output be printed?
 #'
-#' @return No return value, but this function will write files to the specified output directory
-#'         containing the differences between the input data frames.
+#' @return A list with elements `diffs`, `standard_diffs`, and `variable_diffs`
+#'   (tibbles summarizing the differences).
 #'
 #' @export
-execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_svn = FALSE, .print_output = TRUE){
+execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .print_output = TRUE){
 
   # Exit if no names in common ----------------------------------------------
   names_in_common <- dplyr::intersect(names(.base_df), names(.compare_df))
@@ -42,7 +41,7 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
   out <- list()
 
   # Initialize to empty data frames
-  out$diffs <- tibble::tribble(~name, ~value)
+  out$diffs <- tibble::tibble(name = character(), value = character())
   out$standard_diffs <- tibble::tibble(name = character(), value = character())
   out$variable_diffs <- tibble::tibble(name = character(), value = character())
 
@@ -144,8 +143,6 @@ execute_data_diffs <- function(.base_df, .compare_df, .subject_col, .base_from_s
   out$diffs <- print_diffs
   out$standard_diffs <- standard_diffs
   out$variable_diffs <- variable_diffs
-
-  out$value_diffs <- diffdf_value_changes_to_df(full_diff)
 
   if (.print_output) {
     print(
