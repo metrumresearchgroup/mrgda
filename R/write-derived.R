@@ -125,7 +125,6 @@ write_derived <- function(
   # ── 4. Write csv and spec-list (always) ────────────────────────────────────
 
   write_csv_dots(x = .data, file = .file)
-  cli::cli_alert_success("csv written")
 
   if (!dir.exists(.meta_data_folder)) {
     dir.create(.meta_data_folder)
@@ -137,7 +136,6 @@ write_derived <- function(
   )
 
   yaml::write_yaml(.spec_list, .spec_list_file)
-  cli::cli_alert_success("spec-list.yml written")
 
   # ── 5. Regenerate xpt and define (only when content changed) ───────────────
   # These files embed timestamps, so we skip regeneration when nothing changed
@@ -148,6 +146,8 @@ write_derived <- function(
     is.null(old_spec_md5) |
     !identical(old_csv_md5, unname(tools::md5sum(.file))) |
     !identical(old_spec_md5, unname(tools::md5sum(.spec_list_file)))
+
+  outputs <- c("csv")
 
   if (.needs_update) {
     haven::write_xpt(
@@ -165,8 +165,10 @@ write_derived <- function(
       )
     )
 
-    cli::cli_alert_success("xpt and define regenerated (content changed)")
+    outputs <- c(outputs, "xpt", "define")
   }
+
+  cli::cli_alert_success("Outputs written: {paste(outputs, collapse = ', ')}")
 
   # ── 6. Compute and report diffs ────────────────────────────────────────────
 
@@ -176,7 +178,7 @@ write_derived <- function(
   data_variable_rows <- tibble::tibble(name = character(), value = character())
   compare_df <- read_csv_dots(.file)
 
-  if (.execute_diffs) {
+  if (.execute_diffs && .needs_update) {
     if (!is.null(base_spec_list$base_df)) {
       spec_diffs <- execute_spec_diffs(
         .base_spec = base_spec_list$base_df,
@@ -241,7 +243,7 @@ write_derived <- function(
       con = file.path(.meta_data_folder, "last-run-summary.txt")
     )
   } else if (!.needs_update) {
-    cli::cli_alert_info("No changes found")
+    cli::cli_alert_info("No changes since last run (see last-run-summary.txt for latest diffs)")
   }
 
   cli::cli_alert_success("File: {.path {(.abs_file)}}")

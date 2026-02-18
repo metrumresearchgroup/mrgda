@@ -240,32 +240,19 @@ test_that("write_derived rewrites last-run-summary.txt with spec changes when da
   })
 })
 
-test_that("write_derived computes diffs even when csv is unchanged", {
+test_that("write_derived skips diffs when csv is unchanged", {
   withr::with_tempdir({
     .csv <- paste0(getwd(), "/pk.csv")
-    .prev <- paste0(getwd(), "/prev.csv")
 
     write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
       suppressMessages()
 
-    # prev differs from current — diffs should be reported even though csv is unchanged
-    nm_prev <- nm
-    nm_prev$WT[1] <- nm_prev$WT[1] + 1
-    readr::write_csv(nm_prev, .prev, na = ".")
-
-    write_derived(
-      .data = nm,
-      .spec = nm_spec,
-      .file = .csv,
-      .prev_file = .prev,
-      .compare_from_svn = FALSE
-    ) %>% suppressMessages()
+    # Re-run with same data — diffs should be skipped
+    write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
 
     diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "last-run-summary.txt")
-    expect_true(file.exists(diffs_path))
-
-    diff_lines <- readLines(diffs_path)
-    expect_true(any(grepl("DATA CHANGES", diff_lines, fixed = TRUE)))
+    expect_false(file.exists(diffs_path))
   })
 })
 

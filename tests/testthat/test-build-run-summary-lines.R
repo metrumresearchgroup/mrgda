@@ -22,7 +22,7 @@ test_that("build_run_summary_lines includes header and all sections when both di
     .baseline_info = "by jsmith at 2026-01-15 10:30:45 (r120)"
   )
 
-  expect_true(any(grepl("WRITE DERIVED SUMMARY", lines, fixed = TRUE)))
+  expect_true(any(grepl("DIFF SUMMARY", lines, fixed = TRUE)))
   expect_true(any(grepl("Local:", lines, fixed = TRUE)))
   expect_true(any(grepl("Repository:", lines, fixed = TRUE)))
   expect_true(any(grepl("by tester", lines, fixed = TRUE)))

@@ -16,9 +16,9 @@ format_kv_lines <- function(.df) {
 #'   variable-specific data diffs (value changes, added/removed columns).
 #' @param .spec_diff_rows A two-column tibble (`name`, `value`) of spec diffs.
 #' @param .current_info Character string describing the local version
-#'   (e.g. `"andersone at 2026-02-17 18:54:01"`).
+#'   (e.g. `"by andersone at 2026-02-17 18:54:01"`).
 #' @param .baseline_info Character string describing the repository version
-#'   (e.g. `"r255 by andersone at 2026-01-28 11:45:21"`).
+#'   (e.g. `"by andersone at 2026-01-28 11:45:21 (r255)"`).
 #'
 #' @return A character vector of lines for console/file output.
 #' @noRd
@@ -35,7 +35,8 @@ build_run_summary_lines <- function(
   lbl_width <- nchar("Repository:")
   header <- c(
     rule,
-    "  WRITE DERIVED SUMMARY",
+    "  DIFF SUMMARY",
+    "  Comparing local copy against latest in repository.",
     rule,
     paste0("  ", format("Local:", width = lbl_width), "  ", .current_info),
     paste0("  ", format("Repository:", width = lbl_width), "  ", .baseline_info),
