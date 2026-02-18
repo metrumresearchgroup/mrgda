@@ -41,7 +41,7 @@ are only regenerated when the csv or spec-list.yml content has changed,
 avoiding unnecessary diffs in version control from embedded timestamps.
 
 Diffs are always computed against the baseline (SVN or local) and reported
-in last-run-summary.txt whenever at least one data or spec diff exists.
+in diff-summary.txt whenever at least one data or spec diff exists.
 
 If a legacy metadata folder containing diffs.csv is detected, it is
 automatically removed and regenerated.

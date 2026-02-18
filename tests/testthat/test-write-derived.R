@@ -38,8 +38,8 @@ test_that("write_derived write xpt: xpt data includes correct labels", {
 })
 
 
-test_that("write_derived does not write last-run-summary.txt when no changes", {
-  diffs_path <- paste0(gsub(".csv", "" , .temp_csv, fixed=TRUE), "/last-run-summary.txt")
+test_that("write_derived does not write diff-summary.txt when no changes", {
+  diffs_path <- paste0(gsub(".csv", "" , .temp_csv, fixed=TRUE), "/diff-summary.txt")
   expect_false(file.exists(diffs_path))
 })
 
@@ -60,7 +60,7 @@ test_that("write_derived skips xpt and define when csv and spec are unchanged", 
   })
 })
 
-test_that("write_derived leaves last-run-summary.txt untouched on unchanged re-run", {
+test_that("write_derived leaves diff-summary.txt untouched on unchanged re-run", {
   withr::with_tempdir({
     .csv <- paste0(getwd(), "/pk.csv")
     write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
@@ -72,7 +72,7 @@ test_that("write_derived leaves last-run-summary.txt untouched on unchanged re-r
     write_derived(.data = nm2, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
       suppressMessages()
 
-    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "last-run-summary.txt")
+    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "diff-summary.txt")
     expect_true(file.exists(diffs_path))
     diffs_mtime <- file.mtime(diffs_path)
 
@@ -161,7 +161,7 @@ test_that("write_derived removes legacy metadata folder with diffs.csv and regen
   })
 })
 
-test_that("write_derived writes last-run-summary.txt with expected content when data changes", {
+test_that("write_derived writes diff-summary.txt with expected content when data changes", {
   withr::with_tempdir({
     .csv <- paste0(getwd(), "/pk.csv")
     write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
@@ -173,7 +173,7 @@ test_that("write_derived writes last-run-summary.txt with expected content when 
     write_derived(.data = nm2, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
       suppressMessages()
 
-    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "last-run-summary.txt")
+    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "diff-summary.txt")
     expect_true(file.exists(diffs_path))
 
     diff_lines <- readLines(diffs_path)
@@ -199,14 +199,14 @@ test_that("write_derived writes last-run-summary.txt with expected content when 
   })
 })
 
-test_that("write_derived rewrites last-run-summary.txt with spec changes when data does not change", {
+test_that("write_derived rewrites diff-summary.txt with spec changes when data does not change", {
   withr::with_tempdir({
     .csv <- paste0(getwd(), "/pk.csv")
     write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
       suppressMessages()
 
-    # Plant a stale last-run-summary.txt (simulates leftover from old version or prior change)
-    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "last-run-summary.txt")
+    # Plant a stale diff-summary.txt (simulates leftover from old version or prior change)
+    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "diff-summary.txt")
     writeLines(
       c(
         "Local:       by stale-user at 2026-01-01 00:00:00",
@@ -251,7 +251,7 @@ test_that("write_derived skips diffs when csv is unchanged", {
     write_derived(.data = nm, .spec = nm_spec, .file = .csv, .compare_from_svn = FALSE) %>%
       suppressMessages()
 
-    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "last-run-summary.txt")
+    diffs_path <- file.path(gsub(".csv", "", .csv, fixed = TRUE), "diff-summary.txt")
     expect_false(file.exists(diffs_path))
   })
 })

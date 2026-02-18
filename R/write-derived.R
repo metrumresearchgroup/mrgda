@@ -9,7 +9,7 @@
 #' avoiding unnecessary diffs in version control from embedded timestamps.
 #'
 #' Diffs are always computed against the baseline (SVN or local) and reported
-#' in last-run-summary.txt whenever at least one data or spec diff exists.
+#' in diff-summary.txt whenever at least one data or spec diff exists.
 #'
 #' If a legacy metadata folder containing diffs.csv is detected, it is
 #' automatically removed and regenerated.
@@ -240,13 +240,20 @@ write_derived <- function(
 
     writeLines(
       text = summary_lines,
-      con = file.path(.meta_data_folder, "last-run-summary.txt")
+      con = file.path(.meta_data_folder, "diff-summary.txt")
     )
   } else if (!.needs_update) {
-    cli::cli_alert_info("No changes since last run (see last-run-summary.txt for latest diffs)")
+    .diff_summary_path <- file.path(.meta_data_folder, "diff-summary.txt")
+    if (file.exists(.diff_summary_path)) {
+      .rel_diff_summary <- fs::path_rel(.diff_summary_path)
+      cli::cli_alert_info("No changes since last run (see {.path {(.rel_diff_summary)}})")
+    } else {
+      cli::cli_alert_info("No changes since last run")
+    }
   }
 
-  cli::cli_alert_success("File: {.path {(.abs_file)}}")
+  .rel_file <- fs::path_rel(.abs_file)
+  cli::cli_alert_success("Derived dataset: {.path {(.rel_file)}}")
 
   # ── 7. Return ──────────────────────────────────────────────────────────────
 
