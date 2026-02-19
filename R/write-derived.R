@@ -102,6 +102,12 @@ write_derived <- function(
     unlink(.meta_data_folder, recursive = TRUE)
   }
 
+  cli::cli_progress_bar(
+    total = 4,
+    format = "{cli::pb_bar} {cli::pb_current}/{cli::pb_total}",
+    clear = TRUE
+  )
+
   # ── 3. Snapshot old state ──────────────────────────────────────────────────
   # Everything here runs BEFORE any files are written so we capture the
   # previous version of both data and spec for diffing, plus md5 checksums
@@ -126,6 +132,7 @@ write_derived <- function(
 
   # ── 4. Write csv and spec-list (always) ────────────────────────────────────
 
+  cli::cli_progress_update()
   write_csv_dots(x = .data, file = .file)
 
   if (!dir.exists(.meta_data_folder)) {
@@ -150,6 +157,8 @@ write_derived <- function(
     !identical(old_spec_md5, unname(tools::md5sum(.spec_list_file)))
 
   outputs <- c("csv")
+
+  cli::cli_progress_update()
 
   if (.needs_update) {
     haven::write_xpt(
@@ -180,6 +189,8 @@ write_derived <- function(
   data_variable_rows <- tibble::tibble(name = character(), value = character())
   compare_df <- read_csv_dots(.file)
 
+  cli::cli_progress_update()
+
   if (.execute_diffs && .needs_update) {
     if (!is.null(base_spec_list$base_df)) {
       spec_diffs <- execute_spec_diffs(
@@ -201,6 +212,8 @@ write_derived <- function(
       data_variable_rows <- data_diffs$variable_diffs
     }
   }
+
+  cli::cli_progress_update()
 
   # Print and write summary
   .abs_file <- tools::file_path_as_absolute(.file)
