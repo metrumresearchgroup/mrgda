@@ -33,7 +33,7 @@ Imports:
     rprojroot,
     crayon,
     forcats,
-    stringr,
+    tidyselect,
     knitr,
     readr,
     fs
