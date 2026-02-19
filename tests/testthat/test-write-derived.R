@@ -264,13 +264,23 @@ test_that("write_derived works with special characters in file name", {
 })
 
 test_that("write_derived gives error if data has comma in any value", {
-  df_comma <-
-    dplyr::tibble(
-      name = c("smith, john", "james", "mark"),
-      values = c(1, 2, 3)
-      )
+  nm_comma <- nm
+  nm_comma$STUDYID[1] <- "STUDY,X"
 
-  expect_error(write_derived(.data = df_comma, .spec = nm_spec, .file = .temp_csv, .compare_from_svn = FALSE))
+  expect_error(
+    write_derived(.data = nm_comma, .spec = nm_spec, .file = .temp_csv, .compare_from_svn = FALSE),
+    "STUDYID"
+  )
+})
+
+test_that("write_derived comma check ignores non-character columns", {
+  # nm has no commas in character columns and passes the spec check,
+
+  # so the comma check should not raise an error
+  expect_no_error(
+    write_derived(.data = nm, .spec = nm_spec, .file = .temp_csv, .compare_from_svn = FALSE) %>%
+      suppressMessages()
+  )
 })
 
 test_that("write_derived works with no ID column in data", {

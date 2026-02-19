@@ -71,15 +71,15 @@ write_derived <- function(
     )
   }
 
-  check_for_commas <- purrr::map(
-    .data,
-    ~ any(stringr::str_detect(string = .x, pattern = ","), na.rm = TRUE)
-  )
-
-  check_for_commas <- check_for_commas[unlist(check_for_commas)]
-  if (length(check_for_commas) > 0) {
+  comma_cols <- .data %>%
+    dplyr::select(tidyselect::where(is.character)) %>%
+    dplyr::summarise(dplyr::across(tidyselect::everything(), ~ any(grepl(",", .x, fixed = TRUE)))) %>%
+    tidyr::pivot_longer(tidyselect::everything()) %>%
+    dplyr::filter(value) %>%
+    dplyr::pull(name)
+  if (length(comma_cols) > 0) {
     cli::cli_abort(
-      "Comma found in following column(s): {.val {names(check_for_commas)}}"
+      "Comma found in following column(s): {.val {comma_cols}}"
     )
   }
 
