@@ -36,7 +36,7 @@ get_svn_baseline <- function(.prev_file, .compare_from_svn, .reader = read_csv_d
     base_temp <- tempfile(fileext = .file_ext)
 
     svn_info_raw <- try(
-      system(paste0("svn info 2>/dev/null -r HEAD ", base), intern = TRUE),
+      system(paste0("svn info 2>/dev/null ", base), intern = TRUE),
       silent = TRUE
     )
 
@@ -55,7 +55,7 @@ get_svn_baseline <- function(.prev_file, .compare_from_svn, .reader = read_csv_d
 
     if (length(prev_rev) > 0 && !is.na(prev_rev)) {
 
-      export_try <- try(system(paste0("svn export -r ", prev_rev, " ", base ," ", base_temp, " > /dev/null 2>&1")))
+      export_try <- try(system(paste0("svn cat ", base, " > ", base_temp, " 2>/dev/null")))
 
       if (export_try == 0) {
         from_svn <- TRUE

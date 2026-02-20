@@ -59,6 +59,7 @@ write_derived <- function(
   spec_check <- yspec::ys_check(.data, .spec, error_on_fail = FALSE) %>%
     suppressMessages()
 
+
   if (!spec_check) {
     cli::cli_abort(
       "Spec check failed. Please run {.fn yspec::ys_check} and ensure it passes."
@@ -77,6 +78,7 @@ write_derived <- function(
     tidyr::pivot_longer(tidyselect::everything()) %>%
     dplyr::filter(value) %>%
     dplyr::pull(name)
+
   if (length(comma_cols) > 0) {
     cli::cli_abort(
       "Comma found in following column(s): {.val {comma_cols}}"
@@ -109,12 +111,14 @@ write_derived <- function(
 
   # Baselines for diffing (from SVN or local, depending on .compare_from_svn)
   base_df_list <- get_svn_baseline(.prev_file, .compare_from_svn)
+
   base_spec_list <- get_svn_baseline(
     .prev_file = .spec_list_file,
     .compare_from_svn = .compare_from_svn,
     .reader = yaml::read_yaml,
     .file_ext = ".yml"
   )
+
 
   # md5 checksums (NULL = file doesn't exist yet, i.e. first run)
   old_csv_md5 <- if (file.exists(.file)) {
@@ -128,6 +132,7 @@ write_derived <- function(
 
   write_csv_dots(x = .data, file = .file)
 
+
   if (!dir.exists(.meta_data_folder)) {
     dir.create(.meta_data_folder)
   }
@@ -138,6 +143,7 @@ write_derived <- function(
   )
 
   yaml::write_yaml(.spec_list, .spec_list_file)
+
 
   # ── 5. Regenerate xpt and define (only when content changed) ───────────────
   # These files embed timestamps, so we skip regeneration when nothing changed
@@ -159,6 +165,7 @@ write_derived <- function(
       name = paste0("a", substr(gsub("[^[:alnum:]]", "", .data_name), 1, 7))
     )
 
+
     silence_console_output(
       yspec::render_fda_define(
         x = .spec,
@@ -166,6 +173,7 @@ write_derived <- function(
         output_dir = .meta_data_folder
       )
     )
+
 
     outputs <- c(outputs, "xpt", "define")
   }
@@ -180,6 +188,7 @@ write_derived <- function(
   data_variable_rows <- tibble::tibble(name = character(), value = character())
   compare_df <- read_csv_dots(.file)
 
+
   if (.execute_diffs && .needs_update) {
     if (!is.null(base_spec_list$base_df)) {
       spec_diffs <- execute_spec_diffs(
@@ -187,6 +196,7 @@ write_derived <- function(
         .compare_spec = yaml::read_yaml(.spec_list_file)
       )
       spec_diff_rows <- spec_diffs$diffs
+
     }
 
     if (!is.null(base_df_list$base_df)) {
@@ -199,6 +209,7 @@ write_derived <- function(
       data_diff_rows <- data_diffs$diffs
       data_standard_rows <- data_diffs$standard_diffs
       data_variable_rows <- data_diffs$variable_diffs
+
     }
   }
 
