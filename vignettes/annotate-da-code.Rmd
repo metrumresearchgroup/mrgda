@@ -1,21 +1,21 @@
 ---
-title: "explain-code"
+title: "annotate-da-code"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{explain-code}
+  %\VignetteIndexEntry{annotate-da-code}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-This is a vignette to help you become familiar with using `explain()`. 
-Check out the <a href="https://metrumresearchgroup.github.io/mrgda/reference/explain.html"
+This is a vignette to help you become familiar with using `annotate_da()`.
+Check out the <a href="https://metrumresearchgroup.github.io/mrgda/reference/annotate_da.html"
 target="_blank">function documentation</a> for additional background and examples.
 
-`explain()` prints a formatted message containing the result of a provided expression. 
-This function is intended to be run interactively in the R console to aid in code 
+`annotate_da()` prints a formatted message containing the result of a provided expression.
+This function is intended to be run interactively in the R console to aid in code
 understanding, transfer and debugging.
 
-Below, we will go through a few examples cases using `explain()`.
+Below, we will go through a few examples cases using `annotate_da()`.
 
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
@@ -31,16 +31,16 @@ library(dplyr)
 
 # Setup
 
-We will use `explain()` to document data manipulations and checks on the derived PK 
+We will use `annotate_da()` to document data manipulations and checks on the derived PK
 data set from `mrgda`.
 
 ```{r, message=FALSE}
 pk_data <- readr::read_csv(system.file("derived/pk.csv", package = "mrgda"))
 ```
 
-# Using explain()
+# Using annotate_da()
 
-Before performing a data manipulation, we can use `explain()` to document why
+Before performing a data manipulation, we can use `annotate_da()` to document why
 it is needed. This will help transfer knowledge of assumptions/decisions made
 to future authors or reviewers.
 
@@ -53,10 +53,10 @@ pk_data <-
 ```
 
 For instance, if we're planning to exclude a record we believe is an outlier, 
-we can first use `explain()` to show where in the data the issue exists.
+we can first use `annotate_da()` to show where in the data the issue exists.
 
 ```{r}
-mrgda::explain("ID = 1 has outlier in PK data, will remove", {
+mrgda::annotate_da("ID = 1 has outlier in PK data, will remove", {
   pk_data %>% 
     filter(ID == 1, DVID == 2, TIME < 24) %>% 
     select(ID, TIME, TAD, DV, DVID, EVID)
@@ -69,13 +69,13 @@ the console outputs, helping it be more easily seen.
 
 ## Arguments
 
-Users need to provide two arguments to `explain()`. The first is a message 
+Users need to provide two arguments to `annotate_da()`. The first is a message
 to display in the header and the second is an expression to display the result of.
 
 As shown previously, this expression could be in the form of a data.frame.
 
 ```{r}
-mrgda::explain("Show the first few records of ID = 2 from the pk_data data.frame", {
+mrgda::annotate_da("Show the first few records of ID = 2 from the pk_data data.frame", {
   pk_data %>% 
     filter(ID == 2) %>% 
     select(ID, TIME, DV, EVID) %>% 
@@ -86,7 +86,7 @@ mrgda::explain("Show the first few records of ID = 2 from the pk_data data.frame
 A vector can also be provided, such as one containing all the unique studies from the data set.
 
 ```{r}
-mrgda::explain("Show a vector of all studies in the data set", {
+mrgda::annotate_da("Show a vector of all studies in the data set", {
   pk_data %>% 
     distinct(STUDYID) %>% 
     pull(STUDYID)
@@ -96,7 +96,7 @@ mrgda::explain("Show a vector of all studies in the data set", {
 Calculations can even be performed.
 
 ```{r}
-mrgda::explain("Total number of PK records that are not BLQ and doses", {
+mrgda::annotate_da("Total number of PK records that are not BLQ and doses", {
   nrow(pk_data %>% filter(DVID == 2, BLQ == 1)) +
     nrow(pk_data %>% filter(DVID ==1))
 })

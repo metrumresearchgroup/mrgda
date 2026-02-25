@@ -25,6 +25,6 @@ reference:
     desc: Data versioning helpers
     contents:
     - assign_id
-    - explain
+    - annotate_da
     - read_csv_dots
     - write_csv_dots
