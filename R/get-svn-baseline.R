@@ -35,10 +35,10 @@ get_svn_baseline <- function(.prev_file, .compare_from_svn, .reader = read_csv_d
 
     base_temp <- tempfile(fileext = .file_ext)
 
-    svn_info_raw <- try(
+    svn_info_raw <- suppressWarnings(try(
       system(paste0("svn info 2>/dev/null ", base), intern = TRUE),
       silent = TRUE
-    )
+    ))
 
     if (length(svn_info_raw) > 0 && !inherits(svn_info_raw, "try-error")) {
       rev_line <- grep("^Revision: ", svn_info_raw, value = TRUE)
