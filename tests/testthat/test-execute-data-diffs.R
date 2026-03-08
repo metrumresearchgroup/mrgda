@@ -44,7 +44,7 @@ test_that("The function returns nothing if there are no diffs detected", {
 
 
 
-test_that("The function works if .suject_col is NULL", {
+test_that("The function works if .subject_col is NULL", {
   lst <- execute_data_diffs(.base_df2, .compare_df2, .subject_col = NULL)
   expect_false(rlang::is_empty(lst$diffs))
 
@@ -62,8 +62,8 @@ test_that("Test if data.frames don't have shared names", {
   compare_df <- data.frame(D = c(1, 2), E = c(4, 7), F = c(5, 9))
 
   expect_error(
-    execute_data_diffs(base_df, compare_df,
-                       "The base and compare data frames do not have any columns to compare"))
+    execute_data_diffs(base_df, compare_df, NULL),
+    "do not have any columns to compare")
 })
 
 # Create test data frames
