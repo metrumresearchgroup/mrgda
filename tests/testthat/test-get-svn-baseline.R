@@ -131,6 +131,28 @@ test_that("get_svn_baseline returns from_svn FALSE when file is not in SVN", {
   })
 })
 
+test_that("get_svn_baseline does not warn when file is not in SVN", {
+  svn_dir1 <- local_svn_repo()
+  withr::defer(unlink(svn_dir1, recursive = TRUE))
+
+  system(paste0("rm -rf ", svn_dir1))
+  system(paste0("svnadmin create ", svn_dir1))
+
+  svn_dir2 <- local_svn_repo()
+  withr::defer(unlink(svn_dir2, recursive = TRUE))
+
+  withr::with_dir(svn_dir2, {
+    system(paste0("svn co file:///", svn_dir1, " ", svn_dir2, " -q -q"))
+
+    # File exists locally but was never added/committed to SVN
+    write_csv_dots(x = data.frame(a = 1), file = "new_file.csv")
+
+    expect_no_warning(
+      get_svn_baseline(file.path(svn_dir2, "new_file.csv"), TRUE)
+    )
+  })
+})
+
 test_that("get_svn_baseline handles non-SVN directory with compare_from_svn TRUE", {
   tmp <- withr::local_tempdir()
   writeLines("Version: 1.0", con = file.path(tmp, "temp.Rproj"))
