@@ -66,7 +66,9 @@ get_svn_baseline <- function(.prev_file, .compare_from_svn, .reader = read_csv_d
   }
 
   base_df <-
-    if (file.exists(base)) {
+    if (.compare_from_svn && !from_svn) {
+      NULL
+    } else if (file.exists(base)) {
       .reader(base)
     } else {
       NULL

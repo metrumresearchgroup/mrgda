@@ -263,6 +263,8 @@ write_derived <- function(
     } else {
       cli::cli_alert_info("No changes since last run")
     }
+  } else if (is.null(base_df_list$base_df)) {
+    cli::cli_alert_info("Initial version")
   }
 
   .rel_file <- fs::path_rel(.abs_file)
