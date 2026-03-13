@@ -64,3 +64,43 @@ build_run_summary_lines <- function(
 
   c(header, body, "", rule)
 }
+
+#' Build summary lines for an initial version (no SVN baseline)
+#'
+#' @param .current_info Character string describing the local version.
+#' @param .n_rows Integer number of rows.
+#' @param .n_cols Integer number of columns.
+#' @param .n_subjects Integer number of unique subjects.
+#'
+#' @return A character vector of lines for console/file output.
+#' @noRd
+build_initial_summary_lines <- function(
+    .current_info,
+    .n_rows,
+    .n_cols,
+    .n_subjects
+) {
+  rule <- paste(rep("=", 65), collapse = "")
+  thin_rule <- paste(rep("-", 65), collapse = "")
+
+  summary_rows <- format_kv_lines(
+    tibble::tibble(
+      name = c("Rows", "Columns", "Subjects"),
+      value = as.character(c(.n_rows, .n_cols, .n_subjects))
+    )
+  )
+
+  c(
+    rule,
+    "  INITIAL VERSION",
+    "  No prior file in repository to compare against.",
+    rule,
+    paste0("  Local:       ", .current_info),
+    thin_rule,
+    "",
+    "  DATA SUMMARY",
+    summary_rows,
+    "",
+    rule
+  )
+}

@@ -691,3 +691,46 @@ test_that("diff-summary omits per-column diffs when row count changes", {
     expect_false(any(grepl("\\d+ diffs", diff_lines)))
   })
 })
+
+# ── Scenario 13: Initial version summary when file not in SVN ────────────────
+
+test_that("write_derived writes initial version summary when file is not in SVN", {
+  skip_if_not(svn_is_available(), "svn not available")
+
+  svn_repo_dir <- local_svn_repo()
+  withr::defer(unlink(svn_repo_dir, recursive = TRUE))
+  system(paste0("rm -rf ", svn_repo_dir), ignore.stdout = TRUE, ignore.stderr = TRUE)
+  system(paste0("svnadmin create ", svn_repo_dir), ignore.stdout = TRUE, ignore.stderr = TRUE)
+
+  svn_wc_dir <- local_svn_repo()
+  withr::defer(unlink(svn_wc_dir, recursive = TRUE))
+
+  co_result <- system(
+    paste0("svn co file:///", svn_repo_dir, " ", svn_wc_dir, " -q"),
+    ignore.stdout = TRUE, ignore.stderr = TRUE
+  )
+  skip_if(co_result != 0, "svn checkout failed")
+
+  withr::with_dir(svn_wc_dir, {
+    csv_path <- file.path(svn_wc_dir, "pk.csv")
+
+    # First run — file not yet committed to SVN
+    write_derived(
+      .data = nm_s, .spec = nm_spec_s, .file = csv_path,
+      .compare_from_svn = TRUE
+    ) %>% suppressMessages()
+
+    diffs_path <- file.path(svn_wc_dir, "pk", "diff-summary.txt")
+    expect_true(file.exists(diffs_path))
+
+    diff_lines <- readLines(diffs_path)
+    expect_true(any(grepl("INITIAL VERSION", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("No prior file in repository", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("DATA SUMMARY", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("Rows", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("Columns", diff_lines, fixed = TRUE)))
+    expect_true(any(grepl("Subjects", diff_lines, fixed = TRUE)))
+    # Should NOT have Repository line
+    expect_false(any(grepl("Repository:", diff_lines, fixed = TRUE)))
+  })
+})

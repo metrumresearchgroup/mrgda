@@ -85,3 +85,25 @@ test_that("build_run_summary_lines includes baseline info", {
 
   expect_true(any(grepl("by jsmith", lines, fixed = TRUE)))
 })
+
+test_that("build_initial_summary_lines includes header, local info, and data counts", {
+  lines <- build_initial_summary_lines(
+    .current_info = "by tester at 2026-03-13 10:30:25",
+    .n_rows = 1520,
+    .n_cols = 26,
+    .n_subjects = 304
+  )
+
+  expect_true(any(grepl("INITIAL VERSION", lines, fixed = TRUE)))
+  expect_true(any(grepl("No prior file in repository", lines, fixed = TRUE)))
+  expect_true(any(grepl("Local:", lines, fixed = TRUE)))
+  expect_true(any(grepl("by tester", lines, fixed = TRUE)))
+  expect_true(any(grepl("DATA SUMMARY", lines, fixed = TRUE)))
+  expect_true(any(grepl("1520", lines, fixed = TRUE)))
+  expect_true(any(grepl("26", lines, fixed = TRUE)))
+  expect_true(any(grepl("304", lines, fixed = TRUE)))
+  # Should NOT have Repository line
+  expect_false(any(grepl("Repository:", lines, fixed = TRUE)))
+  # Should have === borders
+  expect_true(any(grepl("^=+$", lines)))
+})

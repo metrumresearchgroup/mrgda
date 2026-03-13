@@ -263,8 +263,26 @@ write_derived <- function(
     } else {
       cli::cli_alert_info("No changes since last run")
     }
-  } else if (is.null(base_df_list$base_df)) {
-    cli::cli_alert_info("Initial version")
+  } else if (.compare_from_svn && is.null(base_df_list$base_df)) {
+    generated_at <- Sys.time()
+    generated_by <- Sys.info()[["user"]]
+    generated_at_fmt <- format(generated_at, "%Y-%m-%d %H:%M:%S")
+    current_info <- paste0("by ", generated_by, " at ", generated_at_fmt)
+
+    summary_lines <- build_initial_summary_lines(
+      .current_info = current_info,
+      .n_rows = nrow(compare_df),
+      .n_cols = ncol(compare_df),
+      .n_subjects = length(unique(compare_df[[.subject_col]]))
+    )
+
+    cat("\n")
+    writeLines(summary_lines)
+
+    writeLines(
+      text = summary_lines,
+      con = file.path(.meta_data_folder, "diff-summary.txt")
+    )
   }
 
   .rel_file <- fs::path_rel(.abs_file)
