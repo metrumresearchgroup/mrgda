@@ -22,11 +22,17 @@ temp_dir <- tempdir()
 test_that("The function identifies and outputs differences", {
   diffs_list <- execute_data_diffs(.base_df, .compare_df, "ID")
   diffs <- diffs_list$diffs
-  expect_equal(diffs$name[1], "N Rows Diff")
-  expect_equal(diffs$value[1], "1 row(s) added")
-  expect_equal(diffs$name[2], "New Columns")
-  expect_equal(diffs$value[2], "C")
-  expect_equal(diffs$value[5], "1 ID(s) added")
+  expect_equal(diffs$name[1], "Rows")
+  expect_equal(diffs$value[1], "4 (+1)")
+  expect_equal(diffs$name[2], "Columns")
+  expect_equal(diffs$value[2], "4 (+1)")
+  expect_equal(diffs$name[3], "Subjects")
+  expect_equal(diffs$value[3], "4 (+1)")
+  expect_true(any(grepl("New Columns", diffs$name)))
+  expect_true(any(grepl("C", diffs$value)))
+  # Rows changed — per-column value diffs suppressed (noise from row shifts)
+  expect_false(any(diffs$name == "Values changed"))
+  expect_false(any(grepl("diffs$", diffs$value)))
 })
 
 
@@ -38,10 +44,9 @@ test_that("The function returns nothing if there are no diffs detected", {
 
 
 
-test_that("The function works if .suject_col is NULL", {
+test_that("The function works if .subject_col is NULL", {
   lst <- execute_data_diffs(.base_df2, .compare_df2, .subject_col = NULL)
   expect_false(rlang::is_empty(lst$diffs))
-  expect_equal(lst$value_diffs$BASE[1], "2.5")
 
   x <-  try(execute_data_diffs(.base_df2, .compare_df2, .subject_col = "ID"), silent = TRUE)
 
@@ -57,8 +62,8 @@ test_that("Test if data.frames don't have shared names", {
   compare_df <- data.frame(D = c(1, 2), E = c(4, 7), F = c(5, 9))
 
   expect_error(
-    execute_data_diffs(base_df, compare_df,
-                       "The base and compare data frames do not have any columns to compare"))
+    execute_data_diffs(base_df, compare_df, NULL),
+    "do not have any columns to compare")
 })
 
 # Create test data frames
@@ -79,8 +84,10 @@ test_that("execute_data_diffs works with removing columns", {
   diffs_list3 <- execute_data_diffs(.base_df3, .compare_df3, "ID")
 
   diffs <- diffs_list3$diffs
-  expect_equal(diffs$value[1], "1 row(s) removed")
-  expect_equal(diffs$name[2], "Removed Columns")
-  expect_equal(diffs$value[2], "C")
+  expect_equal(diffs$value[1], "3 (-1)")
+  expect_equal(diffs$name[2], "Columns")
+  expect_equal(diffs$value[2], "3 (-1)")
+  expect_true(any(grepl("Removed Columns", diffs$name)))
+  expect_true(any(diffs$value == "C"))
 })
 
