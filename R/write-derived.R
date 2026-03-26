@@ -4,6 +4,16 @@
 #' This function will take a data frame in R and write it out to csv.
 #' It also creates a metadata folder, storing the xpt file along with other useful information.
 #'
+#' The csv and spec-list.yml are always written. The xpt and define document
+#' are only regenerated when the csv or spec-list.yml content has changed,
+#' avoiding unnecessary diffs in version control from embedded timestamps.
+#'
+#' Diffs are always computed against the baseline (SVN or local) and reported
+#' in diff-summary.txt whenever at least one data or spec diff exists.
+#'
+#' If a legacy metadata folder containing diffs.csv is detected, it is
+#' automatically removed and regenerated.
+#'
 #' @param .data a data frame
 #' @param .spec a yspec object
 #' @param .file csv file name to write out to (including path)
@@ -20,102 +30,267 @@
 #'}
 #' @md
 #' @export
-write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file = NULL, .compare_from_svn = TRUE, .return_base_compare = FALSE, .execute_diffs = TRUE) {
+write_derived <- function(
+  .data,
+  .spec,
+  .file,
+  .subject_col = "ID",
+  .prev_file = NULL,
+  .compare_from_svn = TRUE,
+  .return_base_compare = FALSE,
+  .execute_diffs = TRUE
+) {
+
+  # Flow:
+  #   1. Validate inputs
+  #   2. Derive paths
+  #   3. Snapshot old state (baselines + md5s, before writing anything)
+  #   4. Write csv and spec-list (always)
+  #   5. Regenerate xpt and define (only when content changed)
+  #   6. Compute and report diffs
+  #   7. Return
+
+  # ── 1. Validate inputs ────────────────────────────────────────────────────
 
   if (tools::file_ext(.file) != "csv") {
-    stop("'.file' must reference a 'csv' file")
+    cli::cli_abort("{.arg .file} must reference a {.val csv} file")
   }
 
-  spec_check <- yspec::ys_check(.data, .spec, error_on_fail = FALSE) %>% suppressMessages()
+  spec_check <- yspec::ys_check(.data, .spec, error_on_fail = FALSE) %>%
+    suppressMessages()
+
 
   if (!spec_check) {
-    stop("Spec check failed. Please run 'yspec::ys_check()' and ensure it passes.", call. = FALSE)
+    cli::cli_abort(
+      "Spec check failed. Please run {.fn yspec::ys_check} and ensure it passes."
+    )
   }
 
-  .prev_file <- ifelse(is.null(.prev_file), .file, .prev_file)
-
-  # Base Version for Diff ----------------------------------------
-  base_df_list <- get_base_df(.prev_file, .compare_from_svn)
-
-  # Check for commas in data
-  check_for_commas <- purrr::map(.data, ~ any(stringr::str_detect(string = .x, pattern = ","), na.rm = TRUE))
-
-  check_for_commas <- check_for_commas[unlist(check_for_commas)]
-  if (length(check_for_commas) > 0) {
-    cli::cli_abort(paste0("Comma found in following column(s):", paste(names(check_for_commas), collapse = ", ")))
+  if (!.subject_col %in% colnames(.data)) {
+    cli::cli_abort(
+      "Defined {.arg .subject_col} {.val {.subject_col}} not found in data"
+    )
   }
 
-  # Write Out New Version ---------------------------------------------------
-  write_csv_dots(
-    x = .data,
-    file = .file
-  )
+  comma_cols <- .data %>%
+    dplyr::select(tidyselect::where(is.character)) %>%
+    dplyr::summarise(dplyr::across(tidyselect::everything(), ~ any(grepl(",", .x, fixed = TRUE)))) %>%
+    tidyr::pivot_longer(tidyselect::everything()) %>%
+    dplyr::filter(value) %>%
+    dplyr::pull(name)
 
-  # Prepare Metadata Folder -------------------------------------------------
+  if (length(comma_cols) > 0) {
+    cli::cli_abort(
+      "Comma found in following column(s): {.val {comma_cols}}"
+    )
+  }
+
+  # ── 2. Derive paths ───────────────────────────────────────────────────────
+
+  if (is.null(.prev_file)) {
+    .prev_file <- .file
+  }
   .data_location <- dirname(.file)
   .data_name <- tools::file_path_sans_ext(basename(.file))
   .meta_data_folder <- file.path(.data_location, .data_name)
+  .spec_list_file <- file.path(.meta_data_folder, "spec-list.yml")
 
-  # Create directory anew if it exists
-  if (dir.exists(.meta_data_folder)) {
+  cli::cli_rule("write_derived")
+
+  # Remove legacy metadata folder (contained diffs.csv) and start fresh
+  .legacy_diffs_file <- file.path(.meta_data_folder, "diffs.csv")
+  if (dir.exists(.meta_data_folder) && file.exists(.legacy_diffs_file)) {
+    cli::cli_alert_info("Removing legacy metadata folder and regenerating.")
     unlink(.meta_data_folder, recursive = TRUE)
   }
 
-  dir.create(.meta_data_folder)
+  # ── 3. Snapshot old state ──────────────────────────────────────────────────
+  # Everything here runs BEFORE any files are written so we capture the
+  # previous version of both data and spec for diffing, plus md5 checksums
+  # to detect whether content actually changed after writing.
 
-  # Write Out Metadata ------------------------------------------------------
-  haven::write_xpt(
-    data = yspec::ys_add_labels(.data, .spec),
-    path = file.path(.meta_data_folder, paste0(.data_name, ".xpt")),
-    version = 5, # Use version 5
-    name = paste0("a", substr(gsub("[^[:alnum:]]", "", .data_name), 1, 7)) # Max of 8 chars
+  # Baselines for diffing (from SVN or local, depending on .compare_from_svn)
+  base_df_list <- get_svn_baseline(.prev_file, .compare_from_svn)
+
+  base_spec_list <- get_svn_baseline(
+    .prev_file = .spec_list_file,
+    .compare_from_svn = .compare_from_svn,
+    .reader = yaml::read_yaml,
+    .file_ext = ".yml"
   )
 
-  # Write out the spec
-  .spec_list <-
-    purrr::map(as.list(.spec), ~ {
-      .x[intersect(c("short", "type", "unit", "values", "decode"), names(.x))]
-    })
 
-  yaml::write_yaml(.spec_list, file.path(.meta_data_folder, "spec-list.yml"))
-
-  # Try to render spec
-  silence_console_output(
-    yspec::render_fda_define(
-      x = .spec,
-      stem = "define",
-      output_dir = .meta_data_folder
-    )
-  )
-
-  # Search for ID column
-  if (!.subject_col %in% colnames(.data)) {
-    stop("Defined .subject_col '", .subject_col, "' not found in data")
+  # md5 checksums (NULL = file doesn't exist yet, i.e. first run)
+  old_csv_md5 <- if (file.exists(.file)) {
+    unname(tools::md5sum(.file))
+  }
+  old_spec_md5 <- if (file.exists(.spec_list_file)) {
+    unname(tools::md5sum(.spec_list_file))
   }
 
-  # Execute data diffs ------------------------------------------------------
+  # ── 4. Write csv and spec-list (always) ────────────────────────────────────
+
+  write_csv_dots(x = .data, file = .file)
+
+
+  if (!dir.exists(.meta_data_folder)) {
+    dir.create(.meta_data_folder)
+  }
+
+  .spec_list <- purrr::map(
+    as.list(.spec),
+    ~ .x[intersect(c("short", "type", "unit", "values", "decode"), names(.x))]
+  )
+
+  yaml::write_yaml(.spec_list, .spec_list_file)
+
+
+  # ── 5. Regenerate xpt and define (only when content changed) ───────────────
+  # These files embed timestamps, so we skip regeneration when nothing changed
+  # to keep version-control diffs clean.
+
+  .needs_update <-
+    is.null(old_csv_md5) |
+    is.null(old_spec_md5) |
+    !identical(old_csv_md5, unname(tools::md5sum(.file))) |
+    !identical(old_spec_md5, unname(tools::md5sum(.spec_list_file)))
+
+  outputs <- c("csv")
+
+  if (.needs_update) {
+    haven::write_xpt(
+      data = yspec::ys_add_labels(.data, .spec),
+      path = file.path(.meta_data_folder, paste0(.data_name, ".xpt")),
+      version = 5,
+      name = paste0("a", substr(gsub("[^[:alnum:]]", "", .data_name), 1, 7))
+    )
+
+
+    silence_console_output(
+      yspec::render_fda_define(
+        x = .spec,
+        stem = "define",
+        output_dir = .meta_data_folder
+      )
+    )
+
+
+    outputs <- c(outputs, "xpt", "define")
+  }
+
+  cli::cli_alert_success("Outputs written: {paste(outputs, collapse = ', ')}")
+
+  # ── 6. Compute and report diffs ────────────────────────────────────────────
+
+  spec_diff_rows <- tibble::tibble(name = character(), value = character())
+  data_diff_rows <- tibble::tibble(name = character(), value = character())
+  data_standard_rows <- tibble::tibble(name = character(), value = character())
+  data_variable_rows <- tibble::tibble(name = character(), value = character())
   compare_df <- read_csv_dots(.file)
 
-  if (!is.null(base_df_list$base_df) & .execute_diffs) {
-    diffs <-
-      execute_data_diffs(
+
+  if (.execute_diffs && .needs_update) {
+    if (!is.null(base_spec_list$base_df)) {
+      spec_diffs <- execute_spec_diffs(
+        .base_spec = base_spec_list$base_df,
+        .compare_spec = yaml::read_yaml(.spec_list_file)
+      )
+      spec_diff_rows <- spec_diffs$diffs
+
+    }
+
+    if (!is.null(base_df_list$base_df)) {
+      data_diffs <- execute_data_diffs(
         .base_df = base_df_list$base_df,
         .compare_df = compare_df,
         .subject_col = .subject_col,
-        .base_from_svn = base_df_list$from_svn
+        .print_output = FALSE
       )
+      data_diff_rows <- data_diffs$diffs
+      data_standard_rows <- data_diffs$standard_diffs
+      data_variable_rows <- data_diffs$variable_diffs
 
-    write_csv_dots(
-      x = diffs$diffs,
-      file = file.path(.meta_data_folder, 'diffs.csv')
+    }
+  }
+
+  # Print and write summary
+  .abs_file <- tools::file_path_as_absolute(.file)
+  has_summary_diffs <- nrow(data_diff_rows) > 0 || nrow(spec_diff_rows) > 0
+
+  if (has_summary_diffs) {
+    generated_at <- Sys.time()
+    generated_by <- Sys.info()[["user"]]
+    generated_at_fmt <- format(generated_at, "%Y-%m-%d %H:%M:%S")
+
+    current_info <- paste0("by ", generated_by, " at ", generated_at_fmt)
+
+    baseline_info <- if (base_df_list$from_svn) {
+      parts <- "by "
+      if (!is.na(base_df_list$svn_author)) {
+        parts <- paste0(parts, base_df_list$svn_author)
+      } else {
+        parts <- paste0(parts, "unknown")
+      }
+      if (!is.na(base_df_list$svn_date)) {
+        svn_date_clean <- sub(" [+-]\\d{4}$", "", base_df_list$svn_date)
+        parts <- paste0(parts, " at ", svn_date_clean)
+      }
+      paste0(parts, " (r", base_df_list$prev_rev, ")")
+    } else {
+      paste0("by ", generated_by)
+    }
+
+    summary_lines <- build_run_summary_lines(
+      .data_standard_rows = data_standard_rows,
+      .data_variable_rows = data_variable_rows,
+      .spec_diff_rows = spec_diff_rows,
+      .current_info = current_info,
+      .baseline_info = baseline_info
+    )
+
+    cat("\n")
+    writeLines(summary_lines)
+
+    writeLines(
+      text = summary_lines,
+      con = file.path(.meta_data_folder, "diff-summary.txt")
+    )
+  } else if (!.needs_update) {
+    .diff_summary_path <- file.path(.meta_data_folder, "diff-summary.txt")
+    if (file.exists(.diff_summary_path)) {
+      .rel_diff_summary <- fs::path_rel(.diff_summary_path)
+      cli::cli_alert_info("No changes since last run (see {.path {(.rel_diff_summary)}})")
+    } else {
+      cli::cli_alert_info("No changes since last run")
+    }
+  } else if (.compare_from_svn && is.null(base_df_list$base_df)) {
+    generated_at <- Sys.time()
+    generated_by <- Sys.info()[["user"]]
+    generated_at_fmt <- format(generated_at, "%Y-%m-%d %H:%M:%S")
+    current_info <- paste0("by ", generated_by, " at ", generated_at_fmt)
+
+    summary_lines <- build_initial_summary_lines(
+      .current_info = current_info,
+      .n_rows = nrow(compare_df),
+      .n_cols = ncol(compare_df),
+      .n_subjects = length(unique(compare_df[[.subject_col]]))
+    )
+
+    cat("\n")
+    writeLines(summary_lines)
+
+    writeLines(
+      text = summary_lines,
+      con = file.path(.meta_data_folder, "diff-summary.txt")
     )
   }
 
-  cli::cli_alert(paste0("File written: ", cli::col_blue(tools::file_path_as_absolute(.file))))
-  cli::cli_alert(paste0("Metadata folder: ", cli::col_blue(tools::file_path_as_absolute(.meta_data_folder))))
+  .rel_file <- fs::path_rel(.abs_file)
+  cli::cli_alert_success("Derived dataset: {.path {(.rel_file)}}")
+  cli::cli_rule()
 
+  # ── 7. Return ──────────────────────────────────────────────────────────────
 
-  # Return ------------------------------------------------------------------
   if (.return_base_compare) {
     return(
       list(
@@ -124,9 +299,7 @@ write_derived <- function(.data, .spec, .file, .subject_col = "ID", .prev_file =
         base_from_svn = base_df_list$from_svn
       )
     )
-
   } else {
     return(invisible(NULL))
   }
-
 }

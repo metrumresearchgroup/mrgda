@@ -488,9 +488,10 @@ dataset versions and understand their contents.
     (derived from the `yspec` object).
   - **Define-XML**: Rendered HTML and PDF versions of the data
     definition (using `yspec::render_fda_define`).
-  - **`diffs.csv`**: If a previous version of the dataset is available
-    (either locally or from SVN, controlled by `.compare_from_svn`), it
-    generates diff reports highlighting changes between versions.
+  - **`diff-summary.txt`**: If a previous version of the dataset is
+    available (either locally or from SVN, controlled by
+    `.compare_from_svn`), a summary of data and spec changes is written
+    here and printed to the console.
 - **Versioning & Comparison**:
   - `.prev_file`: Path to the previous version of the CSV file (defaults
     to `.file` if not specified).

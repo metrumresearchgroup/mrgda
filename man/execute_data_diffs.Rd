@@ -4,7 +4,7 @@
 \alias{execute_data_diffs}
 \title{Execute Differences Between Data Frames}
 \usage{
-execute_data_diffs(.base_df, .compare_df, .subject_col, .base_from_svn = FALSE)
+execute_data_diffs(.base_df, .compare_df, .subject_col, .print_output = TRUE)
 }
 \arguments{
 \item{.base_df}{A data frame that serves as the base for comparison.}
@@ -14,11 +14,11 @@ execute_data_diffs(.base_df, .compare_df, .subject_col, .base_from_svn = FALSE)
 \item{.subject_col}{A string representing the column name to be used for subject-based differences.
 Set to \code{NULL} for data frames not containing an subject column.}
 
-\item{.base_from_svn}{Logical. Was base df exported from svn?}
+\item{.print_output}{Logical. Should console output be printed?}
 }
 \value{
-No return value, but this function will write files to the specified output directory
-containing the differences between the input data frames.
+A list with elements \code{diffs}, \code{standard_diffs}, and \code{variable_diffs}
+(tibbles summarizing the differences).
 }
 \description{
 This function executes the comparison of two data frames, generates
