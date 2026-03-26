@@ -36,8 +36,18 @@ read_src_dir <- function(.path,
 
   .files_of_interest <- list_files_of_type(.path = .path, .file_types = .file_types)
 
+  if (length(.files_of_interest$files_of_type) == 0) {
+    stop(paste0("No files of type '", .file_types, "' found in the specified path."))
+  }
+
   if (!is.null(.read_domains)) {
     .domains <- tools::file_path_sans_ext(basename(.files_of_interest$files_of_type))
+
+    missing_domains <- setdiff(tolower(.read_domains), tolower(.domains))
+    if (length(missing_domains) > 0) {
+      stop(paste0("The following requested domains could not be found: ", paste(missing_domains, collapse = ", ")))
+    }
+
     .domains_keep <- tolower(.domains) %in% tolower(.read_domains)
     .files_read <- .files_of_interest$files_of_type[.domains_keep]
   } else {
@@ -72,26 +82,21 @@ read_src_dir <- function(.path,
 
   }
 
-  n_pass = 0
-  n_fail = 0
-
   for (file.i in .files_read) {
 
     .file_size_kb <- .file_sizes$SIZE[.file_sizes$FILE == file.i] / 1000
 
     cli::cli_progress_message(crayon::yellow(paste0("Reading in ", basename(file.i), " (", .file_size_kb, " KB)")))
-    data.i <- try(.read_function(file.i), silent = TRUE)
+    data.i <- tryCatch({
+      .read_function(file.i)
+    }, error = function(e) {
+      stop(paste0("Failed to load file: ", file.i, "\nOriginal error: ", e$message))
+    })
 
-    if (inherits(data.i, "try-error")) {
-      cli::cli_alert_danger(file.i)
-      n_fail <- n_fail + 1
-    } else {
-      cli::cli_alert_success(file.i)
-      domain_name.i <- tools::file_path_sans_ext(basename(file.i))
-      .out[[domain_name.i]] <- data.i
-      md5_hashes[[domain_name.i]] <- unname(tools::md5sum(file.i))
-      n_pass <- n_pass + 1
-    }
+    cli::cli_alert_success(file.i)
+    domain_name.i <- tools::file_path_sans_ext(basename(file.i))
+    .out[[domain_name.i]] <- data.i
+    md5_hashes[[domain_name.i]] <- unname(tools::md5sum(file.i))
 
     rm(data.i)
 
@@ -106,18 +111,6 @@ read_src_dir <- function(.path,
   .out$mrgda_src_meta$md5  <- md5_hashes
   .out$mrgda_src_meta$type <- .files_of_interest$type
   .out$mrgda_src_meta$path <- .path
-
-  print(
-    cli::boxx(
-      header = "read_src_dir Summary",
-      label = c(
-        paste0("Number of domains successfully loaded: ", n_pass),
-        paste0("Number of domains that failed to load: ", n_fail)
-      )
-    )
-  )
-
-
 
   return(.out)
 
