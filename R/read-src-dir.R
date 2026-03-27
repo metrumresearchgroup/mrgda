@@ -90,7 +90,7 @@ read_src_dir <- function(.path,
     data.i <- try(.read_function(file.i), silent = TRUE)
 
     if (inherits(data.i, "try-error")) {
-      stop(paste0("Failed to load file: ", file.i, "\nOriginal error: ", attr(data.i, "condition")$message))
+      cli::cli_abort(paste0("Failed to load file: ", file.i, "\nOriginal error: ", attr(data.i, "condition")$message))
     }
 
     cli::cli_alert_success(file.i)
