@@ -45,7 +45,10 @@ read_src_dir <- function(.path,
 
     missing_domains <- setdiff(tolower(.read_domains), tolower(.domains))
     if (length(missing_domains) > 0) {
-      cli::cli_abort(paste0("The following requested domains could not be found: ", paste(missing_domains, collapse = ", ")))
+      cli::cli_abort(paste0(
+        "The following requested domains could not be found: ",
+        paste(missing_domains, collapse = ", ")
+      ))
     }
 
     .domains_keep <- tolower(.domains) %in% tolower(.read_domains)
@@ -90,7 +93,12 @@ read_src_dir <- function(.path,
     data.i <- try(.read_function(file.i), silent = TRUE)
 
     if (inherits(data.i, "try-error")) {
-      cli::cli_abort(paste0("Failed to load file: ", file.i, "\nOriginal error: ", attr(data.i, "condition")$message))
+      cli::cli_abort(paste0(
+        "Failed to load file: ",
+        file.i,
+        "\nOriginal error: ",
+        attr(data.i, "condition")$message
+      ))
     }
 
     cli::cli_alert_success(file.i)
