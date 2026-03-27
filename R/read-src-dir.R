@@ -87,11 +87,11 @@ read_src_dir <- function(.path,
     .file_size_kb <- .file_sizes$SIZE[.file_sizes$FILE == file.i] / 1000
 
     cli::cli_progress_message(crayon::yellow(paste0("Reading in ", basename(file.i), " (", .file_size_kb, " KB)")))
-    data.i <- tryCatch({
-      .read_function(file.i)
-    }, error = function(e) {
-      stop(paste0("Failed to load file: ", file.i, "\nOriginal error: ", e$message))
-    })
+    data.i <- try(.read_function(file.i), silent = TRUE)
+
+    if (inherits(data.i, "try-error")) {
+      stop(paste0("Failed to load file: ", file.i, "\nOriginal error: ", attr(data.i, "condition")$message))
+    }
 
     cli::cli_alert_success(file.i)
     domain_name.i <- tools::file_path_sans_ext(basename(file.i))
