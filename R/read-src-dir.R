@@ -45,7 +45,7 @@ read_src_dir <- function(.path,
 
     missing_domains <- setdiff(tolower(.read_domains), tolower(.domains))
     if (length(missing_domains) > 0) {
-      stop(paste0("The following requested domains could not be found: ", paste(missing_domains, collapse = ", ")))
+      cli::cli_abort(paste0("The following requested domains could not be found: ", paste(missing_domains, collapse = ", ")))
     }
 
     .domains_keep <- tolower(.domains) %in% tolower(.read_domains)
