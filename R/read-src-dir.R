@@ -37,7 +37,7 @@ read_src_dir <- function(.path,
   .files_of_interest <- list_files_of_type(.path = .path, .file_types = .file_types)
 
   if (length(.files_of_interest$files_of_type) == 0) {
-    stop(paste0("No files of type '", .file_types, "' found in the specified path."))
+    cli::cli_abort(paste0("No files of type '", .file_types, "' found in the specified path."))
   }
 
   if (!is.null(.read_domains)) {
