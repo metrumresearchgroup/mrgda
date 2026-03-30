@@ -6,12 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Tools for Data Assembly • mrgda</title>
-<!-- favicons --><link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
-<link rel="apple-touch-icon" type="image/png" sizes="180x180" href="apple-touch-icon.png">
-<link rel="apple-touch-icon" type="image/png" sizes="120x120" href="apple-touch-icon-120x120.png">
-<link rel="apple-touch-icon" type="image/png" sizes="76x76" href="apple-touch-icon-76x76.png">
-<link rel="apple-touch-icon" type="image/png" sizes="60x60" href="apple-touch-icon-60x60.png">
+<!-- favicons --><link rel="icon" type="image/png" sizes="48x48" href="favicon-48x48.png">
+<link rel="icon" type="”image/svg+xml”" href="favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="icon" sizes="any" href="favicon.ico">
+<link rel="manifest" href="site.webmanifest">
 <!-- jquery --><script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script><!-- Bootstrap --><link href="https://cdnjs.cloudflare.com/ajax/libs/bootswatch/3.4.0/flatly/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.4.1/js/bootstrap.min.js" integrity="sha256-nuL8/2cJ5NDSSwnKD8VqreErSWHtnEP9E7AySL+1ev4=" crossorigin="anonymous"></script><!-- bootstrap-toc --><link rel="stylesheet" href="bootstrap-toc.css">
 <script src="bootstrap-toc.js"></script><!-- Font Awesome icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" integrity="sha256-mmgLkCYLUQbXn0B1SRqzHar6dCnv9oZFPEC1g1cwlkk=" crossorigin="anonymous">
@@ -40,7 +39,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">mrgda</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.13.0</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.13.0.9011</span>
       </span>
     </div>
 
@@ -57,10 +56,10 @@
   </a>
   <ul class="dropdown-menu" role="menu">
 <li>
-      <a href="articles/assigning-id.html">assigning-id</a>
+      <a href="articles/annotate-da-code.html">annotate-da-code</a>
     </li>
     <li>
-      <a href="articles/explain-code.html">explain-code</a>
+      <a href="articles/assigning-id.html">assigning-id</a>
     </li>
   </ul>
 </li>
@@ -91,7 +90,6 @@
 <div class="section level1">
 <div class="page-header"><h1 id="mrgda--data-assembly-workflow">mrgda – Data Assembly Workflow<a class="anchor" aria-label="anchor" href="#mrgda--data-assembly-workflow"></a>
 </h1></div>
-<p><a href="https://docs.google.com/presentation/d/129PoYxjcYMp5lWMFoMZj-hgvuAOFHB4CEbCUIDbNdh8/edit?usp=sharing" class="external-link">Link to Data Assembly Demystified Presentation</a></p>
 <ul>
 <li><a href="#background">Background</a></li>
 <li>
@@ -164,7 +162,7 @@
 <li>
 <strong>Path Specification</strong>: You provide the full path to the source data directory using the <code>.path</code> argument.</li>
 <li>
-<strong>File Type Detection</strong>: The function can auto-detect file types (e.g., CSV, SAS7BDAT, XPT) if <code>.file_types</code> is set to <code>"detect"</code> (the default). Alternatively, you can specify the type.</li>
+<strong>File Type Selection</strong>: You must specify the file type (e.g., CSV, SAS7BDAT, XPT) via <code>.file_types</code>.</li>
 <li>
 <strong>Selective Domain Loading</strong>: If you only need specific domains, you can provide a character vector of domain names to the <code>.read_domains</code> argument (e.g., <code>c('dm', 'lb')</code>). By default, it loads all domains.</li>
 <li>
@@ -181,7 +179,7 @@
 <span><span class="va">target_spec</span> <span class="op">&lt;-</span> <span class="fu">ys_load</span><span class="op">(</span><span class="fu">here</span><span class="op">(</span><span class="st">"data/derived/pk.yaml"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Read SDTM source data from the '100' subdirectory</span></span>
-<span><span class="va">src_100</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_src_dir.html">read_src_dir</a></span><span class="op">(</span><span class="fu">here</span><span class="op">(</span><span class="st">"data"</span>, <span class="st">"source"</span>, <span class="st">"100"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">src_100</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/read_src_dir.html">read_src_dir</a></span><span class="op">(</span><span class="fu">here</span><span class="op">(</span><span class="st">"data"</span>, <span class="st">"source"</span>, <span class="st">"100"</span><span class="op">)</span>, .file_types <span class="op">=</span> <span class="st">"xpt"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level1">
@@ -563,17 +561,9 @@
 <li>
 <strong><code>spec-list.yml</code></strong>: A YAML file containing the data specification (derived from the <code>yspec</code> object).</li>
 <li>
-<strong>Define-XML</strong>: Rendered HTML and PDF versions of the data definition (using <code><a href="https://rdrr.io/pkg/yspec/man/render_fda_define.html" class="external-link">yspec::render_fda_define</a></code>).</li>
+<strong>Define-XML</strong>: Rendered HTML and PDF versions of the data definition (using <code><a href="https://metrumresearchgroup.github.io/yspec/reference/render_fda_define.html" class="external-link">yspec::render_fda_define</a></code>).</li>
 <li>
-<strong><code>subject-columns.yml</code></strong>: A YAML file identifying subject-level columns.</li>
-<li>
-<strong><code>history.csv</code></strong>: Tracks changes to the dataset across versions, including user, date/time, comments, and revision numbers (if applicable).</li>
-<li>
-<strong><code>sys-info.yml</code></strong>: System information at the time of writing (user, R version, OS).</li>
-<li>
-<strong><code>dependencies.yml</code></strong>: If run within an RStudio project, it attempts to find scripts that use this derived file.</li>
-<li>
-<strong><code>diffs.csv</code> &amp; <code>subject-diffs.csv</code></strong>: If a previous version of the dataset is available (either locally or from SVN, controlled by <code>.compare_from_svn</code>), it generates diff reports highlighting changes between versions.</li>
+<strong><code>diff-summary.txt</code></strong>: If a previous version of the dataset is available (either locally or from SVN, controlled by <code>.compare_from_svn</code>), a summary of data and spec changes is written here and printed to the console.</li>
 </ul>
 </li>
 <li>
@@ -630,10 +620,10 @@
 <div class="developers">
 <h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
-<li>Eric Anderson <br><small class="roles"> Author, maintainer </small>  </li>
-<li>Grace O'Brien <br><small class="roles"> Author </small>  </li>
-<li>Michael McDermott <br><small class="roles"> Author </small>  </li>
-<li>Kyle Barrett <br><small class="roles"> Author </small>  </li>
+<li>Eric Anderson <br><small class="roles"> Author, maintainer </small>   </li>
+<li>Grace O'Brien <br><small class="roles"> Author </small>   </li>
+<li>Michael McDermott <br><small class="roles"> Author </small>   </li>
+<li>Kyle Barrett <br><small class="roles"> Author </small>   </li>
 </ul>
 </div>
 
@@ -650,7 +640,7 @@
 
 <div class="pkgdown">
   <p></p>
-<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.3.</p>
 </div>
 
       </footer>
