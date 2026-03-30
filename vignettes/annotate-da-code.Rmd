@@ -25,7 +25,14 @@ knitr::opts_chunk$set(
 ```
 
 ```{r load packages, results = 'hide', message=FALSE, warning=FALSE}
-library(mrgda)
+if (file.exists("../DESCRIPTION")) {
+  source("../R/annotate-da.R")
+} else if (file.exists("DESCRIPTION")) {
+  source("R/annotate-da.R")
+} else {
+  library(mrgda)
+}
+
 library(dplyr)
 ```
 
@@ -35,7 +42,13 @@ We will use `annotate_da()` to document data manipulations and checks on the der
 data set from `mrgda`.
 
 ```{r, message=FALSE}
-pk_data <- readr::read_csv(system.file("derived/pk.csv", package = "mrgda"))
+pk_data <- readr::read_csv(
+  if (file.exists("../inst/derived/pk.csv")) {
+    "../inst/derived/pk.csv"
+  } else {
+    system.file("derived/pk.csv", package = "mrgda")
+  }
+)
 ```
 
 # Using annotate_da()
@@ -56,7 +69,7 @@ For instance, if we're planning to exclude a record we believe is an outlier,
 we can first use `annotate_da()` to show where in the data the issue exists.
 
 ```{r}
-mrgda:::annotate_da("ID = 1 has outlier in PK data, will remove", {
+annotate_da("ID = 1 has outlier in PK data, will remove", {
   pk_data %>% 
     filter(ID == 1, DVID == 2, TIME < 24) %>% 
     select(ID, TIME, TAD, DV, DVID, EVID)
@@ -75,7 +88,7 @@ to display in the header and the second is an expression to display the result o
 As shown previously, this expression could be in the form of a data.frame.
 
 ```{r}
-mrgda:::annotate_da("Show the first few records of ID = 2 from the pk_data data.frame", {
+annotate_da("Show the first few records of ID = 2 from the pk_data data.frame", {
   pk_data %>% 
     filter(ID == 2) %>% 
     select(ID, TIME, DV, EVID) %>% 
@@ -86,7 +99,7 @@ mrgda:::annotate_da("Show the first few records of ID = 2 from the pk_data data.
 A vector can also be provided, such as one containing all the unique studies from the data set.
 
 ```{r}
-mrgda:::annotate_da("Show a vector of all studies in the data set", {
+annotate_da("Show a vector of all studies in the data set", {
   pk_data %>% 
     distinct(STUDYID) %>% 
     pull(STUDYID)
@@ -96,7 +109,7 @@ mrgda:::annotate_da("Show a vector of all studies in the data set", {
 Calculations can even be performed.
 
 ```{r}
-mrgda:::annotate_da("Total number of PK records that are not BLQ and doses", {
+annotate_da("Total number of PK records that are not BLQ and doses", {
   nrow(pk_data %>% filter(DVID == 2, BLQ == 1)) +
     nrow(pk_data %>% filter(DVID ==1))
 })
