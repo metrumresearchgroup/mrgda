@@ -63,3 +63,31 @@ test_that("labels match filenames across all xpt files", {
     expect_equal(actual_label, expected_label)
   }
 })
+
+test_that("read_src_dir errors when no files of the specified type are found", {
+  dir <- local_svn_repo()
+  withr::defer(unlink(dir, recursive = TRUE))
+  # Directory exists but has no xpt files
+  expect_error(
+    read_src_dir(dir, .file_types = "xpt"),
+    "No files of type 'xpt' found in the specified path."
+  )
+})
+
+test_that("read_src_dir errors when requested domains do not exist", {
+  expect_error(
+    read_src_dir(.path = path, .file_types = "xpt", .read_domains = c("dm", "nonexistent")),
+    "The following requested domains could not be found: nonexistent"
+  )
+})
+
+test_that("read_src_dir errors when a file fails to load", {
+  dir <- local_svn_repo()
+  withr::defer(unlink(dir, recursive = TRUE))
+  # Write a corrupted xpt file
+  writeLines("this is not valid xpt content", file.path(dir, "bad.xpt"))
+  expect_error(
+    read_src_dir(dir, .file_types = "xpt"),
+    "Failed to load file:.*bad\\.xpt"
+  )
+})
