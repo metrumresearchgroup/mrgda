@@ -2,7 +2,15 @@
 
 ## New features and changes
 
+- `read_src_dir()` now requires `.file_types` to be set explicitly; automatic file type detection was removed. (#249)
 - `query_src_list` now searches across values in addition to column and label names. (#251)
+- `write_derived()` now writes a slimmer metadata folder and no longer keeps the older metadata outputs that were previously generated. (#254)
+- `write_derived()` now avoids regenerating the XPT and define files when the CSV and `spec-list.yml` are unchanged, and writes a human-readable `diff-summary.txt` for data and spec changes. (#255)
+- `annotate_da()` replaces `explain()`, and the vignette/examples were renamed to match. (#256)
+
+## Bug fixes
+
+- `read_src_dir()` now errors clearly when no files of the requested type are found, when requested domains are missing, and when a source file fails to load. (#258)
 
 # mrgda 0.13.0
 
