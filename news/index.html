@@ -61,6 +61,27 @@
     </div>
 
     <div class="section level2">
+<h2 class="page-header" data-toc-text="0.14.0" id="mrgda-0140">mrgda 0.14.0<a class="anchor" aria-label="anchor" href="#mrgda-0140"></a></h2>
+<div class="section level3">
+<h3 id="new-features-and-changes-0-14-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-14-0"></a></h3>
+<ul><li>
+<code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now requires <code>.file_types</code> to be set explicitly; automatic file type detection was removed. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/249" class="external-link">#249</a>)</li>
+<li>
+<code>query_src_list</code> now searches across values in addition to column and label names. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/251" class="external-link">#251</a>)</li>
+<li>
+<code><a href="../reference/write_derived.html">write_derived()</a></code> now writes a slimmer metadata folder and no longer keeps the older metadata outputs that were previously generated. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/254" class="external-link">#254</a>)</li>
+<li>
+<code><a href="../reference/write_derived.html">write_derived()</a></code> now avoids regenerating the XPT and define files when the CSV and <code>spec-list.yml</code> are unchanged, and writes a human-readable <code>diff-summary.txt</code> for data and spec changes. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/255" class="external-link">#255</a>)</li>
+<li>
+<code><a href="../reference/annotate_da.html">annotate_da()</a></code> replaces <code><a href="https://metrumresearchgroup.github.io/mrgda/reference/explain.html">explain()</a></code>, and the vignette/examples were renamed to match. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/256" class="external-link">#256</a>)</li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-0-14-0">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-14-0"></a></h3>
+<ul><li>
+<code><a href="../reference/read_src_dir.html">read_src_dir()</a></code> now errors clearly when no files of the requested type are found, when requested domains are missing, and when a source file fails to load. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/258" class="external-link">#258</a>)</li>
+</ul></div>
+</div>
+    <div class="section level2">
 <h2 class="page-header" data-toc-text="0.13.0" id="mrgda-0130">mrgda 0.13.0<a class="anchor" aria-label="anchor" href="#mrgda-0130"></a></h2>
 <div class="section level3">
 <h3 id="new-features-and-changes-0-13-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-13-0"></a></h3>
@@ -135,7 +156,7 @@
 <div class="section level3">
 <h3 id="new-features-and-changes-0-10-0">New features and changes<a class="anchor" aria-label="anchor" href="#new-features-and-changes-0-10-0"></a></h3>
 <ul><li><p>Modified the <code>write_derived</code> function to save data history in the meta data folder (<code>history.csv</code>). (<a href="https://github.com/metrumresearchgroup/mrgda/issues/171" class="external-link">#171</a>, <a href="https://github.com/metrumresearchgroup/mrgda/issues/176" class="external-link">#176</a>)</p></li>
-<li><p>Created the <code><a href="https://dplyr.tidyverse.org/reference/explain.html" class="external-link">explain()</a></code> function that communicates code intentionality. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/164" class="external-link">#164</a>)</p></li>
+<li><p>Created the <code><a href="https://metrumresearchgroup.github.io/mrgda/reference/explain.html">explain()</a></code> function that communicates code intentionality. (<a href="https://github.com/metrumresearchgroup/mrgda/issues/164" class="external-link">#164</a>)</p></li>
 </ul></div>
 </div>
     <div class="section level2">
