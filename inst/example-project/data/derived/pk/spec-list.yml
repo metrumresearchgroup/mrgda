@@ -1,0 +1,131 @@
+C:
+  short: Commented rows
+  type: character
+  values:
+  - '.'
+  - C
+  decode:
+  - Not a comment
+  - Comment for exclusion
+NUM:
+  short: Row number
+  type: numeric
+ID:
+  short: NONMEM ID number
+  type: numeric
+TIME:
+  short: Time after first dose
+  type: numeric
+  unit: hours
+TAD:
+  short: Time after most recent dose
+  type: numeric
+  unit: hours
+DOSE:
+  short: Xanomeline dose
+  type: numeric
+  unit: mg
+DV:
+  short: Plasma xanomeline concentration
+  type: numeric
+  unit: ng/mL
+DVID:
+  short: Dependent variable ID
+  type: numeric
+  values:
+  - 1
+  - 2
+  decode:
+  - Dosing event
+  - PK observation
+CMT:
+  short: Compartment
+  type: numeric
+  values: 1
+  decode: Xanomeline dose and plasma concentration
+EVID:
+  short: Event ID
+  type: numeric
+  values:
+  - 0
+  - 1
+  decode:
+  - Observation event
+  - Dosing event
+AMT:
+  short: Dose amount
+  type: numeric
+  unit: mg
+RATE:
+  short: Dose rate
+  type: numeric
+  unit: mg/hour
+DUR:
+  short: Dose duration
+  type: numeric
+  unit: hours
+MDV:
+  short: Missing dependent variable flag
+  type: numeric
+  values:
+  - 0
+  - 1
+  decode:
+  - DV is not missing
+  - DV is missing
+BLQ:
+  short: Below limit of quantification
+  type: numeric
+  values:
+  - 0
+  - 1
+  decode:
+  - 'No'
+  - 'Yes'
+DAY:
+  short: Study day
+  type: numeric
+  unit: days
+WTBL:
+  short: Baseline weight
+  type: numeric
+  unit: kg
+WT:
+  short: Time-varying weight
+  type: numeric
+  unit: kg
+AGEBL:
+  short: Baseline age
+  type: numeric
+  unit: years
+SEX:
+  short: Sex
+  type: numeric
+  values:
+  - 0
+  - 1
+  decode:
+  - Female
+  - Male
+RACE:
+  short: Race
+  type: numeric
+  values:
+  - 1
+  - 2
+  - 3
+  - 4
+  decode:
+  - White
+  - Black or African American
+  - Asian
+  - Other or not specified
+STUDYID:
+  short: Study identifier
+  type: character
+USUBJID:
+  short: Unique subject identifier
+  type: character
+DATETIME:
+  short: Source event datetime
+  type: character
