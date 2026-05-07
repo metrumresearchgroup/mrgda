@@ -40,8 +40,10 @@ annotate_da <- function(.msg, .expr) {
 
   message("")
 
-  result <- .expr
-  output <- utils::capture.output(print(result))
+  output <- utils::capture.output({
+    result <- .expr
+    print(result)
+  })
   writeLines(output)
 
   .file <- getOption("mrgda.annotate_da_file", NULL)

@@ -20,14 +20,20 @@ test_that("use_annotate_da_file clears file and annotate_da appends output", {
     expect_equal(readLines(annotation_file), character())
 
     capture.output(annotate_da("ID = 1 has outlier, will remove", {
-      data.frame(ID = 1, DV = 100)
+      cat("\n--- Raw Data ---\n")
+      print(data.frame(ID = 1, DV = 100))
+      cat("\n--- Corrected Data ---\n")
+      data.frame(ID = 1, DV = 2.4)
     }))
 
     saved <- readLines(annotation_file)
     expect_false(any(saved == "old output"))
     expect_true(any(saved == "# Explanation: ID = 1 has outlier, will remove"))
+    expect_true(any(grepl("Raw Data", saved)))
+    expect_true(any(grepl("Corrected Data", saved)))
     expect_true(any(grepl("ID.*DV", saved)))
     expect_true(any(grepl("1.*100", saved)))
+    expect_true(any(grepl("1.*2.4", saved)))
   })
 })
 
