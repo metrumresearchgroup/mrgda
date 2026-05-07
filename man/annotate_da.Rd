@@ -19,10 +19,19 @@ This function prints a formatted message explaining the reasoning for a section 
 and then prints the result of evaluating the provided expression. This function is
 intended to be run interactively in the R console to aid in code understanding and debugging.
 }
+\details{
+If the \code{mrgda.annotate_da_file} option is set to a file path, the explanation
+and printed result are also appended to that file as Markdown.
+}
 \examples{
 \dontrun{
 dat <- Theoph
 dat$Time[2] <- 0
+annotate_da("Subject 1 has duplicate time 0", {
+  dat \%>\% filter(Subject == 1, Time == 0)
+})
+
+use_annotate_da_file("script/data-assembly/study-101-annotations.md")
 annotate_da("Subject 1 has duplicate time 0", {
   dat \%>\% filter(Subject == 1, Time == 0)
 })
