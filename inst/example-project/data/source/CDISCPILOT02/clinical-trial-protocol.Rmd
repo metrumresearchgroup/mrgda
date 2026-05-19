@@ -1,0 +1,692 @@
+---
+title: "Clinical Study Protocol"
+subtitle: "A Randomized, Double-Blind, Placebo-Controlled, Parallel-Group Study of Transdermal Xanomeline in Subjects With Mild to Moderate Alzheimer's Disease"
+author: "Protocol CDISCPILOT01"
+date: "`r format(Sys.Date(), '%B %d, %Y')`"
+output:
+  pdf_document:
+    toc: true
+    number_sections: true
+geometry: margin=0.8in
+fontsize: 10pt
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+data_dir <- "."
+read_domain <- function(domain) {
+  haven::read_xpt(file.path(data_dir, paste0(domain, ".xpt"))) |>
+    as.data.frame()
+}
+
+fmt <- function(x) {
+  x <- as.character(x)
+  x[is.na(x) | x == ""] <- "Not reported"
+  x
+}
+
+clean_text <- function(x) {
+  x <- iconv(as.character(x), from = "", to = "UTF-8", sub = "'")
+  gsub("[\u2018\u2019]", "'", x)
+}
+
+ts_val <- function(param) {
+  clean_text(ts$TSVAL[ts$TSPARMCD == param])
+}
+
+dm <- read_domain("dm")
+ae <- read_domain("ae")
+cm <- read_domain("cm")
+ds <- read_domain("ds")
+eg <- read_domain("eg")
+ex <- read_domain("ex")
+lb <- read_domain("lb")
+mh <- read_domain("mh")
+pc <- read_domain("pc")
+pp <- read_domain("pp")
+suppae <- read_domain("suppae")
+suppdm <- read_domain("suppdm")
+suppds <- read_domain("suppds")
+sv <- read_domain("sv")
+ts <- read_domain("ts")
+vs <- read_domain("vs")
+
+study_id <- unique(dm$STUDYID)
+protocol_title <- "A Randomized, Double-Blind, Placebo-Controlled, Parallel-Group Study of Transdermal Xanomeline in Subjects With Mild to Moderate Alzheimer's Disease"
+protocol_number <- study_id
+protocol_version <- "Version 1.0"
+protocol_status <- "Reconstructed example protocol"
+countries <- paste(sort(unique(dm$COUNTRY)), collapse = ", ")
+site_count <- length(unique(dm$SITEID))
+randomized_dm <- subset(dm, ARM != "Screen Failure")
+treated_dm <- subset(dm, ACTARM != "Screen Failure")
+
+study_start <- min(as.Date(dm$RFSTDTC), na.rm = TRUE)
+study_end <- max(as.Date(dm$RFENDTC), na.rm = TRUE)
+exposure_start <- min(as.Date(ex$EXSTDTC), na.rm = TRUE)
+exposure_end <- max(as.Date(ex$EXENDTC), na.rm = TRUE)
+
+arm_table <- as.data.frame(table(dm$ARM), stringsAsFactors = FALSE)
+names(arm_table) <- c("Planned Arm", "Subjects")
+
+actual_arm_table <- as.data.frame(table(dm$ACTARM), stringsAsFactors = FALSE)
+names(actual_arm_table) <- c("Actual Arm", "Subjects")
+
+sex_table <- as.data.frame(table(dm$SEX), stringsAsFactors = FALSE)
+names(sex_table) <- c("Sex", "Subjects")
+
+race_table <- as.data.frame(sort(table(dm$RACE), decreasing = TRUE), stringsAsFactors = FALSE)
+names(race_table) <- c("Race", "Subjects")
+
+ethnic_table <- as.data.frame(table(dm$ETHNIC), stringsAsFactors = FALSE)
+names(ethnic_table) <- c("Ethnicity", "Subjects")
+
+site_table <- as.data.frame(sort(table(dm$SITEID), decreasing = TRUE), stringsAsFactors = FALSE)
+names(site_table) <- c("Site", "Subjects")
+
+ex_regimens <- unique(ex[, c("EXTRT", "EXDOSE", "EXDOSU", "EXDOSFRM", "EXDOSFRQ", "EXROUTE")])
+ex_regimens <- ex_regimens[order(ex_regimens$EXDOSE), ]
+names(ex_regimens) <- c("Treatment", "Dose", "Unit", "Form", "Frequency", "Route")
+
+ex_visits <- unique(ex[, c("VISITNUM", "VISIT", "VISITDY")])
+ex_visits <- ex_visits[order(ex_visits$VISITNUM), ]
+names(ex_visits) <- c("Visit Number", "Visit", "Study Day")
+
+visit_cols <- c("VISITNUM", "VISIT", "VISITDY")
+domain_visits <- function(x) {
+  if (all(visit_cols %in% names(x))) {
+    x[, visit_cols]
+  } else {
+    NULL
+  }
+}
+
+all_visits <- unique(do.call(rbind, Filter(
+  Negate(is.null),
+  lapply(list(ae, cm, ds, eg, lb, mh, pc, pp, sv, vs), domain_visits)
+)))
+all_visits <- all_visits[order(all_visits$VISITNUM), ]
+names(all_visits) <- c("Visit Number", "Visit", "Study Day")
+
+scheduled_visits <- subset(all_visits, !grepl("UNSCHEDULED", Visit) & !is.na(`Study Day`))
+
+lb_cats <- as.data.frame(sort(table(fmt(lb$LBCAT)), decreasing = TRUE), stringsAsFactors = FALSE)
+names(lb_cats) <- c("Category", "Results")
+
+lb_nri <- as.data.frame(sort(table(fmt(lb$LBNRIND)), decreasing = TRUE), stringsAsFactors = FALSE)
+names(lb_nri) <- c("Reference Range Indicator", "Results")
+
+lb_tests <- unique(lb[, c("LBCAT", "LBTESTCD", "LBTEST", "LBSTRESU")])
+lb_tests$LBCAT <- fmt(lb_tests$LBCAT)
+lb_tests$LBSTRESU <- fmt(lb_tests$LBSTRESU)
+lb_tests <- lb_tests[order(lb_tests$LBCAT, lb_tests$LBTESTCD), ]
+names(lb_tests) <- c("Category", "Code", "Test", "Unit")
+
+pc_tests <- unique(pc[, c("PCTESTCD", "PCTEST", "PCSTRESU", "PCSPEC", "PCLLOQ")])
+pc_tests <- pc_tests[order(pc_tests$PCSPEC, pc_tests$PCTESTCD), ]
+names(pc_tests) <- c("Code", "Analyte", "Unit", "Specimen", "Lower Limit")
+
+pc_tpts <- unique(pc[, c("VISIT", "VISITDY", "PCTPT", "PCTPTNUM")])
+pc_tpts <- pc_tpts[order(pc_tpts$VISITDY, pc_tpts$PCTPTNUM), ]
+names(pc_tpts) <- c("Visit", "Study Day", "Nominal Time Point", "Nominal Hour")
+
+pp_tests <- unique(pp[, c("PPTESTCD", "PPTEST", "PPSTRESU", "PPSPEC")])
+pp_tests$PPSTRESU <- fmt(pp_tests$PPSTRESU)
+pp_tests <- pp_tests[order(pp_tests$PPSPEC, pp_tests$PPTESTCD), ]
+names(pp_tests) <- c("Code", "Parameter", "Unit", "Specimen")
+
+eg_tests <- unique(eg[, c("EGTESTCD", "EGTEST", "EGSTRESU")])
+eg_tests$EGSTRESU <- fmt(eg_tests$EGSTRESU)
+eg_tests <- eg_tests[order(eg_tests$EGTESTCD), ]
+names(eg_tests) <- c("Code", "ECG Parameter", "Unit")
+
+vs_tests <- unique(vs[, c("VSTESTCD", "VSTEST", "VSPOS", "VSLOC", "VSSTRESU")])
+vs_tests$VSPOS <- fmt(vs_tests$VSPOS)
+vs_tests$VSLOC <- fmt(vs_tests$VSLOC)
+vs_tests$VSSTRESU <- fmt(vs_tests$VSSTRESU)
+vs_tests <- vs_tests[order(vs_tests$VSTESTCD, vs_tests$VSPOS, vs_tests$VSLOC), ]
+names(vs_tests) <- c("Code", "Vital Sign", "Position", "Location", "Unit")
+
+death_count <- sum(dm$DTHFL == "Y", na.rm = TRUE)
+ds_death_count <- length(unique(ds$USUBJID[ds$DSDECOD == "DEATH" | ds$DSTERM == "DEATH"]))
+
+domain_summary <- data.frame(
+  Domain = c("DM", "AE", "CM", "DS", "EG", "EX", "LB", "MH", "PC", "PP", "SUPPAE", "SUPPDM", "SUPPDS", "SV", "TS", "VS"),
+  Description = c(
+    "Demographics",
+    "Adverse events",
+    "Concomitant medications",
+    "Disposition",
+    "ECG test results",
+    "Exposure",
+    "Laboratory tests",
+    "Medical history",
+    "Pharmacokinetic concentrations",
+    "Pharmacokinetic parameters",
+    "Supplemental adverse event qualifiers",
+    "Supplemental demographic qualifiers",
+    "Supplemental disposition qualifiers",
+    "Subject visits",
+    "Trial summary",
+    "Vital signs"
+  ),
+  Records = c(nrow(dm), nrow(ae), nrow(cm), nrow(ds), nrow(eg), nrow(ex), nrow(lb), nrow(mh), nrow(pc), nrow(pp), nrow(suppae), nrow(suppdm), nrow(suppds), nrow(sv), nrow(ts), nrow(vs)),
+  Subjects = c(
+    length(unique(dm$USUBJID)),
+    length(unique(ae$USUBJID)),
+    length(unique(cm$USUBJID)),
+    length(unique(ds$USUBJID)),
+    length(unique(eg$USUBJID)),
+    length(unique(ex$USUBJID)),
+    length(unique(lb$USUBJID)),
+    length(unique(mh$USUBJID)),
+    length(unique(pc$USUBJID)),
+    length(unique(pp$USUBJID)),
+    length(unique(suppae$USUBJID)),
+    length(unique(suppdm$USUBJID)),
+    length(unique(suppds$USUBJID)),
+    length(unique(sv$USUBJID)),
+    NA,
+    length(unique(vs$USUBJID))
+  )
+)
+
+ds_summary <- as.data.frame(sort(table(fmt(ds$DSDECOD)), decreasing = TRUE), stringsAsFactors = FALSE)
+names(ds_summary) <- c("Disposition Event", "Records")
+
+ae_terms <- as.data.frame(head(sort(table(fmt(ae$AEDECOD)), decreasing = TRUE), 15), stringsAsFactors = FALSE)
+names(ae_terms) <- c("Adverse Event", "Records")
+
+ae_severity <- as.data.frame(table(fmt(ae$AESEV), fmt(ae$AESER)), stringsAsFactors = FALSE)
+names(ae_severity) <- c("Severity", "Serious", "Records")
+ae_severity <- subset(ae_severity, Records > 0)
+
+ae_relation <- as.data.frame(sort(table(fmt(ae$AEREL)), decreasing = TRUE), stringsAsFactors = FALSE)
+names(ae_relation) <- c("Relationship to Study Drug", "Records")
+
+cm_terms <- as.data.frame(head(sort(table(fmt(cm$CMDECOD)), decreasing = TRUE), 15), stringsAsFactors = FALSE)
+names(cm_terms) <- c("Medication", "Records")
+
+cm_indications <- as.data.frame(sort(table(fmt(cm$CMINDC)), decreasing = TRUE), stringsAsFactors = FALSE)
+names(cm_indications) <- c("Indication", "Records")
+
+mh_categories <- as.data.frame(sort(table(fmt(mh$MHCAT)), decreasing = TRUE), stringsAsFactors = FALSE)
+names(mh_categories) <- c("Medical History Category", "Records")
+
+mh_terms <- as.data.frame(head(sort(table(fmt(mh$MHTERM)), decreasing = TRUE), 15), stringsAsFactors = FALSE)
+names(mh_terms) <- c("Medical History Term", "Records")
+
+alzheimer_count <- length(unique(mh$USUBJID[grepl("ALZHEIMER", mh$MHTERM, ignore.case = TRUE)]))
+
+trial_summary <- data.frame(
+  Item = c(
+    "Trial indication",
+    "Diagnosis group",
+    "Age range",
+    "Blinding",
+    "Control type",
+    "Treatment length",
+    "Dosing frequency",
+    "Primary objective",
+    "Secondary objectives"
+  ),
+  Value = c(
+    paste(ts_val("INDIC"), collapse = "; "),
+    paste(ts_val("TDIGRP"), collapse = "; "),
+    paste(ts_val("AGEMIN"), collapse = "; "),
+    paste(ts_val("TBLIND"), collapse = "; "),
+    paste(ts_val("TCNTRL"), collapse = "; "),
+    paste(ts_val("LENGTH"), collapse = "; "),
+    paste(ts_val("DOSFRQ"), collapse = "; "),
+    paste(ts_val("OBJPRIM"), collapse = "; "),
+    paste(ts_val("OBJSEC"), collapse = "; ")
+  )
+)
+
+objective_endpoint_table <- data.frame(
+  Objective = c(
+    "Primary efficacy",
+    "Secondary efficacy",
+    "Safety and tolerability",
+    "Pharmacokinetics"
+  ),
+  Endpoint = c(
+    "Change in ADAS-Cog and CIBIC+ scores by assigned dose.",
+    "Behavior and activities of daily living endpoints, including NPI-X and DAD where available in the original efficacy database.",
+    "Treatment-emergent adverse events, serious adverse events, laboratory tests, vital signs, ECGs, deaths, concomitant medications, and disposition.",
+    "Xanomeline plasma and urine concentrations and derived PK parameters including AUC, Cmax, Tmax, half-life, renal clearance, and urinary amount excreted."
+  )
+)
+
+design_table <- data.frame(
+  Attribute = c(
+    "Study phase",
+    "Design",
+    "Control",
+    "Blinding",
+    "Population",
+    "Planned duration",
+    "Treatment arms",
+    "Route and dosage form",
+    "Study sites"
+  ),
+  Description = c(
+    "Clinical pharmacology, efficacy, and safety study.",
+    "Multicenter, randomized, double-blind, placebo-controlled, parallel-group study.",
+    paste(ts_val("TCNTRL"), collapse = "; "),
+    paste(ts_val("TBLIND"), collapse = "; "),
+    paste0("Subjects with ", paste(ts_val("INDIC"), collapse = "; "), "."),
+    paste(ts_val("LENGTH"), collapse = "; "),
+    paste(sort(unique(dm$ARM[dm$ARM != "Screen Failure"])), collapse = "; "),
+    paste0("Transdermal patch; ", paste(ts_val("DOSFRQ"), collapse = "; "), "."),
+    paste0(site_count, " sites in ", countries, ".")
+  )
+)
+
+population_flags <- unique(suppdm[, c("QNAM", "QLABEL", "QVAL")])
+population_flags <- population_flags[order(population_flags$QNAM), ]
+names(population_flags) <- c("Flag", "Population", "Value")
+
+teae_summary <- as.data.frame(sort(table(fmt(suppae$QVAL[suppae$QNAM == "AETRTEM"])), decreasing = TRUE), stringsAsFactors = FALSE)
+names(teae_summary) <- c("Treatment-Emergent Flag", "Records")
+
+entry_criteria <- unique(suppds[, c("QNAM", "QLABEL", "QVAL")])
+names(entry_criteria) <- c("Qualifier", "Label", "Value")
+```
+
+\newpage
+
+\begin{center}
+{\Large \textbf{Clinical Study Protocol}}\\[0.2in]
+{\large \textbf{`r protocol_title`}}\\[0.3in]
+\end{center}
+
+| Field | Value |
+|---|---|
+| Protocol Number | `r protocol_number` |
+| Protocol Version | `r protocol_version` |
+| Protocol Date | `r format(Sys.Date(), '%B %d, %Y')` |
+| Investigational Product | Xanomeline transdermal patch |
+| Sponsor | CDISCPILOT01 example sponsor |
+| Development Phase | Clinical pharmacology, efficacy, and safety |
+| Study Design | Randomized, double-blind, placebo-controlled, parallel-group |
+| Confidentiality | This reconstructed protocol is for example-project documentation and data interpretation only. |
+
+\newpage
+
+# Protocol Administrative Information
+
+This protocol is reconstructed from the XPT source data in `inst/example-project/data/source/CDISCPILOT01`. It is intended for example-project documentation and data interpretation. It is not an original sponsor-approved protocol and must not be used to conduct human subject research.
+
+**Study identifier:** `r study_id`
+
+**Protocol title:** A randomized, placebo-controlled, parallel-group study of transdermal Xanomeline in subjects with mild to moderate Alzheimer's disease.
+
+**Investigational product:** Xanomeline transdermal patch.
+
+**Control:** Matching placebo transdermal patch.
+
+**Country and sites:** `r countries`; `r site_count` sites.
+
+**Observed subject reference period:** `r format(study_start, '%Y-%m-%d')` to `r format(study_end, '%Y-%m-%d')`.
+
+**Observed exposure period:** `r format(exposure_start, '%Y-%m-%d')` to `r format(exposure_end, '%Y-%m-%d')`.
+
+## Protocol History
+
+| Version | Date | Summary of Changes |
+|---|---|---|
+| 1.0 | `r format(Sys.Date(), '%Y-%m-%d')` | Initial reconstructed protocol prepared from available CDISCPILOT01 source domains. |
+
+# Protocol Synopsis
+
+```{r synopsis}
+synopsis <- data.frame(
+  Item = c(
+    "Design",
+    "Population",
+    "Sample size in source data",
+    "Treatment groups",
+    "Route and dosage form",
+    "Primary objective",
+    "Key assessments",
+    "PK sampling",
+    "Key scheduled visits"
+  ),
+  Description = c(
+    "Multicenter, randomized, placebo-controlled, parallel-group clinical pharmacology and safety study.",
+    paste0("Adult and older adult subjects with Alzheimer's disease, supported by medical history records for ", alzheimer_count, " subjects."),
+    paste0(nrow(dm), " subjects in demographics, including ", nrow(randomized_dm), " non-screen-failure records and ", nrow(treated_dm), " records with non-screen-failure actual treatment."),
+    paste(sort(unique(dm$ARM)), collapse = "; "),
+    "Once-daily transdermal patch.",
+    paste(ts_val("OBJPRIM"), collapse = "; "),
+    "Adverse events, concomitant medications, disposition, ECG, exposure, laboratory tests, medical history, pharmacokinetic concentrations and parameters, subject visits, and vital signs.",
+    "Plasma and urine Xanomeline concentrations at baseline from pre-dose through 48 hours post-dose.",
+    paste(paste0(scheduled_visits$Visit, " (Day ", scheduled_visits$`Study Day`, ")"), collapse = "; ")
+  ),
+  check.names = FALSE
+)
+knitr::kable(synopsis, longtable = TRUE)
+```
+
+# Background and Rationale
+
+Xanomeline is a cholinergic agonist evaluated here as a transdermal therapeutic system for subjects with mild to moderate Alzheimer's disease. The transdermal formulation is intended to provide systemic exposure while supporting once-daily administration.
+
+The CDISCPILOT01 trial summary records describe a randomized, double-blind, placebo-controlled study evaluating dose response for ADAS-Cog and CIBIC+ scores, with additional safety, behavioral, activities-of-daily-living, and pharmacokinetic assessments. The reconstructed source package supports the protocol structure through trial summary, subject visit, adverse event, concomitant medication, disposition, ECG, exposure, laboratory, medical history, pharmacokinetic concentration, pharmacokinetic parameter, supplemental qualifier, and vital sign records.
+
+The available source package still does not include the original sponsor protocol, randomization metadata, eligibility case report form fields, efficacy assessment domains, study drug accountability records, or detailed event narratives. Those omissions limit reconstruction of operational rules and final endpoint hierarchy. The protocol below uses the available source data as the controlling evidence and flags inferred content where appropriate.
+
+# Objectives and Endpoints
+
+## Primary Objective
+
+To determine whether there is a statistically significant relationship between change in ADAS-Cog and CIBIC+ scores and Xanomeline transdermal dose.
+
+## Secondary Objectives
+
+1. To document the safety profile of Xanomeline transdermal therapeutic system.
+2. To assess dose-dependent improvement in behavior and activities of daily living.
+3. To characterize plasma and urine Xanomeline concentration-time profiles and pharmacokinetic parameters after dosing.
+4. To summarize laboratory, ECG, and vital sign findings over scheduled and unscheduled visits.
+5. To summarize adverse events by term, seriousness, severity, treatment-emergent flag, and relationship to study drug.
+6. To summarize disposition, concomitant medication, medical history, and exposure to placebo, Xanomeline 54 mg, and Xanomeline 81 mg transdermal patches.
+
+## Endpoints
+
+Primary efficacy endpoints are inferred from trial summary records as change in ADAS-Cog and CIBIC+ scores by dose, but efficacy assessment domains are not present in this source package. Safety endpoints include adverse events, serious adverse events, adverse event severity, treatment-emergent flag and relationship, laboratory reference range indicators, ECG parameters, vital sign values, deaths recorded in demographics and disposition, concomitant medication use, and exposure interruptions or dosing patterns where available. Pharmacokinetic endpoints include observed Xanomeline concentration by matrix, nominal time point, visit, and derived PK parameters.
+
+Treatment-emergent adverse event timing can be approximated from adverse event start dates and exposure dates. Detailed adjudication, causality narratives, and original event coding decisions would need the source clinical database or original study documents.
+
+```{r objectives-endpoints}
+knitr::kable(objective_endpoint_table, caption = "Objectives and Endpoints")
+```
+
+# Study Design
+
+This is reconstructed as a multicenter, randomized, placebo-controlled, parallel-group study. Subjects were screened, randomized to placebo or one of two Xanomeline dose levels, and followed through Week 24 with additional Week 26 or retrieval records represented in vital signs. Exposure records show dosing at baseline, Week 2, and Week 24.
+
+```{r study-design}
+knitr::kable(design_table, caption = "Study Design")
+```
+
+## Study Schema
+
+Subjects enter screening, complete baseline assessments, and are randomized to placebo, Xanomeline 54 mg, or Xanomeline 81 mg transdermal patch. Treatment and safety follow-up continue through Week 24, with Week 26 and retrieval records represented in the source data. PK sampling is concentrated at baseline from pre-dose through 48 hours post-dose.
+
+```{r planned-arms}
+knitr::kable(arm_table, caption = "Planned Treatment Arms")
+knitr::kable(actual_arm_table, caption = "Actual Treatment Arms")
+```
+
+```{r sites}
+knitr::kable(head(site_table, 20), caption = "Subjects by Site")
+```
+
+# Study Population
+
+The study population consists of adult and older adult subjects with mild to moderate Alzheimer's disease who are able to comply with study visits, treatment administration, and protocol-required safety and PK assessments. Eligibility criteria below are reconstructed from the available domains and should be treated as plausible protocol language rather than the original sponsor-approved criteria.
+
+## Inclusion Criteria
+
+Based on the source data and the CDISC pilot Xanomeline context, eligible subjects would have met all of the following criteria:
+
+1. Adult or older adult male or female subjects.
+2. Clinical diagnosis of Alzheimer's disease, represented in the medical history domain for `r alzheimer_count` subjects.
+3. Ability to receive a transdermal patch and complete protocol-required safety and PK assessments.
+4. Availability for follow-up through the planned `r paste(ts_val("LENGTH"), collapse = "; ")` treatment period.
+5. Written informed consent provided by the subject or legally authorized representative.
+
+## Exclusion Criteria
+
+Subjects would have been excluded for any of the following:
+
+1. Clinically significant unstable medical condition that could confound safety assessment.
+2. Screening laboratory or vital sign finding considered clinically unacceptable by the investigator.
+3. Known hypersensitivity or contraindication to Xanomeline or patch components.
+4. Use of prohibited concomitant medications or participation in another interventional study.
+5. Any condition preventing reliable PK sampling or follow-up.
+
+## Withdrawal Criteria
+
+Subjects may discontinue study treatment or withdraw from study participation because of adverse event, lack of efficacy, withdrawal by subject or caregiver, physician decision, protocol violation, death, loss to follow-up, or sponsor decision. These categories are represented in the disposition source data and should be handled according to the final statistical analysis plan.
+
+## Demographic Characteristics in Source Data
+
+```{r demographics}
+demo_summary <- data.frame(
+  Characteristic = c(
+    "Subjects",
+    "Non-screen-failure planned treatment records",
+    "Non-screen-failure actual treatment records",
+    "Age, mean",
+    "Age, median",
+    "Age, range",
+    "Female",
+    "Male",
+    "Deaths flagged in demographics"
+  ),
+  Value = c(
+    nrow(dm),
+    nrow(randomized_dm),
+    nrow(treated_dm),
+    round(mean(dm$AGE, na.rm = TRUE), 1),
+    median(dm$AGE, na.rm = TRUE),
+    paste0(min(dm$AGE, na.rm = TRUE), "-", max(dm$AGE, na.rm = TRUE), " years"),
+    sum(dm$SEX == "F"),
+    sum(dm$SEX == "M"),
+    death_count
+  )
+)
+knitr::kable(demo_summary)
+```
+
+```{r demographic-tables}
+knitr::kable(sex_table, caption = "Sex")
+knitr::kable(race_table, caption = "Race")
+knitr::kable(ethnic_table, caption = "Ethnicity")
+```
+
+# Investigational Product and Administration
+
+The investigational product is Xanomeline administered as a once-daily transdermal patch. Exposure records include placebo patches and active Xanomeline patches at 54 mg and 81 mg.
+
+Study drug should be applied as a transdermal patch according to randomized treatment assignment. Subjects, caregivers, investigators, and sponsor personnel involved in study conduct are assumed to remain blinded to assigned treatment until the database is locked, unless unblinding is required for subject safety.
+
+```{r exposure-regimens}
+knitr::kable(ex_regimens, caption = "Exposure Regimens")
+knitr::kable(ex_visits, caption = "Exposure Visits")
+```
+
+## Treatment Compliance and Accountability
+
+Treatment compliance, patch application site rotation, accountability, and dose modification rules are not represented in the source domains and would need to be supplied by the original protocol or operational manuals. In a sponsor protocol, accountability would include dispensation, return, reconciliation, and documentation of missed or interrupted patch applications.
+
+## Prior and Concomitant Therapy
+
+Concomitant medications should be recorded from screening through the final study visit. Medications used for the primary study condition, prophylaxis, or treatment of adverse events should be coded and summarized by treatment arm.
+
+# Schedule of Assessments
+
+The following schedule is reconstructed from visit, laboratory, vital sign, ECG, exposure, PK, disposition, and subject-visit records. Unscheduled visits are retained because the source data include clinically relevant safety observations outside nominal scheduled visits.
+
+```{r visits}
+knitr::kable(all_visits, longtable = TRUE, caption = "Visits Represented in Source Data")
+```
+
+```{r soa}
+soa <- data.frame(
+  Assessment = c(
+    "Demographics",
+    "Medical history",
+    "Adverse events",
+    "Concomitant medications",
+    "Disposition",
+    "ECG",
+    "Exposure",
+    "Laboratory tests",
+    "Pharmacokinetic concentrations",
+    "Pharmacokinetic parameters",
+    "Subject visits",
+    "Vital signs"
+  ),
+  Screening = c("X", "X", "", "", "X", "X", "", "X", "", "", "X", "X"),
+  Baseline = c("", "", "X", "X", "X", "X", "X", "X", "X", "X", "X", "X"),
+  `Weeks 2-24` = c("", "", "X", "X", "X", "X", "X", "X", "", "X", "X", "X"),
+  `Week 26/Retrieval` = c("", "", "", "", "X", "X", "", "", "", "", "X", "X"),
+  Unscheduled = c("", "", "X", "X", "", "", "", "X", "", "", "", "X"),
+  check.names = FALSE
+)
+knitr::kable(soa, caption = "Reconstructed Schedule of Assessments")
+```
+
+# Safety Assessments
+
+Safety will be monitored throughout the study by review of adverse events, concomitant medications, clinical laboratory tests, vital signs, ECGs, deaths, and disposition events. Safety data should be reviewed by visit and treatment arm, with clinically significant findings followed until resolution or stabilization where possible.
+
+## Adverse Events
+
+Adverse events should be collected from first study treatment through the end of follow-up and coded using a standard medical dictionary. Events should be classified by seriousness, severity, relationship to study drug, action taken, outcome, and treatment-emergent status. The adverse event source domain contains `r nrow(ae)` records for `r length(unique(ae$USUBJID))` subjects. There are `r sum(ae$AESER == "Y", na.rm = TRUE)` serious adverse event records across `r length(unique(ae$USUBJID[ae$AESER == "Y"]))` subjects and `r sum(ae$AESEV == "SEVERE", na.rm = TRUE)` severe adverse event records across `r length(unique(ae$USUBJID[ae$AESEV == "SEVERE"]))` subjects.
+
+```{r adverse-events}
+knitr::kable(ae_terms, caption = "Most Frequent Adverse Events")
+knitr::kable(ae_severity, caption = "Adverse Events by Severity and Seriousness")
+knitr::kable(ae_relation, caption = "Adverse Event Relationship to Study Drug")
+knitr::kable(teae_summary, caption = "Treatment-Emergent Adverse Event Flag")
+```
+
+## Laboratory Assessments
+
+Clinical laboratory testing includes chemistry, hematology, urinalysis, and additional miscellaneous results. Abnormal findings should be assessed for clinical significance and followed according to investigator judgment. The source package contains `r nrow(lb)` laboratory records.
+
+```{r labs}
+knitr::kable(lb_cats, caption = "Laboratory Results by Category")
+knitr::kable(lb_nri, caption = "Laboratory Results by Reference Range Indicator")
+knitr::kable(lb_tests, longtable = TRUE, caption = "Laboratory Tests")
+```
+
+## Vital Signs
+
+Vital signs include blood pressure, pulse rate, height, temperature, and weight. Blood pressure and pulse should be collected in supine and standing positions where applicable.
+
+```{r vitals}
+knitr::kable(vs_tests, longtable = TRUE, caption = "Vital Sign Parameters")
+```
+
+## ECG Assessments
+
+Standard and ambulatory ECG assessments should be performed according to the schedule of assessments. ECGs should be interpreted by qualified personnel, and clinically significant abnormalities should be recorded as adverse events where appropriate. The ECG domain contains `r nrow(eg)` records for `r length(unique(eg$USUBJID))` subjects.
+
+```{r ecg}
+knitr::kable(eg_tests, caption = "ECG Parameters")
+```
+
+## Deaths
+
+The demographics domain contains `r death_count` subjects flagged with death. The disposition domain contains `r ds_death_count` subjects with a death disposition event. Adverse event data identify `r length(unique(ae$USUBJID[ae$AESER == "Y"]))` subjects with serious adverse events. Detailed causality narratives and adjudication records are not represented in these source files.
+
+# Disposition, Medication, and Medical History
+
+## Disposition
+
+Subject disposition should be summarized for all screened subjects and by randomized treatment arm. The disposition domain contains `r nrow(ds)` records for `r length(unique(ds$USUBJID))` subjects. It includes randomization records, completion status, screen failures, discontinuations, and final visit milestones.
+
+```{r disposition}
+knitr::kable(ds_summary, caption = "Disposition Events")
+knitr::kable(entry_criteria, caption = "Supplemental Disposition Qualifiers")
+```
+
+## Concomitant Medications
+
+The concomitant medication domain contains `r nrow(cm)` records for `r length(unique(cm$USUBJID))` subjects.
+
+```{r concomitant-medications}
+knitr::kable(cm_indications, caption = "Concomitant Medication Indications")
+knitr::kable(cm_terms, caption = "Most Frequent Concomitant Medications")
+```
+
+## Medical History
+
+The medical history domain contains `r nrow(mh)` records for `r length(unique(mh$USUBJID))` subjects, including Alzheimer's disease records for `r alzheimer_count` subjects.
+
+```{r medical-history}
+knitr::kable(mh_categories, caption = "Medical History Categories")
+knitr::kable(mh_terms, caption = "Most Frequent Medical History Terms")
+```
+
+# Pharmacokinetic Assessments
+
+The pharmacokinetic concentration domain contains `r nrow(pc)` records for Xanomeline in plasma and urine. Sampling is represented at baseline from pre-dose through 48 hours post-dose, including interval collections for urine. The pharmacokinetic parameter domain contains `r nrow(pp)` records for `r length(unique(pp$USUBJID))` subjects.
+
+```{r pk}
+knitr::kable(pc_tests, caption = "PK Analytes and Specimens")
+knitr::kable(pc_tpts, longtable = TRUE, caption = "PK Nominal Time Points")
+knitr::kable(pp_tests, caption = "PK Parameters")
+```
+
+PK analyses should summarize concentration-time data by treatment, specimen, and nominal time point. Derived PK parameters should be summarized by specimen, treatment arm, and parameter. Values below the lower limit of quantification should be handled using predefined rules before noncompartmental analysis or descriptive summaries.
+
+# Statistical Considerations
+
+## Analysis Populations
+
+All analyses for this reconstructed protocol should be descriptive unless the original efficacy analysis plan is supplied. The safety analysis set should include all subjects with non-screen-failure actual treatment assignment, using the demographics actual arm field and supplemental population flags as the available proxy for treatment received. The intent-to-treat and efficacy populations are represented by supplemental demographic flags but cannot be fully audited without the original randomization and efficacy datasets. PK summaries should include subjects with at least one quantifiable or reportable PK concentration or parameter record.
+
+```{r population-flags}
+knitr::kable(population_flags, caption = "Supplemental Population Flags")
+```
+
+## General Analysis Methods
+
+Continuous variables should be summarized with n, mean, standard deviation, median, minimum, and maximum. Categorical variables should be summarized with counts and percentages. Adverse events should be summarized by system organ class, preferred term, severity, seriousness, treatment-emergent flag, relationship, and treatment arm. Disposition, concomitant medication, medical history, ECG, laboratory, and vital sign summaries should be presented by visit or timing category and treatment arm where applicable. PK concentrations and parameters should be summarized by specimen, nominal time point or parameter, and actual treatment arm.
+
+## Efficacy Analysis
+
+The trial summary records identify dose-response evaluation of ADAS-Cog and CIBIC+ as the primary objective. Because efficacy assessment domains are not present in the example source package, the efficacy analysis cannot be reconstructed here. A complete protocol would specify estimands, analysis windows, missing data handling, covariates, multiplicity control, and sensitivity analyses.
+
+## Safety Analysis
+
+Safety analyses should include all treated subjects and summarize observed results by actual treatment arm. Treatment-emergent adverse events should be summarized separately from all adverse events using the supplemental AE treatment-emergent flag.
+
+# Data Handling and Quality Control
+
+The source package should be checked for:
+
+1. Consistency of `STUDYID`, `USUBJID`, site, arm, and actual arm values across domains.
+2. Consistency of visit numbers, visit names, and study days.
+3. Consistency of trial summary records with the reconstructed protocol text.
+4. Completeness of subject visit and exposure records for treated subjects.
+5. Consistency of adverse event timing, seriousness, severity, treatment-emergent flag, relationship, and disposition outcomes.
+6. Completeness and plausibility of concomitant medication and medical history records.
+7. Validity of ECG, laboratory, vital sign, and PK standardized units.
+8. Consistency of PK time point labels, nominal time values, and derived parameter records.
+9. Traceability from generated outputs to the source XPT and supplemental qualifier records.
+
+# Ethical and Regulatory Considerations
+
+For an actual trial, the protocol and informed consent materials would require institutional review board or ethics committee approval before initiation. The study would be conducted in accordance with Good Clinical Practice, applicable regulations, and the Declaration of Helsinki.
+
+# References
+
+1. International Council for Harmonisation. ICH E6(R2): Good Clinical Practice.
+2. International Council for Harmonisation. ICH E9: Statistical Principles for Clinical Trials.
+3. CDISC Study Data Tabulation Model implementation principles, as reflected in the CDISCPILOT01 source domains.
+
+# Limitations of Reconstruction
+
+This document is inferred from available XPT source data. Trial summary records provide objective, design, indication, and treatment-duration evidence, but the source package does not include the original protocol, efficacy assessment domains, randomization metadata, detailed adverse event narratives, adjudication records, or study drug accountability details. Those records should be incorporated from source systems or original study documents before using this as anything beyond an example protocol.
+
+\newpage
+
+# Appendix: Source Data Evidence
+
+The following tables document the source domains and trial summary records used to reconstruct this example protocol.
+
+```{r appendix-source-domains}
+knitr::kable(domain_summary, caption = "Source Domains Used for Reconstruction")
+```
+
+```{r appendix-trial-summary}
+knitr::kable(trial_summary, caption = "Trial Summary Records")
+```
