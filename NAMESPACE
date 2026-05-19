@@ -3,6 +3,7 @@
 export("%>%")
 export(annotate_da)
 export(assign_id)
+export(derived_to_here)
 export(execute_data_diffs)
 export(query_src_list)
 export(read_csv_dots)
