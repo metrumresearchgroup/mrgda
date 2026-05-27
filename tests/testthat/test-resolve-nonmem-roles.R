@@ -300,7 +300,7 @@ test_that("role_overrides must be a list", {
       .data = dat,
       .role_overrides = "DV"
     ),
-    "must be a named list"
+    "must be a list"
   )
 })
 

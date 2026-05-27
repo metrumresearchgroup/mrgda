@@ -58,7 +58,8 @@ default_nonmem_column_names_by_role <- list(
 #' \describe{
 #'   \item{study_id}{Study identifier. Looks for "STUDYID", then "STUDY".}
 #'   \item{id}{Subject ID. Looks for "ID".}
-#'   \item{subject_label}{Subject label used outside of NONMEM. Looks for "USUBJID", then "SUBJID".}
+#'   \item{subject_label}{Subject label used outside of NONMEM. Looks for
+#'   "USUBJID", then "SUBJID".}
 #'   \item{time}{Time after first dose. Looks for "TIME", then "TAFD".}
 #'   \item{tad}{Time after most recent dose. Looks for "TAD", then "TSD".}
 #'   \item{dv}{Observed value or dependent variable. Looks for "DV".}
@@ -69,26 +70,33 @@ default_nonmem_column_names_by_role <- list(
 #'   \item{dur}{Dose infusion duration. Looks for "DUR".}
 #'   \item{cmt}{Compartment number or compartment label. Looks for "CMT".}
 #'   \item{dvid}{Observed value type, such as parent or metabolite. Looks for "DVID".}
-#'   \item{blq}{Flag for values below the quantification limit. Looks for "BLQ", then "BLOQ", then "BQL".}
-#'   \item{dose_group}{Dose group or planned dose level. Looks for "DOSE", then "DOSEGRP".}
+#'   \item{blq}{Flag for values below the quantification limit. Looks for
+#'   "BLQ", then "BLOQ", then "BQL".}
+#'   \item{dose_group}{Dose group or planned dose level. Looks for "DOSE",
+#'   then "DOSEGRP".}
 #'   \item{day}{Study day or analysis day. Looks for "DAY".}
-#'   \item{datetime}{Date or date-time value for the record. Looks for "DATETIME", then "DATE".}
-#'   \item{comment}{Column used to flag, exclude, ignore, or drop records. Looks for "C", then "EXCL", then "IGNORE", then "DROP".}
+#'   \item{datetime}{Date or date-time value for the record. Looks for
+#'   "DATETIME", then "DATE".}
+#'   \item{comment}{Column used to flag, exclude, ignore, or drop records.
+#'   Looks for "C", then "EXCL", then "IGNORE", then "DROP".}
 #'   \item{occasion}{Dosing occasion. Looks for "OCC".}
 #' }
 #'
 #' @param .data A data frame containing the NONMEM-style dataset.
-#' @param .role_overrides A named list of user-supplied column choices. Each
-#'   name should be one of the fields listed in Details. Each value may be
-#'   `NULL` or omitted for auto-detect, one column name, or `FALSE` to turn off
-#'   that field.
+#' @param .role_overrides A list of named user-supplied column choices. Names
+#'   should be one of the fields listed in Details. Unknown names are ignored.
+#'   Each value may be `NULL` or omitted for auto-detect, one column name, or
+#'   `FALSE` to turn off that field.
 #'
 #' @return A data frame with one row per NONMEM data field. The columns are:
 #' \describe{
 #'   \item{role}{The NONMEM data field being resolved.}
-#'   \item{column}{The dataset column found for that field, or `NA` if none was found.}
-#'   \item{source}{How the column was found.}
-#'   \item{status}{Whether the lookup worked.}
+#'   \item{column}{The dataset column found for that field, or `NA` if none was
+#'   found.}
+#'   \item{source}{How the column was found: "default name", "override", or
+#'   "not found".}
+#'   \item{status}{Whether the lookup worked: "OK", "missing column",
+#'   "disabled", or "skipped".}
 #' }
 #'
 #' @examples
@@ -97,6 +105,7 @@ default_nonmem_column_names_by_role <- list(
 #'   ID = 1,
 #'   TIME = 0,
 #'   DV = 1.2,
+#'   CONC = 1.2,
 #'   EVID = 0
 #' )
 #'
@@ -104,7 +113,7 @@ default_nonmem_column_names_by_role <- list(
 #'
 #' resolve_nonmem_roles(
 #'   nonmem_data,
-#'   .role_overrides = list(dv = "DV")
+#'   .role_overrides = list(dv = "CONC")
 #' )
 #'
 #' @export
@@ -118,19 +127,21 @@ resolve_nonmem_roles <- function(.data, .role_overrides = list()) {
   }
 
   if (!is.list(.role_overrides)) {
-    stop("`.role_overrides` must be a named list.", call. = FALSE)
+    stop("`.role_overrides` must be a list.", call. = FALSE)
   }
 
   dataset_column_names <- names(.data)
 
-  # Build one row for each NONMEM field.
+  # Build one result row for each known NONMEM field.
   #
-  # Each row answers four plain questions:
+  # Each row answers:
   #
-  # What field were we trying to find?
-  # What dataset column did we find?
-  # How did we find it?
-  # Did the lookup work?
+  # role: Which field were we trying to find?
+  # column: Which dataset column did we find?
+  # source: How did we find it?
+  # status: Did the lookup work?
+  #
+  # Unknown override names are ignored because only known fields are iterated.
   default_nonmem_column_names_by_role %>%
     purrr::imap_dfr(
       resolve_one_nonmem_field_to_one_column,
@@ -192,9 +203,7 @@ resolve_one_nonmem_field_to_one_column <- function(
   # This removes blanks, removes missing values, and removes repeats.
   cleaned_user_column_choices <- clean_column_names(user_column_choice)
 
-  # In this first version, each NONMEM field can only point to one column.
-  #
-  # Example:
+  # Each NONMEM field can only point to one column.
   #
   # .role_overrides = list(dv = "CONC")
   #
@@ -202,7 +211,7 @@ resolve_one_nonmem_field_to_one_column <- function(
   #
   # .role_overrides = list(dv = c("CONC", "LIDV"))
   #
-  # is not allowed.
+  # is not allowed because one role cannot map to multiple columns.
   if (length(cleaned_user_column_choices) > 1) {
     stop(
       "Role override for `",
@@ -332,8 +341,7 @@ find_first_matching_nonmem_column <- function(
 #'
 #' @noRd
 clean_column_names <- function(column_names) {
-  # Convert the input to character values so the rest of the function can
-  # treat everything the same way.
+  # Normalize the input before matching so every caller gets the same behavior.
   #
   # Examples:
   #
@@ -343,7 +351,7 @@ clean_column_names <- function(column_names) {
   column_names_as_text <- column_names %>%
     as.character()
 
-  # Keep only real column names.
+  # Remove blanks and missing values.
   #
   # nzchar() checks whether each string has at least one character.
   # keepNA = FALSE means missing values are treated like empty strings and

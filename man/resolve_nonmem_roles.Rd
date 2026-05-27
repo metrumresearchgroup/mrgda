@@ -9,18 +9,21 @@ resolve_nonmem_roles(.data, .role_overrides = list())
 \arguments{
 \item{.data}{A data frame containing the NONMEM-style dataset.}
 
-\item{.role_overrides}{A named list of user-supplied column choices. Each
-name should be one of the fields listed in Details. Each value may be
-\code{NULL} or omitted for auto-detect, one column name, or \code{FALSE} to turn off
-that field.}
+\item{.role_overrides}{A list of named user-supplied column choices. Names
+should be one of the fields listed in Details. Unknown names are ignored.
+Each value may be \code{NULL} or omitted for auto-detect, one column name, or
+\code{FALSE} to turn off that field.}
 }
 \value{
 A data frame with one row per NONMEM data field. The columns are:
 \describe{
 \item{role}{The NONMEM data field being resolved.}
-\item{column}{The dataset column found for that field, or \code{NA} if none was found.}
-\item{source}{How the column was found.}
-\item{status}{Whether the lookup worked.}
+\item{column}{The dataset column found for that field, or \code{NA} if none was
+found.}
+\item{source}{How the column was found: "default name", "override", or
+"not found".}
+\item{status}{Whether the lookup worked: "OK", "missing column",
+"disabled", or "skipped".}
 }
 }
 \description{
@@ -43,7 +46,8 @@ By default, this function looks for the following columns:
 \describe{
 \item{study_id}{Study identifier. Looks for "STUDYID", then "STUDY".}
 \item{id}{Subject ID. Looks for "ID".}
-\item{subject_label}{Subject label used outside of NONMEM. Looks for "USUBJID", then "SUBJID".}
+\item{subject_label}{Subject label used outside of NONMEM. Looks for
+"USUBJID", then "SUBJID".}
 \item{time}{Time after first dose. Looks for "TIME", then "TAFD".}
 \item{tad}{Time after most recent dose. Looks for "TAD", then "TSD".}
 \item{dv}{Observed value or dependent variable. Looks for "DV".}
@@ -54,11 +58,15 @@ By default, this function looks for the following columns:
 \item{dur}{Dose infusion duration. Looks for "DUR".}
 \item{cmt}{Compartment number or compartment label. Looks for "CMT".}
 \item{dvid}{Observed value type, such as parent or metabolite. Looks for "DVID".}
-\item{blq}{Flag for values below the quantification limit. Looks for "BLQ", then "BLOQ", then "BQL".}
-\item{dose_group}{Dose group or planned dose level. Looks for "DOSE", then "DOSEGRP".}
+\item{blq}{Flag for values below the quantification limit. Looks for
+"BLQ", then "BLOQ", then "BQL".}
+\item{dose_group}{Dose group or planned dose level. Looks for "DOSE",
+then "DOSEGRP".}
 \item{day}{Study day or analysis day. Looks for "DAY".}
-\item{datetime}{Date or date-time value for the record. Looks for "DATETIME", then "DATE".}
-\item{comment}{Column used to flag, exclude, ignore, or drop records. Looks for "C", then "EXCL", then "IGNORE", then "DROP".}
+\item{datetime}{Date or date-time value for the record. Looks for
+"DATETIME", then "DATE".}
+\item{comment}{Column used to flag, exclude, ignore, or drop records.
+Looks for "C", then "EXCL", then "IGNORE", then "DROP".}
 \item{occasion}{Dosing occasion. Looks for "OCC".}
 }
 }
@@ -68,6 +76,7 @@ nonmem_data <- data.frame(
   ID = 1,
   TIME = 0,
   DV = 1.2,
+  CONC = 1.2,
   EVID = 0
 )
 
@@ -75,7 +84,7 @@ resolve_nonmem_roles(nonmem_data)
 
 resolve_nonmem_roles(
   nonmem_data,
-  .role_overrides = list(dv = "DV")
+  .role_overrides = list(dv = "CONC")
 )
 
 }
