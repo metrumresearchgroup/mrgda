@@ -133,14 +133,9 @@ resolve_nonmem_roles <- function(.data, .role_overrides = list()) {
   # Did the lookup work?
   default_nonmem_column_names_by_role %>%
     purrr::imap_dfr(
-      function(default_column_names_for_this_field, field_name) {
-        resolve_one_nonmem_field_to_one_column(
-          field_name = field_name,
-          dataset_column_names = dataset_column_names,
-          user_column_choice = .role_overrides[[field_name]],
-          default_column_names_for_this_field = default_column_names_for_this_field
-        )
-      }
+      resolve_one_nonmem_field_to_one_column,
+      dataset_column_names = dataset_column_names,
+      user_column_choices = .role_overrides
     )
 }
 
@@ -159,21 +154,23 @@ resolve_nonmem_roles <- function(.data, .role_overrides = list()) {
 #' 3. Does the dataset contain one of the default column names for this field?
 #' 4. If none of those worked, mark the field as skipped.
 #'
-#' @param field_name The NONMEM field being resolved, such as "dv" or "time".
-#' @param dataset_column_names The column names from the dataset.
-#' @param user_column_choice The user-provided value for this field, if any.
 #' @param default_column_names_for_this_field The default column names to try
 #'   for this field.
+#' @param field_name The NONMEM field being resolved, such as "dv" or "time".
+#' @param dataset_column_names The column names from the dataset.
+#' @param user_column_choices The full list of user-provided column choices.
 #'
 #' @return One row for the output data frame.
 #'
 #' @noRd
 resolve_one_nonmem_field_to_one_column <- function(
+  default_column_names_for_this_field,
   field_name,
   dataset_column_names,
-  user_column_choice,
-  default_column_names_for_this_field
+  user_column_choices
 ) {
+  user_column_choice <- user_column_choices[[field_name]]
+
   # FALSE means the user intentionally turned off this field.
   #
   # Example:
