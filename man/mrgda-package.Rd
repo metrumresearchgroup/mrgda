@@ -24,7 +24,6 @@ Useful links:
 
 Authors:
 \itemize{
-  \item Eric Anderson \email{andersone@metrumrg.com}
   \item Grace O'Brien \email{graceo@metrumrg.com}
   \item Michael McDermott \email{michaelm@metrumrg.com}
   \item Kyle Barrett \email{barrettk@metrumrg.com}

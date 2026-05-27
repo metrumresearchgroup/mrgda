@@ -1,166 +1,169 @@
-#' Default candidate column names for each NONMEM semantic role
+#' Default column names to try for each NONMEM data field
 #'
-#' @keywords internal
+#' These defaults are intentionally conservative. Project-specific names and
+#' analysis-specific names should be supplied through `.role_overrides` rather
+#' than auto-detected.
+#'
+#' @noRd
 default_role_candidates <- list(
-  id = c("ID", "SUBJID", "SUBJECT", "CID"),
-  subject_label = c("USUBJID", "SUBJID", "SUBJECT"),
-  time = c("TIME", "TIMEA", "TFRD", "NTIME", "ATIME"),
-  tad = c("TAD", "TAFD", "TSD", "TIMEAD"),
-  dv = c("DV", "CONC", "CP", "Y", "LIDV", "IPRED"),
-  evid = c("EVID", "EVENT", "EVENTID"),
-  mdv = c("MDV"),
-  amt = c("AMT", "DOSEAMT", "DAMT"),
-  rate = c("RATE"),
-  dur = c("DUR", "DURATION"),
-  cmt = c("CMT", "COMP"),
-  dvid = c("DVID", "DVIDN", "DVIDC", "PARAMCD"),
-  blq = c("BLQ", "BLOQ", "BQL", "LLOQFL", "BLQFL"),
-  dose_group = c("DOSE", "DOSEGRP", "TRT", "TRTA", "TRTAN", "ARM", "ARMCD"),
-  day = c("DAY", "STDY", "NOMDAY", "ADY"),
-  datetime = c("DATETIME", "DTC", "DATE", "LBDTC", "PCDTC"),
-  comment = c("C", "COMMENT", "EXCL", "DROP", "IGNORE", "FLAG"),
-  occasion = c("OCC", "VISIT", "VISITNUM", "PERIOD", "CYCLE", "OCCASION")
+  id = "ID",
+  subject_label = c("SUBJID", "USUBJID"),
+  time = "TIME",
+  tad = c("TAD", "TAFD", "TSD"),
+  dv = "DV",
+  evid = "EVID",
+  mdv = "MDV",
+  amt = "AMT",
+  rate = "RATE",
+  dur = "DUR",
+  cmt = "CMT",
+  dvid = "DVID",
+  blq = c("BLQ", "BLOQ", "BQL"),
+  dose_group = c("DOSE", "DOSEGRP"),
+  day = "DAY",
+  datetime = c("DATETIME", "DATE"),
+  comment = c("C", "EXCL", "IGNORE", "DROP"),
+  occasion = "OCC"
 )
 
-.scalar_roles <- names(default_role_candidates)
-
-.multi_roles <- c(
-  "bl_cat_cov",
-  "bl_cont_cov",
-  "tv_cat_cov",
-  "tv_cont_cov",
-  "occ_cov"
-)
-
-#' Resolve semantic roles for a NONMEM-style dataset
+#' Resolve NONMEM data fields
 #'
-#' Inspects a data frame plus its yspec specification and returns which
-#' column should fill each NONMEM semantic role (`id`, `time`, `dv`, `amt`,
-#' covariate groups, etc.). Resolution order for each role:
+#' Inspects a data frame and returns which column should be used for each
+#' NONMEM data field.
+#'
+#' Resolution order:
 #'
 #' 1. User override from `.role_overrides`.
-#' 2. yspec `SETUP__$flags` (for multi-column covariate roles).
-#' 3. Exact match against the default NONMEM column names for that role.
-#' 4. Case-insensitive match against the default NONMEM column names.
-#' 5. Unresolved (`NULL` for scalar roles, `character()` for multi-column roles).
+#' 2. Exact match against conservative NONMEM column names.
+#' 3. Case-insensitive match against conservative NONMEM column names.
+#' 4. Unresolved.
 #'
 #' @param .data A data frame containing the NONMEM-style dataset.
-#' @param .spec A yspec object from `yspec::load_spec()`.
 #' @param .role_overrides Named list of user-supplied overrides. For each
-#'   role, the value may be `NULL` or omitted (auto-detect), a column name
-#'   (use that column), `FALSE` (disable the role), `character()` (clear a
-#'   multi-column role), or a character vector of column names (multi-column
-#'   roles).
+#'   field, the value may be `NULL` or omitted for auto-detect, one column
+#'   name, or `FALSE` to disable the field.
 #'
-#' @return A list with `roles` (named list of resolved roles keyed by role
-#'   name) and `role_map` (tibble with columns `role`, `resolved`, `source`,
-#'   `status`).
+#' @return A list with `roles` and `role_map`.
+#'
 #' @examples
 #' \dontrun{
-#' spec <- yspec::load_spec("inst/examples/pk.yml")
-#' nm <- read_csv_dots("inst/examples/pk.csv")
-#' res <- resolve_nonmem_roles(.data = nm, .spec = spec)
+#' nm <- read_csv_dots(system.file("derived", "pk.csv", package = "mrgda"))
+#'
+#' res <- resolve_nonmem_roles(nm)
 #' res$roles$id
 #' res$role_map
+#'
+#' res <- resolve_nonmem_roles(
+#'   nm,
+#'   .role_overrides = list(
+#'     subject_label = "USUBJID",
+#'     datetime = "DATETIME"
+#'   )
+#' )
 #' }
-#' @md
+#'
 #' @export
-resolve_nonmem_roles <- function(.data, .spec, .role_overrides = list()) {
+resolve_nonmem_roles <- function(.data, .role_overrides = list()) {
   cols <- names(.data)
-  flags <- tryCatch(yspec::get_meta(.spec)$flags, error = function(e) NULL) %||%
-    list()
 
-  results <- c(
-    purrr::map(
-      .scalar_roles,
-      ~ resolve_scalar_role(.x, cols, .role_overrides[[.x]])
-    ),
-    purrr::map(
-      .multi_roles,
-      ~ resolve_multi_role(.x, cols, .role_overrides[[.x]], flags[[.x]])
-    )
-  ) %>%
-    purrr::set_names(c(.scalar_roles, .multi_roles))
+  results <- purrr::imap(
+    default_role_candidates,
+    \(candidates, role) {
+      resolve_role_col(
+        role = role,
+        cols = cols,
+        override = .role_overrides[[role]],
+        candidates = candidates
+      )
+    }
+  )
 
   list(
     roles = purrr::map(results, "value"),
-    role_map = tibble::tibble(
-      role = unname(purrr::map_chr(results, "role")),
-      resolved = unname(purrr::map_chr(results, "resolved")),
-      source = unname(purrr::map_chr(results, "source")),
-      status = unname(purrr::map_chr(results, "status"))
+    role_map = purrr::map_dfr(
+      results,
+      `[`,
+      c("role", "resolved", "source", "status")
     )
   )
 }
 
-#' Resolve a single scalar role
-#' @keywords internal
-resolve_scalar_role <- function(role, cols, override) {
+#' Resolve one role to one column
+#' @noRd
+resolve_role_col <- function(role, cols, override, candidates) {
   if (isFALSE(override)) {
     return(role_row(role, NULL, NA_character_, "override", "disabled"))
   }
-  if (is.character(override) && length(override) && nzchar(override[1])) {
-    hit <- override[1]
-    return(role_row(
+
+  override <- clean_role_cols(override)
+
+  if (length(override) > 1) {
+    stop(
+      "Role override for `",
       role,
-      if (hit %in% cols) hit else NULL,
-      hit,
-      "override",
-      if (hit %in% cols) "OK" else "missing column"
+      "` must be one column name.",
+      call. = FALSE
+    )
+  }
+
+  if (length(override)) {
+    hit <- override[[1]]
+    found <- hit %in% cols
+
+    return(role_row(
+      role = role,
+      value = if (found) hit else NULL,
+      resolved = hit,
+      source = "override",
+      status = if (found) "OK" else "missing column"
     ))
   }
 
-  candidates <- default_role_candidates[[role]]
-  if (length(hit <- intersect(candidates, cols))) {
-    return(role_row(role, hit[1], hit[1], "exact name", "OK"))
-  }
-  if (length(hit_ci <- cols[toupper(cols) %in% toupper(candidates)])) {
+  hit <- match_role_col(candidates, cols)
+
+  if (length(hit)) {
     return(role_row(
-      role,
-      hit_ci[1],
-      hit_ci[1],
-      "case-insensitive",
-      "OK"
+      role = role,
+      value = hit[["col"]],
+      resolved = hit[["col"]],
+      source = hit[["source"]],
+      status = "OK"
     ))
   }
 
   role_row(role, NULL, NA_character_, "not found", "skipped")
 }
 
-#' Resolve a single multi-column role
-#' @keywords internal
-resolve_multi_role <- function(role, cols, override, flagged) {
-  if (isFALSE(override)) {
-    return(role_row(
-      role,
-      character(),
-      NA_character_,
-      "override",
-      "disabled"
-    ))
+#' Match possible role columns against data columns
+#' @noRd
+match_role_col <- function(candidates, cols) {
+  candidates <- clean_role_cols(candidates)
+
+  hit <- intersect(candidates, cols)
+
+  if (length(hit)) {
+    return(c(col = unname(hit[[1]]), source = "exact name"))
   }
-  if (is.character(override)) {
-    return(role_row_multi(
-      role,
-      intersect(override, cols),
-      override,
-      "override"
-    ))
+
+  idx <- match(toupper(candidates), toupper(cols), nomatch = 0)
+  idx <- idx[idx > 0]
+
+  if (length(idx)) {
+    return(c(col = unname(cols[[idx[[1]]]]), source = "case-insensitive"))
   }
-  if (length(flagged)) {
-    flagged <- as.character(flagged)
-    return(role_row_multi(
-      role,
-      intersect(flagged, cols),
-      flagged,
-      "yspec flags"
-    ))
-  }
-  role_row(role, character(), NA_character_, "not found", "skipped")
+
+  NULL
 }
 
-#' Build a role-row list (scalar)
-#' @keywords internal
+#' Clean role column names
+#' @noRd
+clean_role_cols <- function(x) {
+  x <- as.character(x)
+  unique(x[!is.na(x) & nzchar(x)])
+}
+
+#' Build one row of role information
+#' @noRd
 role_row <- function(role, value, resolved, source, status) {
   list(
     role = role,
@@ -168,22 +171,5 @@ role_row <- function(role, value, resolved, source, status) {
     resolved = resolved,
     source = source,
     status = status
-  )
-}
-
-#' Build a role-row list (multi-column), computing status from requested vs kept
-#' @keywords internal
-role_row_multi <- function(role, kept, requested, source) {
-  missing <- setdiff(requested, kept)
-  role_row(
-    role,
-    kept,
-    if (length(kept)) paste(kept, collapse = ", ") else NA_character_,
-    source,
-    if (length(missing) == 0) {
-      "OK"
-    } else {
-      glue::glue("missing: {paste(missing, collapse = ', ')}")
-    }
   )
 }
