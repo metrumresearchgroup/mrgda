@@ -43,7 +43,7 @@ By default, this function looks for the following columns:
 \describe{
 \item{study_id}{Study identifier. Looks for "STUDYID", then "STUDY".}
 \item{id}{Subject ID. Looks for "ID".}
-\item{subject_label}{Subject label used outside of NONMEM. Looks for "SUBJID", then "USUBJID".}
+\item{subject_label}{Subject label used outside of NONMEM. Looks for "USUBJID", then "SUBJID".}
 \item{time}{Time after first dose. Looks for "TIME", then "TAFD".}
 \item{tad}{Time after most recent dose. Looks for "TAD", then "TSD".}
 \item{dv}{Observed value or dependent variable. Looks for "DV".}

@@ -36,6 +36,7 @@ test_that("resolves default NONMEM column names", {
   dat <- make_df(c(
     "STUDYID",
     "ID",
+    "USUBJID",
     "SUBJID",
     "TIME",
     "TAD",
@@ -59,7 +60,7 @@ test_that("resolves default NONMEM column names", {
 
   expect_role_result(res, "study_id", "STUDYID")
   expect_role_result(res, "id", "ID")
-  expect_role_result(res, "subject_label", "SUBJID")
+  expect_role_result(res, "subject_label", "USUBJID")
   expect_role_result(res, "time", "TIME")
   expect_role_result(res, "tad", "TAD")
   expect_role_result(res, "dv", "DV")
@@ -82,8 +83,8 @@ test_that("first default column name wins when several are present", {
   dat <- make_df(c(
     "STUDY",
     "STUDYID",
-    "USUBJID",
     "SUBJID",
+    "USUBJID",
     "TAFD",
     "TIME",
     "TSD",
@@ -97,7 +98,7 @@ test_that("first default column name wins when several are present", {
   res <- resolve_nonmem_roles(.data = dat)
 
   expect_role_result(res, "study_id", "STUDYID")
-  expect_role_result(res, "subject_label", "SUBJID")
+  expect_role_result(res, "subject_label", "USUBJID")
   expect_role_result(res, "time", "TIME")
   expect_role_result(res, "tad", "TAD")
   expect_role_result(res, "datetime", "DATETIME")
@@ -107,7 +108,7 @@ test_that("first default column name wins when several are present", {
 test_that("alternate default column names resolve when preferred names are absent", {
   dat <- make_df(c(
     "STUDY",
-    "USUBJID",
+    "SUBJID",
     "TAFD",
     "TSD",
     "BLOQ",
@@ -119,7 +120,7 @@ test_that("alternate default column names resolve when preferred names are absen
   res <- resolve_nonmem_roles(.data = dat)
 
   expect_role_result(res, "study_id", "STUDY")
-  expect_role_result(res, "subject_label", "USUBJID")
+  expect_role_result(res, "subject_label", "SUBJID")
   expect_role_result(res, "time", "TAFD")
   expect_role_result(res, "tad", "TSD")
   expect_role_result(res, "blq", "BLOQ")
@@ -162,12 +163,13 @@ test_that("unresolved roles remain present in the output", {
 
   res <- resolve_nonmem_roles(.data = dat)
 
-  expect_true("dv" %in% res$role)
-  expect_true("time" %in% res$role)
   expect_true("study_id" %in% res$role)
-  expect_true(is.na(role_result_value(res, "dv", "column")))
-  expect_true(is.na(role_result_value(res, "time", "column")))
+  expect_true("time" %in% res$role)
+  expect_true("dv" %in% res$role)
+
   expect_true(is.na(role_result_value(res, "study_id", "column")))
+  expect_true(is.na(role_result_value(res, "time", "column")))
+  expect_true(is.na(role_result_value(res, "dv", "column")))
 })
 
 # ---- overrides -------------------------------------------------------------

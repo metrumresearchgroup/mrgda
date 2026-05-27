@@ -19,7 +19,7 @@
 default_nonmem_column_names_by_role <- list(
   study_id = c("STUDYID", "STUDY"),
   id = "ID",
-  subject_label = c("SUBJID", "USUBJID"),
+  subject_label = c("USUBJID", "SUBJID"),
   time = c("TIME", "TAFD"),
   tad = c("TAD", "TSD"),
   dv = "DV",
@@ -58,7 +58,7 @@ default_nonmem_column_names_by_role <- list(
 #' \describe{
 #'   \item{study_id}{Study identifier. Looks for "STUDYID", then "STUDY".}
 #'   \item{id}{Subject ID. Looks for "ID".}
-#'   \item{subject_label}{Subject label used outside of NONMEM. Looks for "SUBJID", then "USUBJID".}
+#'   \item{subject_label}{Subject label used outside of NONMEM. Looks for "USUBJID", then "SUBJID".}
 #'   \item{time}{Time after first dose. Looks for "TIME", then "TAFD".}
 #'   \item{tad}{Time after most recent dose. Looks for "TAD", then "TSD".}
 #'   \item{dv}{Observed value or dependent variable. Looks for "DV".}
@@ -297,9 +297,9 @@ find_first_matching_nonmem_column <- function(
   #
   # Example:
   #
-  # possible_column_names = c("STUDYID", "STUDY")
+  # possible_column_names = c("USUBJID", "SUBJID")
   #
-  # This checks for "STUDYID" first, then "STUDY".
+  # This checks for "USUBJID" first, then "SUBJID".
   for (possible_column_name in cleaned_possible_column_names) {
     if (possible_column_name %in% dataset_column_names) {
       return(c(
