@@ -29,3 +29,7 @@ reference:
     - read_csv_dots
     - write_csv_dots
     - derived_to_here
+  - title: NONMEM Data Exploration
+    desc: Helpers for generic NONMEM EDA workflows
+    contents:
+    - resolve_nonmem_roles
