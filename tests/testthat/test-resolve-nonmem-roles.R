@@ -1,9 +1,7 @@
 # Tests for resolve_nonmem_roles()
 #
 # Helpers construct minimal fixtures so each behavior of the resolver is
-# exercised in isolation, without depending on external CSV files. A final
-# block round-trips on inst/examples to guard against regressions on a
-# realistic dataset.
+# exercised in isolation, without depending on external CSV files.
 
 make_df <- function(cols) {
   df <- data.frame(
@@ -341,25 +339,28 @@ test_that("output has one row per role and no duplicate roles", {
   expect_equal(nrow(res), length(unique(res$role)))
 })
 
-# ---- end-to-end against inst/examples --------------------------------------
+# ---- package fixture -------------------------------------------------------
 
-test_that("resolves a realistic dataset from inst/examples", {
-  csv <- system.file("examples", "pk.csv", package = "mrgda")
-  skip_if(!nzchar(csv) || !file.exists(csv), "inst/examples not installed")
+test_that("resolves a realistic dataset from inst/derived", {
+  csv <- system.file("derived", "pk.csv", package = "mrgda")
 
   nm <- read_csv_dots(csv)
   res <- resolve_nonmem_roles(.data = nm)
 
+  expect_role_result(res, "study_id", "STUDYID")
   expect_role_result(res, "id", "ID")
-  expect_role_result(res, "subject_label", "USUBJID")
   expect_role_result(res, "time", "TIME")
   expect_role_result(res, "tad", "TAD")
   expect_role_result(res, "dv", "DV")
   expect_role_result(res, "amt", "AMT")
   expect_role_result(res, "evid", "EVID")
   expect_role_result(res, "mdv", "MDV")
+  expect_role_result(res, "rate", "RATE")
+  expect_role_result(res, "dur", "DUR")
   expect_role_result(res, "cmt", "CMT")
+  expect_role_result(res, "dvid", "DVID")
   expect_role_result(res, "blq", "BLQ")
   expect_role_result(res, "dose_group", "DOSE")
+  expect_role_result(res, "day", "DAY")
   expect_role_result(res, "comment", "C")
 })
