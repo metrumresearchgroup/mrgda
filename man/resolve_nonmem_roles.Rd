@@ -9,41 +9,73 @@ resolve_nonmem_roles(.data, .role_overrides = list())
 \arguments{
 \item{.data}{A data frame containing the NONMEM-style dataset.}
 
-\item{.role_overrides}{Named list of user-supplied overrides. For each
-field, the value may be \code{NULL} or omitted for auto-detect, one column
-name, or \code{FALSE} to disable the field.}
+\item{.role_overrides}{A named list of user-supplied column choices. Each
+name should be one of the fields listed in Details. Each value may be
+\code{NULL} or omitted for auto-detect, one column name, or \code{FALSE} to turn off
+that field.}
 }
 \value{
-A list with \code{roles} and \code{role_map}.
+A data frame with one row per NONMEM data field. The columns are:
+\describe{
+\item{role}{The NONMEM data field being resolved.}
+\item{column}{The dataset column found for that field, or \code{NA} if none was found.}
+\item{source}{How the column was found.}
+\item{status}{Whether the lookup worked.}
+}
 }
 \description{
-Inspects a data frame and returns which column should be used for each
-NONMEM data field.
+This function looks at the column names in a NONMEM-style dataset and tries
+to decide which column should be used for each common NONMEM data field.
 }
 \details{
-Resolution order:
+For example, if the dataset has a column named "DV", this function will mark
+that column as the \code{dv} field.
+
+The function checks for columns in this order:
 \enumerate{
-\item User override from \code{.role_overrides}.
-\item Exact match against conservative NONMEM column names.
-\item Case-insensitive match against conservative NONMEM column names.
-\item Unresolved.
+\item Use a user-provided override from \code{.role_overrides}, if one was supplied.
+\item Look for one of the default NONMEM-style column names.
+\item If no match is found, leave the field unresolved.
+}
+
+By default, this function looks for the following columns:
+
+\describe{
+\item{study_id}{Study identifier. Looks for "STUDYID", then "STUDY".}
+\item{id}{Subject ID. Looks for "ID".}
+\item{subject_label}{Subject label used outside of NONMEM. Looks for "SUBJID", then "USUBJID".}
+\item{time}{Time after first dose. Looks for "TIME", then "TAFD".}
+\item{tad}{Time after most recent dose. Looks for "TAD", then "TSD".}
+\item{dv}{Observed value or dependent variable. Looks for "DV".}
+\item{evid}{Event type, such as observation or dose. Looks for "EVID".}
+\item{mdv}{Flag for whether the dependent variable is missing or ignored. Looks for "MDV".}
+\item{amt}{Dose amount. Looks for "AMT".}
+\item{rate}{Dose infusion rate. Looks for "RATE".}
+\item{dur}{Dose infusion duration. Looks for "DUR".}
+\item{cmt}{Compartment number or compartment label. Looks for "CMT".}
+\item{dvid}{Observed value type, such as parent or metabolite. Looks for "DVID".}
+\item{blq}{Flag for values below the quantification limit. Looks for "BLQ", then "BLOQ", then "BQL".}
+\item{dose_group}{Dose group or planned dose level. Looks for "DOSE", then "DOSEGRP".}
+\item{day}{Study day or analysis day. Looks for "DAY".}
+\item{datetime}{Date or date-time value for the record. Looks for "DATETIME", then "DATE".}
+\item{comment}{Column used to flag, exclude, ignore, or drop records. Looks for "C", then "EXCL", then "IGNORE", then "DROP".}
+\item{occasion}{Dosing occasion. Looks for "OCC".}
 }
 }
 \examples{
-\dontrun{
-nm <- read_csv_dots(system.file("derived", "pk.csv", package = "mrgda"))
-
-res <- resolve_nonmem_roles(nm)
-res$roles$id
-res$role_map
-
-res <- resolve_nonmem_roles(
-  nm,
-  .role_overrides = list(
-    subject_label = "USUBJID",
-    datetime = "DATETIME"
-  )
+nonmem_data <- data.frame(
+  STUDYID = "ABC123",
+  ID = 1,
+  TIME = 0,
+  DV = 1.2,
+  EVID = 0
 )
-}
+
+resolve_nonmem_roles(nonmem_data)
+
+resolve_nonmem_roles(
+  nonmem_data,
+  .role_overrides = list(dv = "DV")
+)
 
 }
