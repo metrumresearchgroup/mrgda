@@ -139,7 +139,7 @@ resolve_nonmem_roles <- function(.data, .role_overrides = list()) {
   # role: Which field were we trying to find?
   # column: Which dataset column did we find?
   # source: How did we find it?
-  # status: Did the lookup work?
+  # status: What was the outcome of resolving this role?
   #
   # Unknown override names are ignored because only known fields are iterated.
   default_nonmem_column_names_by_role %>%
