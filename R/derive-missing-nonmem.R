@@ -246,7 +246,7 @@ prepare_nonmem_dose_interval_data <- function(
   #
   # original_row: lets callers get rows back in the same order they came in.
   # time: a numeric version of the resolved TIME column.
-  # is_dose: TRUE when EVID is 1.
+  # is_dose: TRUE when EVID is 1 or 4.
   # dose_sort: puts dose rows before observations when they share a TIME.
   data <-
     .data %>%
@@ -254,7 +254,7 @@ prepare_nonmem_dose_interval_data <- function(
       "{original_row_column}" := dplyr::row_number(),
       "{time_column}" := as.numeric(.data[[original_time_column]]),
       "{is_dose_column}" := !is.na(.data[[original_evid_column]]) &
-        .data[[original_evid_column]] == 1,
+        .data[[original_evid_column]] %in% c(1, 4),
       "{dose_sort_column}" := ifelse(.data[[is_dose_column]], 0L, 1L)
     ) %>%
     dplyr::arrange(

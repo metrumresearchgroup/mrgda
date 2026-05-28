@@ -40,6 +40,18 @@ test_that("derive_missing_nonmem_tad processes dose rows first for TIME ties", {
   expect_equal(res$TAD, c(0, 0, 1))
 })
 
+test_that("derive_missing_nonmem_tad treats EVID 4 as a dose", {
+  dat <- data.frame(
+    ID = c(1, 1, 1, 1),
+    TIME = c(0, 2, 8, 10),
+    EVID = c(1, 0, 4, 0)
+  )
+
+  res <- mrgda:::derive_missing_nonmem_tad(dat)
+
+  expect_equal(res$TAD, c(0, 2, 0, 2))
+})
+
 test_that("derive_missing_nonmem_tad leaves existing TAD unchanged", {
   dat <- data.frame(
     ID = c(1, 1),
@@ -139,6 +151,18 @@ test_that("derive_missing_nonmem_occ processes dose rows first for TIME ties", {
 
   expect_equal(res$ROW, dat$ROW)
   expect_equal(res$OCC, c(1, 1, 1))
+})
+
+test_that("derive_missing_nonmem_occ treats EVID 4 as a dose", {
+  dat <- data.frame(
+    ID = c(1, 1, 1, 1),
+    TIME = c(0, 2, 8, 10),
+    EVID = c(1, 0, 4, 0)
+  )
+
+  res <- mrgda:::derive_missing_nonmem_occ(dat)
+
+  expect_equal(res$OCC, c(1, 1, 2, 2))
 })
 
 test_that("derive_missing_nonmem_occ leaves existing OCC unchanged", {
