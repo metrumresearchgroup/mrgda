@@ -402,3 +402,27 @@ nonmem_field_result_row <- function(role, column, source, status) {
     status = status
   )
 }
+
+#' Get the resolved column for one NONMEM role
+#'
+#' @param resolved_roles A data frame returned by [resolve_nonmem_roles()].
+#' @param role The NONMEM role name.
+#'
+#' @return The resolved column name for `role`.
+#'
+#' @noRd
+resolved_nonmem_role_column <- function(resolved_roles, role) {
+  resolved_roles$column[resolved_roles$role == role][[1]]
+}
+
+#' Get the resolved status for one NONMEM role
+#'
+#' @param resolved_roles A data frame returned by [resolve_nonmem_roles()].
+#' @param role The NONMEM role name.
+#'
+#' @return The resolved status for `role`.
+#'
+#' @noRd
+resolved_nonmem_role_status <- function(resolved_roles, role) {
+  resolved_roles$status[resolved_roles$role == role][[1]]
+}
