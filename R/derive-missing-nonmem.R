@@ -14,15 +14,29 @@
 #'
 #' @noRd
 derive_missing_nonmem_tad <- function(.data, .role_overrides = list()) {
+  # Resolve column roles up front so derived values use the same column choices
+  # as the rest of the NONMEM helper layer.
   resolved_roles <- resolve_nonmem_roles(
     .data = .data,
     .role_overrides = .role_overrides
   )
 
+  # If TAD is already present, leave the dataset alone.
+  #
+  # If the user explicitly disabled TAD with:
+  #
+  # .role_overrides = list(tad = FALSE)
+  #
+  # also leave the dataset alone.
   if (nonmem_role_is_resolved_or_disabled(resolved_roles, "tad")) {
     return(.data)
   }
 
+  # TAD can only be derived when we know:
+  #
+  # id: Which subject does each row belong to?
+  # time: What is the row time?
+  # evid: Which rows are dose rows?
   require_nonmem_roles_for_derivation(
     resolved_roles = resolved_roles,
     required_roles = c("id", "time", "evid"),
@@ -30,12 +44,21 @@ derive_missing_nonmem_tad <- function(.data, .role_overrides = list()) {
   )
 
   role_columns <- nonmem_time_derivation_role_columns(resolved_roles)
+
+  # Use "TAD" by default.
+  #
+  # If the user supplied a TAD override to a missing column name, derive into
+  # that column name instead.
   tad_column <- derived_nonmem_role_column_name(
     role_overrides = .role_overrides,
     role = "tad",
     default_column = "TAD"
   )
 
+  # Build the shared dose-interval information once.
+  #
+  # This keeps TAD and OCC using the same subject ordering, same-time dose
+  # handling, cumulative dose count, and most recent dose time.
   prepared_data <- prepare_nonmem_dose_interval_data(
     .data = .data,
     role_columns = role_columns,
@@ -46,6 +69,9 @@ derive_missing_nonmem_tad <- function(.data, .role_overrides = list()) {
   time_column <- temporary_columns[["mrgda_time"]]
   last_dose_time_column <- temporary_columns[["mrgda_last_dose_time"]]
 
+  # TAD is the current row time minus the most recent dose time.
+  #
+  # Rows before the first dose have no most recent dose, so they get NA.
   prepared_data$data %>%
     dplyr::mutate(
       "{tad_column}" := ifelse(
@@ -69,15 +95,29 @@ derive_missing_nonmem_tad <- function(.data, .role_overrides = list()) {
 #'
 #' @noRd
 derive_missing_nonmem_occ <- function(.data, .role_overrides = list()) {
+  # Resolve column roles up front so OCC uses the same role lookup as TAD and
+  # the public resolver.
   resolved_roles <- resolve_nonmem_roles(
     .data = .data,
     .role_overrides = .role_overrides
   )
 
+  # If OCC is already present, leave the dataset alone.
+  #
+  # If the user explicitly disabled occasion with:
+  #
+  # .role_overrides = list(occasion = FALSE)
+  #
+  # also leave the dataset alone.
   if (nonmem_role_is_resolved_or_disabled(resolved_roles, "occasion")) {
     return(.data)
   }
 
+  # OCC can only be derived when we know:
+  #
+  # id: Which subject does each row belong to?
+  # time: What is the row time?
+  # evid: Which rows are dose rows and observation rows?
   require_nonmem_roles_for_derivation(
     resolved_roles = resolved_roles,
     required_roles = c("id", "time", "evid"),
@@ -85,18 +125,30 @@ derive_missing_nonmem_occ <- function(.data, .role_overrides = list()) {
   )
 
   role_columns <- nonmem_time_derivation_role_columns(resolved_roles)
+
+  # Use "OCC" by default.
+  #
+  # If the user supplied an occasion override to a missing column name, derive
+  # into that column name instead.
   occ_column <- derived_nonmem_role_column_name(
     role_overrides = .role_overrides,
     role = "occasion",
     default_column = "OCC"
   )
 
+  # Build the shared dose-interval information once.
+  #
+  # This gives OCC the same cumulative dose count used by TAD, while preserving
+  # the original row order for the final result.
   prepared_data <- prepare_nonmem_dose_interval_data(
     .data = .data,
     role_columns = role_columns,
     protected_column_names = occ_column
   )
 
+  # OCC needs a few extra working columns on top of the shared dose-interval
+  # columns. Keep their names collision-safe so user columns are never removed
+  # by mistake when temporary columns are dropped.
   occ_temporary_columns <- unique_temporary_column_names(
     existing_column_names = c(names(prepared_data$data), occ_column),
     requested_column_names = c(
@@ -118,6 +170,13 @@ derive_missing_nonmem_occ <- function(.data, .role_overrides = list()) {
   dose_had_pk_column <- temporary_columns[["mrgda_dose_had_pk"]]
   new_dose_column <- temporary_columns[["mrgda_new_dose"]]
 
+  # First, identify PK observations.
+  #
+  # Then, within each subject and dose interval, mark whether that dose interval
+  # had at least one usable PK observation.
+  #
+  # Finally, count a new occasion each time we enter a new dose interval that
+  # had usable PK. Rows before the first dose stay at OCC = 0.
   prepared_data$data %>%
     add_nonmem_pk_observation_column(
       evid_column = original_evid_column,
@@ -157,6 +216,10 @@ prepare_nonmem_dose_interval_data <- function(
   role_columns,
   protected_column_names = character()
 ) {
+  # The helper adds temporary columns and removes them before returning.
+  #
+  # Use generated names so an input data set with columns like
+  # "mrgda_original_row" is still handled safely.
   temporary_columns <- unique_temporary_column_names(
     existing_column_names = c(names(.data), protected_column_names),
     requested_column_names = c(
@@ -179,6 +242,12 @@ prepare_nonmem_dose_interval_data <- function(
   n_doses_column <- temporary_columns[["mrgda_n_doses"]]
   last_dose_time_column <- temporary_columns[["mrgda_last_dose_time"]]
 
+  # Add the shared working columns.
+  #
+  # original_row: lets callers get rows back in the same order they came in.
+  # time: a numeric version of the resolved TIME column.
+  # is_dose: TRUE when EVID is 1.
+  # dose_sort: puts dose rows before observations when they share a TIME.
   data <-
     .data %>%
     dplyr::mutate(
@@ -194,9 +263,16 @@ prepare_nonmem_dose_interval_data <- function(
       .data[[dose_sort_column]],
       .data[[original_row_column]]
     ) %>%
+    # Work subject by subject so each subject gets an independent dose count
+    # and most recent dose time.
     dplyr::group_by(.data[[original_id_column]]) %>%
     dplyr::mutate(
+      # N_DOSES is the cumulative number of dose rows seen so far.
       "{n_doses_column}" := cumsum(.data[[is_dose_column]]),
+      # The most recent dose time is carried forward after each dose.
+      #
+      # Before the first dose, this stays -Inf so callers can distinguish
+      # pre-dose rows from rows with an actual last dose.
       "{last_dose_time_column}" := cummax(ifelse(
         .data[[is_dose_column]],
         .data[[time_column]],
@@ -218,6 +294,9 @@ add_nonmem_pk_observation_column <- function(
   blq_column,
   is_pk_observation_column
 ) {
+  # Start with the standard NONMEM observation definition.
+  #
+  # EVID == 0 means this row is an observation row.
   data <-
     .data %>%
     dplyr::mutate(
@@ -225,10 +304,13 @@ add_nonmem_pk_observation_column <- function(
         .data[[evid_column]] == 0
     )
 
+  # If there is no resolved BLQ column, all observation rows count as usable PK.
   if (is.null(blq_column)) {
     return(data)
   }
 
+  # If a BLQ column was found, only observations with BLQ == 0 count as usable
+  # PK observations for occasion numbering.
   data %>%
     dplyr::mutate(
       "{is_pk_observation_column}" := .data[[is_pk_observation_column]] &
@@ -241,6 +323,7 @@ add_nonmem_pk_observation_column <- function(
 restore_nonmem_original_order <- function(.data, temporary_columns) {
   original_row_column <- temporary_columns[["mrgda_original_row"]]
 
+  # Put rows back exactly where they started, then remove all temporary columns.
   .data %>%
     dplyr::arrange(.data[[original_row_column]]) %>%
     dplyr::select(-dplyr::all_of(temporary_columns))
@@ -248,6 +331,9 @@ restore_nonmem_original_order <- function(.data, temporary_columns) {
 
 #' @noRd
 nonmem_role_is_resolved_or_disabled <- function(resolved_roles, role) {
+  # "OK" means the data already has a column for this role.
+  #
+  # "disabled" means the user intentionally opted out of this role.
   resolved_nonmem_role_status(resolved_roles, role) %in% c("OK", "disabled")
 }
 
@@ -257,6 +343,8 @@ require_nonmem_roles_for_derivation <- function(
   required_roles,
   derived_role_label
 ) {
+  # Derivation helpers need actual input columns. Missing required roles are
+  # reported together so the user can fix all missing inputs at once.
   missing_required_roles <- required_roles[
     vapply(
       required_roles,
@@ -281,6 +369,8 @@ require_nonmem_roles_for_derivation <- function(
 
 #' @noRd
 nonmem_time_derivation_role_columns <- function(resolved_roles) {
+  # BLQ is optional. It is only used by OCC to decide which observation rows
+  # count as usable PK observations.
   blq_column <- NULL
 
   if (resolved_nonmem_role_status(resolved_roles, "blq") == "OK") {
@@ -301,12 +391,22 @@ derived_nonmem_role_column_name <- function(
   role,
   default_column
 ) {
+  # If no overrides were supplied, derive into the standard NONMEM column name.
   if (is.null(role_overrides)) {
     return(default_column)
   }
 
   cleaned_override <- clean_column_names(role_overrides[[role]])
 
+  # An override to a missing column is treated as the desired output column name.
+  #
+  # Example:
+  #
+  # .role_overrides = list(tad = "MYTAD")
+  #
+  # means:
+  #
+  # Derive the missing TAD values into "MYTAD".
   if (length(cleaned_override)) {
     return(cleaned_override[[1]])
   }
@@ -319,6 +419,8 @@ unique_temporary_column_names <- function(
   existing_column_names,
   requested_column_names
 ) {
+  # make.unique() appends suffixes only when a requested temporary column would
+  # collide with an existing data column or a previous temporary column.
   safe_column_names <- make.unique(c(
     existing_column_names,
     requested_column_names
