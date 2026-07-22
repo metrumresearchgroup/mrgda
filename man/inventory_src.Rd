@@ -9,7 +9,8 @@ inventory_src(.src_list, .subject_col = "USUBJID")
 \arguments{
 \item{.src_list}{A named list of source data frames, typically returned by
 \code{\link[=read_src_dir]{read_src_dir()}}. Elements whose names start with \code{mrgda_} are treated as
-package metadata and excluded from the domain inventory.}
+package metadata and excluded from the domain inventory. The executable
+\code{corrections} audit returned by \code{\link[=apply_src_corrections]{apply_src_corrections()}} is also excluded.}
 
 \item{.subject_col}{A single character string naming the subject identifier.
 Defaults to \code{"USUBJID"}.}

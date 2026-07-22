@@ -3,6 +3,7 @@
 S3method(print,mrgda_src_inventory)
 export("%>%")
 export(annotate_da)
+export(apply_src_corrections)
 export(assign_id)
 export(derived_to_here)
 export(execute_data_diffs)

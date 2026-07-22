@@ -32,6 +32,15 @@ test_that("inventory_src summarizes domains and variables", {
   expect_equal(age$N_DISTINCT, 2)
 })
 
+test_that("inventory_src uses canonical domain order", {
+  inventory <- inventory_src(list(
+    pc = tibble::tibble(USUBJID = "01", PCSEQ = 1),
+    dm = tibble::tibble(USUBJID = "01")
+  ))
+
+  expect_equal(inventory$domains$DOMAIN, c("dm", "pc"))
+})
+
 test_that("inventory_src uses labels and excludes mrgda metadata", {
   dm <- tibble::tibble(USUBJID = "01", AGE = 30)
   labels <- tibble::tibble(
@@ -53,6 +62,22 @@ test_that("inventory_src uses labels and excludes mrgda metadata", {
     inventory$variables$LABEL[inventory$variables$VARIABLE == "AGE"],
     "Age from metadata"
   )
+})
+
+test_that("inventory_src excludes the source-correction audit", {
+  src <- list(
+    dm = tibble::tibble(USUBJID = "01", AGE = 30),
+    corrections = tibble::tibble(
+      domain = "dm",
+      USUBJID = "01",
+      variable = "AGE"
+    )
+  )
+
+  inventory <- inventory_src(src)
+
+  expect_equal(inventory$domains$DOMAIN, "dm")
+  expect_false("corrections" %in% inventory$variables$DOMAIN)
 })
 
 test_that("inventory_src reports inferred-key problems", {

@@ -11,7 +11,8 @@
 #'
 #' @param .src_list A named list of source data frames, typically returned by
 #'   [read_src_dir()]. Elements whose names start with `mrgda_` are treated as
-#'   package metadata and excluded from the domain inventory.
+#'   package metadata and excluded from the domain inventory. The executable
+#'   `corrections` audit returned by [apply_src_corrections()] is also excluded.
 #' @param .subject_col A single character string naming the subject identifier.
 #'   Defaults to `"USUBJID"`.
 #'
@@ -52,10 +53,16 @@ inventory_src <- function(.src_list, .subject_col = "USUBJID") {
     cli::cli_abort("{.arg .src_list} must have unique, non-empty names")
   }
 
-  domain_names <- src_names[
-    !startsWith(src_names, "mrgda_") &
-      vapply(.src_list, is.data.frame, logical(1))
-  ]
+  domain_names <-
+    tibble::tibble(
+      domain = src_names[
+        !startsWith(src_names, "mrgda_") &
+          src_names != "corrections" &
+          purrr::map_lgl(.src_list, is.data.frame)
+      ]
+    ) %>%
+    dplyr::arrange(.data$domain) %>%
+    dplyr::pull(.data$domain)
   if (length(domain_names) == 0) {
     cli::cli_abort("{.arg .src_list} does not contain any source data frames")
   }
@@ -75,11 +82,7 @@ inventory_src <- function(.src_list, .subject_col = "USUBJID") {
     paste(x, collapse = ", ")
   }
 
-  domain_rows <- vector("list", length(domain_names))
-  variable_rows <- vector("list", length(domain_names))
-
-  for (i in seq_along(domain_names)) {
-    domain <- domain_names[[i]]
+  inventory_rows <- purrr::map(domain_names, function(domain) {
     data <- .src_list[[domain]]
     data_names <- names(data)
 
@@ -105,10 +108,9 @@ inventory_src <- function(.src_list, .subject_col = "USUBJID") {
 
     datetime_variables <- data_names[
       grepl("(DTC|DT|TM)$", data_names, ignore.case = TRUE) |
-        vapply(
+        purrr::map_lgl(
           data,
-          function(x) inherits(x, c("Date", "POSIXct", "POSIXlt")),
-          logical(1)
+          ~ inherits(.x, c("Date", "POSIXct", "POSIXlt"))
         )
     ]
     result_variables <- data_names[
@@ -142,7 +144,7 @@ inventory_src <- function(.src_list, .subject_col = "USUBJID") {
         missing_sequences == 0
     }
 
-    domain_rows[[i]] <- tibble::tibble(
+    domain_row <- tibble::tibble(
       DOMAIN = domain,
       N_ROWS = nrow(data),
       N_COLUMNS = ncol(data),
@@ -158,7 +160,7 @@ inventory_src <- function(.src_list, .subject_col = "USUBJID") {
       KEY_UNIQUE = key_unique
     )
 
-    variable_rows[[i]] <- dplyr::bind_rows(lapply(data_names, function(variable) {
+    variable_row <- purrr::map_dfr(data_names, function(variable) {
       values <- data[[variable]]
       label <- attr(values, "label")
 
@@ -200,13 +202,15 @@ inventory_src <- function(.src_list, .subject_col = "USUBJID") {
         N_MISSING = sum(is.na(values)),
         N_DISTINCT = dplyr::n_distinct(values, na.rm = TRUE)
       )
-    }))
-  }
+    })
+
+    list(domains = domain_row, variables = variable_row)
+  })
 
   structure(
     list(
-      domains = dplyr::bind_rows(domain_rows),
-      variables = dplyr::bind_rows(variable_rows)
+      domains = purrr::map_dfr(inventory_rows, "domains"),
+      variables = purrr::map_dfr(inventory_rows, "variables")
     ),
     class = "mrgda_src_inventory"
   )
