@@ -15,6 +15,7 @@ reference:
     desc: Read source data files
     contents:
     - read_src_dir
+    - inventory_src
     - query_src_list
   - title: Data Creation
     desc: Write NONMEM data set

@@ -2,6 +2,7 @@
 
 ## New features and changes
 
+- `inventory_src()` creates compact domain- and variable-level inventories of source lists, including inferred source keys and key-integrity counts.
 - `read_src_dir()` now requires `.file_types` to be set explicitly; automatic file type detection was removed. (#249)
 - `query_src_list` now searches across values in addition to column and label names. (#251)
 - `write_derived()` now writes a slimmer metadata folder and no longer keeps the older metadata outputs that were previously generated. (#254)
@@ -364,4 +365,3 @@
 - A supporting feature is `nm_summary()`. Its purpose is to provide the user
   with quick visual summaries of their data. It outputs these summaries in
   either tables or figures, depending on the users preference.
-
