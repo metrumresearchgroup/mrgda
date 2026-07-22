@@ -2,30 +2,26 @@
 % Please edit documentation in R/assert-derived-sl.R
 \name{assert_derived_sl}
 \alias{assert_derived_sl}
-\title{Assert the structure of a subject-level derived-data list}
+\title{Assert the structure of subject-level derived data}
 \usage{
-assert_derived_sl(.sl, .subject_col = "USUBJID")
+assert_derived_sl(.sl)
 }
 \arguments{
 \item{.sl}{The complete subject-level list, typically \code{derived$sl}.}
-
-\item{.subject_col}{A single character string naming the subject identifier.
-Defaults to \code{"USUBJID"}.}
 }
 \value{
-\code{.sl}, invisibly. The function aborts with all detected structural
-issues when validation fails.
+\code{.sl}, invisibly.
 }
 \description{
 Validate the complete \code{derived$sl} list before its elements are joined.
-Each element must be a nonempty, named, ungrouped data frame containing
-exactly \code{USUBJID} and one model variable, with no missing or duplicated
-subject identifiers. The element name must match its model variable without
-regard to case.
-
-This is a structural assertion. It does not check model-variable missingness,
-subject coverage across elements, allowed values, derivation correctness, or
-scientific plausibility.
+Each element must contain exactly \code{USUBJID} and one model variable, with one
+populated row per subject. The element name must match the model variable
+without regard to case.
+}
+\details{
+This function checks structure only. It does not check model-variable
+missingness, subject coverage across elements, allowed values, derivation
+correctness, or scientific plausibility.
 }
 \examples{
 sl <- list(

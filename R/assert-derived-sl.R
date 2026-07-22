@@ -1,30 +1,17 @@
-# Keep duplicate-value messages short and consistent across the assertions.
-format_derived_issue_values <- function(.values, .limit = 5L) {
-  values <- unique(as.character(.values))
-  shown <- utils::head(values, .limit)
-  suffix <- if (length(values) > .limit) ", ..." else ""
-  paste0(paste(shown, collapse = ", "), suffix)
-}
-
-#' Assert the structure of a subject-level derived-data list
+#' Assert the structure of subject-level derived data
 #'
-#' @description
 #' Validate the complete `derived$sl` list before its elements are joined.
-#' Each element must be a nonempty, named, ungrouped data frame containing
-#' exactly `USUBJID` and one model variable, with no missing or duplicated
-#' subject identifiers. The element name must match its model variable without
-#' regard to case.
+#' Each element must contain exactly `USUBJID` and one model variable, with one
+#' populated row per subject. The element name must match the model variable
+#' without regard to case.
 #'
-#' This is a structural assertion. It does not check model-variable missingness,
-#' subject coverage across elements, allowed values, derivation correctness, or
-#' scientific plausibility.
+#' This function checks structure only. It does not check model-variable
+#' missingness, subject coverage across elements, allowed values, derivation
+#' correctness, or scientific plausibility.
 #'
 #' @param .sl The complete subject-level list, typically `derived$sl`.
-#' @param .subject_col A single character string naming the subject identifier.
-#'   Defaults to `"USUBJID"`.
 #'
-#' @return `.sl`, invisibly. The function aborts with all detected structural
-#'   issues when validation fails.
+#' @return `.sl`, invisibly.
 #'
 #' @examples
 #' sl <- list(
@@ -35,182 +22,79 @@ format_derived_issue_values <- function(.values, .limit = 5L) {
 #' assert_derived_sl(sl)
 #'
 #' @export
-assert_derived_sl <- function(.sl, .subject_col = "USUBJID") {
-  # The top-level object must be a list, not a single data frame.
-  if (!is.list(.sl) || is.data.frame(.sl)) {
-    cli::cli_abort("{.arg .sl} must be a named list of data frames")
+assert_derived_sl <- function(.sl) {
+  # derived$sl must be a nonempty list.
+  if (!is.list(.sl) || is.data.frame(.sl) || length(.sl) == 0) {
+    cli::cli_abort("{.arg .sl} must be a nonempty named list of data frames")
   }
 
-  # The subject column must be identified by one usable column name.
+  # Each list element needs a unique name.
   if (
-    !is.character(.subject_col) ||
-      length(.subject_col) != 1 ||
-      is.na(.subject_col) ||
-      !nzchar(.subject_col)
+    is.null(names(.sl)) ||
+      anyNA(names(.sl)) ||
+      any(!nzchar(names(.sl))) ||
+      anyDuplicated(tolower(names(.sl)))
   ) {
-    cli::cli_abort("{.arg .subject_col} must be a single non-empty string")
+    cli::cli_abort("{.arg .sl} must have unique, nonempty names")
   }
 
-  # An empty list cannot produce a subject-level dataset.
-  if (length(.sl) == 0) {
-    cli::cli_abort("{.arg .sl} must contain at least one subject-level element")
-  }
+  purrr::iwalk(.sl, function(data, name) {
+    label <- paste0("derived$sl$", name)
 
-  # Stable, unique names identify the model variable in each element.
-  sl_names <- names(.sl)
-  if (
-    is.null(sl_names) ||
-      anyNA(sl_names) ||
-      any(!nzchar(sl_names)) ||
-      anyDuplicated(tolower(sl_names))
-  ) {
-    cli::cli_abort(
-      "{.arg .sl} must have unique, non-empty, case-insensitive names"
-    )
-  }
+    # Each element must be a data frame.
+    if (!is.data.frame(data)) {
+      cli::cli_abort("{label} must be a data frame")
+    }
 
-  # Inspect every element and report all structural problems in one error.
-  issues <-
-    purrr::imap(.sl, function(piece, piece_name) {
-      label <- paste0("derived$sl$", piece_name)
-      piece_issues <- character()
+    # Grouping must not carry into later joins.
+    if (dplyr::is_grouped_df(data)) {
+      cli::cli_abort("{label} must be ungrouped")
+    }
 
-      # Every element must be a data frame before column checks are safe.
-      if (!is.data.frame(piece)) {
-        return(paste0(label, " must be a data frame"))
-      }
+    # Each element must contain data.
+    if (nrow(data) == 0) {
+      cli::cli_abort("{label} must contain at least one row")
+    }
 
-      # Grouping can silently change later joins and summaries.
-      if (dplyr::is_grouped_df(piece)) {
-        piece_issues <- c(
-          piece_issues,
-          paste0(label, " must be ungrouped")
-        )
-      }
+    # Column names must be unambiguous.
+    if (anyDuplicated(names(data))) {
+      cli::cli_abort("{label} must have unique column names")
+    }
 
-      # Each model variable must contribute at least one subject row.
-      if (nrow(piece) == 0) {
-        piece_issues <- c(
-          piece_issues,
-          paste0(label, " must contain at least one row")
-        )
-      }
+    # Model-data columns must be atomic.
+    if (any(purrr::map_lgl(data, is.list))) {
+      cli::cli_abort("{label} must not contain list columns")
+    }
 
-      # Duplicate column names make name-based selection ambiguous.
-      duplicate_columns <- anyDuplicated(names(piece)) > 0
-      if (duplicate_columns) {
-        piece_issues <- c(
-          piece_issues,
-          paste0(label, " must have unique column names")
-        )
-      }
+    # USUBJID is the subject-level join key.
+    if (!("USUBJID" %in% names(data))) {
+      cli::cli_abort("{label} must contain USUBJID")
+    }
 
-      # List columns cannot be ordinary model-data fields.
-      list_columns <- names(piece)[purrr::map_lgl(piece, is.list)]
-      if (length(list_columns) > 0) {
-        piece_issues <- c(
-          piece_issues,
-          paste0(
-            label,
-            " must not contain list column(s): ",
-            paste(list_columns, collapse = ", ")
-          )
-        )
-      }
+    # Each element stores one model variable.
+    model_variable <- setdiff(names(data), "USUBJID")
+    if (length(model_variable) != 1) {
+      cli::cli_abort("{label} must contain USUBJID and one model variable")
+    }
 
-      # Every subject-level element needs the subject join key.
-      if (!(.subject_col %in% names(piece))) {
-        piece_issues <- c(
-          piece_issues,
-          paste0(label, " must contain ", .subject_col)
-        )
-      }
+    # The list name must identify its model variable.
+    if (tolower(name) != tolower(model_variable)) {
+      cli::cli_abort("{label} must be named for model variable {model_variable}")
+    }
 
-      # Keep each element narrow: one subject key plus one model variable.
-      model_variables <- setdiff(names(piece), .subject_col)
-      if (length(model_variables) != 1) {
-        piece_issues <- c(
-          piece_issues,
-          paste0(
-            label,
-            " must contain exactly ",
-            .subject_col,
-            " and one model variable"
-          )
-        )
-      } else if (tolower(piece_name) != tolower(model_variables)) {
-        piece_issues <- c(
-          piece_issues,
-          paste0(
-            label,
-            " must be named for model variable ",
-            model_variables
-          )
-        )
-      }
+    # Every row needs a subject identifier.
+    missing_subject <-
+      is.na(data$USUBJID) |
+      !nzchar(trimws(as.character(data$USUBJID)))
+    if (any(missing_subject)) {
+      cli::cli_abort("{label} has missing or blank USUBJID values")
+    }
 
-      # Check subject values only when the subject column is unambiguous and
-      # atomic; earlier checks explain why unusable columns fail.
-      if (
-        !duplicate_columns &&
-          .subject_col %in% names(piece) &&
-          !is.list(piece[[.subject_col]])
-      ) {
-        subject_values <- piece[[.subject_col]]
-        missing_subject <-
-          is.na(subject_values) |
-          !nzchar(trimws(as.character(subject_values)))
+    # Each subject can appear only once in an element.
+    if (anyDuplicated(data$USUBJID)) {
+      cli::cli_abort("{label} has duplicated USUBJID values")
+    }
+  })
 
-        # Missing or blank subjects cannot participate in the final join.
-        if (any(missing_subject)) {
-          piece_issues <- c(
-            piece_issues,
-            paste0(
-              label,
-              " has ",
-              sum(missing_subject),
-              " missing or blank ",
-              .subject_col,
-              " value(s)"
-            )
-          )
-        }
-
-        # A subject may appear only once within a subject-level element.
-        duplicate_subjects <-
-          piece %>%
-          dplyr::ungroup() %>%
-          dplyr::filter(!missing_subject) %>%
-          dplyr::count(.data[[.subject_col]], name = ".n") %>%
-          dplyr::filter(.data$.n > 1) %>%
-          dplyr::pull(.data[[.subject_col]])
-
-        if (length(duplicate_subjects) > 0) {
-          piece_issues <- c(
-            piece_issues,
-            paste0(
-              label,
-              " has duplicated ",
-              .subject_col,
-              " value(s): ",
-              format_derived_issue_values(duplicate_subjects)
-            )
-          )
-        }
-      }
-
-      piece_issues
-    }) %>%
-    purrr::flatten_chr()
-
-  # Return one readable error containing every issue found above.
-  if (length(issues) > 0) {
-    cli::cli_abort(c(
-      "{.arg .sl} failed subject-level structure checks:",
-      stats::setNames(issues, rep("x", length(issues)))
-    ))
-  }
-
-  # Preserve the input so this assertion can be used in a pipeline.
   invisible(.sl)
 }

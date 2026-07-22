@@ -2,34 +2,25 @@
 % Please edit documentation in R/assert-derived-tv.R
 \name{assert_derived_tv}
 \alias{assert_derived_tv}
-\title{Assert the structure of a time-varying derived-data list}
+\title{Assert the structure of time-varying derived data}
 \usage{
-assert_derived_tv(.tv, .subject_col = "USUBJID", .datetime_col = "DATETIME")
+assert_derived_tv(.tv)
 }
 \arguments{
 \item{.tv}{The complete time-varying list, typically \code{derived$tv}.}
-
-\item{.subject_col}{A single character string naming the subject identifier.
-Defaults to \code{"USUBJID"}.}
-
-\item{.datetime_col}{A single character string naming the event datetime.
-Defaults to \code{"DATETIME"}.}
 }
 \value{
-\code{.tv}, invisibly. The function aborts with all detected structural
-issues when validation fails.
+\code{.tv}, invisibly.
 }
 \description{
 Validate the complete \code{derived$tv} list before its elements are row-bound.
-Each element must be a nonempty, named, ungrouped data frame with populated
-\code{USUBJID} and \code{DATETIME} columns. Those two columns must uniquely identify a
-row within each element, and columns shared across elements must have types
-compatible with \code{\link[dplyr:bind_rows]{dplyr::bind_rows()}}.
-
-Key uniqueness is checked within each element, not across elements. Events
-from different elements may legitimately occur for the same subject at the
-same datetime. This structural assertion does not validate event semantics,
-allowed values, derivation correctness, or scientific plausibility.
+Each element must contain populated \code{USUBJID} and \code{DATETIME} columns, and
+those columns must identify a unique row within that element.
+}
+\details{
+The same subject and datetime may occur in different elements. This function
+checks structure only; it does not check event semantics, allowed values,
+derivation correctness, or scientific plausibility.
 }
 \examples{
 tv <- list(
