@@ -19,6 +19,8 @@ reference:
   - title: Data Creation
     desc: Write NONMEM data set
     contents:
+    - assert_derived_sl
+    - assert_derived_tv
     - write_derived
     - execute_data_diffs
   - title: Data Management

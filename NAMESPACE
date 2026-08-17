@@ -2,6 +2,8 @@
 
 export("%>%")
 export(annotate_da)
+export(assert_derived_sl)
+export(assert_derived_tv)
 export(assign_id)
 export(derived_to_here)
 export(execute_data_diffs)
